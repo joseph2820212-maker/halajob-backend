@@ -1,0 +1,26 @@
+import * as yup from 'yup';
+
+export const eventValidationSchema = yup.object().shape({
+  name: yup.string().required('Name is required'),
+  price: yup.number().optional(),
+  event_type: yup.string().optional(),
+  description: yup.string().optional(),
+  latitude: yup.number().required('Latitude is required'),
+  longitude: yup.number().required('Longitude is required'),
+  booking_method: yup.string().url('Invalid booking method URL').optional(),
+  organization: yup.string().optional(),
+  phone: yup.number().typeError('Phone must be a number').optional(),
+  whatsapp: yup.number().optional(),
+  facebook: yup.string().url('Invalid Facebook URL').optional(),
+  instagram: yup.string().url('Invalid Instagram URL').optional(),
+  start_time: yup.string().optional(),
+  end_time: yup.string().optional(),
+  start_date: yup.date().optional(),
+  end_date: yup.date().optional(),
+  start_event_date: yup.date().optional(),
+  end_event_date: yup.date().optional(),
+  event_time: yup.date().optional(),
+  relation: yup.string().optional(),
+  node: yup.string().optional(),
+  status: yup.boolean().optional(),
+});
