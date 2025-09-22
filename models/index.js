@@ -9,6 +9,7 @@ import JopNameModel from './JopNameModel.js';
 import JopServiceModel from './JopServiceModel.js';
 import JopSalaryModel from './JopSalaryModel.js';
 import JopTypeModel from './JopTypeModel.js';
+import jobsModel from './JobModel.js';
 
 export {
   UserModel,
@@ -22,4 +23,5 @@ export {
   JopServiceModel,
   JopSalaryModel,
   JopTypeModel,
+  jobsModel
 };

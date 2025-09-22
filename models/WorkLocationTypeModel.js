@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 
 const WorkLocationTypeSchema = new mongoose.Schema({
-    name_ar: { type: String, required: true, unique: true },
-    name_en: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
+    title_ar: { type: String, required: true, unique: true },
+    title_en: { type: String, required: true },
     keyword: { type: [String] }
 }, { collection: "work_location" })
 

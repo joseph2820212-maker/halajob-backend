@@ -2,8 +2,9 @@ import mongoose from "mongoose";
 
 const JopNameSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
-  title_ar: { type: String, required: true },
-  title_en: { type: String, required: true },
+  title_ar: { type: String },
+  is_auto:{type:Boolean,default:true},
+  title_en: { type: String },
   keyword: { type: [String] }
 }, { collection: "jop_name" });
 

@@ -1,0 +1,21 @@
+{
+  "name": "search-api-local",
+  "type": "module",
+  "scripts": {
+    "setup": "node ./search/setup.js",
+    "suggest-seed": "node ./search/suggest-build.js",
+    "indexer": "node ./search/indexer.js",
+    "start": "node ./index.js",
+    "dev": "node ./index.js"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.1.5",
+    "meilisearch": "^0.53.0",
+    "mongoose": "^8.6.0",
+    "node-fetch": "^3.3.2",
+    "redis": "^4.6.13"
+  }
+}
