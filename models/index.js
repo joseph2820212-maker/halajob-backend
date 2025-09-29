@@ -13,6 +13,7 @@ import jobsModel from './JobModel.js';
 import EmployeeModel from './EmployeeModel.js';
 import CountryModel from './CountryModel.js';
 import CurrencyModel from './CurrencyModel.js';
+import SheetModel from './SheetModel.js';
 
 export {
   UserModel,
@@ -30,4 +31,5 @@ export {
   EmployeeModel,
   CountryModel,
   CurrencyModel,
+  SheetModel
 };

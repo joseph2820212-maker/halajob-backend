@@ -48,7 +48,6 @@ const EN_STOP = new Set([
 function tokenize(text) {
   const norm = normalizeMixed(text);
   const toks = norm.split(/\s+/).filter(Boolean);
-  // استبعاد الوقفيات + كلمات قصيرة جداً
   const filtered = toks.filter(t => t.length >= 2 && !AR_STOP.has(t) && !EN_STOP.has(t));
   return filtered;
 }
@@ -97,17 +96,30 @@ const DICT_TTL_MS = 10 * 60 * 1000;
 async function getDictionary() {
   const now = Date.now();
   if (now - DICT_CACHE.at < DICT_TTL_MS && DICT_CACHE.terms.length) return DICT_CACHE.terms;
-  const docs = await JopNameModel.find({}, { name: 1, title_ar: 1, title_en: 1, keyword: 1 }).lean();
+
+  // نقرأ الحقول المطلوبة + دعم كلٍ من keywords/keyword
+  const docs = await JopNameModel.find(
+    {},
+    { title_ar: 1, title_en: 1, name: 1, keywords: 1, keyword: 1,
+      sector_ar: 1, sector_en: 1, subsector_ar: 1, subsector_en: 1 }
+  ).lean();
+
   const set = new Set();
   for (const d of docs) {
-    [d.name, d.title_ar, d.title_en].filter(Boolean).forEach(t => {
-      const n = normalizeMixed(String(t));
-      if (n) {
-        set.add(n);
-        n.split(/\s+/).forEach(w => w && set.add(w));
-      }
-    });
-    (Array.isArray(d.keyword) ? d.keyword : []).forEach(k => {
+    [d.name, d.title_ar, d.title_en, d.sector_ar, d.sector_en, d.subsector_ar, d.subsector_en]
+      .filter(Boolean)
+      .forEach(t => {
+        const n = normalizeMixed(String(t));
+        if (n) {
+          set.add(n);
+          n.split(/\s+/).forEach(w => w && set.add(w));
+        }
+      });
+    const kwAll = [
+      ...(Array.isArray(d.keywords) ? d.keywords : []),
+      ...(Array.isArray(d.keyword) ? d.keyword : []),
+    ];
+    kwAll.forEach(k => {
       const n = normalizeMixed(String(k));
       if (n) set.add(n);
     });
@@ -117,19 +129,16 @@ async function getDictionary() {
 }
 
 function correctTokens(tokens, dict) {
-  // نصحح فقط الكلمات التي >3 حروف ولم نجد أي نتيجة لاحقاً
   const out = [];
   for (const t of tokens) {
     if (t.length <= 3) { out.push(t); continue; }
     let best = t, bestDist = Infinity;
     for (const cand of dict) {
-      // نتجاهل المرشحين الطويلين جداً لتقليل الكلفة
       if (Math.abs(cand.length - t.length) > Math.max(2, Math.floor(t.length * 0.5))) continue;
       const d = levenshtein(t, cand);
       if (d < bestDist) { bestDist = d; best = cand; }
       if (bestDist === 0) break;
     }
-    // عتبة تصحيح معتدلة
     out.push(bestDist <= Math.max(2, Math.floor(t.length * 0.25)) ? best : t);
   }
   return uniquePreserveOrder(out);
@@ -137,51 +146,56 @@ function correctTokens(tokens, dict) {
 
 /* اختيار العنوان بحسب اللغة */
 function pickTitle(doc, lan) {
-  return lan === "ar" ? (doc.title_ar || doc.title_en || doc.name) : (doc.title_en || doc.title_ar || doc.name);
+  return lan === "ar" ? (doc.title_ar || doc.title_en || doc.name)
+                      : (doc.title_en || doc.title_ar || doc.name);
 }
 
-/* =============== البحث الدلالي المبسّط عبر Aggregation ===============
-
-  الفكرة:
-  - نستخرج كلمات مفتاحية من نص طويل (مع عبارات 2-3 كلمات).
-  - نبني $match باستخدام AND لكل كلمة (كل كلمة لازم تظهر في أحد الحقول).
-  - نبني score بالـ $addFields: لكل كلمة نقطة إذا ظهرت (1)،
-    ولكل "عبارة" نعطي وزن 2.
-  - نرتّب حسب score تنازليًا.
-  - نُعيد فقط العناوين (deduped).
-*/
+/* =============== البحث الدلالي المبسّط عبر Aggregation =============== */
 
 function buildAndMatch(tokens) {
   return {
     $and: tokens.map((tok) => {
-      const rxObj = new RegExp(escapeRegex(tok), "i"); // RegExp فيه i
+      const rxObj = new RegExp(escapeRegex(tok), "i");
       return {
         $or: [
           { name: rxObj },
           { title_ar: rxObj },
           { title_en: rxObj },
-          // 👇 أهم تعديل: شِل $options لأن rxObj أصلاً يحمل i
-          { keyword: { $elemMatch: { $regex: rxObj } } },
+          // إضافة الحقول المطلوبة للبحث
+          { sector_ar: rxObj },
+          { sector_en: rxObj },
+          { subsector_ar: rxObj },
+          { subsector_en: rxObj },
+          // دعم كِلا الحقلين keywords/keyword
+          { keywords: { $elemMatch: { $regex: rxObj } } },
+          { keyword:  { $elemMatch: { $regex: rxObj } } },
         ],
       };
     }),
   };
 }
-// نبني تعبير score داخل $addFields
+
 function buildScoreExpr(tokens, phrases) {
+  // سنستخدم $ifNull لمصفوفة الكلمات المفتاحية لتجميع كلا الحقلين
+  const KW_ARRAY = { $ifNull: ["$keywords", { $ifNull: ["$keyword", []] }] };
+
   const tokenPoints = tokens.map(tok => {
-    const rxStr = escapeRegex(tok); // نص فقط
+    const rxStr = escapeRegex(tok);
     return {
       $cond: [
         {
           $or: [
-            { $regexMatch: { input: "$name",     regex: rxStr, options: "i" } },
-            { $regexMatch: { input: "$title_ar", regex: rxStr, options: "i" } },
-            { $regexMatch: { input: "$title_en", regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$name",          regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$title_ar",      regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$title_en",      regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$sector_ar",     regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$sector_en",     regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$subsector_ar",  regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$subsector_en",  regex: rxStr, options: "i" } },
             {
               $anyElementTrue: {
                 $map: {
-                  input: { $ifNull: ["$keyword", []] },
+                  input: KW_ARRAY,
                   as: "k",
                   in: { $regexMatch: { input: "$$k", regex: rxStr, options: "i" } }
                 }
@@ -200,13 +214,17 @@ function buildScoreExpr(tokens, phrases) {
       $cond: [
         {
           $or: [
-            { $regexMatch: { input: "$name",     regex: rxStr, options: "i" } },
-            { $regexMatch: { input: "$title_ar", regex: rxStr, options: "i" } },
-            { $regexMatch: { input: "$title_en", regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$name",          regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$title_ar",      regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$title_en",      regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$sector_ar",     regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$sector_en",     regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$subsector_ar",  regex: rxStr, options: "i" } },
+            { $regexMatch: { input: "$subsector_en",  regex: rxStr, options: "i" } },
             {
               $anyElementTrue: {
                 $map: {
-                  input: { $ifNull: ["$keyword", []] },
+                  input: KW_ARRAY,
                   as: "k",
                   in: { $regexMatch: { input: "$$k", regex: rxStr, options: "i" } }
                 }
@@ -221,44 +239,44 @@ function buildScoreExpr(tokens, phrases) {
 
   return { $add: [...tokenPoints, ...phrasePoints] };
 }
+
 /* ======================== Controller ======================== */
 const search = async (req, res) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const rawQuery = String(req.query.search || "").trim();
-    if (!rawQuery) 
-     return ReturnAppData.getError({res,message:lan==="ar"?"حقل البحث مطلوب":"query 'search reuired"});
+    if (!rawQuery)
+      return ReturnAppData.getError({ res, message: lan === "ar" ? "حقل البحث مطلوب" : "query 'search' required" });
 
-    // 1) تحليل النص الطويل -> كلمات مفتاحية + عبارات
+    // 1) تحليل النص -> كلمات + عبارات
     let tokens = tokenize(rawQuery);
-   if (!tokens.length) return ReturnAppData.getData({res,data:[]}); 
+    if (!tokens.length) return ReturnAppData.getData({ res, data: [] });
 
-    // حد أقصى حتى لا تصبح الاستعلامات ثقيلة
     const MAX_TOKENS = 8;
     tokens = uniquePreserveOrder(tokens).slice(0, MAX_TOKENS);
-
     const phrases = extractPhrases(tokens, { maxPhrases: 5 });
 
-    // 2) الاستعلام الأول: AND على الكلمات (ترتيب حر) + ترتيب بحسب score
+    // 2) الاستعلام الأول
     const pipeline = [
       { $match: buildAndMatch(tokens) },
-      {
-        $addFields: {
-          __score: buildScoreExpr(tokens, phrases)
-        }
-      },
+      { $addFields: { __score: buildScoreExpr(tokens, phrases) } },
       { $sort: { __score: -1 } },
       { $limit: 50 },
-      { $project: { title_ar: 1, title_en: 1, name: 1, __score: 1 } }
+      {
+        $project: {
+          title_ar: 1, title_en: 1, name: 1, __score: 1,
+          // الحقول المطلوبة للإرجاع
+          sector_ar: 1, sector_en: 1, subsector_ar: 1, subsector_en: 1,
+        }
+      }
     ];
 
     let docs = await JopNameModel.aggregate(pipeline).exec();
 
-    // 3) إن لم نجد نتائج، جرّب التصحيح الإملائي لكل كلمة ثم أعد البحث
+    // 3) تصحيح إملائي إن لزم
     if (docs.length === 0) {
       const dict = await getDictionary();
       const corrected = correctTokens(tokens, dict);
-      // لو حصل تغيير حقيقي نعيد المحاولة
       const changed = corrected.join(" ") !== tokens.join(" ");
       if (changed) {
         const pipeline2 = [
@@ -266,30 +284,39 @@ const search = async (req, res) => {
           { $addFields: { __score: buildScoreExpr(corrected, extractPhrases(corrected)) } },
           { $sort: { __score: -1 } },
           { $limit: 50 },
-          { $project: { title_ar: 1, title_en: 1, name: 1, __score: 1 } }
+          {
+            $project: {
+              title_ar: 1, title_en: 1, name: 1, __score: 1,
+              sector_ar: 1, sector_en: 1, subsector_ar: 1, subsector_en: 1,
+            }
+          }
         ];
         docs = await JopNameModel.aggregate(pipeline2).exec();
       }
     }
 
-    // 4) إعادة العناوين فقط (بدون تكرار)
-   const results = [];
-const seen = new Set();
-
-for (const d of docs) {
-  const title = pickTitle(d, lan);
-  if (title && !seen.has(title)) {
-    seen.add(title);
-    results.push({
-      id: String(d._id),
-      title
-    });
-  }
-}
-    return ReturnAppData.getData({res,data:results})
+    // 4) نتائج
+    const results = [];
+    const seen = new Set();
+    for (const d of docs) {
+      const title = pickTitle(d, lan);
+      if (title && !seen.has(title)) {
+        seen.add(title);
+        results.push({
+          id: String(d._id),
+          title,
+          sector_ar: d.sector_ar || null,
+          sector_en: d.sector_en || null,
+          subsector_ar: d.subsector_ar || null,
+          subsector_en: d.subsector_en || null,
+        });
+      }
+    }
+    return ReturnAppData.getData({ res, data: results });
   } catch (err) {
     console.error(err);
-     return ReturnAppData.getError({res,message:lan==="ar"?"حدث خطأ غير متوقع":"server error"})
+    const lan = (req.get("lan") || "en").toLowerCase();
+    return ReturnAppData.getError({ res, message: lan === "ar" ? "حدث خطأ غير متوقع" : "server error" });
   }
 };
 

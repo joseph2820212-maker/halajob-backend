@@ -82,9 +82,6 @@ export const csv = async (req, res) => {
       upserted: result.upsertedCount ?? (result.upserted?.length || 0),
     });
   } catch (err) {
-    console.log('====================================');
-    console.log(err);
-    console.log('====================================');
     return res.status(500).json({ error: err.message });
   }
 };

@@ -1,27 +1,27 @@
 import mongoose from "mongoose";
 
 const JopNameSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  title_ar: { type: String },
-  is_auto:{type:Boolean,default:true},
-  title_en: { type: String },
-  keyword: { type: [String] }
-}, { collection: "jop_name" });
+  sheet: { type: mongoose.Schema.Types.ObjectId, ref: "Sheet", index: true, required: true },
 
+  sector_ar: { type: String, trim: true },
+  sector_en: { type: String, trim: true },
+  subsector_ar: { type: String, trim: true },
+  subsector_en: { type: String, trim: true },
+  title_ar: { type: String, trim: true },
+  title_en: { type: String, trim: true },
+
+  // طابق الكنترولر: "keywords"
+  keywords: { type: [String], default: [] },
+
+  is_auto: { type: Boolean, default: true },
+
+  // مفتاح إزالة التكرار
+  dedupeKey: { type: String, required: true, index: true, trim: true },
+}, { collection: "jop_name", timestamps: true });
+
+// الفهرس الوحيد المطلوب
+JopNameSchema.index({ sheet: 1, dedupeKey: 1 }, { unique: true });
+
+// لا داعي لفهرس فريد آخر
 const JopNameModel = mongoose.model("JopName", JopNameSchema);
-
-// ✅ حذف الفهرس بعد الاتصال
-mongoose.connection.once("open", async () => {
-  try {
-    await JopNameModel.collection.dropIndex("name_ar_1");
-    console.log("Dropped index: name_ar_1");
-  } catch (err) {
-    if (err.codeName === "IndexNotFound") {
-      console.log("Index name_ar_1 not found, nothing to drop.");
-    } else {
-      console.error("Error dropping index:", err);
-    }
-  }
-});
-
 export default JopNameModel;

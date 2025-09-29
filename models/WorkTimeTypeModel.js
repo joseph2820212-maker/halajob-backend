@@ -5,7 +5,7 @@ const WorkTimeTypeSchema = new mongoose.Schema({
     title_ar: { type: String, required: true, unique: true },
     title_en: { type: String, required: true },
     keyword: { type: [String] },
-    max_date:{type:Date}
+    max_day:{type:Number}
 }, { collection: "work_time" })
 
 const WorkTimeTypeModel = mongoose.model('WorkTimeTypeSchema', WorkTimeTypeSchema)
