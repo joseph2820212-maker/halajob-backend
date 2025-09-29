@@ -261,7 +261,7 @@ const search = async (req, res) => {
       { $match: buildAndMatch(tokens) },
       { $addFields: { __score: buildScoreExpr(tokens, phrases) } },
       { $sort: { __score: -1 } },
-      { $limit: 50 },
+      { $limit: MAX_TOKENS },
       {
         $project: {
           title_ar: 1, title_en: 1, name: 1, __score: 1,
@@ -305,10 +305,7 @@ const search = async (req, res) => {
         results.push({
           id: String(d._id),
           title,
-          sector_ar: d.sector_ar || null,
-          sector_en: d.sector_en || null,
-          subsector_ar: d.subsector_ar || null,
-          subsector_en: d.subsector_en || null,
+         
         });
       }
     }
