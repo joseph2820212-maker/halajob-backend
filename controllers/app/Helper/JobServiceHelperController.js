@@ -292,5 +292,16 @@ for (const d of docs) {
      return ReturnAppData.getError({res,message:lan==="ar"?"حدث خطأ غير متوقع":"server error"})
   }
 };
-
-export default { search };
+const get=async(req,res,next)=>{
+  const lan = (req.get("lan") || "en").toLowerCase();
+  const data=await JopServiceModel.find();
+  const results=data.map((item)=>{
+    return {
+      id:item._id,
+      title:lan==="ar"?item.title_ar:item.title_en,
+     
+    }
+  })
+  return ReturnAppData.getData({res,data:results})
+}
+export default { search ,get};

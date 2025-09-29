@@ -23,6 +23,9 @@ const jobsSchema = new Schema(
     jobs_name: [{ type: String, trim: true }],
 
     // النوع والوقت والراتب والموقع
+    
+    currency_id: { type: Schema.Types.ObjectId, ref: "countries", required: true },
+    country_id: { type: Schema.Types.ObjectId, ref: "countries", required: true },
     jop_type_id: { type: Schema.Types.ObjectId, ref: "jop_type", required: true },
     jop_type_info: { type: Schema.Types.Mixed, required: false, default: {} }, // كان [Object]، صُحح إلى كائن/مختلط
     jop_time_id: { type: Schema.Types.ObjectId, ref: "jop_time", required: true },

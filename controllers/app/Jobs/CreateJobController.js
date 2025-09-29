@@ -11,6 +11,8 @@ const jobSchema = yup.object({
   jop_salary_id: yup.string().required(),
   jop_salary_info: yup.object().required(),
   description: yup.string().required(),
+  country_id:yup.string().required(),
+  currency_id:yup.string().required(),
   is_send_emails: yup.boolean().required(),
   emails: yup.array(yup.string().email()).when("is_send_emails", {
     is: true,

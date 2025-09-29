@@ -9,6 +9,7 @@ import userRoutes from './routesUser/index.js';
 import error from './middlewares/error.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { scheduleCurrencyRefresh } from "./services/currency.service.js";
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -37,6 +38,7 @@ app.use('/user/v1', userRoutes);
 app.use(helmet());
 app.use(compression());
 app.use(mongoSanitize());
+// scheduleCurrencyRefresh();
 
 // أخطاء
 app.use(error.notFound);
