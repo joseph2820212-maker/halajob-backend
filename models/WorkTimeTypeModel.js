@@ -8,6 +8,6 @@ const WorkTimeTypeSchema = new mongoose.Schema({
     max_day:{type:Number}
 }, { collection: "work_time" })
 
-const WorkTimeTypeModel = mongoose.model('WorkTimeTypeSchema', WorkTimeTypeSchema)
+const WorkTimeTypeModel = mongoose.model('work_time', WorkTimeTypeSchema)
 
 export default WorkTimeTypeModel;

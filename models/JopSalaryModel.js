@@ -18,6 +18,6 @@ const JopSalarySchema = new mongoose.Schema({
 
 }, { collection: "jop_salary" })
 
-const JopSalaryModel = mongoose.model('JopSalarySchema', JopSalarySchema)
+const JopSalaryModel = mongoose.model('jop_salary', JopSalarySchema)
 
 export default JopSalaryModel;

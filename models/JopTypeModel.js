@@ -16,6 +16,6 @@ const JopTypeSchema = new mongoose.Schema({
   option:   { type: [OptionSchema], default: [] },
 }, { collection: 'jop_type', timestamps: true });
 
-const JopTypeModel = mongoose.model('JopTypeSchema', JopTypeSchema)
+const JopTypeModel = mongoose.model('jop_type', JopTypeSchema)
 
 export default JopTypeModel;

@@ -46,3 +46,12 @@ app.use(error.converter);
 app.use(error.handler);
 
 export default app;
+
+
+// npm i dictionary-en@3.1.0
+// npm i wink-nlp
+// npm i wink-eng-lite-web-model
+// npm install araby
+// npm install nspell
+// npm install nspell dictionary-en araby wink-nlp wink-eng-lite-web-model
+

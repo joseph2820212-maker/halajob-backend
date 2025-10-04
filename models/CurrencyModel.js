@@ -13,6 +13,6 @@ const CurrencySchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 }, { collection: "currencies" });
 
-const CurrencyModel = mongoose.model('CurrencySchema', CurrencySchema)
+const CurrencyModel = mongoose.model('currencies', CurrencySchema)
 
 export default CurrencyModel;

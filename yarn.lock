@@ -2832,6 +2832,13 @@ append-field@^1.0.0:
 aproba@^2.0.0:
   version "2.1.0"
 
+araby@^0.0.4-x:
+  version "0.0.4-x"
+  resolved "https://registry.npmjs.org/araby/-/araby-0.0.4-x.tgz"
+  integrity sha512-wMT0LxoqbL0AVa/lOIMB10ELWVyWlWn9h+x2jK7T1jZ2sBphPvbC2/WI1nbV1VF3tbWpWaIGCmwHI5pDQ6W7fw==
+  dependencies:
+    express "^4.21.1"
+
 archy@~1.0.0:
   version "1.0.0"
 
@@ -3475,6 +3482,11 @@ dicer@0.2.5:
     readable-stream "1.1.x"
     streamsearch "0.1.2"
 
+dictionary-en@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/dictionary-en/-/dictionary-en-3.2.0.tgz"
+  integrity sha512-oujbJhuplUTlDntmOoultEcNyk8ge7cFI6yXNn7eJvpbBJOhGNhWtK0XjOJsiwl4EfIeyvDKwGB95vJXv1d+lQ==
+
 diff@^7.0.0:
   version "7.0.0"
 
@@ -3577,7 +3589,7 @@ express-mongo-sanitize@^2.2.0:
   resolved "https://registry.npmjs.org/express-mongo-sanitize/-/express-mongo-sanitize-2.2.0.tgz"
   integrity sha512-PZBs5nwhD6ek9ZuP+W2xmpvcrHwXZxD5GdieX2dsjPbAbH4azOkrHbycBud2QRU+YQF1CT+pki/lZGedHgo/dQ==
 
-express@^4.17.1:
+express@^4.17.1, express@^4.21.1:
   version "4.21.1"
   resolved "https://registry.npmjs.org/express/-/express-4.21.1.tgz"
   integrity sha512-YSFlK1Ee0/GC8QaO91tHcDxJiE/X4FbpAyQWkxAvG6AXCuR65YzK8ua6D9hvi/TzUfZMpc+BwuM1IPw8fmQBiQ==
@@ -4084,6 +4096,11 @@ is-binary-path@~2.1.0:
   integrity sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==
   dependencies:
     binary-extensions "^2.0.0"
+
+is-buffer@^2.0.0:
+  version "2.0.5"
+  resolved "https://registry.npmjs.org/is-buffer/-/is-buffer-2.0.5.tgz"
+  integrity sha512-i2R6zNFDwgEHJyQUtJEk0XFi1i0dPFn/oqjK3/vPCcDeJvW5NQ83V8QbicfF1SupOaB0h8ntgBC2YiE7dfyctQ==
 
 is-cidr@^5.1.1:
   version "5.1.1"
@@ -4989,6 +5006,13 @@ npm@^11.6.0:
     treeverse "^3.0.0"
     validate-npm-package-name "^6.0.2"
     which "^5.0.0"
+
+nspell@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.npmjs.org/nspell/-/nspell-2.1.5.tgz"
+  integrity sha512-PSStyugKMiD9mHmqI/CR5xXrSIGejUXPlo88FBRq5Og1kO5QwQ5Ilu8D8O5I/SHpoS+mibpw6uKA8rd3vXd2Sg==
+  dependencies:
+    is-buffer "^2.0.0"
 
 object-assign@^4, object-assign@^4.1.1:
   version "4.1.1"
@@ -6052,6 +6076,16 @@ which@^5.0.0:
   version "5.0.0"
   dependencies:
     isexe "^3.1.1"
+
+wink-eng-lite-web-model@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.npmjs.org/wink-eng-lite-web-model/-/wink-eng-lite-web-model-1.8.1.tgz"
+  integrity sha512-M2tSOU/rVNkDj8AS8IoKJaM7apJJjS0cN+hE8CPazfnB4A/ojyc9+7RMPk18UOiIdSyWk7MR6w8z9lWix2l5tA==
+
+wink-nlp@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.npmjs.org/wink-nlp/-/wink-nlp-2.4.0.tgz"
+  integrity sha512-d02inlNJL0LLNTLoYfkxZYGrqnYDSZV4HI4WpeuyIEfpu7UcUqUW1ZYWr+JTFm4ZR6dQdzOW/FtHEQRO+o/zzA==
 
 winston-daily-rotate-file@1.4.0:
   version "1.4.0"

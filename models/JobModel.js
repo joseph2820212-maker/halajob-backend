@@ -11,7 +11,12 @@ const jobsSchema = new Schema(
     job_name: { type: String, required: true, trim: true },
     job_name_id: { type: Schema.Types.ObjectId, ref: "jop_name", required: false },
     description: { type: String, required: true, trim: true },
-
+    languages: [
+      {
+        name: String,
+        level: { type: Number, min: 1, max: 5 },
+      },
+    ],
     // حالة ونشر
     status: { type: Boolean, default: false },
     is_accepted: { type: Boolean, default: false },
@@ -22,15 +27,13 @@ const jobsSchema = new Schema(
     // تصنيفات إضافية (احتفظت بها إن كنت تستعملها)
     jobs_name: [{ type: String, trim: true }],
 
-    // النوع والوقت والراتب والموقع
-    
-    currency_id: { type: Schema.Types.ObjectId, ref: "countries", required: true },
+    // النوع والوقت والراتب والموقع   
+    currency_id: { type: Schema.Types.ObjectId, ref: "currencies", required: true },
     countries: { type:[String],  required: true },
     jop_type_id: { type: Schema.Types.ObjectId, ref: "jop_type", required: true },
     jop_type_info: { type: Schema.Types.Mixed, required: false, default: {} }, // كان [Object]، صُحح إلى كائن/مختلط
-    jop_time_id: { type: Schema.Types.ObjectId, ref: "jop_time", required: true },
+    jop_time_id: { type: Schema.Types.ObjectId, ref: "work_time", required: true },
     jop_time_info: { type: Schema.Types.Mixed, required: false, default: {} },
-
     jop_salary_id: { type: Schema.Types.ObjectId, ref: "jop_salary", required: true }, // كان salary_type_id
     jop_salary_info: { type: Schema.Types.Mixed, required: true }, // بحسب المواصفات required:true
 

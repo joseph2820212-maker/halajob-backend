@@ -32,7 +32,7 @@ const jobSchema = yup.object({
 
   jop_salary_id: yup.string().required(),
   jop_salary_info: yup.object().required(),
-
+languages:yup.object().optional(),
   description: yup.string().required(),
 
   countries: yup.array().of(yup.string().trim().min(1)).min(1).required(),

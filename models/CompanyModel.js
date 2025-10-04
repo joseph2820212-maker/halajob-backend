@@ -23,6 +23,6 @@ const CompanySchema = new mongoose.Schema({
     
 },{collection : "companies"})
 
-const CompanyModel = mongoose.model('CompanySchema', CompanySchema)
+const CompanyModel = mongoose.model('companies', CompanySchema)
 
 export default CompanyModel;
