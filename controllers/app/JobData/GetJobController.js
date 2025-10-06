@@ -21,6 +21,12 @@ import {
 } from "../../../models/index.js";
 
 /* ============== LIST ============== */
+function buildPublicUrl(base, rel) {
+  if (!base) return rel;
+  const cleaned = rel?.replace(/^\/+/, "") || "";
+  return base.endsWith("/") ? base + cleaned : `${base}/${cleaned}`;
+}
+
 const get = async (req, res) => {
   try {
     const page  = Number(req.query.page  || 1);
@@ -38,7 +44,7 @@ const get = async (req, res) => {
         .find(filter, { job_name: 1, company_id: 1, jop_type_id: 1 })
         .skip(skip)
         .limit(limit)
-        .populate({ path: "company_id", select: "company_name" })
+        .populate({ path: "company_id", select: "company_name image" })
         .populate({ path: "jop_type_id", select: `title_${lan}` })
         .lean(),
       jobsModel.countDocuments(filter),
@@ -48,6 +54,7 @@ const get = async (req, res) => {
       id: it._id,
       title: it.job_name || "",
       company: it.company_id?.company_name || null,
+      company_image:it.company_id?.image?buildPublicUrl(process.env.PUBLIC_BASE_URL, it.company_id?.image):null,
       job_type: it.jop_type_id?.[`title_${lan}`] || null,
     }));
 
@@ -112,7 +119,7 @@ const getById = async (req, res) => {
       out_link:job.out_link,
       jop_services: (services || []).map((s) => ({ title: s?.[`title_${lan}`] || null })),
       company: company
-        ? { name: company.company_name ?? null, email: company.company_email ?? null,company_address:company.company_address }
+        ? { name: company.company_name ?? null, email: company.company_email ?? null,company_address:company.company_address,company_image:company?.image?buildPublicUrl(process.env.PUBLIC_BASE_URL, company?.image):null, }
         : null,
     };
 
