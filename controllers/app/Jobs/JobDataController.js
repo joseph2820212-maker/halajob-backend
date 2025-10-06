@@ -8,6 +8,10 @@ import {
   UserSavedJobModel,
 } from "../../../models/index.js";
 
+/* أسماء المجموعات المساعدة للعدّ */
+const REV_COLL = UserReviewJobModel.collection.name;
+const SAVE_COLL = UserSavedJobModel.collection.name;
+
 /* تحقق شركة المالك */
 async function ensureCompany(req, res) {
   const lan = (req.get("lan") || "en").toLowerCase();
@@ -29,8 +33,85 @@ async function ensureCompany(req, res) {
   return company;
 }
 
+/* 0) الوظائف التي أنشأتها الشركة (بالأحدث) */
+ const getCreatedJobs = async (req, res, next) => {
+  try {
+    const lan = (req.get("lan") || "en").toLowerCase();
+    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit ?? "10", 10)));
+    const q = (req.query.q ?? "").trim();
+
+    const company = await ensureCompany(req, res);
+    if (!company) return;
+
+    const $match = { company_id: company._id };
+    if (q) {
+      $match.$or = [
+        { job_name: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
+      ];
+    }
+
+    const items = await jobsModel.aggregate([
+      { $match },
+      { $sort: { createdAt: -1, _id: -1 } },
+      { $skip: page * limit },
+      { $limit: limit },
+
+      // عدّ المراجعات
+      {
+        $lookup: {
+          from: REV_COLL,
+          let: { jid: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$job_id", "$$jid"] } } },
+            { $count: "c" },
+          ],
+          as: "reviews",
+        },
+      },
+      // عدّ الحفظ
+      {
+        $lookup: {
+          from: SAVE_COLL,
+          let: { jid: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$job_id", "$$jid"] } } },
+            { $count: "c" },
+          ],
+          as: "saves",
+        },
+      },
+
+      {
+        $project: {
+          _id: 1,
+          job_name: 1,
+          jop_type_id: 1,
+          jop_salary_id: 1,
+          rating: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          reviews_count: { $ifNull: [{ $arrayElemAt: ["$reviews.c", 0] }, 0] },
+          saves_count: { $ifNull: [{ $arrayElemAt: ["$saves.c", 0] }, 0] },
+        },
+      },
+    ]);
+
+    // hasMore تقريبي دون total كامل لتوفير الاستعلام
+    const hasMore = items.length === limit;
+
+    return ReturnAppData.createData({
+      res,
+      data: { page, limit, hasMore, items },
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 /* 1) بيانات الوظيفة بالمعرّف */
- const getJobById = async (req, res, next) => {
+const getJobById = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const id = req.params.id;
@@ -54,8 +135,8 @@ async function ensureCompany(req, res) {
   }
 };
 
-/* 2) تعليقات الوظيفة: إرجاع بالأحدث مع اسم ومعرّف المستخدم */
-export const getJobReviews = async (req, res, next) => {
+/* 2) تعليقات الوظيفة */
+ const getJobReviews = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const id = req.params.id;
@@ -120,7 +201,7 @@ export const getJobReviews = async (req, res, next) => {
 };
 
 /* 3) توزيع وتفاصيل التقييم دون تعديل قاعدة البيانات */
-export const getJobRatingStats = async (req, res, next) => {
+ const getJobRatingStats = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const id = req.params.id;
@@ -156,17 +237,14 @@ export const getJobRatingStats = async (req, res, next) => {
         )
       : 0;
 
-    return ReturnAppData.createData({
-      res,
-      data: { avg, counts, total },
-    });
+    return ReturnAppData.createData({ res, data: { avg, counts, total } });
   } catch (e) {
     next(e);
   }
 };
 
-/* 4) من قام بحفظ الوظيفة: بالأحدث مع الاسم والمعرّف */
-export const getJobSavers = async (req, res, next) => {
+/* 4) من قام بحفظ الوظيفة */
+ const getJobSavers = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const id = req.params.id;
@@ -230,6 +308,7 @@ export const getJobSavers = async (req, res, next) => {
 };
 
 export default {
+  getCreatedJobs,
   getJobById,
   getJobReviews,
   getJobRatingStats,

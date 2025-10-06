@@ -35,6 +35,8 @@ const UserApplyingJobSchema = new mongoose.Schema(
     user_job_rating:{type:Number,default:0},
     is_collect_rating:{type:Boolean,default:false},
     cv_download:{type:Boolean,default:false},
+    is_filter:{type:Boolean,default:false},
+    filter_on:{type:Boolean,default:false},
     is_send_interview: { type: Boolean, default: false },
     interview_information: {
       meet_link: String,
@@ -42,6 +44,7 @@ const UserApplyingJobSchema = new mongoose.Schema(
       is_online: { type: Boolean, default: false },
       is_in_office: { type: Boolean, default: false },
       office_address: String,
+      note:String,
       longitude: Number,
       latitude: Number,
     },

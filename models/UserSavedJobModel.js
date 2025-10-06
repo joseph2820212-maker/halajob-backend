@@ -1,12 +1,16 @@
-
 import mongoose from "mongoose";
 
-const UserSavedJob = new mongoose.Schema({
- user_id: { type: mongoose.Schema.Types.ObjectId, ref: "UserSchema", required: true },
- job_id: { type: mongoose.Schema.Types.ObjectId, ref: "jobs", index: true, required: true },
+const UserSavedJobSchema = new mongoose.Schema(
+  {
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    job_id:  { type: mongoose.Schema.Types.ObjectId, ref: "jobs", required: true, index: true },
+  },
+  { collection: "user_saved_job", timestamps: true }
+);
 
-}, { collection: "user_saved_job" })
+// فهارس
+UserSavedJobSchema.index({ user_id: 1, createdAt: -1 });
+UserSavedJobSchema.index({ user_id: 1, job_id: 1 }, { unique: true }); // يمنع التكرار
 
-const UserSavedJobModel = mongoose.model('user_saved_job', UserSavedJob)
-
+const UserSavedJobModel = mongoose.model("user_saved_job", UserSavedJobSchema);
 export default UserSavedJobModel;
