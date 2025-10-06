@@ -88,7 +88,13 @@ const jobsSchema = new Schema(
         },
       ],
     },
-
+    user_show:{type:Number,default:0},
+    user_review:{type:Number,default:0},
+    user_applying:{type:Number,default:0},
+    out_side_applying:{type:Number,default:0},
+    user_saved:{type:Number,default:0}, 
+    rating:{type:Number,default:0},
+    is_update:{type:Boolean,default:false},
     // أسئلة إضافية بحد أقصى 5
     questions: {
       type: [Schema.Types.Mixed],

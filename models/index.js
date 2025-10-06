@@ -14,6 +14,12 @@ import EmployeeModel from './EmployeeModel.js';
 import CountryModel from './CountryModel.js';
 import CurrencyModel from './CurrencyModel.js';
 import SheetModel from './SheetModel.js';
+import UserApplyingJobModel from './UserApplyingJobModel.js';
+import UserOutSideApplyingJobModel from './UserOutSideApplyingJobModel.js';
+import UserRatingJobModel from './UserRatingJobModel.js';
+import UserReviewJobModel from './UserReviewJobModel.js';
+import UserSavedJobModel from './UserSavedJobModel.js';
+import UserShowJobModel from './UserShowJobModel.js';
 
 export {
   UserModel,
@@ -31,5 +37,11 @@ export {
   EmployeeModel,
   CountryModel,
   CurrencyModel,
-  SheetModel
+  SheetModel,
+  UserApplyingJobModel,
+  UserOutSideApplyingJobModel,
+  UserRatingJobModel,
+  UserReviewJobModel,
+  UserSavedJobModel,
+  UserShowJobModel,
 };

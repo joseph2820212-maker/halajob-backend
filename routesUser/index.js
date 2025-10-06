@@ -4,7 +4,9 @@ import CompanyRote from './CompanyRote.js';
 import HelperRote from './HelperRote.js';
 import JobRote from './JobRote.js';
 import EmployeeRote from './EmployeeRote.js';
-
+import JobInformationRote from './JobInformationRote.js';
+import ApplyingJobRote from './ApplyingJobRote.js';
+import JobResultRote from './JobResultRote.js';
 
 
 const router = express.Router();
@@ -13,5 +15,8 @@ router.use('/company', CompanyRote);
 router.use('/helper', HelperRote);
 router.use('/job', JobRote);
 router.use('/employee', EmployeeRote);
+router.use('/job-information', JobInformationRote);
+router.use('/applying-job', ApplyingJobRote);
+router.use('/job-result', JobResultRote);
 
 export default router;
