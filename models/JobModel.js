@@ -11,6 +11,10 @@ const jobsSchema = new Schema(
     job_name: { type: String, required: true, trim: true },
     job_name_id: { type: Schema.Types.ObjectId, ref: "jop_name", required: false },
     description: { type: String, required: true, trim: true },
+    is_remote:{type:Boolean,default:false},
+    job_keywords:{type:[String]},
+     keywords_norm: { type: [String], default: [] },
+     phrases_norm:  { type: [String], default: [] },  
     languages: [
       {
         name: String,
@@ -122,6 +126,11 @@ const jobsSchema = new Schema(
 // فهارس مفيدة
 jobsSchema.index({ company_id: 1, status: 1, is_accepted: 1 });
 jobsSchema.index({ job_name: "text", description: "text" });
-
+jobsSchema.index({ status:1, is_accepted:1, createdAt:-1, _id:-1 });
+jobsSchema.index({ countries:1, status:1, is_accepted:1, createdAt:-1 });
+jobsSchema.index({ keywords_norm:1 });   // Array index
+jobsSchema.index({ phrases_norm:1 });    // Array index
+jobsSchema.index({ company_id:1, createdAt:-1 });
+jobsSchema.index({ jop_type_id:1, createdAt:-1 });
 const jobsModel = mongoose.model("jobs", jobsSchema);
 export default jobsModel;

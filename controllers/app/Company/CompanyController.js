@@ -6,6 +6,11 @@ import path from "path";
  * GET /company
  * Returns the company if the account is usable; otherwise returns a localized reason.
  */
+function buildPublicUrl(base, rel) {
+  if (!base) return rel;
+  const cleaned = rel?.replace(/^\/+/, "") || "";
+  return base.endsWith("/") ? base + cleaned : `${base}/${cleaned}`;
+}
 const get = async (req, res, next) => {
   try {
     const user = req.user;
@@ -24,7 +29,7 @@ const get = async (req, res, next) => {
     }
 
     // Normalize boolean flags to avoid undefined traps
-    const canUpload = company.can_upload === true;
+    const canUpload = company.can_upload === false;
     const accepted = company.accepted === true;
     const active = company.status === true;
 
@@ -69,8 +74,23 @@ const get = async (req, res, next) => {
             : "The account has been temporarily suspended",
       });
     }
-
-    return ReturnAppData.getData({ res, data: company });
+    const response={
+      id:company.id,
+      name:company.name,
+      image:company?.image?buildPublicUrl(process.env.PUBLIC_BASE_URL, company?.image):null,
+      company_email:company.company_email,
+      created_year:company.created_year,
+      description:company.description,
+      company_size:company.company_size,
+      company_type:company.company_type,
+      company_country:company.company_country,
+      company_address:company.company_address,
+      company_contact:company.company_contact,
+      company_phone:company.company_phone,
+      company_phone_code:company.company_phone_code,
+      company_website:company.company_website,
+    }
+    return ReturnAppData.getData({ res, data: response });
   } catch (err) {
     return ReturnAppData.getError({
       res,
@@ -352,13 +372,7 @@ const update = async (req, res, next) => {
 
 const UPLOADS_DIR = path.resolve(process.cwd(), "uploads"); // e.g. /app/uploads
 
-function buildPublicUrl(base, filename) {
-  // base: e.g. https://api.example.com
-  // Result: https://api.example.com/uploads/<filename>
-  const cleanBase = (base || "").replace(/\/+$/, "");
-  const cleanFile = (filename || "").replace(/^\/+/, "");
-  return `${cleanBase}/uploads/${cleanFile}`;
-}
+
 
 const updateImage = async (req, res, next) => {
   const lan = (req.get("lan") || "en").toLowerCase();
