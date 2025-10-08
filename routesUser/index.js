@@ -8,6 +8,7 @@ import JobInformationRote from './JobInformationRote.js';
 import ApplyingJobRote from './ApplyingJobRote.js';
 import JobResultRote from './JobResultRote.js';
 import JobProfileRote from './JobProfileRote.js';
+import CompanyProfileRote from './CompanyProfileRote.js';
 
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.use('/job-information', JobInformationRote);
 router.use('/applying-job', ApplyingJobRote);
 router.use('/job-result', JobResultRote);
 router.use('/job-profile', JobProfileRote);
+router.use('/company-jobs-profile', CompanyProfileRote);
 
 export default router;
