@@ -17,7 +17,7 @@ import {
 const { Types, isValidObjectId } = mongoose;
 
 function buildPublicUrl(base, rel) {
-  if (!base) return rel || null;
+  if (!base) return process.env.PUBLIC_BASE_URL+"/"+ rel || null;
   const c = rel?.replace(/^\/+/, "") || "";
   return base.endsWith("/") ? base + c : `${base}/${c}`;
 }
@@ -72,18 +72,25 @@ const COMPANY_COLL  = CompanyModel.collection.name;             // "companies"
 const USS_COLL      = UserShowJobModel.collection.name;         // "user_show_job" (أو حسب اسمك الفعلي)
 
 /* ========= list ========= */
+
 const get = async (req, res) => {
   try {
+    // ===== inputs =====
     const page  = Math.max(1, Number(req.query.page || 1));
     const limit = Math.min(50, Math.max(1, Number(req.query.limit || 10)));
-    const rawSearch = String(req.query.search || "").slice(0, 100);
-    const search = rawSearch.trim();
+    const lan   = (req.get("lan") || "en").toLowerCase();
+    const rawSearch = String(req.query.search || "").slice(0, 100).trim();
     const countryId = (req.query.country_id || "").trim();
-    const lan = (req.get("lan") || "en").toLowerCase();
-    const userId = req.user?._id ? new Types.ObjectId(req.user._id) : null;
 
-    const tokens = tokenizeBasic(search);
+    // user_id من الهيدر أولاً ثم من req.user
+    const userIdHeader = req.get("user_id") || null;
+    const userId = userIdHeader && isValidObjectId(userIdHeader)
+      ? new Types.ObjectId(userIdHeader)
+      : (req.user?._id ? new Types.ObjectId(req.user._id) : null);
 
+    const tokens = tokenizeBasic(rawSearch);
+
+    // ===== parse filters (الواردة من العميل) =====
     const rawFilters = (() => {
       const f = req.query.filters;
       if (!f) return {};
@@ -92,20 +99,50 @@ const get = async (req, res) => {
       return {};
     })();
 
-    const companyIds = parseIds(rawFilters.companies);
-    const typeIds    = parseIds(rawFilters.types);
-    const publishKey = typeof rawFilters.publish_date === "string" ? rawFilters.publish_date : null;
-    const isRemote   = typeof rawFilters.is_remote === "boolean" ? rawFilters.is_remote : null;
-    const notSeen    = rawFilters.not_seen === true;
+    const companyIds = parseIds(rawFilters.companies);                 // select_one
+    const typeIds    = parseIds(rawFilters.types);                     // select_many
+    const publishKey = typeof rawFilters.publish_date === "string" ? rawFilters.publish_date : null; // select_one
+    const isRemote   = typeof rawFilters.is_remote === "boolean" ? rawFilters.is_remote : null;      // boolean
+    const notSeen    = rawFilters.not_seen === true;                   // boolean (وظائف لم تُشاهد)
 
     const createdAtGte = publishKey ? dateFromBucket(publishKey) : null;
 
+    // ===== localization =====
+    const L = lan === "ar"
+      ? {
+          companies: "الشركات",
+          types: "أنواع الوظائف",
+          remote: "عن بُعد",
+          remote_yes: "عن بُعد",
+          remote_no: "في المكتب",
+          publish_date: "تاريخ النشر",
+          pd_24h: "آخر 24 ساعة",
+          pd_7d: "آخر 7 أيام",
+          pd_30d: "آخر 30 يومًا",
+          not_seen: "وظائف لم تُشاهد",
+          not_seen_true: "غير مُشاهدة بعد",
+        }
+      : {
+          companies: "Companies",
+          types: "Job types",
+          remote: "Remote",
+          remote_yes: "Remote",
+          remote_no: "On-site",
+          publish_date: "Publish date",
+          pd_24h: "Last 24 hours",
+          pd_7d: "Last 7 days",
+          pd_30d: "Last 30 days",
+          not_seen: "Unseen jobs",
+          not_seen_true: "Not seen yet",
+        };
+
+    // ===== base match =====
     const match = {
       status: true,
       is_accepted: true,
       ...(countryId && { countries: countryId }),
-      ...(tokens.length && { keywords_norm: { $in: tokens } }), // أقل صرامة
-      ...(companyIds.length && { company_id: { $in: companyIds } }),
+      ...(tokens.length && { keywords_norm: { $in: tokens } }),
+      ...(companyIds.length && { company_id: companyIds[0] }), // select_one
       ...(typeIds.length && { jop_type_id: { $in: typeIds } }),
       ...(createdAtGte && { createdAt: { $gte: createdAtGte } }),
       ...(isRemote === true && { is_remote: true }),
@@ -114,6 +151,7 @@ const get = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
+    // ===== core pipeline =====
     const core = [
       { $match: match },
 
@@ -136,16 +174,20 @@ const get = async (req, res) => {
       { $unwind: { path: "$jop_type", preserveNullAndEmptyArrays: true } },
 
       { $addFields: {
+          company_name: "$company.company_name",
+          company_image: "$company.image",
+          job_type_title: `$jop_type.title_${lan}`,
           _kwScore: tokens.length
             ? { $size: { $setIntersection: [ { $ifNull: ["$keywords_norm", []] }, tokens ] } }
             : 0
       }},
     ];
 
+    // فلتر "غير مُشاهدة" عبر user_show_job
     const seenFilter = (notSeen && userId)
       ? [
           { $lookup: {
-              from: USS_COLL,
+              from: USS_COLL, // user_show_job
               let: { jid: "$._id" },
               pipeline: [
                 { $match: { $expr: { $and: [
@@ -160,9 +202,7 @@ const get = async (req, res) => {
         ]
       : [];
 
-    const pipeline = [
-      ...core,
-      ...seenFilter,
+    const sortAndProject = [
       { $sort: { _kwScore: -1, createdAt: -1, _id: -1 } },
       { $project: {
           title: "$job_name",
@@ -171,17 +211,44 @@ const get = async (req, res) => {
           createdAt: 1,
           is_remote: 1,
           countries: 1,
-          company: "$company.company_name",
-          company_image: "$company.image",
-          job_type: `$jop_type.title_${lan}`,
-      }},
-      { $facet: {
-          items: [ { $skip: skip }, { $limit: limit } ],
-          meta:  [ { $count: "total" } ]
+          company: "$company_name",
+          company_image: 1,
+          job_type: "$job_type_title",
       }},
     ];
 
+    // ===== facets (بدون عدّادات) =====
+    const facet = {
+      items: [ { $skip: skip }, { $limit: limit } ],
+      meta:  [ { $count: "total" } ],
+    };
+
+    if (page === 1&& ! req.query.filters) {
+      facet.companies = [
+        { $match: { company_id: { $type: "objectId" } } },
+        { $group: { _id: "$company_id", name: { $first: "$company" }, image: { $first: "$company_image" } } },
+        { $sort: { name: 1 } },
+        { $limit: 100 },
+      ];
+      facet.types = [
+        { $match: { jop_type_id: { $type: "objectId" } } },
+        { $group: { _id: "$jop_type_id", title: { $first: "$job_type" } } },
+        { $sort: { title: 1 } },
+        { $limit: 100 },
+      ];
+      // remote/publish_date/not_seen خيارات ثابتة
+    }
+
+    const pipeline = [
+      ...core,
+      ...seenFilter,
+      ...sortAndProject,
+      { $facet: facet },
+    ];
+
+    // ===== run =====
     const [agg] = await jobsModel.aggregate(pipeline).allowDiskUse(true);
+
     const items = agg?.items || [];
     const total = agg?.meta?.[0]?.total || 0;
 
@@ -189,24 +256,68 @@ const get = async (req, res) => {
       id: it._id,
       title: it.title || "",
       company: it.company || null,
-      company_image: buildPublicUrl(PUBLIC_BASE, it.company_image),
+      company_image: it.company_image ? buildPublicUrl(PUBLIC_BASE, it.company_image) : null,
       job_type: it.job_type || null,
       is_remote: !!it.is_remote,
       countries: it.countries || [],
       created_at: it.createdAt,
     }));
 
-    return ReturnAppData.getData({
-      res,
-      data,
-      other: {
-        pagination: { page, limit, total, pages: Math.ceil(total / limit) },
-      }
-    });
+    const other = {
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    };
+
+    if (page === 1&& ! req.query.filters) {
+      // خيارات الفلاتر
+      const companiesOpts = (() => {
+        const seen = new Set();
+        return (agg.companies || [])
+          .filter(c => { const k = String(c._id); if (seen.has(k)) return false; seen.add(k); return true; })
+          .map(c => ({
+            id: c._id,
+            label: c.name || "",
+            image: c.image ? buildPublicUrl(PUBLIC_BASE, c.image) : null,
+          }));
+      })();
+
+      const typesOpts = (agg.types || []).map(t => ({
+        id: t._id,
+        label: t.title || "",
+      }));
+
+      const remoteOpts = [
+        { value: true,  label: L.remote_yes },
+        { value: false, label: L.remote_no  },
+      ];
+
+      const publishOpts = [
+        { value: "last_24h", label: L.pd_24h },
+        { value: "last_7d",  label: L.pd_7d  },
+        { value: "last_30d", label: L.pd_30d },
+      ];
+
+      const notSeenOpts = [
+        { value: true, label: L.not_seen_true },
+      ];
+
+      other.filters = {
+        groups: [
+          { key: "companies",    title: L.companies,    type: "select_one",  options: companiesOpts, selected: companyIds[0] || null },
+          { key: "types",        title: L.types,        type: "select_many", options: typesOpts,     selected: typeIds },
+          { key: "remote",       title: L.remote,       type: "boolean",     options: remoteOpts,    selected: typeof isRemote === "boolean" ? isRemote : null },
+          { key: "publish_date", title: L.publish_date, type: "select_one",  options: publishOpts,   selected: publishKey || null },
+          { key: "not_seen",     title: L.not_seen,     type: "boolean",     options: notSeenOpts,   selected: notSeen === true ? true : null },
+        ],
+      };
+    }
+
+    return ReturnAppData.getData({ res, data, other });
   } catch (err) {
     return ReturnAppData.getError({ res, message: err?.message || "Get failed" });
   }
 };
+
+
 
 /* ========= details ========= */
 const getById = async (req, res) => {

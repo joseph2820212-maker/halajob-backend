@@ -10,6 +10,7 @@ import CompanyRote from "./CompanyRote.js";
 import CountryRote from "./CountryRote.js";
 import CurrencyRote from "./CurrencyRote.js";
 import WorkTimeRote from "./WorkTimeRote.js";
+import JobRote from "./JobRote.js";
 
 import fs from 'fs';
 import path from 'path';
@@ -29,6 +30,7 @@ router.use('/Company', CompanyRote);
 router.use('/Country', CountryRote);
 router.use('/Currency', CurrencyRote);
 router.use('/WorkTime', WorkTimeRote);
+router.use('/Job', JobRote);
 
 router.get('/image/:name', (req, res) => {
   const fileName = req.params.name;
