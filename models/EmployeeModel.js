@@ -21,11 +21,37 @@ const EmployeeSchema = new mongoose.Schema(
     status: { type: Boolean, default: true },
     accepted: Boolean,
 
-    latest_work_experience: {
-      name: String,
-      company: String,
-    },
-
+    latest_work_experience:  {
+        company_name: String,
+        start_date:Date,
+        end_date:Date,
+        is_until_now:Boolean,
+        position:String,
+        points:[{
+          title:String,
+          contents:[{
+            title:String,
+            description:String
+          }]
+        }]
+      },
+    about_me:{type:String},
+    experience: [
+      {
+        company_name: String,
+        start_date:Date,
+        end_date:Date,
+        is_until_now:Boolean,
+        position:String,
+        points:[{
+          title:String,
+          contents:[{
+            title:String,
+            description:String
+          }]
+        }]
+      }
+    ],
     education: [
       {
         level: String,
@@ -80,7 +106,12 @@ const EmployeeSchema = new mongoose.Schema(
     ],
 
     work_location: { type: String, enum: ["remote", "personal", "in_office"] },
-
+    links:[
+      {
+        title:String,
+        url:String
+      }
+    ],
     is_can_move: { type: Boolean, default: false },
     is_free_for_work: { type: Boolean, default: false },
   },

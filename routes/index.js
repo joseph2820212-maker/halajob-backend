@@ -11,6 +11,9 @@ import CountryRote from "./CountryRote.js";
 import CurrencyRote from "./CurrencyRote.js";
 import WorkTimeRote from "./WorkTimeRote.js";
 import JobRote from "./JobRote.js";
+import FontRote from "./FontRote.js";
+import ColorRote from "./ColorRote.js";
+import ResumeRote from "./ResumeRote.js";
 
 import fs from 'fs';
 import path from 'path';
@@ -31,6 +34,10 @@ router.use('/Country', CountryRote);
 router.use('/Currency', CurrencyRote);
 router.use('/WorkTime', WorkTimeRote);
 router.use('/Job', JobRote);
+router.use('/Color', ColorRote);
+router.use('/Font', FontRote);
+router.use('/Resume', ResumeRote);
+
 
 router.get('/image/:name', (req, res) => {
   const fileName = req.params.name;

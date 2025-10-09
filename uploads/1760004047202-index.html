@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Resume — Mohammed Nour Mnini</title>
+  <style>
+    /* Base */
+:root {
+  --ink: #0b132b;
+  --muted: #475569;
+  --line: #e5e7eb;
+  --accent: #1f2937;
+  --bg: #ffffff;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background-image: url("/images/");
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+}
+
+.page {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--line);
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.name {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+  letter-spacing: 0.2px;
+}
+
+.contact {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.contact a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--line); }
+.contact a:hover { border-bottom-color: var(--muted); }
+
+.section {
+  margin: 24px 0;
+}
+
+.section-title {
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+  margin: 0 0 12px 0;
+  border-left: 3px solid var(--accent);
+  padding-left: 10px;
+}
+
+.item {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+.item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.role {
+  margin: 0;
+  font-size: 16px;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.subhead {
+  margin-top: 6px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.subsubhead {
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.bullets {
+  margin: 8px 0 0 18px;
+}
+
+.tags {
+  margin: 6px 0 0 0;
+}
+.aboutMe{
+  color: var(--muted);
+  font-size: medium;
+  overflow: inherit;
+}
+/* Responsive */
+@media (max-width: 640px) {
+  .item-head { flex-direction: column; align-items: flex-start; }
+  .meta { white-space: normal; }
+  .name { font-size: 26px; }
+}
+
+/* Print */
+@media print {
+  body { color: #000; }
+  .page { margin: 0; padding: 0; }
+  .header { border-bottom: 1px solid #000; }
+  a { color: #000; text-decoration: none; }
+}
+
+  </style>
+  
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <div class="name-block">
+        <h1 class="name">USER NAME</h1>
+        <p class="contact">
+          <a href="tel:+963956309384">+963 XXX XXX XXX</a> ·
+          <a href="mailto:mhdnourmnini@gmail.com">user@domain.xxx</a> ·
+          CITY,COUNTRY -  GENDER
+        </p>
+      </div>
+    </header>
+ <article class="item">
+         <h2 class="section-title">About Me</h2>
+         <p class="aboutMe">
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Sint quod inventore accusantium non illum dolorem, natus quos consequuntur laudantium dolor harum delectus recusandae, officia eaque facere quo nisi quasi dolorum?
+         </p>
+      </article>
+      <article class="item">
+   <h2 class="section-title">latest Work Experience</h2>
+        <div class="item-head">
+          <h3 class="role">JOB POSITION</h3>
+          <div class="meta">COMPANY NAME · 0X/20XX – 0X/20XX</div>
+        </div>
+        <ul class="bullets">
+          <li>The skill that was worked on and the job that was offered.</li>
+          <li>The skill that was worked on and the job that was offered.</li>
+          <li>The skill that was worked on and the job that was offered.</li>
+        </ul>
+      </article>
+    <section class="section">
+      <h2 class="section-title">Experience</h2>
+     
+ 
+
+   
+
+      <article class="item">
+        <div class="item-head">
+          <h3 class="role">JOB POSITION</h3>
+          <div class="meta">COMPANY NAME · XX/XXXX – XX/XXXX</div>
+        </div>
+        <div class="subsubhead">Frontend Development</div>
+        <ul class="bullets">
+          <li><strong>Frameworks:</strong> React.js, Vue.js.</li>
+          <li><strong>State Management:</strong> Redux, Vuex.</li>
+          <li><strong>Styling:</strong> Sass, Tailwind CSS, Material‑UI.</li>
+          <li><strong>Languages:</strong> JavaScript, TypeScript.</li>
+          <li><strong>Tools:</strong> Vite, npm, webpack.</li>
+          <li><strong>Responsive Design:</strong> Cross‑browser and device support.</li>
+        </ul>
+        <div class="subsubhead">Backend Development</div>
+        <ul class="bullets">
+          <li><strong>Framework:</strong> Laravel.</li>
+          <li><strong>Databases:</strong> MySQL, PostgreSQL with Eloquent ORM.</li>
+          <li><strong>APIs:</strong> RESTful APIs, Laravel Sanctum/Passport.</li>
+          <li><strong>Performance:</strong> Redis, Memcached, Queues.</li>
+          <li><strong>Server‑Side:</strong> PHP logic and PHPUnit testing.</li>
+        </ul>
+        <div class="subsubhead">DevOps and Version Control</div>
+        <ul class="bullets">
+          <li><strong>Servers/Cloud:</strong> Linux, AWS, GCP, Azure.</li>
+          <li><strong>CI/CD:</strong> Automated pipelines and deployments.</li>
+          <li><strong>Git:</strong> GitHub, GitLab, Bitbucket.</li>
+        </ul>
+      </article>
+
+      <article class="item">
+        <div class="item-head">
+          <h3 class="role">Backend Developer</h3>
+          <div class="meta">RSM IT Technologies · 09/2022 – 02/2023</div>
+        </div>
+        <ul class="bullets">
+          <li>Designed and implemented robust backend systems and APIs.</li>
+          <li>Optimized server‑side performance and database operations.</li>
+          <li>Collaborated with cross‑functional teams to align with client needs.</li>
+        </ul>
+      </article>
+
+      <article class="item">
+        <div class="item-head">
+          <h3 class="role">Front End Developer</h3>
+          <div class="meta">My Communication · 02/2021 – 01/2022</div>
+        </div>
+        <ul class="bullets">
+          <li>Built dynamic, responsive UIs with React.js and Vue.js.</li>
+          <li>Ensured seamless integration with backend services.</li>
+          <li>Focused on modular, maintainable code.</li>
+        </ul>
+      </article>
+
+      <article class="item">
+        <div class="item-head">
+          <h3 class="role">Backend Developer</h3>
+          <div class="meta">ISR Company · 02/2020 – 06/2021</div>
+        </div>
+        <ul class="bullets">
+          <li>Developed backend systems with Laravel and secure APIs.</li>
+          <li>Managed databases and supported scalable architectures.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Skills</h2>
+      <p class="tags">
+        laravel, react, vue, vuex, redux, Sass, Tailwind, CSS, Bootstrap, Material‑UI, JavaScript, TypeScript, Vite, npm, webpack, MySQL, PostgreSQL, Eloquent, RESTful APIs, Laravel Sanctum/Passport, Laravel Queues, PHPUnit, PHP, CI/CD pipelines, automation scripts, Git, GitHub, GitLab, Bitbucket
+      </p>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Education</h2>
+      <article class="item">
+        <div class="item-head">
+          <h3 class="role">Programming Engineering — Bachelor’s Degree</h3>
+          <div class="meta">Syrian Private University · 05/2022</div>
+        </div>
+      </article>
+      <article class="item">
+        <div class="item-head">
+          <h3 class="role">English Language Proficiency — Level B1</h3>
+          <div class="meta">Alhadara Institute · 01/2022</div>
+        </div>
+      </article>
+      <article class="item">
+        <div class="item-head">
+          <h3 class="role">React Developer</h3>
+          <div class="meta">L‑ONE company · 05/2020</div>
+        </div>
+      </article>
+      <article class="item">
+        <div class="item-head">
+          <h3 class="role">Laravel Certification</h3>
+          <div class="meta">clay‑code company · 01/2020</div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

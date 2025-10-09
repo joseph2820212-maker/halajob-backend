@@ -20,6 +20,10 @@ import UserRatingJobModel from './UserRatingJobModel.js';
 import UserReviewJobModel from './UserReviewJobModel.js';
 import UserSavedJobModel from './UserSavedJobModel.js';
 import UserShowJobModel from './UserShowJobModel.js';
+import ColorModel from './ColorModel.js';
+import FontModel from './FontModel.js';
+import ResumeModel from './ResumeModel.js';
+import UserResumeModel from './UserResumeModel.js';
 
 export {
   UserModel,
@@ -44,4 +48,8 @@ export {
   UserReviewJobModel,
   UserSavedJobModel,
   UserShowJobModel,
+  ColorModel,
+  FontModel,
+  ResumeModel,
+  UserResumeModel,
 };
