@@ -1,0 +1,36 @@
+{
+  "ar": {
+    "job_created": "تم إنشاء وظيفة جديدة",
+    "job_saved": "قام مستخدم بحفظ وظيفتك",
+    "job_reviewed": "قمت بمراجعة طلب مستخدم",
+    "job_applied": "قام مستخدم بالتقديم على وظيفتك",
+    "job_updated": "تم تحديث بيانات الوظيفة",
+    "job_deleted": "تم حذف الوظيفة",
+    "job_stopped": "تم إيقاف نشر الوظيفة",
+    "job_rated": "قام مستخدم بتقييم الوظيفة",
+    "job_waiting": "تم وضع طلب المستخدم في حالة انتظار",
+    "job_accepted": "قمت بقبول طلب المستخدم",
+    "job_rejected": "قمت برفض طلب المستخدم",
+    "job_auto_cancel": "تم إلغاء الطلب تلقائيًا من النظام",
+    "meet_in_online": "تم تحديد اجتماع عبر خدمة خارجية مثل Google Meet",
+    "meet_on_app": "تم تحديد اجتماع داخل التطبيق",
+    "meet_in_office": "تم تحديد اجتماع في المكتب"
+  },
+  "en": {
+    "job_created": "A new job has been created",
+    "job_saved": "A user saved your job",
+    "job_reviewed": "You reviewed a user's application",
+    "job_applied": "A user applied for your job",
+    "job_updated": "Job details have been updated",
+    "job_deleted": "The job has been deleted",
+    "job_stopped": "Job posting has been stopped",
+    "job_rated": "A user rated your job",
+    "job_waiting": "A user's application is waiting for your review",
+    "job_accepted": "You accepted a user's application",
+    "job_rejected": "You rejected a user's application",
+    "job_auto_cancel": "An application was auto-cancelled by the system",
+    "meet_in_online": "An online meeting was scheduled via an external service",
+    "meet_on_app": "A meeting was scheduled inside the app",
+    "meet_in_office": "A meeting was scheduled at the office"
+  }
+}

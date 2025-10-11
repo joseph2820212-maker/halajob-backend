@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const UserApplyingJobSchema = new mongoose.Schema(
   {
+     status: {
+    type: String, default:"waiting",
+    enum: ['waiting',"accepted", 'rejected',"auto_cancel"],
+  },
+  status_changed_at:{type:Date},
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserSchema",
@@ -38,10 +43,12 @@ const UserApplyingJobSchema = new mongoose.Schema(
     is_filter:{type:Boolean,default:false},
     filter_on:{type:Boolean,default:false},
     is_send_interview: { type: Boolean, default: false },
+    send_interview_at:{type:Date},
     interview_information: {
       meet_link: String,
       date: Date,
       is_online: { type: Boolean, default: false },
+      is_on_app: { type: Boolean, default: false },
       is_in_office: { type: Boolean, default: false },
       office_address: String,
       note:String,

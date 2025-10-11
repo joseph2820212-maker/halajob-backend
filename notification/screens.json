@@ -1,0 +1,246 @@
+{
+  "routes": {
+    "login": {
+      "route_key": "login",
+      "route_path": "/login",
+      "description": "Navigate to login screen",
+      "fallback_route": "/",
+      "example": {
+        "route": "login"
+      }
+    },
+    "otp_verification": {
+      "route_key": "otp_verification",
+      "route_path": "/otp-verification",
+      "description": "Navigate to OTP verification screen",
+      "fallback_route": "/login",
+      "example": {
+        "route": "otp_verification",
+        "email": "user@example.com",
+        "flow": "forgot"
+      }
+    },
+    "register_employer": {
+      "route_key": "register_employer",
+      "route_path": "/register-employer",
+      "description": "Navigate to employer registration screen",
+      "fallback_route": "/login",
+      "example": {
+        "route": "register_employer"
+      }
+    },
+    "forgot_password": {
+      "route_key": "forgot_password",
+      "route_path": "/forgot-password",
+      "description": "Navigate to forgot password screen",
+      "fallback_route": "/login",
+      "example": {
+        "route": "forgot_password"
+      }
+    },
+    "password_reset": {
+      "route_key": "password_reset",
+      "route_path": "/password-reset",
+      "description": "Navigate to password reset screen",
+      "fallback_route": "/login",
+      "example": {
+        "route": "password_reset",
+        "email": "user@example.com",
+        "token": "reset_token"
+      }
+    },
+    "job_seeker_home": {
+      "route_key": "job_seeker_home",
+      "route_path": "/home",
+      "description": "Navigate to job seeker home screen",
+      "fallback_route": "/",
+      "example": {
+        "route": "job_seeker_home"
+      }
+    },
+    "job_seeker_search": {
+      "route_key": "job_seeker_search",
+      "route_path": "/job-seeker/search",
+      "description": "Navigate to job search screen",
+      "fallback_route": "/home",
+      "example": {
+        "route": "job_seeker_search"
+      }
+    },
+    "job_seeker_saved": {
+      "route_key": "job_seeker_saved",
+      "route_path": "/job-seeker/saved",
+      "description": "Navigate to saved jobs screen",
+      "fallback_route": "/home",
+      "example": {
+        "route": "job_seeker_saved"
+      }
+    },
+    "job_seeker_applications": {
+      "route_key": "job_seeker_applications",
+      "route_path": "/job-seeker/applications",
+      "description": "Navigate to applications screen",
+      "fallback_route": "/home",
+      "example": {
+        "route": "job_seeker_applications"
+      }
+    },
+    "job_seeker_profile": {
+      "route_key": "job_seeker_profile",
+      "route_path": "/job-seeker/profile",
+      "description": "Navigate to job seeker profile screen",
+      "fallback_route": "/home",
+      "example": {
+        "route": "job_seeker_profile"
+      }
+    },
+    "job_seeker_resume": {
+      "route_key": "job_seeker_resume",
+      "route_path": "/job-seeker/resume",
+      "description": "Navigate to resume screen",
+      "fallback_route": "/job-seeker/profile",
+      "example": {
+        "route": "job_seeker_resume"
+      }
+    },
+    "job_details": {
+      "route_key": "job_details",
+      "route_path": "/job-details",
+      "description": "Navigate to job details page",
+      "fallback_route": "/home",
+      "example": {
+        "route": "job_details",
+        "jobId": "12345"
+      }
+    },
+    "application_form_by_id": {
+      "route_key": "application_form_by_id",
+      "route_path": "/application-form-by-id",
+      "description": "Navigate to application form by job ID",
+      "fallback_route": "/job-seeker/applications",
+      "example": {
+        "route": "application_form_by_id",
+        "jobId": "12345"
+      }
+    },
+    "application_history": {
+      "route_key": "application_history",
+      "route_path": "/application-history",
+      "description": "Navigate to application history screen",
+      "fallback_route": "/job-seeker/applications",
+      "example": {
+        "route": "application_history"
+      }
+    },
+    "application_detail": {
+      "route_key": "application_detail",
+      "route_path": "/application-detail",
+      "description": "Navigate to application detail page",
+      "fallback_route": "/application-history",
+      "example": {
+        "route": "application_detail",
+        "applicationId": "app_789"
+      }
+    },
+    "employer_dashboard": {
+      "route_key": "employer_dashboard",
+      "route_path": "/employer/dashboard",
+      "description": "Navigate to employer dashboard",
+      "fallback_route": "/home",
+      "example": {
+        "route": "employer_dashboard"
+      }
+    },
+    "employer_post_job": {
+      "route_key": "employer_post_job",
+      "route_path": "/employer/post-job",
+      "description": "Navigate to post job screen",
+      "fallback_route": "/employer/dashboard",
+      "example": {
+        "route": "employer_post_job"
+      }
+    },
+    "employer_applicants": {
+      "route_key": "employer_applicants",
+      "route_path": "/employer/applicants",
+      "description": "Navigate to all applicants screen",
+      "fallback_route": "/employer/dashboard",
+      "example": {
+        "route": "employer_applicants"
+      }
+    },
+    "employer_profile": {
+      "route_key": "employer_profile",
+      "route_path": "/employer/profile",
+      "description": "Navigate to employer profile screen",
+      "fallback_route": "/employer/dashboard",
+      "example": {
+        "route": "employer_profile"
+      }
+    },
+    "job_management": {
+      "route_key": "job_management",
+      "route_path": "/employer/job-management",
+      "description": "Navigate to job management screen",
+      "fallback_route": "/employer/dashboard",
+      "example": {
+        "route": "job_management"
+      }
+    },
+    "job_metrics": {
+      "route_key": "job_metrics",
+      "route_path": "/employer/job-metrics",
+      "description": "Navigate to job metrics page",
+      "fallback_route": "/employer/dashboard",
+      "example": {
+        "route": "job_metrics",
+        "jobId": "12345",
+        "jobName": "Software Engineer"
+      }
+    },
+    "applicants_by_job": {
+      "route_key": "applicants_by_job",
+      "route_path": "/employer/applicants-by-job",
+      "description": "Navigate to applicants for specific job",
+      "fallback_route": "/employer/applicants",
+      "example": {
+        "route": "applicants_by_job",
+        "jobId": "12345"
+      }
+    },
+    "company_join_request": {
+      "route_key": "company_join_request",
+      "route_path": "/company/join-request",
+      "description": "Navigate to company join request screen",
+      "fallback_route": "/employer/dashboard",
+      "example": {
+        "route": "company_join_request"
+      }
+    },
+    "company_file_management": {
+      "route_key": "company_file_management",
+      "route_path": "/company/file-management",
+      "description": "Navigate to company file management screen",
+      "fallback_route": "/employer/dashboard",
+      "example": {
+        "route": "company_file_management"
+      }
+    },
+    "splash": {
+      "route_key": "splash",
+      "route_path": "/",
+      "description": "Navigate to splash screen",
+      "fallback_route": null,
+      "example": {
+        "route": "splash"
+      }
+    }
+  },
+  "usage": {
+    "description": "Send notification payload with route key and parameters",
+    "example": {
+      "route": "job_details",
+      "jobId": "12345"
+    }
+  }
+}

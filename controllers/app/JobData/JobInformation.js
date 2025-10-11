@@ -7,6 +7,7 @@ import {
   UserRatingJobModel,
   UserSavedJobModel,
 } from "../../../models/index.js";
+import { job_applied_notification, job_reviewed_notification, job_seeker_saved_notification } from "../../../notification/JobCompanyNotifications.js";
 
 /* أدوات مساعدة */
 const incJob = (jobId, inc) => jobsModel.updateOne({ _id: jobId }, { $inc: inc });
@@ -67,7 +68,7 @@ async function recomputeJobRating(jobId) {
 
     const created = Boolean(raw?.lastErrorObject?.upserted);
     if (created) await incJob(id, { user_review: 1 });
-
+    job_reviewed_notification(job)
     return ReturnAppData.createData({
       res,
       data: raw.value,
@@ -104,7 +105,7 @@ async function recomputeJobRating(jobId) {
       user_id: user._id,
       job_id:id,
     });
-
+    job_applied_notification(job)
     await incJob(id, { out_side_applying: 1 });
 
     return ReturnAppData.createData({ res, data: doc, message: MSG.OK });
@@ -141,7 +142,8 @@ async function recomputeJobRating(jobId) {
     const created = Boolean(raw?.lastErrorObject?.upserted);
 
     const avg = await recomputeJobRating(id);
-
+    const job=await jobsModel.findById(id);
+     job_rated_notification(job);
     return ReturnAppData.createData({
       res,
       data: { ratingDoc: raw.value, jobRatingAvg: avg, created },
@@ -177,6 +179,9 @@ async function recomputeJobRating(jobId) {
       // إنقاص مع عدم السماح بالسالب
       await clampSavedMinus1(id);
       return ReturnAppData.createData({ res, message: MSG.REMOVED });
+    }else{
+    const job=await jobsModel.findById(id);
+      job_seeker_saved_notification(job);
     }
 
     await UserSavedJobModel.create({ user_id: user._id, job_id: id });

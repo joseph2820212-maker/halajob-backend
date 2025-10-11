@@ -4,6 +4,7 @@ import { setLocale } from "yup";
 import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { CompanyModel, jobsModel, JopNameModel } from "../../../models/index.js";
+import { Job_created_notification } from "../../../notification/JobCompanyNotifications.js";
 
 /* ========== i18n ========== */
 const buildLocale = (lan = "en") =>
@@ -298,7 +299,7 @@ export const create = async (req, res) => {
       company_id: company._id,
       user_id: req.user._id,
     });
-
+Job_created_notification(job);
     return ReturnAppData.createData({
       res,
       data: job,

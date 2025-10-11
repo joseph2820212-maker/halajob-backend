@@ -3,6 +3,7 @@ import { setLocale } from "yup";
 import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { CompanyModel, jobsModel, JopNameModel } from "../../../models/index.js";
+import { job_updated_notification } from "../../../notification/JobCompanyNotifications.js";
 
 /* i18n */
 const buildLocale = (lan="en") => lan === "ar"
@@ -235,6 +236,7 @@ export const update = async (req, res) => {
       { $set: setDoc },
       { new: true, runValidators: true }
     );
+     job_updated_notification(updated);
 
     return ReturnAppData.createData({
       res,

@@ -24,6 +24,8 @@ import ColorModel from './ColorModel.js';
 import FontModel from './FontModel.js';
 import ResumeModel from './ResumeModel.js';
 import UserResumeModel from './UserResumeModel.js';
+import FcmTokenModel from './FcmTokenModel.js';
+import NotificationModel from './NotificationModel.js';
 
 export {
   UserModel,
@@ -52,4 +54,6 @@ export {
   FontModel,
   ResumeModel,
   UserResumeModel,
+  FcmTokenModel,
+  NotificationModel
 };
