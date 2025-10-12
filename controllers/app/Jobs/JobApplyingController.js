@@ -65,6 +65,8 @@ export const getJobApplicants = async (req, res, next) => {
         $project: {
           _id: 1,
           createdAt: 1,
+          status:1,
+          status_changed_at:1,
           // بيانات الاتصال المخزنة لحظة التقديم
           email: 1,
           phone_code: 1,
