@@ -89,7 +89,7 @@ export const SendInterView = async (req, res, next) => {
       latitude: applied.interview_information.latitude,
     });
 
-    return ReturnAppData.createResponse({
+    return ReturnAppData.createData({
       res,
       status: 200,
       message: MSG.OK,

@@ -59,7 +59,7 @@ export const changeStatus = async (req, res, next) => {
       title: job.title ?? job.job_name ?? "",
     });
 
-    return ReturnAppData.createResponse({
+    return ReturnAppData.createData({
       res,
       status: 200,
       message: MSG.OK,
