@@ -11,7 +11,8 @@ import {
   CompanyModel,
   JopTypeModel,
   UserShowJobModel,
-  UserSavedJobModel
+  UserSavedJobModel,
+  CountryModel
 } from "../../../models/index.js";
 
 /* ========= utils ========= */
@@ -41,6 +42,10 @@ const normalizeMixed = s =>
   normalizeEnglish(
     normalizeArabic((s || "").replace(NON_AR_EN, " ").replace(/\s+/g, " ").trim())
   );
+
+function escapeRegExp(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 function tokenizeBasic(text) {
   const toks = normalizeMixed(text).split(/\s+/).filter(Boolean);
@@ -72,8 +77,8 @@ const JOP_TYPE_COLL = JopTypeModel.collection.name;            // "jop_type"
 const COMPANY_COLL = CompanyModel.collection.name;             // "companies"
 const USS_COLL = UserShowJobModel.collection.name;         // "user_show_job" (أو حسب اسمك الفعلي)
 
-/* ========= list ========= */
 
+/* ========= list ========= */
 const get = async (req, res) => {
   try {
     // ===== inputs =====
@@ -81,17 +86,14 @@ const get = async (req, res) => {
     const limit = Math.min(50, Math.max(1, Number(req.query.limit || 10)));
     const lan = (req.get("lan") || "en").toLowerCase();
     const rawSearch = String(req.query.search || "").slice(0, 100).trim();
-    const countryId = (req.query.country_id || "").trim();
+    const countryIdRaw = (req.query.country_id || "").trim();
 
-    // user_id من الهيدر أولاً ثم من req.user
-    const userIdHeader = req.get("user_id") || null;
-    const userId = userIdHeader && isValidObjectId(userIdHeader)
-      ? new Types.ObjectId(userIdHeader)
-      : (req.user?._id ? new Types.ObjectId(req.user._id) : null);
+    // user_id
+    const userIdParam =
+      req.query.user_id || req.params.user_id || req.get("user_id") || req.user?._id || null;
+    const userObjId = isValidObjectId(userIdParam) ? new Types.ObjectId(String(userIdParam)) : null;
 
-    const tokens = tokenizeBasic(rawSearch);
-
-    // ===== parse filters (الواردة من العميل) =====
+    // ===== parse filters =====
     const rawFilters = (() => {
       const f = req.query.filters;
       if (!f) return {};
@@ -100,84 +102,112 @@ const get = async (req, res) => {
       return {};
     })();
 
-    const companyIds = parseIds(rawFilters.companies);                 // select_one
-    const typeIds = parseIds(rawFilters.types);                     // select_many
-    const publishKey = typeof rawFilters.publish_date === "string" ? rawFilters.publish_date : null; // select_one
-    const isRemote = typeof rawFilters.is_remote === "boolean" ? rawFilters.is_remote : null;      // boolean
-    const notSeen = rawFilters.not_seen === true;                   // boolean (وظائف لم تُشاهد)
-
+    const companyIds = parseIds(rawFilters.companies);
+    const typeIds    = parseIds(rawFilters.types);
+    const publishKey = typeof rawFilters.publish_date === "string" ? rawFilters.publish_date : null;
+    const isRemote   = typeof rawFilters.is_remote === "boolean" ? rawFilters.is_remote : null;
+    const notSeen    = rawFilters.not_seen === true;
     const createdAtGte = publishKey ? dateFromBucket(publishKey) : null;
 
-    // ===== localization =====
-    const L = lan === "ar"
-      ? {
-        companies: "الشركات",
-        types: "أنواع الوظائف",
-        remote: "عن بُعد",
-        remote_yes: "عن بُعد",
-        remote_no: "في المكتب",
-        publish_date: "تاريخ النشر",
-        pd_24h: "آخر 24 ساعة",
-        pd_7d: "آخر 7 أيام",
-        pd_30d: "آخر 30 يومًا",
-        not_seen: "وظائف لم تُشاهد",
-        not_seen_true: "غير مُشاهدة بعد",
+    // ===== country condition (يدعم id أو code/اسم) =====
+    let countryCond = {};
+    if (countryIdRaw) {
+      if (isValidObjectId(countryIdRaw)) {
+        // جلب مرجع الدولة لإنتاج بدائل مطابقة مع حقل countries النصّي
+        const cDoc = await CountryModel.findById(countryIdRaw)
+          .select("code name_en name_ar").lean().catch(() => null);
+        const candidates = [
+          String(countryIdRaw),
+          cDoc?.code,
+          cDoc?.code?.toLowerCase?.(),
+          cDoc?.code?.toUpperCase?.(),
+          cDoc?.name_en,
+          cDoc?.name_ar,
+        ].filter(Boolean);
+        if (candidates.length) countryCond = { countries: { $in: candidates } };
+        else countryCond = { countries: { $in: [String(countryIdRaw)] } };
+      } else {
+        countryCond = { countries: { $in: [countryIdRaw] } };
       }
-      : {
-        companies: "Companies",
-        types: "Job types",
-        remote: "Remote",
-        remote_yes: "Remote",
-        remote_no: "On-site",
-        publish_date: "Publish date",
-        pd_24h: "Last 24 hours",
-        pd_7d: "Last 7 days",
-        pd_30d: "Last 30 days",
-        not_seen: "Unseen jobs",
-        not_seen_true: "Not seen yet",
-      };
+    }
 
-    // ===== base match =====
+    // ===== search tokens & regex =====
+    const tokens = tokenizeBasic(rawSearch);
+    let orConds = [];
+    if (tokens.length) {
+      orConds.push({ keywords_norm: { $in: tokens } });
+      orConds.push({ phrases_norm:  { $in: tokens } });
+      const rx = new RegExp(tokens.map(t => escapeRegExp(t)).join("|"), "i");
+      orConds.push({ job_name: rx }, { description: rx }, { keywords_norm: rx }, { phrases_norm: rx });
+    }
+
+    // ===== match =====
     const match = {
       status: true,
       is_accepted: true,
-      ...(countryId && { countries: countryId }),
-      ...(tokens.length && { keywords_norm: { $in: tokens } }),
-      ...(companyIds.length && { company_id: companyIds[0] }), // select_one
+      ...countryCond,
+      ...(orConds.length && { $or: orConds }),
+      ...(companyIds.length && { company_id: companyIds[0] }),
       ...(typeIds.length && { jop_type_id: { $in: typeIds } }),
       ...(createdAtGte && { createdAt: { $gte: createdAtGte } }),
       ...(isRemote === true && { is_remote: true }),
       ...(isRemote === false && { is_remote: false }),
     };
 
+    // ===== localization =====
+    const L = lan === "ar"
+      ? {
+          companies: "الشركات",
+          types: "أنواع الوظائف",
+          remote: "عن بُعد",
+          remote_yes: "عن بُعد",
+          remote_no: "في المكتب",
+          publish_date: "تاريخ النشر",
+          pd_24h: "آخر 24 ساعة",
+          pd_7d: "آخر 7 أيام",
+          pd_30d: "آخر 30 يومًا",
+          not_seen: "وظائف لم تُشاهد",
+          not_seen_true: "غير مُشاهدة بعد",
+        }
+      : {
+          companies: "Companies",
+          types: "Job types",
+          remote: "Remote",
+          remote_yes: "Remote",
+          remote_no: "On-site",
+          publish_date: "Publish date",
+          pd_24h: "Last 24 hours",
+          pd_7d: "Last 7 days",
+          pd_30d: "Last 30 days",
+          not_seen: "Unseen jobs",
+          not_seen_true: "Not seen yet",
+        };
+
     const skip = (page - 1) * limit;
 
     // ===== core pipeline =====
     const core = [
       { $match: match },
-
       {
         $lookup: {
           from: COMPANY_COLL,
           localField: "company_id",
           foreignField: "_id",
           as: "company",
-          pipeline: [{ $project: { company_name: 1, image: 1 } }]
-        }
+          pipeline: [{ $project: { company_name: 1, image: 1 } }],
+        },
       },
       { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
-
       {
         $lookup: {
           from: JOP_TYPE_COLL,
           localField: "jop_type_id",
           foreignField: "_id",
           as: "jop_type",
-          pipeline: [{ $project: { [`title_${lan}`]: 1 } }]
-        }
+          pipeline: [{ $project: { [`title_${lan}`]: 1 } }],
+        },
       },
       { $unwind: { path: "$jop_type", preserveNullAndEmptyArrays: true } },
-
       {
         $addFields: {
           company_name: "$company.company_name",
@@ -185,36 +215,36 @@ const get = async (req, res) => {
           job_type_title: `$jop_type.title_${lan}`,
           _kwScore: tokens.length
             ? { $size: { $setIntersection: [{ $ifNull: ["$keywords_norm", []] }, tokens] } }
-            : 0
-        }
+            : 0,
+        },
       },
     ];
 
-    // فلتر "غير مُشاهدة" عبر user_show_job
-    const seenFilter = (notSeen && userId)
+    // not_seen
+    const seenFilter = (notSeen && userObjId)
       ? [
-        {
-          $lookup: {
-            from: USS_COLL, // user_show_job
-            let: { jid: "$._id" },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $and: [
-                      { $eq: ["$job_id", "$$jid"] },
-                      { $eq: ["$user_id", userId] }
-                    ]
-                  }
-                }
-              },
-              { $limit: 1 }
-            ],
-            as: "seenHit"
-          }
-        },
-        { $match: { seenHit: { $size: 0 } } },
-      ]
+          {
+            $lookup: {
+              from: USS_COLL,
+              let: { jid: "$._id" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        { $eq: ["$job_id", "$$jid"] },
+                        { $eq: ["$user_id", userObjId] },
+                      ],
+                    },
+                  },
+                },
+                { $limit: 1 },
+              ],
+              as: "seenHit",
+            },
+          },
+          { $match: { seenHit: { $size: 0 } } },
+        ]
       : [];
 
     const sortAndProject = [
@@ -230,41 +260,38 @@ const get = async (req, res) => {
           company: "$company_name",
           company_image: 1,
           job_type: "$job_type_title",
-        }
+        },
       },
     ];
-    // ===== check saved jobs =====
-    const savedJoin = userId
+
+    const savedJoin = userObjId
       ? [
-        {
-          $lookup: {
-            from: UserSavedJobModel.collection.name,
-            let: { jid: "$_id" },
-            pipeline: [
-              {
-                $match: {
-                  $expr: {
-                    $and: [
-                      { $eq: ["$job_id", "$$jid"] },
-                      { $eq: ["$user_id", userId] },
-                    ],
+          {
+            $lookup: {
+              from: UserSavedJobModel.collection.name,
+              let: { jid: "$_id", uid: userObjId },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: {
+                      $and: [
+                        { $eq: ["$job_id", "$$jid"] },
+                        { $eq: ["$user_id", "$$uid"] },
+                      ],
+                    },
                   },
                 },
-              },
-              { $limit: 1 },
-            ],
-            as: "savedHit",
+                { $limit: 1 },
+              ],
+              as: "savedHit",
+            },
           },
-        },
-        {
-          $addFields: {
-            is_saved: { $cond: [{ $gt: [{ $size: "$savedHit" }, 0] }, true, false] },
-          },
-        },
-        { $project: { savedHit: 0 } },
-      ]
+          { $addFields: { is_saved: { $gt: [{ $size: "$savedHit" }, 0] } } },
+          { $project: { savedHit: 0 } },
+        ]
       : [];
-    // ===== facets (بدون عدّادات) =====
+
+    // ===== facets =====
     const facet = {
       items: [{ $skip: skip }, { $limit: limit }],
       meta: [{ $count: "total" }],
@@ -283,7 +310,6 @@ const get = async (req, res) => {
         { $sort: { title: 1 } },
         { $limit: 100 },
       ];
-      // remote/publish_date/not_seen خيارات ثابتة
     }
 
     const pipeline = [
@@ -309,7 +335,7 @@ const get = async (req, res) => {
       is_remote: !!it.is_remote,
       countries: it.countries || [],
       created_at: it.createdAt,
-      is_saved: !!it.is_saved, // جديد
+      is_saved: !!it.is_saved,
     }));
 
     const other = {
@@ -317,7 +343,6 @@ const get = async (req, res) => {
     };
 
     if (page === 1 && !req.query.filters) {
-      // خيارات الفلاتر
       const companiesOpts = (() => {
         const seen = new Set();
         return (agg.companies || [])
@@ -345,9 +370,7 @@ const get = async (req, res) => {
         { value: "last_30d", label: L.pd_30d },
       ];
 
-      const notSeenOpts = [
-        { value: true, label: L.not_seen_true },
-      ];
+      const notSeenOpts = [{ value: true, label: L.not_seen_true }];
 
       other.filters = {
         groups: [
@@ -366,13 +389,18 @@ const get = async (req, res) => {
   }
 };
 
-
-
 /* ========= details ========= */
 const getById = async (req, res) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const id = String(req.params.id || "");
+      const userIdParam =
+  req.query.user_id ||        // <-- أضف هذا
+  req.params.user_id ||
+  req.get("user_id") ||
+  req.user?._id ||
+  null;
+const userObjId = isValidObjectId(userIdParam) ? new Types.ObjectId(String(userIdParam)) : null;
 
     if (!isValidObjectId(id)) {
       return ReturnAppData.getError({ res, code: 400, message: "invalid id" });
@@ -390,15 +418,16 @@ const getById = async (req, res) => {
     const serviceIds = Array.isArray(job.jop_service)
       ? job.jop_service.filter(Boolean).map(v => (typeof v === "string" ? new Types.ObjectId(v) : v))
       : [];
-
-    const [salary, currency, workTime, services, company, jopType] = await Promise.all([
-      job.jop_salary_id ? JopSalaryModel.findById(job.jop_salary_id).lean() : null,
-      job.currency_id ? CurrencyModel.findById(job.currency_id).lean() : null,
-      job.jop_time_id ? WorkTimeTypeModel.findById(job.jop_time_id).lean() : null,
-      serviceIds.length ? JopServiceModel.find({ _id: { $in: serviceIds } }).lean() : [],
-      job.company_id ? CompanyModel.findById(job.company_id).lean() : null,
-      job.jop_type_id ? JopTypeModel.findById(job.jop_type_id).lean() : null,
-    ]);
+const [salary, currency, workTime, services, company, jopType, isSavedDoc] = await Promise.all([
+  job.jop_salary_id ? JopSalaryModel.findById(job.jop_salary_id).lean() : null,
+  job.currency_id ? CurrencyModel.findById(job.currency_id).lean() : null,
+  job.jop_time_id ? WorkTimeTypeModel.findById(job.jop_time_id).lean() : null,
+  serviceIds.length ? JopServiceModel.find({ _id: { $in: serviceIds } }).lean() : [],
+  job.company_id ? CompanyModel.findById(job.company_id).lean() : null,
+  job.jop_type_id ? JopTypeModel.findById(job.jop_type_id).lean() : null,
+ userObjId ? UserSavedJobModel.exists({ job_id: job._id, user_id: userObjId }) : false,
+]);
+const is_saved = !!isSavedDoc;
 
     const response = {
       id: job._id,
@@ -407,6 +436,7 @@ const getById = async (req, res) => {
       job_type: jopType?.[`title_${lan}`] || null,
       jop_type_info: job.jop_type_info ?? null,
       salary_type: salary?.[`title_${lan}`] || null,
+      is_saved,
       currency: currency
         ? {
           title: currency[`name_${lan}`] ?? null,

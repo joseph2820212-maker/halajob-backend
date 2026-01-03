@@ -3,6 +3,7 @@ import dict from './screens.json'  with { type: 'json' };
 
 
 export default function screen( key) {
+  return key;
   const primary = dict?.routes[key]?.route_key;
 
   // إحلال متغيّرات بصيغة {name}

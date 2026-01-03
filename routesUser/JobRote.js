@@ -5,6 +5,7 @@ import CreateJobController from '../controllers/app/Jobs/CreateJobController.js'
 import GetJobControllerById from '../controllers/app/Jobs/GetJobController.js';
 import UpdateJobController from '../controllers/app/Jobs/UpdateJobController.js';
 import GetJobController from '../controllers/app/JobData/GetJobController.js';
+import GetPopularController from '../controllers/app/JobData/GetPopularController.js';
 authUser
 // إعداد التخزين للملفات
 
@@ -19,6 +20,7 @@ router.post('/update/:id',authUser, UpdateJobController.update);
 router.get('/get-single-job/:id',authUser, GetJobControllerById.getById);
 
 router.get('/get', GetJobController.get);
+router.get('/get-popular', GetPopularController.get);
 router.get('/get-by-id/:id', GetJobController.getById);
 
 // استرجاع البيانات

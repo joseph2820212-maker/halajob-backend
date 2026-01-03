@@ -29,7 +29,6 @@ const jobsSchema = new Schema(
     ref: { type: String, trim: true },
 
     // تصنيفات إضافية (احتفظت بها إن كنت تستعملها)
-    jobs_name: [{ type: String, trim: true }],
 
     // النوع والوقت والراتب والموقع   
     currency_id: { type: Schema.Types.ObjectId, ref: "currencies", required: true },

@@ -3,6 +3,7 @@ import { sendToTokens } from "./SendNotification.js";
 import tt from "./Translate.js";
 import { FcmTokenModel, NotificationModel } from "../models/index.js";
 import screen from "./screen.js";
+import { Types, isValidObjectId } from "mongoose";
 
 // قسّم مصفوفة إلى دفعات
 const chunk = (arr, n = 500) => {
@@ -48,23 +49,32 @@ async function notifyJob(type, job = {}) {
     const cfg = TYPE_MAP[type];
     if (!cfg) return { success: 0, failure: 0, note: `unknown type: ${type}` };
 
-    const user_id = job.user_id;
-    if (!user_id) return { success: 0, failure: 0, note: "no user_id" };
+    // 1) تطبيع المعرّف من أكثر من اسم
+    const rawUserId =
+      job.user_id || job.user || job.created_by || job.owner_id || null;
+    if (!rawUserId) return { success: 0, failure: 0, note: "no user_id" };
 
-    // اجلب توكنات المستخدم الفعالة
-    const docs = await FcmTokenModel.find({ user: user_id, revoked: false })
+    const userId = isValidObjectId(rawUserId)
+      ? new Types.ObjectId(String(rawUserId))
+      : rawUserId;
+
+    // 2) اجلب التوكنات بالدعم لكلا الحقلين user / user_id
+    const docs = await FcmTokenModel.find({
+      $or: [{ user: userId }, { user_id: userId }],
+      revoked: false,
+    })
       .select("token _id")
       .lean();
-    const tokens = docs.map(d => d.token);
+    const tokens = docs.map((d) => d.token);
 
-    // خزّن الإشعار في قاعدة البيانات أولًا
-    const title = tt(cfg.i18n);
-    const body  = job.title ?? job.job_name ?? "";
-    const scr   = screen(cfg.screen);
+    // 3) خزّن الإشعار بالحقل المطلوب من المخطط (user_id)
+    const title = tt("ar", cfg.i18n);
+    const body = job.title ?? job.job_name ?? "";
+    const scr = screen(cfg.screen);
     const jobId = job._id ?? null;
 
     const notif = await NotificationModel.create({
-      user: user_id,
+      user_id: userId,              // <-- كان user
       title,
       body,
       screen: scr,
@@ -74,19 +84,25 @@ async function notifyJob(type, job = {}) {
     });
 
     if (!tokens.length) {
-      return { success: 0, failure: 0, revoked: 0, saved: notif?._id, note: "no tokens" };
+      return {
+        success: 0,
+        failure: 0,
+        revoked: 0,
+        saved: notif?._id,
+        note: "no tokens",
+      };
     }
 
-    let success = 0;
-    let failure = 0;
-    let revoked = 0;
+    let success = 0,
+      failure = 0,
+      revoked = 0;
 
     for (const batch of chunk(tokens, 500)) {
       const res = await sendToTokens(batch, {
         title,
         body,
         screen: scr,
-        id: jobId, // سيُحوَّل إلى data.id + deeplink في طبقة الإرسال لديك
+        id: jobId,
         extraData: { order_id: jobId },
       });
 

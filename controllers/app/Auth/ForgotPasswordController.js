@@ -153,7 +153,7 @@ const forgotPassword = async (req, res, next) => {
     }
 
     // جهاز جديد → أرسل 2FA (٦ أرقام) قبل السماح بالاستعادة
-    const twofa = Math.floor(100000 + Math.random() * 900000); // 100000..999999
+    const twofa = Math.floor(10000 + Math.random() * 90000); // 100000..999999
     user.another_device_code = twofa;
     user.another_device_expires_at = new Date(Date.now() + 10 * 60 * 1000);
     user.pending_device = incomingDevice;

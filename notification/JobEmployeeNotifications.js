@@ -59,7 +59,7 @@ export async function changeJobStatus(status, job = {}) {
       .select("token _id").lean();
     const tokens = docs.map(d => d.token);
 
-    const title = tt(cfg.i18n);
+    const title = tt("ar",cfg.i18n);
     const body  = job.title ?? job.job_name ?? "";
     const scr   = screen(cfg.screen);
     const jobId = job._id ?? null;
@@ -117,7 +117,7 @@ export async function SendInterViewNotification(job = {}) {
       job.is_online    ? "is_online"    : "is_online"; // افتراضي
 
     const cfg = InterviewTypeMap[kind];
-    const title = tt(cfg.i18n);
+    const title = tt("ar",cfg.i18n);
     const body  = job.title ?? job.job_name ?? "";
     const scr   = screen(cfg.screen);
     const jobId = job.job_id ?? job._id ?? null;

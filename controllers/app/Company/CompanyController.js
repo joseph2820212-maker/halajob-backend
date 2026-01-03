@@ -75,8 +75,8 @@ const get = async (req, res, next) => {
       });
     }
     const response={
-      id:company.id,
-      name:company.name,
+      id:company._id,
+      name:company.company_name,
       image:company?.image?buildPublicUrl(process.env.PUBLIC_BASE_URL, company?.image):null,
       company_email:company.company_email,
       created_year:company.created_year,
@@ -89,6 +89,8 @@ const get = async (req, res, next) => {
       company_phone:company.company_phone,
       company_phone_code:company.company_phone_code,
       company_website:company.company_website,
+      accepted:company.accepted,
+      status:company.status
     }
     return ReturnAppData.getData({ res, data: response });
   } catch (err) {

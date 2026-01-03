@@ -33,7 +33,12 @@ const jobSchema = yup
     jop_salary_id: yup.string().required(),
     jop_salary_info: yup.object().required(),
 
-    languages: yup.object().optional(),
+     languages: yup.array().of(
+       yup.object({
+         name: yup.string().required(),
+         level: yup.number().min(1).max(5).required(),
+       })
+     ).optional(),
     description: yup.string().required(),
 
     countries: yup.array().of(yup.string().trim().min(1)).min(1).required(),
@@ -306,27 +311,30 @@ Job_created_notification(job);
       message: lan === "ar" ? "تم إنشاء الوظيفة" : "Job created",
     });
   } catch (e) {
-    if (e.name === "ValidationError") {
-      const lan = (req.get("lan") || "en").toLowerCase();
-      const errors = e.inner?.length
-        ? e.inner.reduce((acc, curr) => {
-            const path = curr.path || "_";
-            (acc[path] ||= []).push(curr.message);
-            return acc;
-          }, {})
-        : { _: [e.message] };
+   if (e.name === "ValidationError") {
+  const lan = (req.get("lan") || "en").toLowerCase();
+  const errors = e.inner?.length
+    ? e.inner.reduce((acc, curr) => {
+        const path = curr.path || "_";
+        (acc[path] ||= []).push(curr.message);
+        return acc;
+      }, {})
+    : { _: [e.message] };
 
-      return ReturnAppData.createError({
-        res,
-        message: lan === "ar" ? "البيانات غير صالحة" : "Invalid payload",
-        errors,
-      });
-    }
-    return ReturnAppData.createError({
-      res,
-      message: "Server error",
-      errors: e?.message,
-    });
+  // نص موحد للمستخدم يوضح الحقول المطلوبة
+  const missingFields = Object.keys(errors).join(", ");
+  const userMessage =
+    lan === "ar"
+      ? `البيانات غير صالحة. يرجى تعبئة الحقول التالية: ${missingFields}`
+      : `Invalid data. Please fill the following fields: ${missingFields}`;
+
+  return ReturnAppData.createError({
+    res,
+    message: userMessage,
+    errors,
+  });
+}
+ 
   }
 };
 

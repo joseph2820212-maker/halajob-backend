@@ -16,6 +16,7 @@ const router = express.Router();
 
 // رفع ملف واحد مع البيانات
 router.get('/job-name', JobNameHelperController.search);
+router.get('/job-search', JobNameHelperController.search);
 router.get('/job-salary', JobSalaryHelperController.search);
 router.get('/job-salary-get', JobSalaryHelperController.get);
 router.get('/job-service', JobServiceHelperController.search);

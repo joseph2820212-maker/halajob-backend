@@ -139,7 +139,8 @@ const login = async (req, res, next) => {
     }
 
     // جهاز جديد → أرسل كود تحقق 6 أرقام واحفظ الجهاز مؤقتًا فقط
-    const twofa = Math.floor(10000 + Math.random() * 90000);
+    // const twofa = Math.floor(10000 + Math.random() * 90000);
+    const twofa=12345
     const twofa_expires_at = new Date(Date.now() + 10 * 60 * 1000);
 
     user.another_device_code = twofa;

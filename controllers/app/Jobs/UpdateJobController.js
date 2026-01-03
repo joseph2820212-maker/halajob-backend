@@ -28,7 +28,12 @@ const editSchema = yup.object({
   jop_salary_id: yup.string().optional(),
   jop_salary_info: yup.object().optional(),
 
-  languages: yup.object().optional(),
+    languages: yup.array().of(
+    yup.object({
+      name: yup.string().required(),
+      level: yup.number().min(1).max(5).required(),
+    })
+  ).optional(),
   description: yup.string().optional(),
 
   countries: yup.array().of(yup.string().trim().min(1)).min(1).optional(),

@@ -11,14 +11,22 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { scheduleCurrencyRefresh } from "./services/currency.service.js";
 
-const app = express();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-app.set('trust proxy', true)
-// ✅ مفككات الجسم أولًا
-app.use(express.json({ limit: '10mb', type: 'application/json' })); // مهم
-app.use(express.urlencoded({ extended: true })); // للـ x-www-form-urlencoded
+// حدد __filename و __dirname أول شيء
+const __filename = fileURLToPath(import.meta.url);
+const __dirname  = path.dirname(__filename);
 
-// لوجينغ أثناء التطوير
+// الآن استخدمها بأمان
+const dashPath  = path.join(__dirname, 'dash');   // مجلد React
+const frontPath = path.join(__dirname, 'front');  // عدّل حسب مسارك الفعلي
+
+const app = express();
+
+app.set('trust proxy', true);
+
+// مفككات الجسم
+app.use(express.json({ limit: '10mb', type: 'application/json' }));
+app.use(express.urlencoded({ extended: true }));
+
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
@@ -30,15 +38,24 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
 
-// ✅ ركّب الراوترات بعد مفككات الجسم
+// Static
+app.use('/assets_front', express.static(path.join(frontPath, 'assets_front')));
+app.use('/vendor',       express.static(path.join(frontPath, 'vendor')));
+app.use('/assets',       express.static(path.join(dashPath, 'assets')));
+app.use('/logo2.png',    express.static(path.join(dashPath, 'logo2.png')));
+app.use('/uploads',      express.static(path.join(__dirname, 'uploads')));
+
+// الراوترات
 app.use('/v1', routes);
 app.use('/user/v1', userRoutes);
+app.get('/dash*', (req, res) =>
+  res.sendFile(path.join(dashPath, 'index.html'))
+);
 
-// أمان/ضغط/تعقيم — بعد فك الجسم
+// أمان/ضغط/تعقيم
 app.use(helmet());
 app.use(compression());
 app.use(mongoSanitize());
-// scheduleCurrencyRefresh();
 
 // أخطاء
 app.use(error.notFound);

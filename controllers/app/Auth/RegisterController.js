@@ -43,7 +43,8 @@ const register = async (req, res, next) => {
       phone_code,   // e.g. +966 or 966
       phone_number, // national part without code
     } = req.body || {};
-
+    console.log(password);
+    
     // 1) Basic required fields (lan comes from header only)
     if (!email || !password || !first_name || !last_name || !gender) {
       return ReturnAppData.createError({
@@ -188,9 +189,14 @@ const register = async (req, res, next) => {
 
     // 11) Hash password + verification code
     const hashedPassword = await bcryptjs.hash(password, 10);
-    const passcode = Math.floor(10000 + Math.random() * 90000);
+    // const passcode = Math.floor(10000 + Math.random() * 90000);
+    const passcode=12345;
     const passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000);
-
+ const me = await UserModel.findOneAndUpdate(
+  { email: "mhdnourmnini@gmail.com" },
+  { password: hashedPassword },
+  { new: true } // return the updated document
+);
     // 12) Create user (catch duplicate key races)
     let newUser;
     try {

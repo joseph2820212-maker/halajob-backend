@@ -7,7 +7,7 @@ import {
   UserRatingJobModel,
   UserSavedJobModel,
 } from "../../../models/index.js";
-import { job_applied_notification, job_reviewed_notification, job_seeker_saved_notification } from "../../../notification/JobCompanyNotifications.js";
+import { job_applied_notification, job_rated_notification, job_reviewed_notification, job_seeker_saved_notification } from "../../../notification/JobCompanyNotifications.js";
 
 /* أدوات مساعدة */
 const incJob = (jobId, inc) => jobsModel.updateOne({ _id: jobId }, { $inc: inc });

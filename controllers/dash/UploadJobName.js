@@ -3,21 +3,21 @@ import fs from "fs";
 import xlsx from "xlsx";
 import { SheetModel, JopNameModel } from "../../models/index.js";
 
-/* خرائط رؤوس الأعمدة المحتملة */
+/* ===== خرائط رؤوس الأعمدة المحتملة بعد التطبيع ===== */
 const H = {
-  sheet: new Set(["sheet", "Sheet", "SHEET", "الورقة", "اسم الورقة"]),
-  rows:  new Set(["rows", "Rows", "ROWS", "عدد الصفوف", "Sheet rows"]),
+  sheet: new Set(["sheet", "الورقة", "اسم الورقة"]),
+  rows:  new Set(["rows", "عدد الصفوف", "sheet rows"]),
 
   sector_ar:    new Set(["القطاع"]),
-  sector_en:    new Set(["Sector"]),
+  sector_en:    new Set(["sector"]),
   subsector_ar: new Set(["المجال الفرعي"]),
-  subsector_en: new Set(["Subsector"]),
+  subsector_en: new Set(["subsector"]),
   title_ar:     new Set(["المسمى الوظيفي"]),
-  title_en:     new Set(["Job Title", "Job title"]),
-  keywords:     new Set(["الكلمات المفتاحية", "Keywords"]),
+  title_en:     new Set(["job title"]),
+  keywords:     new Set(["الكلمات المفتاحية", "keywords"]),
 };
 
-/* أدوات */
+/* ===== أدوات ===== */
 const norm = (s) => String(s ?? "").trim();
 const nlow = (s) => norm(s).toLowerCase();
 const toUndef = (v) => {
@@ -25,6 +25,9 @@ const toUndef = (v) => {
   const s = norm(v);
   return s ? s : undefined;
 };
+// إزالة BOM و NBSP قبل المطابقة
+const hnorm = (s) => String(s ?? "").replace(/\uFEFF/g, "").replace(/\u00A0/g, " ").trim();
+
 /* مفتاح إزالة التكرار */
 const buildDedupeKey = (p) =>
   [p.sector_ar, p.sector_en, p.subsector_ar, p.subsector_en, p.title_ar, p.title_en]
@@ -33,16 +36,26 @@ const buildDedupeKey = (p) =>
 
 /* إيجاد اسم عمود من الهيدر */
 function pick(headers, candidatesSet) {
-  return headers.find((h) => candidatesSet.has(h)) ?? null;
+  const Hn = headers.map(hnorm);
+  for (let i = 0; i < Hn.length; i++) if (candidatesSet.has(nlow(Hn[i]))) return headers[i];
+  return null;
+}
+/* إيجاد كل الأعمدة المطابقة */
+function pickAll(headers, candidatesSet) {
+  const out = [];
+  const Hn = headers.map(hnorm);
+  for (let i = 0; i < Hn.length; i++) if (candidatesSet.has(nlow(Hn[i]))) out.push(headers[i]);
+  return out;
 }
 
-/* تقسيم الكلمات المفتاحية: فاصلة إنكليزية/عربية، فاصلة منقوطة، | ، أو سطر جديد */
+/* تقسيم الكلمات: , ، ؛ ; | وأسطر جديدة وتبويب */
 function splitKeywords(v) {
   const s = norm(v);
   if (!s) return [];
-  return s.split(/[,\u061B;|\n]/).map((x) => x.trim()).filter(Boolean);
+  return s.split(/[,\u060C\u061B;|\n\r\t]+/).map((x) => x.trim()).filter(Boolean);
 }
 
+/* ===== المنفّذ ===== */
 export const uploadExcel = async (req, res) => {
   try {
     if (!req.file?.path) return res.status(400).json({ error: "no file" });
@@ -61,28 +74,27 @@ export const uploadExcel = async (req, res) => {
     const indexRows = xlsx.utils.sheet_to_json(indexWS, { defval: "" });
     if (!indexRows.length) return res.status(400).json({ error: "index sheet empty" });
 
-    // قراءة رؤوس index
+    // رؤوس index
     const indexHeaders = (xlsx.utils.sheet_to_json(indexWS, { header: 1 })[0] || []).map(String);
     const colSheet = pick(indexHeaders, H.sheet) ?? "Sheet";
     const colRows  = pick(indexHeaders, H.rows)  ?? null;
 
-    // 1) إنشاء سجلات Sheets من index
+    /* ===== حذف كل البيانات القديمة قبل البناء ===== */
+    await JopNameModel.deleteMany({});
+    await SheetModel.deleteMany({});
+
+    /* ===== إنشاء سجلات Sheets من index ===== */
     const resultSheets = [];
     for (const r of indexRows) {
       const name = norm(r[colSheet]);
       if (!name) continue;
-
       const totalRows = colRows ? Number(r[colRows] || 0) : 0;
 
-      const doc = await SheetModel.findOneAndUpdate(
-        { name },
-        { $setOnInsert: { name }, $set: { totalRows } },
-        { upsert: true, new: true }
-      );
+      const doc = await SheetModel.create({ name, totalRows });
       resultSheets.push(doc);
     }
 
-    // 2) إدخال jobNames بكفاءة مع bulkWrite
+    /* ===== إدخال jobNames بكفاءة مع bulkWrite ===== */
     let inserted = 0, updated = 0, skipped = 0;
 
     for (const sDoc of resultSheets) {
@@ -102,11 +114,18 @@ export const uploadExcel = async (req, res) => {
         subsector_en: pick(headers, H.subsector_en),
         title_ar:     pick(headers, H.title_ar),
         title_en:     pick(headers, H.title_en),
-        keywords:     pick(headers, H.keywords),
       };
+      // أعمدة الكلمات المفتاحية بالعربي والإنجليزي
+      const kwCols = pickAll(headers, H.keywords);
 
       const ops = [];
       for (const r of rows) {
+        // بناء keywords من كل الأعمدة المطابقة
+        const kw = [];
+        for (const kc of kwCols) kw.push(...splitKeywords(r[kc]));
+        const seen = new Set();
+        const keywords = kw.filter((k) => k && !seen.has(k) && seen.add(k));
+
         // حمولة خام
         const raw = {
           sector_ar:    r[c.sector_ar],
@@ -115,12 +134,15 @@ export const uploadExcel = async (req, res) => {
           subsector_en: r[c.subsector_en],
           title_ar:     r[c.title_ar],
           title_en:     r[c.title_en],
-          keywords:     splitKeywords(r[c.keywords]),
+          keywords,
         };
 
         // تنظيف
         const payload = Object.fromEntries(
-          Object.entries(raw).map(([k, v]) => [k, toUndef(v)])
+          Object.entries(raw).map(([k, v]) => [
+            k,
+            Array.isArray(v) ? (v.length ? v : undefined) : toUndef(v),
+          ])
         );
 
         // صف فارغ إذا كانت الحقول الستة كلها فارغة
@@ -137,7 +159,7 @@ export const uploadExcel = async (req, res) => {
         ops.push({
           updateOne: {
             filter: { sheet: sDoc._id, dedupeKey },
-            update: { $set: { sheet: sDoc._id, dedupeKey, ...payload } },
+            update: { $set: { sheet: sDoc._id, dedupeKey, ...payload, is_auto: true } },
             upsert: true,
           },
         });
@@ -148,12 +170,12 @@ export const uploadExcel = async (req, res) => {
         const upserts = result.upsertedCount ?? Object.keys(result.upsertedIds || {}).length ?? 0;
         inserted += upserts;
         updated  += result.modifiedCount || 0;
-        // الباقي محسوب ضمن skipped مسبقًا عند التصفية
       }
     }
 
     return res.json({
-      sheetsCreatedOrFound: resultSheets.length,
+      resetDone: true,
+      sheetsCreated: resultSheets.length,
       jobNamesInserted: inserted,
       jobNamesUpdated: updated,
       skipped,
