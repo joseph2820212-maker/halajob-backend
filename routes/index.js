@@ -14,6 +14,7 @@ import JobRote from "./JobRote.js";
 import FontRote from "./FontRote.js";
 import ColorRote from "./ColorRote.js";
 import ResumeRote from "./ResumeRote.js";
+import keywordRote from "./keywordRote.js";
 
 import fs from 'fs';
 import path from 'path';
@@ -37,7 +38,7 @@ router.use('/Job', JobRote);
 router.use('/Color', ColorRote);
 router.use('/Font', FontRote);
 router.use('/Resume', ResumeRote);
-
+router.use('/Keyword', keywordRote);
 
 router.get('/image/:name', (req, res) => {
   const fileName = req.params.name;

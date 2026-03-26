@@ -26,6 +26,7 @@ import ResumeModel from './ResumeModel.js';
 import UserResumeModel from './UserResumeModel.js';
 import FcmTokenModel from './FcmTokenModel.js';
 import NotificationModel from './NotificationModel.js';
+import KeywordModel from './KeywordModel.js';
 
 export {
   UserModel,
@@ -55,5 +56,6 @@ export {
   ResumeModel,
   UserResumeModel,
   FcmTokenModel,
-  NotificationModel
+  NotificationModel,
+  KeywordModel
 };

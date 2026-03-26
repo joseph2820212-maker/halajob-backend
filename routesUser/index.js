@@ -11,6 +11,7 @@ import JobProfileRote from './JobProfileRote.js';
 import CompanyProfileRote from './CompanyProfileRote.js';
 import FcmRote from './FcmRote.js';
 import HandleAppliedJobRote from './HandleAppliedJobRote.js';
+import KeywordRote from './KeywordRote.js';
 
 
 const router = express.Router();
@@ -26,5 +27,6 @@ router.use('/job-profile', JobProfileRote);
 router.use('/company-jobs-profile', CompanyProfileRote);
 router.use('/fcm', FcmRote);
 router.use('/handle-applied-job', HandleAppliedJobRote);
+router.use('/keyword', KeywordRote);
 
 export default router;
