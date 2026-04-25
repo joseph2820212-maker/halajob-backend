@@ -50,11 +50,11 @@ export const updateImage = async (req, res, next) => {
       });
     }
 
-    // Delete old image if present
+    // Delete old image safely if present
     if (user.image) {
-     const imagePath = path.join('uploads', user.image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
+      const { abs, uploadsDir } = safeUploadsPath(user.image);
+      if (abs.startsWith(uploadsDir) && fs.existsSync(abs)) {
+        fs.unlinkSync(abs);
       }
     }
 

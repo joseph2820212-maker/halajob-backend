@@ -78,6 +78,17 @@ export const resetPassword = async (req, res, next) => {
       });
     }
 
+    const hasBrand = typeof device.brand === "string" && device.brand.trim();
+    const hasModel = typeof device.model_name === "string" && device.model_name.trim();
+    const hasIsDevice = Object.prototype.hasOwnProperty.call(device, "is_device");
+
+    if (!hasBrand || !hasModel || !hasIsDevice) {
+      return ReturnAppData.createError({
+        res, status: 400,
+        message: lan === "ar" ? "بيانات الجهاز مفقودة." : "Device data is missing.",
+      });
+    }
+
     if (!strongPasswordRe.test(password)) {
       return ReturnAppData.createError({
         res, status: 400,
@@ -107,7 +118,7 @@ export const resetPassword = async (req, res, next) => {
     // Clear passcode state and disable further resets until requested again
     user.passcode = undefined;
     user.passcode_expires_at = undefined;
-    user.can_update_password = undefined;
+    user.can_update_password = false;
 
     // If there was a pending device (2FA flow), clear it now
     user.another_device_code = undefined;

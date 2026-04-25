@@ -1,17 +1,16 @@
-import { CompanyModel, RoleModel, UserModel } from "../../../models/index.js";
+import { UserModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
-import { generateAuthTokens } from "../../../services/tokenService.js";
 
-/** Utils */
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
 const normEmail = (e) => (e || "").trim().toLowerCase();
-const toBool = (v) =>
-  typeof v === "boolean"
-    ? v
-    : typeof v === "number"
-    ? v !== 0
-    : ["true", "1", "yes", "y"].includes(String(v).trim().toLowerCase());
+
+const toBool = (v) => {
+  if (typeof v === "boolean") return v;
+  if (typeof v === "number") return v !== 0;
+  if (typeof v === "string") return ["true", "1", "yes", "y"].includes(v.trim().toLowerCase());
+  return false;
+};
 
 function isDeviceMatch(a = {}, b = {}) {
   const brandA = normStr(a.brand), brandB = normStr(b.brand);
@@ -19,13 +18,9 @@ function isDeviceMatch(a = {}, b = {}) {
   const isDevA = !!a.is_device, isDevB = !!b.is_device;
   if (!brandA || !modelA) return false;
   if (brandA !== brandB || modelA !== modelB || isDevA !== isDevB) return false;
-
-  // لو model_id موجود في الاثنين واختلف → جهاز مختلف
   const midA = normStr(a.model_id || "");
   const midB = normStr(b.model_id || "");
   if (midA && midB && midA !== midB) return false;
-
-  // نتجاهل build_id لأنه يتغيّر مع تحديثات النظام
   return true;
 }
 
@@ -44,20 +39,20 @@ function addOrUpdateDevice(user, dev, { makeDefault = true } = {}) {
     existing.model_id = dev.model_id ?? existing.model_id ?? null;
     existing.last_seen_at = new Date();
     if (makeDefault) user.device = user.device.map((d, i) => ({ ...d, is_default: i === idx }));
-    return { updated: true, index: idx };
-  } else {
-    if (makeDefault) user.device = user.device.map((d) => ({ ...d, is_default: false }));
-    user.device.push({
-      brand: dev.brand,
-      model_name: dev.model_name,
-      model_id: dev.model_id ?? null,
-      is_device: !!dev.is_device,
-      build_id: dev.build_id ?? null,
-      is_default: !!makeDefault,
-      last_seen_at: new Date(),
-    });
-    return { inserted: true, index: user.device.length - 1 };
+    return { inserted: false, updated: true, index: idx };
   }
+
+  if (makeDefault) user.device = user.device.map((d) => ({ ...d, is_default: false }));
+  user.device.push({
+    brand: dev.brand,
+    model_name: dev.model_name,
+    model_id: dev.model_id ?? null,
+    is_device: !!dev.is_device,
+    build_id: dev.build_id ?? null,
+    is_default: !!makeDefault,
+    last_seen_at: new Date(),
+  });
+  return { inserted: true, updated: false, index: user.device.length - 1 };
 }
 
 export const passcodeVerify = async (req, res, next) => {
@@ -72,10 +67,10 @@ export const passcodeVerify = async (req, res, next) => {
       });
     }
 
-    // جلب المستخدم
-    const user = email.includes("@")
-      ? await UserModel.findOne({ email: normEmail(email) })
-      : await UserModel.findOne({ phone_national: email });
+    const identifier = String(email).trim();
+    const user = identifier.includes("@")
+      ? await UserModel.findOne({ email: normEmail(identifier) })
+      : await UserModel.findOne({ phone_national: identifier });
 
     if (!user) {
       return ReturnAppData.createError({
@@ -86,22 +81,18 @@ export const passcodeVerify = async (req, res, next) => {
     }
 
     const now = new Date();
-
-    // صلاحية كود تفعيل الحساب
-    const passcodeValid =
+    const recoveryCodeValid =
       user.passcode &&
-      String(user.passcode) === String(passcode) &&
+      String(user.passcode) === String(passcode).trim() &&
       user.passcode_expires_at &&
       now < new Date(user.passcode_expires_at);
 
-    // صلاحية كود اعتماد جهاز جديد
-    const deviceCodeValid =
+    const newDeviceCodeValid =
       user.another_device_code &&
-      String(user.another_device_code) === String(passcode) &&
+      String(user.another_device_code) === String(passcode).trim() &&
       user.another_device_expires_at &&
       now < new Date(user.another_device_expires_at);
 
-    // جهّز الجهاز الوارد (اختياري)
     const incomingDevice = device
       ? {
           brand: safeStr(device.brand),
@@ -114,76 +105,62 @@ export const passcodeVerify = async (req, res, next) => {
         }
       : null;
 
-    // 1) كود الجهاز الجديد (2FA للجهاز)
-    if (deviceCodeValid) {
+    if (newDeviceCodeValid) {
       const dev = user.pending_device || incomingDevice;
       if (!dev) {
         return ReturnAppData.createError({
           res,
           status: 409,
-          message:
-            lan === "ar" ? "لا يوجد جهاز قيد التحقق." : "No device pending verification.",
+          message: lan === "ar" ? "لا يوجد جهاز قيد التحقق." : "No device pending verification.",
         });
       }
-
-      const result = addOrUpdateDevice(user, dev, { makeDefault: true });
-
-      // نظّف الحقول المؤقتة
+      addOrUpdateDevice(user, dev, { makeDefault: true });
       user.another_device_code = undefined;
       user.another_device_expires_at = undefined;
       user.pending_device = undefined;
-      user.can_update_password=true;
+      user.can_update_password = true;
       user.markModified?.("device");
       await user.save();
-     return ReturnAppData.createData({
-        res,
-        status: 200,
-         message:
-          lan === "ar"?
-           "تم التحقق من الحساب يمكنك تغيير كلمة المرور الان":
-           "The account is verified, you can change the password now"
-      });
-    }
-
-    // 2) كود تفعيل الحساب
-    if (passcodeValid) {
-      user.passcode_active = true;
-      user.status = true;
-
-      // نظّف كود التفعيل
-      user.passcode = undefined;
-      user.passcode_expires_at = undefined;
-user.can_update_password=true;
-      await user.save();
-
-      // بإمكانك هنا عدم إضافة الجهاز نهائيًا (الإضافة تتم عبر 2FA للجهاز)،
-      // لكن سنُرجع هل الجهاز معروف أم لا إن تم تمريره.
-      let device_recognized = false;
-      if (incomingDevice) {
-        ensureDeviceArray(user);
-        device_recognized = user.device.some((d) => isDeviceMatch(d, incomingDevice));
-      }
 
       return ReturnAppData.createData({
         res,
         status: 200,
-         message:
-         lan === "ar"?
-           "تم التحقق من الحساب يمكنك تغيير كلمة المرور الان":
-           "The account is verified, you can change the password now"
+        data: { step: "RESET_PASSWORD" },
+        message:
+          lan === "ar"
+            ? "تم التحقق من الجهاز. يمكنك تغيير كلمة المرور الآن."
+            : "Device verified. You can reset your password now.",
       });
-      
     }
 
-    // 3) كود غير صحيح/منتهي
+    if (recoveryCodeValid) {
+      user.passcode = undefined;
+      user.passcode_expires_at = undefined;
+      user.can_update_password = true;
+      if (incomingDevice?.brand && incomingDevice?.model_name) {
+        addOrUpdateDevice(user, incomingDevice, { makeDefault: true });
+        user.markModified?.("device");
+      }
+      await user.save();
+
+      return ReturnAppData.createData({
+        res,
+        status: 200,
+        data: { step: "RESET_PASSWORD" },
+        message:
+          lan === "ar"
+            ? "تم التحقق من الحساب. يمكنك تغيير كلمة المرور الآن."
+            : "Account verified. You can reset your password now.",
+      });
+    }
+
     return ReturnAppData.createError({
       res,
       status: 400,
-      message:
-        lan === "ar" ? "رمز غير صحيح أو منتهي الصلاحية." : "Invalid or expired code.",
+      message: lan === "ar" ? "رمز غير صحيح أو منتهي الصلاحية." : "Invalid or expired code.",
     });
   } catch (err) {
-    console.error("passcodeVerify error:", err);
+    console.error("forgot passcodeVerify error:", err);
     return ReturnAppData.createError({
       res,
       status: 500,

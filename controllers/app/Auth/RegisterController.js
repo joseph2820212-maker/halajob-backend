@@ -5,6 +5,7 @@ import { UserModel } from "../../../models/index.js";
 import { createNewUser, fetchUserFromEmail } from "../../../services/authService.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
+import crypto from "crypto";
 
 const PUBLIC_EMAIL_DOMAINS = new Set([
   "gmail.com",
@@ -27,8 +28,18 @@ function normalizeCode(code = "") {
   return c.startsWith("+") ? c : `+${c}`;
 }
 
+function toBool(v) {
+  if (typeof v === "boolean") return v;
+  if (typeof v === "number") return v !== 0;
+  if (typeof v === "string") return ["true", "1", "yes", "y"].includes(v.trim().toLowerCase());
+  return false;
+}
+
+function createPasscode() {
+  return crypto.randomInt(10000, 100000);
+}
+
 const register = async (req, res, next) => {
-  // Always read language from header; default to "en"
   const lan = req.get("lan") || "en";
 
   try {
@@ -37,53 +48,44 @@ const register = async (req, res, next) => {
       password,
       first_name,
       last_name,
-      mid_name, // optional
+      mid_name,
       gender,
       device = {},
-      phone_code,   // e.g. +966 or 966
-      phone_number, // national part without code
+      phone_code,
+      phone_number,
     } = req.body || {};
-    console.log(password);
-    
-    // 1) Basic required fields (lan comes from header only)
+
     if (!email || !password || !first_name || !last_name || !gender) {
       return ReturnAppData.createError({
         res,
         status: 400,
-        message:
-          lan === "ar" ? "هنالك بعض البيانات المفقودة" : "There's some missing data.",
+        message: lan === "ar" ? "هنالك بعض البيانات المفقودة" : "There's some missing data.",
       });
     }
 
-    // Normalize inputs
     const emailNorm = String(email).trim().toLowerCase();
     const firstName = String(first_name).trim();
     const lastName = String(last_name).trim();
-    const midName = (mid_name ?? "").trim() || null;
+    const midName = typeof mid_name === "string" && mid_name.trim() ? mid_name.trim() : null;
 
-    // 2) Email format
     if (!emailRe.test(emailNorm)) {
       return ReturnAppData.createError({
         res,
         status: 400,
-        message:
-          lan === "ar" ? "صيغة البريد الإلكتروني غير صحيحة" : "Invalid email format.",
+        message: lan === "ar" ? "صيغة البريد الإلكتروني غير صحيحة" : "Invalid email format.",
       });
     }
 
-    // 3) Uniqueness: email
     const existing = await fetchUserFromEmail(emailNorm);
     if (existing) {
       return ReturnAppData.createError({
         res,
         status: 409,
-        message:
-          lan === "ar" ? "البريد الإلكتروني مسجل مسبقًا" : "Email already registered.",
+        message: lan === "ar" ? "البريد الإلكتروني مسجل مسبقًا" : "Email already registered.",
       });
     }
 
-    // 4) Password strength
-    if (!strongPasswordRe.test(password)) {
+    if (!strongPasswordRe.test(String(password))) {
       return ReturnAppData.createError({
         res,
         status: 400,
@@ -94,25 +96,21 @@ const register = async (req, res, next) => {
       });
     }
 
-    // 5) Name validation
-    if (
-      typeof firstName !== "string" || firstName.length < 2 ||
-      typeof lastName !== "string" || lastName.length < 2
-    ) {
+    if (firstName.length < 2 || lastName.length < 2) {
       return ReturnAppData.createError({
         res,
         status: 400,
-        message:
-          lan === "ar" ? "الاسم يجب أن لا يقل عن حرفين." : "Name must be at least 2 characters long.",
+        message: lan === "ar" ? "الاسم يجب أن لا يقل عن حرفين." : "Name must be at least 2 characters long.",
       });
     }
 
-    // 6) Device validation
-    const { brand, model_name, is_device, build_id } = device || {};
+    const { brand, model_name, model_id, is_device, build_id } = device || {};
     if (
-      typeof brand !== "string" || !brand.trim() ||
-      typeof model_name !== "string" || !model_name.trim() ||
-      typeof is_device !== "boolean"
+      typeof brand !== "string" ||
+      !brand.trim() ||
+      typeof model_name !== "string" ||
+      !model_name.trim() ||
+      !Object.prototype.hasOwnProperty.call(device, "is_device")
     ) {
       return ReturnAppData.createError({
         res,
@@ -121,7 +119,6 @@ const register = async (req, res, next) => {
       });
     }
 
-    // 7) Phone (code + national) ➜ parse to E.164
     if (!phone_code || !phone_number) {
       return ReturnAppData.createError({
         res,
@@ -130,38 +127,36 @@ const register = async (req, res, next) => {
       });
     }
 
-    const code = normalizeCode(phone_code); // "+966"
-    const raw = `${code}${String(phone_number).trim()}`; // "+9665xxxxxxx"
+    const code = normalizeCode(phone_code);
+    const nationalDigits = String(phone_number).replace(/\D/g, "");
+    const raw = `${code}${nationalDigits}`;
     const phoneParsed = parsePhoneNumberFromString(raw);
 
     if (!phoneParsed || !phoneParsed.isValid()) {
       return ReturnAppData.createError({
         res,
         status: 400,
-        message:
-          lan === "ar" ? "رقم الهاتف أو رمز الاتصال غير صحيح" : "Invalid phone number or calling code.",
+        message: lan === "ar" ? "رقم الهاتف أو رمز الاتصال غير صحيح" : "Invalid phone number or calling code.",
       });
     }
 
-    // Ensure calling code matches input
-    const inputDigits = code.replace(/\D/g, ""); // "966"
+    const inputDigits = code.replace(/\D/g, "");
     if (phoneParsed.countryCallingCode !== inputDigits) {
       return ReturnAppData.createError({
         res,
         status: 400,
-        message:
-          lan === "ar" ? "رمز الاتصال لا يطابق الرقم" : "Calling code does not match the number.",
+        message: lan === "ar" ? "رمز الاتصال لا يطابق الرقم" : "Calling code does not match the number.",
       });
     }
 
-    // Standardized phone fields
-    const phone_e164 = phoneParsed.number; // "+9665xxxxxxx"
-    const phone_country = phoneParsed.country || null; // e.g., "SA"
-    const phone_code_norm = `+${phoneParsed.countryCallingCode}`; // "+966"
-    const phone_national = phoneParsed.nationalNumber; // "5xxxxxxx"
+    const phone_e164 = phoneParsed.number;
+    const phone_country = phoneParsed.country || null;
+    const phone_code_norm = `+${phoneParsed.countryCallingCode}`;
+    const phone_national = phoneParsed.nationalNumber;
 
-    // 8) Prevent phone duplication
-    const phoneExists = await UserModel.exists({ phone_e164 });
+    const phoneExists = await UserModel.exists({
+      $or: [{ phone_e164 }, { phone_national }],
+    });
     if (phoneExists) {
       return ReturnAppData.createError({
         res,
@@ -170,15 +165,10 @@ const register = async (req, res, next) => {
       });
     }
 
-    // 9) Company vs public email
     const domain = emailNorm.split("@")[1];
     const is_company = !PUBLIC_EMAIL_DOMAINS.has(domain);
 
-    // 10) Resolve role
-    const roleDoc = await RoleModel.findOne({
-      role_number: is_company ? 11 : 21,
-    }).lean();
-
+    const roleDoc = await RoleModel.findOne({ role_number: is_company ? 11 : 21 }).lean();
     if (!roleDoc?._id) {
       return ReturnAppData.createError({
         res,
@@ -187,17 +177,10 @@ const register = async (req, res, next) => {
       });
     }
 
-    // 11) Hash password + verification code
-    const hashedPassword = await bcryptjs.hash(password, 10);
-    // const passcode = Math.floor(10000 + Math.random() * 90000);
-    const passcode=12345;
+    const hashedPassword = await bcryptjs.hash(String(password), 10);
+    const passcode = createPasscode();
     const passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000);
- const me = await UserModel.findOneAndUpdate(
-  { email: "mhdnourmnini@gmail.com" },
-  { password: hashedPassword },
-  { new: true } // return the updated document
-);
-    // 12) Create user (catch duplicate key races)
+
     let newUser;
     try {
       newUser = await createNewUser({
@@ -213,20 +196,24 @@ const register = async (req, res, next) => {
         lan,
         gender,
         status: false,
+        passcode_active: false,
         phone_e164,
         phone_country,
         phone_code: phone_code_norm,
         phone_national,
-        device: {
-          brand: brand.trim(),
-          model_name: model_name.trim(),
-          is_default: true,
-          is_device,
-          build_id: build_id || null,
-        },
+        device: [
+          {
+            brand: brand.trim(),
+            model_name: model_name.trim(),
+            model_id: typeof model_id === "string" && model_id.trim() ? model_id.trim() : null,
+            is_default: true,
+            is_device: toBool(is_device),
+            build_id: typeof build_id === "string" && build_id.trim() ? build_id.trim() : null,
+            last_seen_at: new Date(),
+          },
+        ],
       });
     } catch (err) {
-      // Handle unique index races on email/phone
       if (err && err.code === 11000) {
         const field = Object.keys(err.keyPattern || {})[0] || "field";
         const msg =
@@ -235,19 +222,17 @@ const register = async (req, res, next) => {
               ? "رقم الهاتف مستخدم مسبقًا"
               : "البريد الإلكتروني مسجل مسبقًا"
             : field.includes("phone")
-              ? "Phone number already registered."
-              : "Email already registered.";
+            ? "Phone number already registered."
+            : "Email already registered.";
         return ReturnAppData.createError({ res, status: 409, message: msg });
       }
-      throw err; // bubble to outer catch
+      throw err;
     }
 
-    // 13) Send verification email
     try {
       await sendRecoveryEmail({ to: emailNorm, passcode });
     } catch (emailErr) {
-      // You can choose to fail or allow retry flow. Here we fail gracefully.
-      // Option A: return 500 and let client retry registration or trigger resend.
+      console.error("register email error:", emailErr);
       return ReturnAppData.createError({
         res,
         status: 502,
@@ -261,7 +246,7 @@ const register = async (req, res, next) => {
     return ReturnAppData.createData({
       res,
       status: 201,
-      data: { user_id: newUser?._id },
+      data: { user_id: newUser?._id, step: "ENTER_PASSCODE" },
       message:
         lan === "ar"
           ? "تم إنشاء الحساب بنجاح، يرجى إدخال رمز التحقق المرسل إلى البريد الإلكتروني."
@@ -272,10 +257,7 @@ const register = async (req, res, next) => {
     return ReturnAppData.createError({
       res,
       status: 500,
-      message:
-        (req.get("lan") || "en") === "ar"
-          ? "حدث خطأ غير متوقع."
-          : "An unexpected error occurred.",
+      message: lan === "ar" ? "حدث خطأ غير متوقع." : "An unexpected error occurred.",
     });
   }
 };
