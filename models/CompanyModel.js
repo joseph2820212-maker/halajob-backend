@@ -4,7 +4,7 @@ const CompanySchema = new mongoose.Schema({
     files:{type:[String]},
     company_name:{type:String,required:false,unique: true},
     company_email:{type:String,required:false,unique: true},
-     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "UserSchema", required: true, unique: true },
+     user_id: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true, unique: true },
     role_id: { type: mongoose.Schema.Types.ObjectId, ref: "roles", required: true },
     permissions: { type: [String] },
     can_upload:{type:Boolean,default:true},

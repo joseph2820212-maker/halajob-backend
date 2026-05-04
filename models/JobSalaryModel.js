@@ -16,8 +16,8 @@ const JopSalarySchema = new mongoose.Schema({
  keyword: { type: [String] },
  option:   { type: [OptionSchema], default: [] },
 
-}, { collection: "jop_salary" })
+}, { collection: "job_salary" })
 
-const JopSalaryModel = mongoose.model('jop_salary', JopSalarySchema)
+const JopSalaryModel = mongoose.model('job_salary', JopSalarySchema)
 
 export default JopSalaryModel;

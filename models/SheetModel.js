@@ -6,4 +6,4 @@ const sheetSchema = new mongoose.Schema({
   totalRows: { type: Number, default: 0 },
 }, { timestamps: true });
 
-export default mongoose.model("Sheet", sheetSchema);
+export default mongoose.model("sheet", sheetSchema);

@@ -9,7 +9,7 @@ const UserApplyingJobSchema = new mongoose.Schema(
   status_changed_at:{type:Date},
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "UserSchema",
+      ref: "users",
       required: true,
       index: true,
     },

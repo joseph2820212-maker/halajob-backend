@@ -5,8 +5,8 @@ const JopServiceSchema = new mongoose.Schema({
  title_ar: { type: String, required: true },
  title_en: { type: String, required: true },
  keyword: { Service: [String] },
-}, { collection: "jop_service" })
+}, { collection: "job_service" })
 
-const JopServiceModel = mongoose.model('JopServiceSchema', JopServiceSchema)
+const JopServiceModel = mongoose.model('JobServiceSchema', JopServiceSchema)
 
 export default JopServiceModel;

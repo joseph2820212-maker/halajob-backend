@@ -17,11 +17,11 @@ const JopNameSchema = new mongoose.Schema({
 
   // مفتاح إزالة التكرار
   dedupeKey: { type: String, required: true, index: true, trim: true },
-}, { collection: "jop_name", timestamps: true });
+}, { collection: "job_name", timestamps: true });
 
 // الفهرس الوحيد المطلوب
 JopNameSchema.index({ sheet: 1, dedupeKey: 1 }, { unique: true });
 
 // لا داعي لفهرس فريد آخر
-const JopNameModel = mongoose.model("JopName", JopNameSchema);
+const JopNameModel = mongoose.model("JobName", JopNameSchema);
 export default JopNameModel;

@@ -5,10 +5,10 @@ import RoleModel from './RoleModel.js';
 import CompanyModel from './CompanyModel.js';
 import WorkLocationTypeModel from './WorkLocationTypeModel.js';
 import WorkTimeTypeModel from './WorkTimeTypeModel.js';
-import JopNameModel from './JopNameModel.js';
-import JopServiceModel from './JopServiceModel.js';
-import JopSalaryModel from './JopSalaryModel.js';
-import JopTypeModel from './JopTypeModel.js';
+import JobNameModel from './JobNameModel.js';
+import JobServiceModel from './JobServiceModel.js';
+import JobSalaryModel from './JobSalaryModel.js';
+import JobTypeModel from './JobTypeModel.js';
 import jobsModel from './JobModel.js';
 import EmployeeModel from './EmployeeModel.js';
 import CountryModel from './CountryModel.js';
@@ -28,6 +28,7 @@ import FcmTokenModel from './FcmTokenModel.js';
 import NotificationModel from './NotificationModel.js';
 import KeywordModel from './KeywordModel.js';
 import BannerModel from './BannerModel.js';
+import LanguageModel from './LanguageModel.js';
 
 export {
   UserModel,
@@ -37,10 +38,10 @@ export {
   CompanyModel,
   WorkLocationTypeModel,
   WorkTimeTypeModel,
-  JopNameModel,
-  JopServiceModel,
-  JopSalaryModel,
-  JopTypeModel,
+  JobNameModel,
+  JobServiceModel,
+  JobSalaryModel,
+  JobTypeModel,
   jobsModel,
   EmployeeModel,
   CountryModel,
@@ -59,5 +60,6 @@ export {
   FcmTokenModel,
   NotificationModel,
   KeywordModel,
-  BannerModel
+  BannerModel,
+  LanguageModel
 };

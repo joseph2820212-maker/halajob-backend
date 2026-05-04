@@ -14,8 +14,8 @@ const JopTypeSchema = new mongoose.Schema({
   title_en: { type: String, required: true },
   keyword:  { type: [String], default: [] },
   option:   { type: [OptionSchema], default: [] },
-}, { collection: 'jop_type', timestamps: true });
+}, { collection: 'job_type', timestamps: true });
 
-const JopTypeModel = mongoose.model('jop_type', JopTypeSchema)
+const JopTypeModel = mongoose.model('job_type', JopTypeSchema)
 
 export default JopTypeModel;
