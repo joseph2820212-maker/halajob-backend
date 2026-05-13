@@ -3,7 +3,7 @@ import * as yup from "yup";
 import { setLocale } from "yup";
 import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
-import { CompanyModel, jobsModel, JopNameModel } from "../../../models/index.js";
+import { CompanyModel, jobsModel, JobNameModel } from "../../../models/index.js";
 import { Job_created_notification } from "../../../notification/JobCompanyNotifications.js";
 
 /* ========== i18n ========== */
@@ -27,11 +27,11 @@ const jobSchema = yup
     job_name: yup.string().required(),
     job_name_id: yup.string().optional(),
     is_remote: yup.boolean().required(),
-    jop_type_id: yup.string().required(),
-    jop_type_info: yup.object().optional(),
+    Job_type_id: yup.string().required(),
+    Job_type_info: yup.object().optional(),
 
-    jop_salary_id: yup.string().required(),
-    jop_salary_info: yup.object().required(),
+    Job_salary_id: yup.string().required(),
+    Job_salary_info: yup.object().required(),
 
      languages: yup.array().of(
        yup.object({
@@ -57,10 +57,10 @@ const jobSchema = yup
     is_cv_required: yup.boolean().required(),
     is_contact_on_emails: yup.boolean().required(),
 
-    jop_time_id: yup.string().required(),
-    jop_time_info: yup.object().optional(),
+    Job_time_id: yup.string().required(),
+    Job_time_info: yup.object().optional(),
 
-    jop_service: yup.array().of(yup.string()).optional(),
+    Job_service: yup.array().of(yup.string()).optional(),
 
     is_out_side: yup.boolean().required(),
     show_company_information: yup.boolean().required(),
@@ -247,9 +247,9 @@ export const create = async (req, res) => {
         ? uniqClean(validated.emails).map((e) => e.toLowerCase())
         : undefined;
 
-    let jopNameDoc = null;
+    let JobNameDoc = null;
     if (validated.job_name_id && mongoose.isValidObjectId(validated.job_name_id)) {
-      jopNameDoc = await JopNameModel.findById(validated.job_name_id)
+      JobNameDoc = await JobNameModel.findById(validated.job_name_id)
         .select("title_ar title_en keywords keyword")
         .lean();
     }
@@ -260,21 +260,21 @@ export const create = async (req, res) => {
     const descKw      = extractKeywordsDeep(validated.description, { limit: KW_LIMIT });
 
     // مصادر الكلمات
-    const jopKeywordsField = Array.isArray(jopNameDoc?.keywords)
-      ? jopNameDoc.keywords
-      : String(jopNameDoc?.keywords || "").split(",");
-    const jopKeywordField2 = Array.isArray(jopNameDoc?.keyword)
-      ? jopNameDoc.keyword
-      : String(jopNameDoc?.keyword || "").split(",");
+    const JobKeywordsField = Array.isArray(JobNameDoc?.keywords)
+      ? JobNameDoc.keywords
+      : String(JobNameDoc?.keywords || "").split(",");
+    const JobKeywordField2 = Array.isArray(JobNameDoc?.keyword)
+      ? JobNameDoc.keyword
+      : String(JobNameDoc?.keyword || "").split(",");
 
     // حقل العرض القديم (حر)
     const job_keywords = uniqClean([
       validated.job_name,
       variantsForSearch(descKw),
-      jopNameDoc?.title_ar,
-      jopNameDoc?.title_en,
-      jopKeywordsField,
-      jopKeywordField2,
+      JobNameDoc?.title_ar,
+      JobNameDoc?.title_en,
+      JobKeywordsField,
+      JobKeywordField2,
       company.company_name,
       company.company_email,
       company.company_website,

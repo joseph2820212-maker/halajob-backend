@@ -1,7 +1,7 @@
-// controllers/Jop Service.controller.js
+// controllers/Job Service.controller.js
 
 import ReturnDashData from "../../helper/ReturnDashData/index.js";
-import { JopServiceModel } from "../../models/index.js";
+import { JobServiceModel } from "../../models/index.js";
 
 /**
  * CREATE
@@ -33,16 +33,16 @@ const create = async (req, res, next) => {
 
     // تحقق من الاسم (لو عندك فهرس فريد على name)
     if (payload.name) {
-      const exists = await JopServiceModel.findOne({ name: payload.name });
+      const exists = await JobServiceModel.findOne({ name: payload.name });
       if (exists) {
         return ReturnDashData.createError({
           res,
-          message: "Jop Service with this name already exists",
+          message: "Job Service with this name already exists",
         });
       }
     }
 
-    const doc = await JopServiceModel.create(payload);
+    const doc = await JobServiceModel.create(payload);
     return ReturnDashData.createData({ res, data: doc });
 
   } catch (err) {
@@ -70,7 +70,7 @@ const create = async (req, res, next) => {
 
 /**
  * UPDATE
- * توقع: /Jop Services/:id
+ * توقع: /Job Services/:id
  */
 const update = async (req, res, next) => {
   try {
@@ -112,7 +112,7 @@ const update = async (req, res, next) => {
       if (!payload.title_en) delete payload.title_en;
     }
 
-    const doc = await JopServiceModel.findByIdAndUpdate(
+    const doc = await JobServiceModel.findByIdAndUpdate(
       id,
       { $set: payload }, // نستبدل القيم المقدمة (ومنها keyword الجديدة)
       {
@@ -125,7 +125,7 @@ const update = async (req, res, next) => {
     if (!doc) {
       return ReturnDashData.updateError({
         res,
-        message: "Jop Service not found",
+        message: "Job Service not found",
       });
     }
 
@@ -175,8 +175,8 @@ const update = async (req, res, next) => {
     const skip = (Number(page) - 1) * Number(limit);
 
     const [items, total] = await Promise.all([
-      JopServiceModel.find(filter).sort(sort).skip(skip).limit(Number(limit)),
-      JopServiceModel.countDocuments(filter),
+      JobServiceModel.find(filter).sort(sort).skip(skip).limit(Number(limit)),
+      JobServiceModel.countDocuments(filter),
     ]);
 
     return ReturnDashData.getData({
@@ -201,16 +201,16 @@ const update = async (req, res, next) => {
 
 /**
  * GET ONE
- * توقع: /Jop Services/:id
+ * توقع: /Job Services/:id
  */
  const getOne = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const doc = await JopServiceModel.findById(id);
+    const doc = await JobServiceModel.findById(id);
     if (!doc) {
       return ReturnDashData.getError({
         res,
-        message: "Jop Service not found",
+        message: "Job Service not found",
       });
     }
     return ReturnDashData.getData({ res, data: doc });
@@ -224,16 +224,16 @@ const update = async (req, res, next) => {
 
 /**
  * DELETE
- * توقع: /Jop Services/:id
+ * توقع: /Job Services/:id
  */
  const remove = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const doc = await JopServiceModel.findByIdAndDelete(id);
+    const doc = await JobServiceModel.findByIdAndDelete(id);
     if (!doc) {
       return ReturnDashData.deleteError({
         res,
-        message: "Jop Service not found",
+        message: "Job Service not found",
       });
     }
     return ReturnDashData.deleteData({

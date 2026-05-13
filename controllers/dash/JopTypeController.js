@@ -1,7 +1,7 @@
-// controllers/Jop Typ.controller.js
+// controllers/Job Typ.controller.js
 
 import ReturnDashData from "../../helper/ReturnDashData/index.js";
-import { JopTypeModel } from "../../models/index.js";
+import { JobTypeModel } from "../../models/index.js";
 
 /**
  * CREATE
@@ -33,16 +33,16 @@ const create = async (req, res, next) => {
 
     // تحقق من الاسم (لو عندك فهرس فريد على name)
     if (payload.name) {
-      const exists = await JopTypeModel.findOne({ name: payload.name });
+      const exists = await JobTypeModel.findOne({ name: payload.name });
       if (exists) {
         return ReturnDashData.createError({
           res,
-          message: "Jop Typ with this name already exists",
+          message: "Job Typ with this name already exists",
         });
       }
     }
 
-    const doc = await JopTypeModel.create(payload);
+    const doc = await JobTypeModel.create(payload);
     return ReturnDashData.createData({ res, data: doc });
 
   } catch (err) {
@@ -70,7 +70,7 @@ const create = async (req, res, next) => {
 
 /**
  * UPDATE
- * توقع: /Jop Typs/:id
+ * توقع: /Job Typs/:id
  */
 const update = async (req, res, next) => {
   try {
@@ -113,7 +113,7 @@ const update = async (req, res, next) => {
       if (!payload.title_en) delete payload.title_en;
     }
 
-    const doc = await JopTypeModel.findByIdAndUpdate(
+    const doc = await JobTypeModel.findByIdAndUpdate(
       id,
       { $set: payload }, // نستبدل القيم المقدمة (ومنها keyword الجديدة)
       {
@@ -126,7 +126,7 @@ const update = async (req, res, next) => {
     if (!doc) {
       return ReturnDashData.updateError({
         res,
-        message: "Jop Typ not found",
+        message: "Job Typ not found",
       });
     }
 
@@ -176,8 +176,8 @@ const update = async (req, res, next) => {
     const skip = (Number(page) - 1) * Number(limit);
 
     const [items, total] = await Promise.all([
-      JopTypeModel.find(filter).sort(sort).skip(skip).limit(Number(limit)),
-      JopTypeModel.countDocuments(filter),
+      JobTypeModel.find(filter).sort(sort).skip(skip).limit(Number(limit)),
+      JobTypeModel.countDocuments(filter),
     ]);
 
     return ReturnDashData.getData({
@@ -202,16 +202,16 @@ const update = async (req, res, next) => {
 
 /**
  * GET ONE
- * توقع: /Jop Typs/:id
+ * توقع: /Job Typs/:id
  */
  const getOne = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const doc = await JopTypeModel.findById(id);
+    const doc = await JobTypeModel.findById(id);
     if (!doc) {
       return ReturnDashData.getError({
         res,
-        message: "Jop Typ not found",
+        message: "Job Typ not found",
       });
     }
     return ReturnDashData.getData({ res, data: doc });
@@ -225,16 +225,16 @@ const update = async (req, res, next) => {
 
 /**
  * DELETE
- * توقع: /Jop Typs/:id
+ * توقع: /Job Typs/:id
  */
  const remove = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const doc = await JopTypeModel.findByIdAndDelete(id);
+    const doc = await JobTypeModel.findByIdAndDelete(id);
     if (!doc) {
       return ReturnDashData.deleteError({
         res,
-        message: "Jop Typ not found",
+        message: "Job Typ not found",
       });
     }
     return ReturnDashData.deleteData({

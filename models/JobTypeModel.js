@@ -1,21 +1,6 @@
 import mongoose from "mongoose";
-const OptionSchema = new mongoose.Schema({
-  title_ar: { type: String, required: true },
-  title_en: { type: String, required: true },
-  type:     { type: String, enum: ['number','time','tow_time','number_with_select'], required: true },
-  required: { type: Boolean, default: false },
-  is_hidden:{ type: Boolean, default: false }, 
-  option:   { type: [{title_ar:String,title_en:String}], default: [] },   //
-}, { _id: false });
-
-const JopTypeSchema = new mongoose.Schema({
-  name:     { type: String, required: true, unique: true },
-  title_ar: { type: String, required: true },
-  title_en: { type: String, required: true },
-  keyword:  { type: [String], default: [] },
-  option:   { type: [OptionSchema], default: [] },
-}, { collection: 'job_type', timestamps: true });
-
-const JopTypeModel = mongoose.model('job_type', JopTypeSchema)
-
-export default JopTypeModel;
+const JobTypeSchema = new mongoose.Schema({ name: { type: String, required: true, unique: true, trim: true, lowercase: true }, title_ar: { type: String, required: true, trim: true }, title_en: { type: String, required: true, trim: true }, keyword: { type: [String], default: [] }, is_active: { type: Boolean, default: true }, sort_order: { type: Number, default: 0 } }, { collection: "job_type", timestamps: true });
+JobTypeSchema.index({ name: 1 }, { unique: true });
+JobTypeSchema.index({ is_active: 1, sort_order: 1 });
+const JobTypeModel = mongoose.model("job_type", JobTypeSchema);
+export default JobTypeModel;

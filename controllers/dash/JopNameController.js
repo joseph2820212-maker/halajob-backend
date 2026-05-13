@@ -1,7 +1,7 @@
 // controllers/Jop Name.controller.js
 
 import ReturnDashData from "../../helper/ReturnDashData/index.js";
-import { JopNameModel } from "../../models/index.js";
+import { JobNameModel } from "../../models/index.js";
 
 /**
  * CREATE
@@ -33,7 +33,7 @@ const create = async (req, res, next) => {
 
     // تحقق من الاسم (لو عندك فهرس فريد على name)
     if (payload.name) {
-      const exists = await JopNameModel.findOne({ name: payload.name });
+      const exists = await JobNameModel.findOne({ name: payload.name });
       if (exists) {
         return ReturnDashData.createError({
           res,
@@ -42,7 +42,7 @@ const create = async (req, res, next) => {
       }
     }
 
-    const doc = await JopNameModel.create(payload);
+    const doc = await JobNameModel.create(payload);
     return ReturnDashData.createData({ res, data: doc });
 
   } catch (err) {
@@ -112,7 +112,7 @@ const update = async (req, res, next) => {
       if (!payload.title_en) delete payload.title_en;
     }
 
-    const doc = await JopNameModel.findByIdAndUpdate(
+    const doc = await JobNameModel.findByIdAndUpdate(
       id,
       { $set: payload }, // نستبدل القيم المقدمة (ومنها keyword الجديدة)
       {
@@ -175,8 +175,8 @@ const update = async (req, res, next) => {
     const skip = (Number(page) - 1) * Number(limit);
 
     const [items, total] = await Promise.all([
-      JopNameModel.find(filter).sort(sort).skip(skip).limit(Number(limit)),
-      JopNameModel.countDocuments(filter),
+      JobNameModel.find(filter).sort(sort).skip(skip).limit(Number(limit)),
+      JobNameModel.countDocuments(filter),
     ]);
 
     return ReturnDashData.getData({
@@ -206,7 +206,7 @@ const update = async (req, res, next) => {
  const getOne = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const doc = await JopNameModel.findById(id);
+    const doc = await JobNameModel.findById(id);
     if (!doc) {
       return ReturnDashData.getError({
         res,
@@ -229,7 +229,7 @@ const update = async (req, res, next) => {
  const remove = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const doc = await JopNameModel.findByIdAndDelete(id);
+    const doc = await JobNameModel.findByIdAndDelete(id);
     if (!doc) {
       return ReturnDashData.deleteError({
         res,

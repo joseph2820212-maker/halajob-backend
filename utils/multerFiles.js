@@ -17,7 +17,7 @@ const sanitizeFileName = (originalName = "") => {
 const rand = () => Math.random().toString(36).slice(2, 8);
 
 // الامتدادات المسموحة
-const ALLOWED_EXTS = [".jpg", ".jpeg", ".png",".pdf"];
+const ALLOWED_EXTS = [".pdf"];
 const DOC_EXTS = [".pdf"];
 
 // Multer config

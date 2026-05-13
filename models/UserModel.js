@@ -62,11 +62,13 @@ const userSchema = new mongoose.Schema(
       index: true,
     },
 
-    permissions: {
-      type: [String],
-      default: [],
-    },
-
+    permissions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "permissions",
+        default: [],
+      },
+    ],
     password: {
       type: String,
       required: true,

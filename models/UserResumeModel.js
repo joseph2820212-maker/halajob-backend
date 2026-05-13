@@ -6,7 +6,7 @@ const UserResumesSchema = new mongoose.Schema({
  color_id: { type: mongoose.Schema.Types.ObjectId, ref: "colors", required: true },
  resume_id: { type: mongoose.Schema.Types.ObjectId, ref: "resumes", required: true },
  is_active: { type: Boolean, default: true }
-}, { collection: "user_resumes" })
+}, { collection: "user_resumes",timestamps:true })
 
 const UserResumeModel = mongoose.model('user_resumes', UserResumesSchema)
 

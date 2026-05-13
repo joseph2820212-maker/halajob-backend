@@ -1,5 +1,5 @@
 // controllers/searchController.js
-import { JopNameModel } from "../../../models/index.js";
+import { JobNameModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 
 /* ======================== Helpers ======================== */
@@ -98,7 +98,7 @@ async function getDictionary() {
   if (now - DICT_CACHE.at < DICT_TTL_MS && DICT_CACHE.terms.length) return DICT_CACHE.terms;
 
   // نقرأ الحقول المطلوبة + دعم كلٍ من keywords/keyword
-  const docs = await JopNameModel.find(
+  const docs = await JobNameModel.find(
     {},
     { title_ar: 1, title_en: 1, name: 1, keywords: 1, keyword: 1,
       sector_ar: 1, sector_en: 1, subsector_ar: 1, subsector_en: 1 }
@@ -271,7 +271,7 @@ const search = async (req, res) => {
       }
     ];
 
-    let docs = await JopNameModel.aggregate(pipeline).exec();
+    let docs = await JobNameModel.aggregate(pipeline).exec();
 
     // 3) تصحيح إملائي إن لزم
     if (docs.length === 0) {
@@ -291,7 +291,7 @@ const search = async (req, res) => {
             }
           }
         ];
-        docs = await JopNameModel.aggregate(pipeline2).exec();
+        docs = await JobNameModel.aggregate(pipeline2).exec();
       }
     }
 

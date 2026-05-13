@@ -1,27 +1,53 @@
 import mongoose from "mongoose";
 
-const JopNameSchema = new mongoose.Schema({
-  sheet: { type: mongoose.Schema.Types.ObjectId, ref: "Sheet", index: true, required: true },
+const normalizeText = (value = "") =>
+  String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ");
 
-  sector_ar: { type: String, trim: true },
-  sector_en: { type: String, trim: true },
-  subsector_ar: { type: String, trim: true },
-  subsector_en: { type: String, trim: true },
-  title_ar: { type: String, trim: true },
-  title_en: { type: String, trim: true },
+const JopNameSchema = new mongoose.Schema(
+  {
+    sheet: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Sheet",
+      index: true,
+      default: null,
+    },
 
-  // طابق الكنترولر: "keywords"
-  keywords: { type: [String], default: [] },
+    sector_ar: { type: String, trim: true, default: "" },
+    sector_en: { type: String, trim: true, default: "" },
+    subSector_ar: { type: String, trim: true, default: "" },
+    subSector_en: { type: String, trim: true, default: "" },
+    title_ar: { type: String, trim: true, default: "" },
+    title_en: { type: String, trim: true, default: "" },
 
-  is_auto: { type: Boolean, default: true },
+    keywords: { type: [String], default: [] },
 
-  // مفتاح إزالة التكرار
-  dedupeKey: { type: String, required: true, index: true, trim: true },
-}, { collection: "job_name", timestamps: true });
+    is_auto: { type: Boolean, default: true },
 
-// الفهرس الوحيد المطلوب
+    dedupeKey: {
+      type: String,
+      required: true,
+      index: true,
+      trim: true,
+    },
+  },
+  { collection: "job_name", timestamps: true }
+);
+
+JopNameSchema.pre("validate", function (next) {
+  if (!this.dedupeKey) {
+    this.dedupeKey = normalizeText(this.title_en || this.title_ar || this.keywords?.[0] || "");
+  }
+
+  if (!this.title_ar && this.title_en) this.title_ar = this.title_en;
+  if (!this.title_en && this.title_ar) this.title_en = this.title_ar;
+
+  next();
+});
+
 JopNameSchema.index({ sheet: 1, dedupeKey: 1 }, { unique: true });
 
-// لا داعي لفهرس فريد آخر
-const JopNameModel = mongoose.model("JobName", JopNameSchema);
+const JopNameModel = mongoose.model("job_name", JopNameSchema);
 export default JopNameModel;

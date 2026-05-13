@@ -5,7 +5,7 @@ const UserReviewJob = new mongoose.Schema({
  user_id: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true },
  job_id: { type: mongoose.Schema.Types.ObjectId, ref: "jobs", index: true, required: true },
  message:{type:String,required:true}
-}, { collection: "user_review_job" })
+}, { collection: "user_review_job",timestamps:true })
 
 const UserReviewJobModel = mongoose.model('user_review_job', UserReviewJob)
 

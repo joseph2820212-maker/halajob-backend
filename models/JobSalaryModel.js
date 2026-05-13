@@ -1,23 +1,6 @@
 import mongoose from "mongoose";
-
-const OptionSchema = new mongoose.Schema({
-  title_ar: { type: String, required: true },
-  title_en: { type: String, required: true },
-  type:     { type: String, enum: ['tow_number_with_select','number_with_select'], required: true },
-  required: { type: Boolean, default: false },
-  is_hidden:{ type: Boolean, default: false }, 
-  option:   { type: [{title_ar:String,title_en:String}], default: [] },   //
-}, { _id: false });
-
-const JopSalarySchema = new mongoose.Schema({
- name:{type: String, required: true, unique: true},
- title_ar: { type: String, required: true },
- title_en: { type: String, required: true },
- keyword: { type: [String] },
- option:   { type: [OptionSchema], default: [] },
-
-}, { collection: "job_salary" })
-
-const JopSalaryModel = mongoose.model('job_salary', JopSalarySchema)
-
-export default JopSalaryModel;
+const JobSalarySchema = new mongoose.Schema({ name: { type: String, required: true, unique: true, trim: true, lowercase: true }, title_ar: { type: String, required: true, trim: true }, title_en: { type: String, required: true, trim: true }, keyword: { type: [String], default: [] }, is_active: { type: Boolean, default: true }, sort_order: { type: Number, default: 0 } }, { collection: "job_salary", timestamps: true });
+JobSalarySchema.index({ name: 1 }, { unique: true });
+JobSalarySchema.index({ is_active: 1, sort_order: 1 });
+const JobSalaryModel = mongoose.model("job_salary", JobSalarySchema);
+export default JobSalaryModel;

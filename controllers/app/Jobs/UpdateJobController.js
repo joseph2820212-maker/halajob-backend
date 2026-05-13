@@ -2,7 +2,7 @@ import * as yup from "yup";
 import { setLocale } from "yup";
 import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
-import { CompanyModel, jobsModel, JopNameModel } from "../../../models/index.js";
+import { CompanyModel, jobsModel, JobNameModel } from "../../../models/index.js";
 import { job_updated_notification } from "../../../notification/JobCompanyNotifications.js";
 
 /* i18n */
@@ -22,11 +22,11 @@ const editSchema = yup.object({
 
   is_remote: yup.boolean().optional(),
 
-  jop_type_id: yup.string().optional(),
-  jop_type_info: yup.object().optional(),
+  Job_type_id: yup.string().optional(),
+  Job_type_info: yup.object().optional(),
 
-  jop_salary_id: yup.string().optional(),
-  jop_salary_info: yup.object().optional(),
+  Job_salary_id: yup.string().optional(),
+  Job_salary_info: yup.object().optional(),
 
     languages: yup.array().of(
     yup.object({
@@ -51,10 +51,10 @@ const editSchema = yup.object({
   is_cv_required: yup.boolean().optional(),
   is_contact_on_emails: yup.boolean().optional(),
 
-  jop_time_id: yup.string().optional(),
-  jop_time_info: yup.object().optional(),
+  Job_time_id: yup.string().optional(),
+  Job_time_info: yup.object().optional(),
 
-  jop_service: yup.array().of(yup.string()).optional(),
+  Job_service: yup.array().of(yup.string()).optional(),
 
   is_out_side: yup.boolean().optional(),
   show_company_information: yup.boolean().optional(),
@@ -183,10 +183,10 @@ export const update = async (req, res) => {
 
     const out_link = merged.is_out_side ? merged.out_link : undefined;
 
-    // جلب JopName إن توفر
-    let jopNameDoc = null;
+    // جلب JobName إن توفر
+    let JobNameDoc = null;
     if (merged.job_name_id && mongoose.isValidObjectId(merged.job_name_id)) {
-      jopNameDoc = await JopNameModel.findById(merged.job_name_id)
+      JobNameDoc = await JobNameModel.findById(merged.job_name_id)
         .select("title_ar title_en keywords keyword")
         .lean();
     }
@@ -196,20 +196,20 @@ export const update = async (req, res) => {
     const phrasesDesc = extractPhrases(tokensDesc, PH_LIMIT);
     const descKw      = extractKeywordsDeep(merged.description || "", { limit: KW_LIMIT });
 
-    const jopKeywordsField = Array.isArray(jopNameDoc?.keywords)
-      ? jopNameDoc.keywords
-      : String(jopNameDoc?.keywords || "").split(",");
-    const jopKeywordField2 = Array.isArray(jopNameDoc?.keyword)
-      ? jopNameDoc.keyword
-      : String(jopNameDoc?.keyword || "").split(",");
+    const JobKeywordsField = Array.isArray(JobNameDoc?.keywords)
+      ? JobNameDoc.keywords
+      : String(JobNameDoc?.keywords || "").split(",");
+    const JobKeywordField2 = Array.isArray(JobNameDoc?.keyword)
+      ? JobNameDoc.keyword
+      : String(JobNameDoc?.keyword || "").split(",");
 
     const job_keywords = uniqClean([
       merged.job_name,
       variantsForSearch(descKw),
-      jopNameDoc?.title_ar,
-      jopNameDoc?.title_en,
-      jopKeywordsField,
-      jopKeywordField2,
+      JobNameDoc?.title_ar,
+      JobNameDoc?.title_en,
+      JobKeywordsField,
+      JobKeywordField2,
       company.company_name,
       company.company_email,
       company.company_website,

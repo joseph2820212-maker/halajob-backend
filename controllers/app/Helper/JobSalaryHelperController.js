@@ -1,5 +1,5 @@
 // controllers/searchController.js
-import { JopSalaryModel } from "../../../models/index.js";
+import { JobSalaryModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 
 /* ======================== Helpers ======================== */
@@ -97,7 +97,7 @@ const DICT_TTL_MS = 10 * 60 * 1000;
 async function getDictionary() {
   const now = Date.now();
   if (now - DICT_CACHE.at < DICT_TTL_MS && DICT_CACHE.terms.length) return DICT_CACHE.terms;
-  const docs = await JopSalaryModel.find({}, { name: 1, title_ar: 1, title_en: 1, keyword: 1 }).lean();
+  const docs = await JobSalaryModel.find({}, { name: 1, title_ar: 1, title_en: 1, keyword: 1 }).lean();
   const set = new Set();
   for (const d of docs) {
     [d.name, d.title_ar, d.title_en].filter(Boolean).forEach(t => {
@@ -252,7 +252,7 @@ const search = async (req, res) => {
       { $project: { title_ar: 1, title_en: 1, name: 1, __score: 1 } }
     ];
 
-    let docs = await JopSalaryModel.aggregate(pipeline).exec();
+    let docs = await JobSalaryModel.aggregate(pipeline).exec();
 
     // 3) إن لم نجد نتائج، جرّب التصحيح الإملائي لكل كلمة ثم أعد البحث
     if (docs.length === 0) {
@@ -268,7 +268,7 @@ const search = async (req, res) => {
           { $limit: 50 },
           { $project: { title_ar: 1, title_en: 1, name: 1, __score: 1 } }
         ];
-        docs = await JopSalaryModel.aggregate(pipeline2).exec();
+        docs = await JobSalaryModel.aggregate(pipeline2).exec();
       }
     }
 
@@ -294,7 +294,7 @@ for (const d of docs) {
 };
 const get=async(req,res,next)=>{
    const lan = (req.get("lan") || "en").toLowerCase();
-  const data=await JopSalaryModel.find();
+  const data=await JobSalaryModel.find();
   const results=data.map((item)=>{
     return {
       id:item._id,

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "cross-env NODE_ENV=development nodemon index.js"
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "seed": "node seeders/index.js"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +28,7 @@
     "dictionary-en": "^3.2.0",
     "dotenv": "^16.0.0",
     "express": "^4.17.1",
+    "express-list-endpoints": "^7.1.1",
     "express-mongo-sanitize": "^2.2.0",
     "ffmpeg-static": "^5.2.0",
     "firebase-admin": "^13.5.0",

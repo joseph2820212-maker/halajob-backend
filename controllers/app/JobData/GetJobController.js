@@ -4,12 +4,12 @@ import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import {
   jobsModel,
-  JopSalaryModel,
+  JobSalaryModel,
   CurrencyModel,
-  JopServiceModel,
+  JobServiceModel,
   WorkTimeTypeModel,
   CompanyModel,
-  JopTypeModel,
+  JobTypeModel,
   UserShowJobModel,
   UserSavedJobModel,
   CountryModel
@@ -73,7 +73,7 @@ function parseIds(v) {
 
 /* ========= constants ========= */
 const PUBLIC_BASE = process.env.PUBLIC_BASE_URL || "";
-const JOP_TYPE_COLL = JopTypeModel.collection.name;            // "jop_type"
+const Job_TYPE_COLL = JobTypeModel.collection.name;            // "Job_type"
 const COMPANY_COLL = CompanyModel.collection.name;             // "companies"
 const USS_COLL = UserShowJobModel.collection.name;         // "user_show_job" (أو حسب اسمك الفعلي)
 
@@ -148,7 +148,7 @@ const get = async (req, res) => {
       ...countryCond,
       ...(orConds.length && { $or: orConds }),
       ...(companyIds.length && { company_id: companyIds[0] }),
-      ...(typeIds.length && { jop_type_id: { $in: typeIds } }),
+      ...(typeIds.length && { Job_type_id: { $in: typeIds } }),
       ...(createdAtGte && { createdAt: { $gte: createdAtGte } }),
       ...(isRemote === true && { is_remote: true }),
       ...(isRemote === false && { is_remote: false }),
@@ -200,19 +200,19 @@ const get = async (req, res) => {
       { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
-          from: JOP_TYPE_COLL,
-          localField: "jop_type_id",
+          from: Job_TYPE_COLL,
+          localField: "Job_type_id",
           foreignField: "_id",
-          as: "jop_type",
+          as: "Job_type",
           pipeline: [{ $project: { [`title_${lan}`]: 1 } }],
         },
       },
-      { $unwind: { path: "$jop_type", preserveNullAndEmptyArrays: true } },
+      { $unwind: { path: "$Job_type", preserveNullAndEmptyArrays: true } },
       {
         $addFields: {
           company_name: "$company.company_name",
           company_image: "$company.image",
-          job_type_title: `$jop_type.title_${lan}`,
+          job_type_title: `$Job_type.title_${lan}`,
           _kwScore: tokens.length
             ? { $size: { $setIntersection: [{ $ifNull: ["$keywords_norm", []] }, tokens] } }
             : 0,
@@ -253,7 +253,7 @@ const get = async (req, res) => {
         $project: {
           title: "$job_name",
           company_id: 1,
-          jop_type_id: 1,
+          Job_type_id: 1,
           createdAt: 1,
           is_remote: 1,
           countries: 1,
@@ -305,8 +305,8 @@ const get = async (req, res) => {
         { $limit: 100 },
       ];
       facet.types = [
-        { $match: { jop_type_id: { $type: "objectId" } } },
-        { $group: { _id: "$jop_type_id", title: { $first: "$job_type" } } },
+        { $match: { Job_type_id: { $type: "objectId" } } },
+        { $group: { _id: "$Job_type_id", title: { $first: "$job_type" } } },
         { $sort: { title: 1 } },
         { $limit: 100 },
       ];
@@ -408,23 +408,23 @@ const userObjId = isValidObjectId(userIdParam) ? new Types.ObjectId(String(userI
 
     const job = await jobsModel.findOne(
       { _id: id, status: true, is_accepted: true },
-      "job_name description jop_type_id jop_type_info jop_time_id jop_time_info jop_salary_id jop_salary_info currency_id company_id is_out_side out_link"
+      "job_name description Job_type_id Job_type_info Job_time_id Job_time_info Job_salary_id Job_salary_info currency_id company_id is_out_side out_link"
     ).lean();
 
     if (!job) {
       return ReturnAppData.getError({ res, code: 404, message: "Job not found" });
     }
 
-    const serviceIds = Array.isArray(job.jop_service)
-      ? job.jop_service.filter(Boolean).map(v => (typeof v === "string" ? new Types.ObjectId(v) : v))
+    const serviceIds = Array.isArray(job.Job_service)
+      ? job.Job_service.filter(Boolean).map(v => (typeof v === "string" ? new Types.ObjectId(v) : v))
       : [];
-const [salary, currency, workTime, services, company, jopType, isSavedDoc] = await Promise.all([
-  job.jop_salary_id ? JopSalaryModel.findById(job.jop_salary_id).lean() : null,
+const [salary, currency, workTime, services, company, JobType, isSavedDoc] = await Promise.all([
+  job.Job_salary_id ? JobSalaryModel.findById(job.Job_salary_id).lean() : null,
   job.currency_id ? CurrencyModel.findById(job.currency_id).lean() : null,
-  job.jop_time_id ? WorkTimeTypeModel.findById(job.jop_time_id).lean() : null,
-  serviceIds.length ? JopServiceModel.find({ _id: { $in: serviceIds } }).lean() : [],
+  job.Job_time_id ? WorkTimeTypeModel.findById(job.Job_time_id).lean() : null,
+  serviceIds.length ? JobServiceModel.find({ _id: { $in: serviceIds } }).lean() : [],
   job.company_id ? CompanyModel.findById(job.company_id).lean() : null,
-  job.jop_type_id ? JopTypeModel.findById(job.jop_type_id).lean() : null,
+  job.Job_type_id ? JobTypeModel.findById(job.Job_type_id).lean() : null,
  userObjId ? UserSavedJobModel.exists({ job_id: job._id, user_id: userObjId }) : false,
 ]);
 const is_saved = !!isSavedDoc;
@@ -433,8 +433,8 @@ const is_saved = !!isSavedDoc;
       id: job._id,
       title: job.job_name || "",
       description: job.description || "",
-      job_type: jopType?.[`title_${lan}`] || null,
-      jop_type_info: job.jop_type_info ?? null,
+      job_type: JobType?.[`title_${lan}`] || null,
+      Job_type_info: job.Job_type_info ?? null,
       salary_type: salary?.[`title_${lan}`] || null,
       is_saved,
       currency: currency
@@ -444,12 +444,12 @@ const is_saved = !!isSavedDoc;
           code: currency.code ?? null,
         }
         : null,
-      jop_time: workTime ? { title: workTime[`title_${lan}`] ?? null } : null,
-      jop_time_info: job.jop_time_info ?? null,
-      jop_salary_info: job.jop_salary_info ?? null,
+      Job_time: workTime ? { title: workTime[`title_${lan}`] ?? null } : null,
+      Job_time_info: job.Job_time_info ?? null,
+      Job_salary_info: job.Job_salary_info ?? null,
       is_out_side: !!job.is_out_side,
       out_link: job.out_link || null,
-      jop_services: (services || []).map(s => ({ title: s?.[`title_${lan}`] || null })),
+      Job_services: (services || []).map(s => ({ title: s?.[`title_${lan}`] || null })),
       company: company
         ? {
           name: company.company_name ?? null,

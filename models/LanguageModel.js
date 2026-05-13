@@ -6,6 +6,6 @@ const LanguageSchema = new mongoose.Schema({
     title_en: { type: String, required: true },
 }, { collection: "languages" })
 
-const PermissionModel = mongoose.model('languagesSchema', LanguageSchema)
+const LanguageModel = mongoose.model('languages', LanguageSchema)
 
-export default PermissionModel;
+export default LanguageModel;

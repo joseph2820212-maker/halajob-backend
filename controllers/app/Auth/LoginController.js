@@ -53,31 +53,64 @@ function makeDefaultDevice(user, idx) {
 function createPasscode() {
   return crypto.randomInt(10000, 100000);
 }
-
 async function buildAuthPayload(user, device) {
   const tokens = await generateAuthTokens(user, device);
-  const role = user.role_id ? await RoleModel.findById(user.role_id).lean() : null;
-  const company = await CompanyModel.findOne({ user_id: user._id, status: true }).lean();
+
+  const role = user.role_id
+    ? await RoleModel.findById(user.role_id).lean()
+    : null;
+
+  const company = await CompanyModel.findOne(
+    { user_id: user._id, status: true },
+    {
+      _id: 1,
+      company_name: 1,
+      logo: 1,
+      status: 1,
+      accepted: 1,
+    }
+  ).lean();
 
   return {
-    user_id: user._id,
-    first_name: user.first_name,
-    mid_name: user.mid_name,
-    last_name: user.last_name,
-    image: user.image ? buildPublicUrl(process.env.PUBLIC_BASE_URL, user.image) : null,
-    phone_code: user.phone_code,
-    phone: user.phone_national,
-    gender: user.gender,
+    user: {
+      id: user._id,
+      first_name: user.first_name,
+      mid_name: user.mid_name,
+      last_name: user.last_name,
+      full_name: [user.first_name, user.mid_name, user.last_name]
+        .filter(Boolean)
+        .join(" "),
+      image: user.image
+        ? buildPublicUrl(process.env.PUBLIC_BASE_URL, user.image)
+        : null,
+      phone_code: user.phone_code,
+      phone: user.phone_national,
+      gender: user.gender,
+    },
+
     role: role
       ? {
           id: role._id,
+          name: role.name,
           title_ar: role.title_ar,
           title_en: role.title_en,
           permissions: user.permissions || [],
         }
       : null,
+
+    company: company
+      ? {
+          id: company._id,
+          company_name: company.company_name,
+          logo: company.logo
+            ? buildPublicUrl(process.env.PUBLIC_BASE_URL, company.logo)
+            : null,
+          status: company.status,
+          accepted: company.accepted,
+        }
+      : null,
+
     tokens,
-    company,
   };
 }
 

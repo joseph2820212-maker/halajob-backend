@@ -1,16 +1,54 @@
 import mongoose from "mongoose";
 
-const CountrySchema = new mongoose.Schema({
-  country_alpha2_code: { type: String, required: true },
-  country_numeric_code: { type: Number },      // كان String
-  region_code:        { type: String },        // كان regin_code
-  country_name_ar:    { type: String },
-  country_name_en:    { type: String },
-  region_name_ar:     { type: String },
-  region_name_en:     { type: String },
-}, { collection: "countries", timestamps: false });
+const CountrySchema = new mongoose.Schema(
+  {
+    country_code: {
+      type: String,
+      required: true,
+      uppercase: true,
+      trim: true,
+    },
 
-CountrySchema.index({ country_alpha2_code: 1, region_code: 1 }, { unique: true });
+    country_name_ar: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-const CountryModel = mongoose.model("Country", CountrySchema); // اسم موديل واضح
+    country_name_en: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    city_name_ar: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    city_name_en: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  {
+    collection: "countries",
+    timestamps: false,
+  }
+);
+
+CountrySchema.index(
+  {
+    country_code: 1,
+    city_name_en: 1,
+  },
+  {
+    unique: true,
+  }
+);
+
+const CountryModel = mongoose.model("countries", CountrySchema);
+
 export default CountryModel;

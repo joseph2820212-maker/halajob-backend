@@ -2,15 +2,15 @@
 import mongoose from "mongoose";
 import {
   SheetModel,
-  JopNameModel,
+  JobNameModel,
   jobsModel,
   CompanyModel,
   CurrencyModel,
   CountryModel,
-  JopTypeModel,
+  JobTypeModel,
   WorkTimeTypeModel,
-  JopSalaryModel,
-  JopServiceModel,
+  JobSalaryModel,
+  JobServiceModel,
 } from "../../models/index.js";
 
 /* أدوات مساعدة */
@@ -41,14 +41,14 @@ const insert = async (req, res) => {
     const [
       jobsName, companies, countries, currencies, jobTimes, jobTypes, jobSalaries, jobServices
     ] = await Promise.all([
-      JopNameModel.find().lean(),
+      JobNameModel.find().lean(),
       CompanyModel.find().lean(),
       CountryModel.find().lean(),
       CurrencyModel.find().lean(),
       WorkTimeTypeModel.find().lean(),
-      JopTypeModel.find().lean(),
-      JopSalaryModel.find().lean(),
-      JopServiceModel.find().lean(),
+      JobTypeModel.find().lean(),
+      JobSalaryModel.find().lean(),
+      JobServiceModel.find().lean(),
     ]);
 
     if (!jobsName.length || !companies.length || !countries.length || !currencies.length ||
@@ -98,9 +98,9 @@ const insert = async (req, res) => {
         const emails = is_send_emails ? [randomEmailSimple()] : undefined;
         const out_link = is_out_side ? `https://jobs.example.com/${jn.dedupeKey || jn._id}` : "";
 
-        const jop_type_info = { _id: jType._id, name: jType?.name || jType?.title || "type" };
-        const jop_time_info = { _id: wTime._id, name: wTime?.name || wTime?.title || "time" };
-        const jop_salary_info = {
+        const Job_type_info = { _id: jType._id, name: jType?.name || jType?.title || "type" };
+        const Job_time_info = { _id: wTime._id, name: wTime?.name || wTime?.title || "time" };
+        const Job_salary_info = {
           _id: jSalary._id,
           name: jSalary?.name || jSalary?.title || "salary",
           min: 500 + Math.floor(Math.random() * 500),
@@ -127,14 +127,14 @@ const insert = async (req, res) => {
 
           currency_id: currency._id,
           countries: pickedCountries,
-          jop_type_id: jType._id,
-          jop_type_info,
-          jop_time_id: wTime._id,
-          jop_time_info,
-          jop_salary_id: jSalary._id,
-          jop_salary_info,
+          Job_type_id: jType._id,
+          Job_type_info,
+          Job_time_id: wTime._id,
+          Job_time_info,
+          Job_salary_id: jSalary._id,
+          Job_salary_info,
 
-          jop_service: services,
+          Job_service: services,
 
           show_company_information: Math.random() < 0.7,
           is_send_emails,

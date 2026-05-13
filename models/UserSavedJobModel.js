@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const UserSavedJobSchema = new mongoose.Schema(
   {
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true, index: true },
     job_id:  { type: mongoose.Schema.Types.ObjectId, ref: "jobs", required: true, index: true },
   },
   { collection: "user_saved_job", timestamps: true }

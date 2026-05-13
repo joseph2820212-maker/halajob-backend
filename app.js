@@ -6,18 +6,16 @@ import mongoSanitize from 'express-mongo-sanitize';
 import morgan from 'morgan';
 import routes from './routes/index.js';
 import userRoutes from './routesUser/index.js';
+import employeeRoutes from './routesEmployee/index.js';
+import routesHealth from './routesHealth/index.js';
+
 import error from './middlewares/error.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { scheduleCurrencyRefresh } from "./services/currency.service.js";
-
-// حدد __filename و __dirname أول شيء
 const __filename = fileURLToPath(import.meta.url);
-const __dirname  = path.dirname(__filename);
-
-// الآن استخدمها بأمان
-const dashPath  = path.join(__dirname, 'dash');   // مجلد React
-const frontPath = path.join(__dirname, 'front');  // عدّل حسب مسارك الفعلي
+const __dirname = path.dirname(__filename);
+// حدد __filename و __dirname أول شيء
 
 const app = express();
 
@@ -35,23 +33,20 @@ if (process.env.NODE_ENV !== 'production') {
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'lan'],
 }));
-
-// Static
-app.use('/assets_front', express.static(path.join(frontPath, 'assets_front')));
-app.use('/vendor',       express.static(path.join(frontPath, 'vendor')));
-app.use('/assets',       express.static(path.join(dashPath, 'assets')));
-app.use('/logo2.png',    express.static(path.join(dashPath, 'logo2.png')));
-app.use('/uploads',      express.static(path.join(__dirname, 'uploads')));
-
-// الراوترات
-app.use('/v1', routes);
-app.use('/user/v1', userRoutes);
-app.get('/dash*', (req, res) =>
-  res.sendFile(path.join(dashPath, 'index.html'))
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"), {
+    maxAge: "7d",
+    index: false,
+  })
 );
 
+app.use('/dash/v1', routes);
+app.use('/employee/v1', employeeRoutes);
+app.use('/health', routesHealth);
+app.use('/user/v1', userRoutes);
 // أمان/ضغط/تعقيم
 app.use(helmet());
 app.use(compression());

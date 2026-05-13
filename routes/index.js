@@ -1,20 +1,21 @@
 import express from 'express';
 import RoleRoute from "./RoleRoute.js"
-import PermissionRote from "./PermissionRote.js"
-import JopNameRote from "./JopNameRote.js"
-import JopServiceRote from "./JopServiceRote.js"
-import JopTypeRote from "./JopTypeRote.js"
-import JopSalaryRote from "./JopSalaryRote.js";
-import exselRote from "./exselRote.js";
-import CompanyRote from "./CompanyRote.js";
-import CountryRote from "./CountryRote.js";
-import CurrencyRote from "./CurrencyRote.js";
-import WorkTimeRote from "./WorkTimeRote.js";
-import JobRote from "./JobRote.js";
-import FontRote from "./FontRote.js";
-import ColorRote from "./ColorRote.js";
-import ResumeRote from "./ResumeRote.js";
-import keywordRote from "./keywordRote.js";
+import PermissionRoute from "./PermissionRoute.js"
+import JobNameRoute from "./JobNameRoute.js"
+import JobServiceRoute from "./JobServiceRoute.js"
+import JobTypeRoute from "./JobTypeRoute.js"
+import JobSalaryRoute from "./JobSalaryRoute.js";
+import exselRoute from "./exselRoute.js";
+import CompanyRoute from "./CompanyRoute.js";
+import CountryRoute from "./CountryRoute.js";
+import CurrencyRoute from "./CurrencyRoute.js";
+import WorkTimeRoute from "./WorkTimeRoute.js";
+import JobRoute from "./JobRoute.js";
+import FontRoute from "./FontRoute.js";
+import ColorRoute from "./ColorRoute.js";
+import ResumeRoute from "./ResumeRoute.js";
+import keywordRoute from "./keywordRoute.js";
+import authRoute from "./authRoute.js";
 
 import fs from 'fs';
 import path from 'path';
@@ -22,23 +23,23 @@ const FILES_DIRECTORY = path.resolve(process.env.FILES_DIRECTORY || './uploads')
 
 const router = express.Router();
 
-
+router.use('/auth', authRoute);
 router.use('/Role', RoleRoute);
-router.use('/Permission', PermissionRote);
-router.use('/JopName', JopNameRote);
-router.use('/JopService', JopServiceRote);
-router.use('/JopType', JopTypeRote);
-router.use('/JopSalary', JopSalaryRote);
-router.use('/exsel', exselRote);
-router.use('/Company', CompanyRote);
-router.use('/Country', CountryRote);
-router.use('/Currency', CurrencyRote);
-router.use('/WorkTime', WorkTimeRote);
-router.use('/Job', JobRote);
-router.use('/Color', ColorRote);
-router.use('/Font', FontRote);
-router.use('/Resume', ResumeRote);
-router.use('/Keyword', keywordRote);
+router.use('/Permission', PermissionRoute);
+router.use('/JobName', JobNameRoute);
+router.use('/JobService', JobServiceRoute);
+router.use('/JobType', JobTypeRoute);
+router.use('/JobSalary', JobSalaryRoute);
+router.use('/exsel', exselRoute);
+router.use('/Company', CompanyRoute);
+router.use('/Country', CountryRoute);
+router.use('/Currency', CurrencyRoute);
+router.use('/WorkTime', WorkTimeRoute);
+router.use('/Job', JobRoute);
+router.use('/Color', ColorRoute);
+router.use('/Font', FontRoute);
+router.use('/Resume', ResumeRoute);
+router.use('/Keyword', keywordRoute);
 
 router.get('/image/:name', (req, res) => {
   const fileName = req.params.name;

@@ -1,7 +1,7 @@
-// controllers/jop Salary.controller.js
+// controllers/Job Salary.controller.js
 
 import ReturnDashData from "../../helper/ReturnDashData/index.js";
-import { JopSalaryModel } from "../../models/index.js";
+import { JobSalaryModel } from "../../models/index.js";
 
 /**
  * CREATE
@@ -32,16 +32,16 @@ const create = async (req, res, next) => {
 
     // تحقق من الاسم (لو عندك فهرس فريد على name)
     if (payload.name) {
-      const exists = await JopSalaryModel.findOne({ name: payload.name });
+      const exists = await JobSalaryModel.findOne({ name: payload.name });
       if (exists) {
         return ReturnDashData.createError({
           res,
-          message: "jop Salary with this name already exists",
+          message: "Job Salary with this name already exists",
         });
       }
     }
 
-    const doc = await JopSalaryModel.create(payload);
+    const doc = await JobSalaryModel.create(payload);
     return ReturnDashData.createData({ res, data: doc });
 
   } catch (err) {
@@ -69,7 +69,7 @@ const create = async (req, res, next) => {
 
 /**
  * UPDATE
- * توقع: /jop Salarys/:id
+ * توقع: /Job Salarys/:id
  */
 const update = async (req, res, next) => {
   try {
@@ -112,7 +112,7 @@ const update = async (req, res, next) => {
       if (!payload.title_en) delete payload.title_en;
     }
 
-    const doc = await JopSalaryModel.findByIdAndUpdate(
+    const doc = await JobSalaryModel.findByIdAndUpdate(
       id,
       { $set: payload }, // نستبدل القيم المقدمة (ومنها keyword الجديدة)
       {
@@ -125,7 +125,7 @@ const update = async (req, res, next) => {
     if (!doc) {
       return ReturnDashData.updateError({
         res,
-        message: "jop Salary not found",
+        message: "Job Salary not found",
       });
     }
 
@@ -175,8 +175,8 @@ const update = async (req, res, next) => {
     const skip = (Number(page) - 1) * Number(limit);
 
     const [items, total] = await Promise.all([
-      JopSalaryModel.find(filter).sort(sort).skip(skip).limit(Number(limit)),
-      JopSalaryModel.countDocuments(filter),
+      JobSalaryModel.find(filter).sort(sort).skip(skip).limit(Number(limit)),
+      JobSalaryModel.countDocuments(filter),
     ]);
 
     return ReturnDashData.getData({
@@ -201,16 +201,16 @@ const update = async (req, res, next) => {
 
 /**
  * GET ONE
- * توقع: /jop Salarys/:id
+ * توقع: /Job Salarys/:id
  */
  const getOne = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const doc = await JopSalaryModel.findById(id);
+    const doc = await JobSalaryModel.findById(id);
     if (!doc) {
       return ReturnDashData.getError({
         res,
-        message: "jop Salary not found",
+        message: "Job Salary not found",
       });
     }
     return ReturnDashData.getData({ res, data: doc });
@@ -224,16 +224,16 @@ const update = async (req, res, next) => {
 
 /**
  * DELETE
- * توقع: /jop Salarys/:id
+ * توقع: /Job Salarys/:id
  */
  const remove = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const doc = await JopSalaryModel.findByIdAndDelete(id);
+    const doc = await JobSalaryModel.findByIdAndDelete(id);
     if (!doc) {
       return ReturnDashData.deleteError({
         res,
-        message: "jop Salary not found",
+        message: "Job Salary not found",
       });
     }
     return ReturnDashData.deleteData({
