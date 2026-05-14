@@ -61,7 +61,7 @@ export const buildCvTemplateData = ({
       .filter(Boolean)
       .join(""),
 
-    image: user.image || "",
+    profile_image_url: user.image || "",
 
     location: firstCountry
       ? `${firstCountry[isAr ? "city_name_ar" : "city_name_en"] || ""}, ${

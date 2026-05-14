@@ -1,0 +1,197 @@
+import dotenv from "dotenv";
+import { CurrencyModel } from "../models/index.js";
+
+dotenv.config();
+
+export const seedCurrencies = async () => {
+  try {
+    const currencies = [
+      {
+        code: "USD",
+        name_en: "US Dollar",
+        name_ar: "دولار أمريكي",
+        symbol_en: "$",
+        symbol_ar: "دولار",
+        rate_base: "USD",
+        rate: 1,
+        is_base: true,
+        is_active: true,
+        is_auto_update: false,
+      },
+      {
+        code: "EUR",
+        name_en: "Euro",
+        name_ar: "يورو",
+        symbol_en: "€",
+        symbol_ar: "يورو",
+        rate_base: "USD",
+        rate: 0.92,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "TRY",
+        name_en: "Turkish Lira",
+        name_ar: "ليرة تركية",
+        symbol_en: "₺",
+        symbol_ar: "ل.ت",
+        rate_base: "USD",
+        rate: 32,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "SYP",
+        name_en: "Syrian Pound",
+        name_ar: "ليرة سورية",
+        symbol_en: "SYP",
+        symbol_ar: "ل.س",
+        rate_base: "USD",
+        rate: 13000,
+        is_base: false,
+        is_active: true,
+        is_auto_update: false,
+      },
+      {
+        code: "SAR",
+        name_en: "Saudi Riyal",
+        name_ar: "ريال سعودي",
+        symbol_en: "SAR",
+        symbol_ar: "ر.س",
+        rate_base: "USD",
+        rate: 3.75,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "AED",
+        name_en: "UAE Dirham",
+        name_ar: "درهم إماراتي",
+        symbol_en: "AED",
+        symbol_ar: "د.إ",
+        rate_base: "USD",
+        rate: 3.67,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "QAR",
+        name_en: "Qatari Riyal",
+        name_ar: "ريال قطري",
+        symbol_en: "QAR",
+        symbol_ar: "ر.ق",
+        rate_base: "USD",
+        rate: 3.64,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "KWD",
+        name_en: "Kuwaiti Dinar",
+        name_ar: "دينار كويتي",
+        symbol_en: "KWD",
+        symbol_ar: "د.ك",
+        rate_base: "USD",
+        rate: 0.31,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "BHD",
+        name_en: "Bahraini Dinar",
+        name_ar: "دينار بحريني",
+        symbol_en: "BHD",
+        symbol_ar: "د.ب",
+        rate_base: "USD",
+        rate: 0.38,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "OMR",
+        name_en: "Omani Rial",
+        name_ar: "ريال عماني",
+        symbol_en: "OMR",
+        symbol_ar: "ر.ع",
+        rate_base: "USD",
+        rate: 0.38,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "JOD",
+        name_en: "Jordanian Dinar",
+        name_ar: "دينار أردني",
+        symbol_en: "JOD",
+        symbol_ar: "د.أ",
+        rate_base: "USD",
+        rate: 0.71,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "EGP",
+        name_en: "Egyptian Pound",
+        name_ar: "جنيه مصري",
+        symbol_en: "EGP",
+        symbol_ar: "ج.م",
+        rate_base: "USD",
+        rate: 48,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+      {
+        code: "LBP",
+        name_en: "Lebanese Pound",
+        name_ar: "ليرة لبنانية",
+        symbol_en: "LBP",
+        symbol_ar: "ل.ل",
+        rate_base: "USD",
+        rate: 89500,
+        is_base: false,
+        is_active: true,
+        is_auto_update: false,
+      },
+      {
+        code: "IQD",
+        name_en: "Iraqi Dinar",
+        name_ar: "دينار عراقي",
+        symbol_en: "IQD",
+        symbol_ar: "د.ع",
+        rate_base: "USD",
+        rate: 1310,
+        is_base: false,
+        is_active: true,
+        is_auto_update: true,
+      },
+    ];
+
+    for (const currency of currencies) {
+      await CurrencyModel.updateOne(
+        { code: currency.code },
+        {
+          $set: {
+            ...currency,
+            rate_updated_at: new Date(),
+          },
+        },
+        { upsert: true }
+      );
+    }
+
+    console.log("✅ Currencies seeded successfully");
+  } catch (error) {
+    console.error("❌ Currencies seeder error:", error);
+    throw error;
+  }
+};

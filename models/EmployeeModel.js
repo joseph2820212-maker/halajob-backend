@@ -76,7 +76,25 @@ const LinkSchema = new Schema(
   },
   { _id: true, timestamps: true }
 );
+const EmployeeCvFileSchema = new Schema(
+  {
+    url: { type: String, trim: true, required: true },
+    fileName: { type: String, trim: true, required: true },
 
+    template_key: { type: String, trim: true, default: "" },
+    title: { type: String, trim: true, default: "" },
+
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "inactive",
+      index: true,
+    },
+
+    created_from_builder: { type: Boolean, default: true },
+  },
+  { _id: true, timestamps: true }
+);
 const ExpectedSalarySchema = new Schema(
   {
     min: { type: Number, default: null, min: 0 },
@@ -294,7 +312,7 @@ const EmployeeSchema = new Schema(
       index: true,
     },
 
-    cvs: { type: [String], default: [] },
+    cvs: { type: [EmployeeCvFileSchema], default: [] },
     latest_work_experience: { type: ExperienceSchema, default: null },
     experience: { type: [ExperienceSchema], default: [] },
     education: { type: [EducationSchema], default: [] },
@@ -308,7 +326,7 @@ const EmployeeSchema = new Schema(
     preferred_work_modes: [
       { type: Schema.Types.ObjectId, ref: "work_modes", index: true },
     ],
-     preferred_countries: [
+    preferred_countries: [
       { type: Schema.Types.ObjectId, ref: "countries", index: true },
     ],
 

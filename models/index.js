@@ -51,6 +51,11 @@ import BannerModel from './BannerModel.js';
 import SearchHistoryModel from './SearchHistoryModel.js';
 import AppSettingsModel from './AppSettingsModel.js';
 
+// cv
+
+import CvTemplateModel from './CvTemplateModel.js';
+import EmployeeCvModel from './EmployeeCvModel.js';
+
 export {
   UserModel,
   RefreshTokenModel,
@@ -97,4 +102,7 @@ export {
   BannerModel,
   SearchHistoryModel,
   AppSettingsModel,
+  //cv
+  CvTemplateModel,
+  EmployeeCvModel
 };

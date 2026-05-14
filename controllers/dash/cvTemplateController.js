@@ -154,3 +154,10 @@ export const deleteCvTemplate = async (req, res, next) => {
     next(error);
   }
 };
+export default {
+  createCvTemplate,
+  updateCvTemplate,
+  getCvTemplatesAdmin,
+  getCvTemplateById,
+  deleteCvTemplate
+}
