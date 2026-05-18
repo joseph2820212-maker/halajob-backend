@@ -13,6 +13,7 @@ router.get("/", dashboardController.getEmployeeDashboard);
 router.get("/profile", infoController.getMyEmployeeProfile);
 router.get("/me/basic-profile", infoController.getMyBasicProfile);
 router.get("/profile/completion", infoController.getMyEmployeeCompletion);
+router.post("/profile/rebuild-search-filters", upload.none(), infoController.rebuildMySearchFilters);
 
 /* Employee profile */
 router.put("/profile", upload.none(), infoController.updateBasicEmployeeProfile);

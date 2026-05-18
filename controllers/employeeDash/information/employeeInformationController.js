@@ -8,16 +8,9 @@ import {
   toObjectIdArray,
 } from "../../../helper/employeeDash/employeeDashHelpers.js";
 
-import CurrencyModel from "../../../models/CurrencyModel.js";
-import JobNameModel from "../../../models/JobNameModel.js";
-import JobTypeModel from "../../../models/JobTypeModel.js";
-import SkillModel from "../../../models/SkillModel.js";
-import LanguageModel from "../../../models/LanguageModel.js";
-import EducationLevelModel from "../../../models/EducationLevelModel.js";
-import WorkModeModel from "../../../models/WorkModeModel.js";
-import CountryModel from "../../../models/CountryModel.js";
-
+import {CurrencyModel,JobNameModel,JobTypeModel,SkillModel,LanguageModel,EducationLevelModel,WorkModeModel,CountryModel} from "../../../models/index.js";
 import { deleteImage, processUploadImage } from "../../../services/imageService.js";
+import { applyEmployeeProjection, rebuildMatchForEmployee } from "../../../services/search/rebuildSearchData.js";
 import mongoose from "mongoose";
 
 const ARRAY_FIELDS = new Set([
@@ -678,6 +671,12 @@ const rebuildEmployeeSearchFilters = async (employee) => {
 
 const shouldRebuildSearchFilters = (fields = []) => fields.some((field) => SEARCH_FILTER_RELATED_FIELDS.has(field));
 
+const refreshEmployeeMatchingData = async (employee, { rebuildMatches = true } = {}) => {
+  await applyEmployeeProjection(employee);
+  await employee.save();
+  if (rebuildMatches) await rebuildMatchForEmployee(employee._id);
+};
+
 const populateEmployeeSection = async (employee, section) => {
   const populateMap = {
     languages: [{ path: "languages.language_id", select: "name title_ar title_en" }],
@@ -806,7 +805,7 @@ export const getMyEmployeeProfile = async (req, res, next) => {
     if (employee.profile_completion !== completion) {
       employee.profile_completion = completion;
       await rebuildEmployeeSearchFilters(employee);
-      await employee.save();
+      await refreshEmployeeMatchingData(employee, { rebuildMatches: false });
     }
 
     return success(res, { employee, completion });
@@ -852,7 +851,7 @@ export const updateBasicEmployeeProfile = async (req, res, next) => {
       await rebuildEmployeeSearchFilters(employee);
     }
 
-    await employee.save();
+    await refreshEmployeeMatchingData(employee, { rebuildMatches: shouldRebuildSearchFilters(touchedFields) });
     await populateEmployeeSingles(employee);
 
     return success(res, employee, "employee_profile_updated");
@@ -872,7 +871,7 @@ export const updateAboutMe = async (req, res, next) => {
     employee.about_me = req.body.about_me ?? "";
     employee.profile_completion = calculateProfileCompletion(employee);
     await rebuildEmployeeSearchFilters(employee);
-    await employee.save();
+    await refreshEmployeeMatchingData(employee);
 
     return success(res, employee, "about_me_updated");
   } catch (error) {
@@ -888,7 +887,7 @@ export const updateLatestWorkExperience = async (req, res, next) => {
     await applySingleField(employee, "latest_work_experience", req.body);
     employee.profile_completion = calculateProfileCompletion(employee);
     await rebuildEmployeeSearchFilters(employee);
-    await employee.save();
+    await refreshEmployeeMatchingData(employee);
 
     return success(res, employee, "latest_work_experience_updated");
   } catch (error) {
@@ -933,7 +932,7 @@ export const updateWorkPreferences = async (req, res, next) => {
       await rebuildEmployeeSearchFilters(employee);
     }
 
-    await employee.save();
+    await refreshEmployeeMatchingData(employee, { rebuildMatches: shouldRebuildSearchFilters(touchedFields) });
 
     await employee.populate([
       { path: "preferred_work_modes", select: "key title_ar title_en keywords_ar keywords_en" },
@@ -972,7 +971,7 @@ export const replaceSection = async (req, res, next) => {
       await rebuildEmployeeSearchFilters(employee);
     }
 
-    await employee.save();
+    await refreshEmployeeMatchingData(employee, { rebuildMatches: SEARCH_FILTER_RELATED_FIELDS.has(section) });
 
     if (section === "expected_salary" || section === "min_salary") {
       await populateEmployeeSingles(employee);
@@ -1018,7 +1017,7 @@ export const addSectionItems = async (req, res, next) => {
       await rebuildEmployeeSearchFilters(employee);
     }
 
-    await employee.save();
+    await refreshEmployeeMatchingData(employee, { rebuildMatches: SEARCH_FILTER_RELATED_FIELDS.has(section) });
     await populateEmployeeSection(employee, section);
 
     const result = Array.isArray(employee[section])
@@ -1064,7 +1063,7 @@ export const updateSectionItem = async (req, res, next) => {
       await rebuildEmployeeSearchFilters(employee);
     }
 
-    await employee.save();
+    await refreshEmployeeMatchingData(employee, { rebuildMatches: SEARCH_FILTER_RELATED_FIELDS.has(section) });
     await populateEmployeeSection(employee, section);
 
     const updatedItem = employee[section].id?.(itemId);
@@ -1105,7 +1104,7 @@ export const deleteSectionItem = async (req, res, next) => {
       await rebuildEmployeeSearchFilters(employee);
     }
 
-    await employee.save();
+    await refreshEmployeeMatchingData(employee, { rebuildMatches: SEARCH_FILTER_RELATED_FIELDS.has(section) });
 
     return success(res, employee, `${section}_item_deleted`);
   } catch (error) {
@@ -1131,7 +1130,7 @@ export const replaceMinSalary = async (req, res, next) => {
     await applySingleField(employee, "min_salary", req.body);
     employee.profile_completion = calculateProfileCompletion(employee);
     await rebuildEmployeeSearchFilters(employee);
-    await employee.save();
+    await refreshEmployeeMatchingData(employee);
 
     await employee.populate({
       path: "expected_salary.currency_id",
@@ -1271,7 +1270,7 @@ export const rebuildMySearchFilters = async (req, res, next) => {
     if (!employee) return;
 
     await rebuildEmployeeSearchFilters(employee);
-    await employee.save();
+    await refreshEmployeeMatchingData(employee);
 
     return success(res, employee.search_filters, "employee_search_filters_rebuilt");
   } catch (error) {

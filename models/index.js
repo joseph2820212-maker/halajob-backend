@@ -25,6 +25,7 @@ import jobsModel from './JobModel.js';
 import JobInvitationModel from './JobInvitationModel.js';
 import JobReportModel from './JobReportModel.js';
 import JobMatchModel from './JobMatchModel.js';
+import JobEmployeeMatchModel from './JobEmployeeMatchModel.js';
 
 import CountryModel from './CountryModel.js';
 import CurrencyModel from './CurrencyModel.js';
@@ -50,6 +51,7 @@ import KeywordModel from './KeywordModel.js';
 import BannerModel from './BannerModel.js';
 import SearchHistoryModel from './SearchHistoryModel.js';
 import AppSettingsModel from './AppSettingsModel.js';
+import JobZainTalentRequestModel from './JobZainTalentRequestModel.js';
 
 // cv
 
@@ -80,6 +82,7 @@ export {
   JobInvitationModel,
   JobReportModel,
   JobMatchModel,
+  JobEmployeeMatchModel,
   CountryModel,
   CurrencyModel,
   SheetModel,
@@ -102,6 +105,7 @@ export {
   BannerModel,
   SearchHistoryModel,
   AppSettingsModel,
+  JobZainTalentRequestModel,
   //cv
   CvTemplateModel,
   EmployeeCvModel

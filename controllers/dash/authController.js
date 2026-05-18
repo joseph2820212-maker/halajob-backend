@@ -95,7 +95,9 @@ const login = async (req, res, next) => {
     const user = identifier.includes("@")
       ? await UserModel.findOne({ email: normEmail(identifier) }).populate("role_id")
       : await UserModel.findOne({ phone_national: identifier }).populate("role_id");
-
+console.log('====================================');
+console.log(identifier);
+console.log('====================================');
     if (!user) {
       return ReturnAppData.createError({
         res,

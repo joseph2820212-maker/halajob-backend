@@ -16,6 +16,11 @@ import { seedCurrencies } from "./seedCurrencies.js";
 import { seedLanguages } from "./seedLanguages.js";
 import { seedExperienceLevels } from "./seedExperienceLevels.js";
 import { seedCvTemplates } from "./seedCvTemplates.js";
+import { seedCompanies } from "./seedCompanies.js";
+import { seedIndustries } from "./seedIndustries.js";
+import { seedSkillsFromEsco } from "./seedSkills.js";
+import { seedEducationLevels } from "./seedEducationLevels.js";
+import { seedJobsAndApplications } from "./seedJobsAndApplications.js";
 
 dotenv.config();
 
@@ -35,7 +40,12 @@ const seeders = {
   languages:seedLanguages,
   experienceLevels:seedExperienceLevels,
   workMode:seedWorkModes,
-  cv:seedCvTemplates
+  cv:seedCvTemplates,
+  company:seedCompanies,
+  industries:seedIndustries,
+  skills:seedSkillsFromEsco,
+  educationLevel:seedEducationLevels,
+  jobsAndApplications:seedJobsAndApplications
 };
 
 // ترتيب التشغيل
@@ -54,7 +64,12 @@ const executionOrder = [
   "currencies",
   "languages",
   "experienceLevels",
-  "cv"
+  "cv",
+  "industries",
+  "company",
+  "skills",
+  "educationLevel",
+  "jobsAndApplications"
 
 ];
 

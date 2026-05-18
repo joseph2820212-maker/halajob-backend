@@ -520,18 +520,30 @@ export const buildDashboardStats = ({
   savedJobs = [],
   recommendedJobs = [],
   latestJobs = [],
+  matchedJobs = [],
   upcomingInterviews = [],
+  smartTips = [],
 }) => {
+  const matchedCount = matchedJobs.length || latestJobs.length || 0;
+
   return {
     total_applications: baseStats.total_applications || baseStats.applications || 0,
     saved_jobs: baseStats.saved_jobs || baseStats.total_saved_jobs || 0,
+    viewed_jobs: baseStats.viewed_jobs || 0,
     upcoming_interviews:
       baseStats.upcoming_interviews || upcomingInterviews.length || 0,
 
     latest_applications_count: latestApplications.length,
     saved_jobs_preview_count: savedJobs.length,
     recommended_jobs_count: recommendedJobs.length,
-    latest_jobs_count: latestJobs.length,
+
+    // الاسم الصحيح الجديد
+    matched_jobs_count: matchedCount,
+
+    // alias قديم حتى لا ينكسر أي frontend قديم
+    latest_jobs_count: matchedCount,
+
+    smart_tips_count: smartTips.length,
 
     waiting_applications: latestApplications.filter((item) => item.status === "waiting").length,
     interview_applications: latestApplications.filter((item) => item.status === "interview").length,

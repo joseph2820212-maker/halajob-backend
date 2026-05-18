@@ -271,6 +271,27 @@ const SearchFiltersSchema = new Schema(
 
 const EmployeeSchema = new Schema(
   {
+    matching_profile: {
+      normalized_skills: { type: [String], default: [] },
+      normalized_languages: { type: [String], default: [] },
+      normalized_titles: { type: [String], default: [] },
+      normalized_job_names: { type: [String], default: [] },
+      normalized_job_types: { type: [String], default: [] },
+      preferred_country_values: { type: [String], default: [] },
+      preferred_work_mode_keys: { type: [String], default: [] },
+
+      career_tags: { type: [String], default: [] },
+      searchable_tokens: { type: [String], default: [] },
+      searchable_text: { type: String, default: "" },
+
+      seniority_score: { type: Number, default: 0 },
+      salary_min_base: { type: Number, default: null },
+      salary_max_base: { type: Number, default: null },
+
+      remote_ready: { type: Boolean, default: false },
+      relocation_ready: { type: Boolean, default: false },
+      free_for_work: { type: Boolean, default: true },
+    },
     user_id: {
       type: Schema.Types.ObjectId,
       ref: "users",
@@ -311,7 +332,6 @@ const EmployeeSchema = new Schema(
       default: null,
       index: true,
     },
-
     cvs: { type: [EmployeeCvFileSchema], default: [] },
     latest_work_experience: { type: ExperienceSchema, default: null },
     experience: { type: [ExperienceSchema], default: [] },
@@ -338,8 +358,8 @@ const EmployeeSchema = new Schema(
       default: null,
       index: true,
     },
-    is_can_move: { type: Boolean, default: false, index: true },
-    is_free_for_work: { type: Boolean, default: false, index: true },
+    is_can_move: { type: Boolean, default: true, index: true },
+    is_free_for_work: { type: Boolean, default: true, index: true },
     work_location: {
       type: String,
       enum: ["remote", "hybrid", "onsite", "field", "unknown"],
@@ -390,7 +410,15 @@ EmployeeSchema.index({ "search_filters.preferred_countries.values": 1 });
 EmployeeSchema.index({ "search_filters.preferred_countries.country_codes": 1 });
 EmployeeSchema.index({ "search_filters.salary.min_base": 1 });
 EmployeeSchema.index({ "search_filters.salary.max_base": 1 });
-
+EmployeeSchema.index({ "matching_profile.normalized_skills": 1 });
+EmployeeSchema.index({ "matching_profile.normalized_languages": 1 });
+EmployeeSchema.index({ "matching_profile.normalized_titles": 1 });
+EmployeeSchema.index({ "matching_profile.preferred_country_values": 1 });
+EmployeeSchema.index({ "matching_profile.preferred_work_mode_keys": 1 });
+EmployeeSchema.index({ "matching_profile.seniority_score": -1 });
+EmployeeSchema.index({ "matching_profile.salary_min_base": 1 });
+EmployeeSchema.index({ "matching_profile.salary_max_base": 1 });
+EmployeeSchema.index({ "matching_profile.searchable_tokens": 1 });
 EmployeeSchema.index({
   profile_headline: "text",
   current_job_title: "text",

@@ -1,11 +1,12 @@
 // controllers/searchController.js
 import { JobNameModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
+import mongoose from "mongoose";
 
 /* ======================== Helpers ======================== */
 // حركات/تنقية
 const AR_DIACRITICS = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g;
-const NON_AR_EN = /[^A-Za-z\u0600-\u06FF\s]/g;
+const NON_AR_EN = /[^A-Za-z0-9\u0600-\u06FF\s]/g;
 
 // ملاحظـة: أبقيت "ة" كما هي (لم أحولها إلى "ه") لنتائج أدق.
 function normalizeArabic(str = "") {
@@ -156,20 +157,30 @@ function buildAndMatch(tokens) {
   return {
     $and: tokens.map((tok) => {
       const rxObj = new RegExp(escapeRegex(tok), "i");
+
+      const orConditions = [
+        { name: rxObj },
+        { title_ar: rxObj },
+        { title_en: rxObj },
+
+        { sector_ar: rxObj },
+        { sector_en: rxObj },
+        { subsector_ar: rxObj },
+        { subsector_en: rxObj },
+
+        { keywords: { $elemMatch: { $regex: rxObj } } },
+        { keyword: { $elemMatch: { $regex: rxObj } } },
+      ];
+
+      // مطابقة مباشرة مع _id
+      if (mongoose.Types.ObjectId.isValid(tok)) {
+        orConditions.unshift({
+          _id: new mongoose.Types.ObjectId(tok),
+        });
+      }
+
       return {
-        $or: [
-          { name: rxObj },
-          { title_ar: rxObj },
-          { title_en: rxObj },
-          // إضافة الحقول المطلوبة للبحث
-          { sector_ar: rxObj },
-          { sector_en: rxObj },
-          { subsector_ar: rxObj },
-          { subsector_en: rxObj },
-          // دعم كِلا الحقلين keywords/keyword
-          { keywords: { $elemMatch: { $regex: rxObj } } },
-          { keyword:  { $elemMatch: { $regex: rxObj } } },
-        ],
+        $or: orConditions,
       };
     }),
   };
@@ -245,10 +256,33 @@ const search = async (req, res) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const rawQuery = String(req.query.search || "").trim();
-    if (!rawQuery)
-      return ReturnAppData.getError({ res, message: lan === "ar" ? "حقل البحث مطلوب" : "query 'search' required" });
 
-    // 1) تحليل النص -> كلمات + عبارات
+    if (!rawQuery) {
+      return ReturnAppData.getError({
+        res,
+        message: lan === "ar" ? "حقل البحث مطلوب" : "query 'search' required",
+      });
+    }
+
+    // مطابقة مباشرة مع _id قبل أي normalization
+    if (mongoose.Types.ObjectId.isValid(rawQuery)) {
+      const doc = await JobNameModel.findById(rawQuery)
+        .select("title_ar title_en name sector_ar sector_en subsector_ar subsector_en")
+        .lean();
+
+      if (doc) {
+        return ReturnAppData.getData({
+          res,
+          data: [
+            {
+              id: String(doc._id),
+              title: pickTitle(doc, lan),
+            },
+          ],
+        });
+      }
+    }
+
     let tokens = tokenize(rawQuery);
     if (!tokens.length) return ReturnAppData.getData({ res, data: [] });
 

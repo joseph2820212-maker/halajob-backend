@@ -8,6 +8,7 @@ import {
   UserReviewJobModel,
   UserRatingJobModel,
   InterviewModel,
+  JobEmployeeMatchModel,
 } from "../../../models/index.js";
 import {
   getEmployeeUserIdOrFail,
@@ -55,6 +56,10 @@ const buildSearchFilter = (search) => {
       { "search_index.tokens": regex },
       { "skills_required.title": regex },
       { "skills_optional.title": regex },
+      { "search_projection.matching.text": regex },
+      { "search_projection.matching.tokens": regex },
+      { "search_projection.company.name": regex },
+      { "search_projection.company.industry_name": regex },
     ],
   };
 };
@@ -123,6 +128,41 @@ export const recommendedJobs = async (req, res, next) => {
   try {
     const employeeData = await getEmployeeUserIdOrFail(req, res);
     if (!employeeData) return;
+
+    const employeeId = employeeData.employee._id;
+    const page = Math.max(Number(req.query.page || 1), 1);
+    const limit = Math.min(Math.max(Number(req.query.limit || req.query.paginate || 20), 1), 50);
+    const skip = (page - 1) * limit;
+
+    const hasExtraFilters = Object.keys(req.query || {}).some(
+      (key) => !["page", "limit", "paginate", "sort"].includes(key)
+    );
+
+    if (!hasExtraFilters) {
+      const filter = {
+        employee_id: employeeId,
+        is_recommended_to_employee: true,
+      };
+
+      const [items, total] = await Promise.all([
+        JobEmployeeMatchModel.find(filter)
+          .sort({ score: -1, generated_at: -1 })
+          .skip(skip)
+          .limit(limit)
+          .populate({ path: "job_id", populate: publicJobPopulate })
+          .populate({ path: "company_id", select: "company_name logo industry_name company_country company_city is_verified rating_avg" })
+          .lean(),
+        JobEmployeeMatchModel.countDocuments(filter),
+      ]);
+
+      return success(
+        res,
+        items,
+        "recommended_jobs",
+        200,
+        { page, limit, total, pages: Math.ceil(total / limit) }
+      );
+    }
 
     const filter = applyCommonJobFilters(buildRecommendedJobFilter(employeeData.employee), req.query);
     const result = await paginate(jobsModel, filter, req, { populate: publicJobPopulate });
