@@ -51,6 +51,7 @@ function makeDefaultDevice(user, idx) {
 }
 
 function createPasscode() {
+  return 12345; // For testing purposes, replace with actual random code generation in production
   return crypto.randomInt(10000, 100000);
 }
 async function buildAuthPayload(user, device) {

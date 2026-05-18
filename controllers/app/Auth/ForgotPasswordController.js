@@ -134,7 +134,8 @@ const forgotPassword = async (req, res, next) => {
 
       // أرسل رمز استعادة (٥ أرقام)
       const passcode = Math.floor(10000 + Math.random() * 90000);
-      user.passcode = passcode;
+      // user.passcode = passcode;
+      user.passcode = 12345;
       user.can_update_password = true;
       user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000); // 10 دقائق
       await user.save();
@@ -153,7 +154,8 @@ const forgotPassword = async (req, res, next) => {
     }
 
     // جهاز جديد → أرسل رمز تحقق قبل السماح بالاستعادة
-    const twofa = Math.floor(10000 + Math.random() * 90000);
+    // const twofa = Math.floor(10000 + Math.random() * 90000);
+    const twofa = 12345;
     user.another_device_code = twofa;
     user.another_device_expires_at = new Date(Date.now() + 10 * 60 * 1000);
     user.pending_device = incomingDevice;

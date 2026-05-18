@@ -39,7 +39,6 @@ const seeders = {
   currencies:seedCurrencies,
   languages:seedLanguages,
   experienceLevels:seedExperienceLevels,
-  workMode:seedWorkModes,
   cv:seedCvTemplates,
   company:seedCompanies,
   industries:seedIndustries,
