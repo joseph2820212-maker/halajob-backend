@@ -856,27 +856,220 @@ export const getCompanyStats = async (companyId) => {
   };
 };
 
+export const buildCompanyHiringPipeline = (rows = []) => {
+  const stages = [
+    { key: "waiting", title: "waiting", color: "slate" },
+    { key: "screening", title: "screening", color: "blue" },
+    { key: "shortlisted", title: "shortlisted", color: "indigo" },
+    { key: "interview", title: "interview", color: "amber" },
+    { key: "offer", title: "offer", color: "purple" },
+    { key: "accepted", title: "accepted", color: "emerald" },
+    { key: "hired", title: "hired", color: "emerald" },
+    { key: "rejected", title: "rejected", color: "rose" },
+    { key: "withdrawn", title: "withdrawn", color: "slate" },
+    { key: "auto_cancel", title: "auto_cancel", color: "slate" },
+  ];
+
+  const counts = rows.reduce((acc, row) => {
+    acc[row?._id || "unknown"] = Number(row?.count || 0);
+    return acc;
+  }, {});
+
+  const items = stages.map((stage) => ({
+    ...stage,
+    count: counts[stage.key] || 0,
+  }));
+
+  const activeKeys = new Set(["waiting", "screening", "shortlisted", "interview", "offer"]);
+  const successKeys = new Set(["accepted", "hired"]);
+  const closedKeys = new Set(["rejected", "withdrawn", "auto_cancel"]);
+
+  return {
+    items,
+    total: items.reduce((sum, item) => sum + item.count, 0),
+    active: items.filter((item) => activeKeys.has(item.key)).reduce((sum, item) => sum + item.count, 0),
+    successful: items.filter((item) => successKeys.has(item.key)).reduce((sum, item) => sum + item.count, 0),
+    closed: items.filter((item) => closedKeys.has(item.key)).reduce((sum, item) => sum + item.count, 0),
+    counts,
+  };
+};
+
 export const buildCompanyDashboardStats = ({
   baseStats = {},
   latestApplications = [],
   latestJobs = [],
   upcomingInterviews = [],
-}) => ({
-  jobs_count: baseStats.jobs_count || 0,
-  active_jobs_count: baseStats.active_jobs_count || 0,
-  applications_count: baseStats.applications_count || 0,
-  upcoming_interviews_count: baseStats.upcoming_interviews_count || 0,
-  reviews_count: baseStats.reviews_count || 0,
-  latest_applications_count: latestApplications.length,
-  latest_jobs_count: latestJobs.length,
-  upcoming_interviews_preview_count: upcomingInterviews.length,
-  waiting_applications: latestApplications.filter((item) => item.status === "waiting").length,
-  interview_applications: latestApplications.filter((item) => item.status === "interview").length,
-  rejected_applications: latestApplications.filter((item) => item.status === "rejected").length,
-  accepted_applications: latestApplications.filter((item) =>
-    ["accepted", "hired", "offer"].includes(item.status)
-  ).length,
-});
+  pipeline = null,
+  smartCandidates = [],
+  recentInvitations = [],
+}) => {
+  const counts = pipeline?.counts || {};
+
+  return {
+    jobs_count: baseStats.jobs_count || 0,
+    active_jobs_count: baseStats.active_jobs_count || 0,
+    applications_count: baseStats.applications_count || 0,
+    upcoming_interviews_count: baseStats.upcoming_interviews_count || 0,
+    reviews_count: baseStats.reviews_count || 0,
+    latest_applications_count: latestApplications.length,
+    latest_jobs_count: latestJobs.length,
+    upcoming_interviews_preview_count: upcomingInterviews.length,
+    smart_candidates_count: smartCandidates.length,
+    recent_invitations_count: recentInvitations.length,
+    waiting_applications: counts.waiting ?? latestApplications.filter((item) => item.status === "waiting").length,
+    screening_applications: counts.screening || 0,
+    shortlisted_applications: counts.shortlisted || 0,
+    interview_applications: counts.interview ?? latestApplications.filter((item) => item.status === "interview").length,
+    offer_applications: counts.offer || 0,
+    rejected_applications: counts.rejected ?? latestApplications.filter((item) => item.status === "rejected").length,
+    accepted_applications: (counts.accepted || 0) + (counts.hired || 0),
+    active_pipeline_count: pipeline?.active || 0,
+    successful_pipeline_count: pipeline?.successful || 0,
+  };
+};
+
+const safeNumber = (value, fallback = 0) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+};
+
+const percentage = (part, total) => {
+  const finalTotal = safeNumber(total);
+  if (!finalTotal) return 0;
+  return Math.round((safeNumber(part) / finalTotal) * 100);
+};
+
+export const buildCompanyPerformanceSummary = ({ latestJobs = [], baseStats = {} }) => {
+  const totals = latestJobs.reduce(
+    (acc, job) => {
+      acc.views += safeNumber(job.user_show);
+      acc.saved += safeNumber(job.user_saved);
+      acc.applications += safeNumber(job.user_applying);
+      acc.reviews += safeNumber(job.user_review);
+      acc.outsideApplications += safeNumber(job.out_side_applying);
+      return acc;
+    },
+    { views: 0, saved: 0, applications: 0, reviews: 0, outsideApplications: 0 }
+  );
+
+  const mostActiveJob = [...latestJobs]
+    .sort((a, b) => safeNumber(b.user_applying) - safeNumber(a.user_applying))[0];
+
+  return {
+    ...totals,
+    total_jobs: baseStats.jobs_count || latestJobs.length || 0,
+    active_jobs: baseStats.active_jobs_count || 0,
+    application_conversion_rate: percentage(totals.applications, totals.views),
+    save_rate: percentage(totals.saved, totals.views),
+    most_active_job: mostActiveJob
+      ? {
+          _id: mostActiveJob._id,
+          job_name: mostActiveJob.job_name || "",
+          applications: safeNumber(mostActiveJob.user_applying),
+          views: safeNumber(mostActiveJob.user_show),
+          saved: safeNumber(mostActiveJob.user_saved),
+        }
+      : null,
+  };
+};
+
+export const buildCompanyReviewsSummary = ({ aggregation = null, latestReviews = [] } = {}) => {
+  const count = safeNumber(aggregation?.count);
+  const average = count ? Number(safeNumber(aggregation?.average).toFixed(1)) : 0;
+
+  return {
+    count,
+    average,
+    distribution: {
+      5: safeNumber(aggregation?.five),
+      4: safeNumber(aggregation?.four),
+      3: safeNumber(aggregation?.three),
+      2: safeNumber(aggregation?.two),
+      1: safeNumber(aggregation?.one),
+    },
+    latest: latestReviews.map((review) => ({
+      _id: review._id,
+      rating: review.rating || 0,
+      message: review.message || "",
+      status: review.status || "published",
+      user: review.is_anonymous ? null : review.user_id || null,
+      createdAt: review.createdAt,
+    })),
+  };
+};
+
+export const normalizeCompanyDashboardCandidate = (match) => {
+  if (!match) return null;
+
+  const employee = match.employee_id || null;
+  const user = match.user_id || employee?.user_id || null;
+  const name = [user?.first_name, user?.mid_name, user?.last_name]
+    .map((x) => String(x || "").trim())
+    .filter(Boolean)
+    .join(" ");
+
+  return {
+    _id: match._id,
+    score: Math.round(safeNumber(match.score)),
+    breakdown: match.breakdown || {},
+    matched_skills: match.matched_skills || [],
+    missing_skills: match.missing_skills || [],
+    matched_languages: match.matched_languages || [],
+    missing_languages: match.missing_languages || [],
+    generated_at: match.generated_at || null,
+    job: normalizeJob(match.job_id),
+    candidate: {
+      employee_id: employee?._id || null,
+      user_id: user?._id || match.user_id || null,
+      name,
+      first_name: user?.first_name || "",
+      last_name: user?.last_name || "",
+      email: user?.email || "",
+      image: user?.image || null,
+      phone_code: user?.phone_code || "",
+      phone_national: user?.phone_national || "",
+      profile_headline: employee?.profile_headline || "",
+      current_job_title: employee?.current_job_title || "",
+      experience_years: employee?.experience_years || 0,
+      profile_completion: employee?.profile_completion || 0,
+      is_free_for_work: Boolean(employee?.is_free_for_work),
+      skills: employee?.skills || [],
+      languages: employee?.languages || [],
+      experience_level: employee?.experience_level_id || null,
+    },
+  };
+};
+
+export const normalizeCompanyDashboardInvitation = (invitation) => {
+  if (!invitation) return null;
+
+  const employee = invitation.employee_id || null;
+  const user = invitation.user_id || employee?.user_id || null;
+  const name = [user?.first_name, user?.mid_name, user?.last_name]
+    .map((x) => String(x || "").trim())
+    .filter(Boolean)
+    .join(" ");
+
+  return {
+    _id: invitation._id,
+    status: invitation.status || "sent",
+    message: invitation.message || "",
+    expires_at: invitation.expires_at || null,
+    responded_at: invitation.responded_at || null,
+    createdAt: invitation.createdAt,
+    updatedAt: invitation.updatedAt,
+    job: normalizeJob(invitation.job_id),
+    candidate: {
+      employee_id: employee?._id || null,
+      user_id: user?._id || invitation.user_id || null,
+      name,
+      first_name: user?.first_name || "",
+      last_name: user?.last_name || "",
+      image: user?.image || null,
+      email: user?.email || "",
+    },
+  };
+};
 
 
 export const escapeRegex = (value = "") =>
