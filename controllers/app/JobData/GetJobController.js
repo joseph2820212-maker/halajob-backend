@@ -1,479 +1,490 @@
-// jobs.controller.js
-
 import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import {
   jobsModel,
-  JobSalaryModel,
-  CurrencyModel,
-  JobServiceModel,
-  WorkTimeTypeModel,
-  CompanyModel,
-  JobTypeModel,
-  UserShowJobModel,
+  EmployeeModel,
   UserSavedJobModel,
-  CountryModel
+  UserShowJobModel,
+  UserApplyingJobModel,
+  JobEmployeeMatchModel,
 } from "../../../models/index.js";
+import { calculateJobEmployeeMatch } from "../../../services/matching/jobEmployeeMatching.js";
 
-/* ========= utils ========= */
-const { Types, isValidObjectId } = mongoose;
-
-function buildPublicUrl(base, rel) {
-  if (!base) return process.env.PUBLIC_BASE_URL + "/" + rel || null;
-  const c = rel?.replace(/^\/+/, "") || "";
-  return base.endsWith("/") ? base + c : `${base}/${c}`;
-}
-
-const NON_AR_EN = /[^\dA-Za-z\u0600-\u06FF\s]/g; // أبقِ الأرقام
-const AR_DIACRITICS = /[\u0610-\u061A\u064B-\u065F\u0670-\u06ED]/g;
-const AR_STOP = new Set(["في", "من", "على", "الى", "عن", "و", "أو", "هذا", "هذه", "ذلك", "هناك", "هنا", "هو", "هي", "هم", "هن", "ما", "لم", "لن", "لا", "قد", "مع", "بعد", "قبل", "بين", "هل", "يا", "كما", "أيضا", "ايضا"]);
-const EN_STOP = new Set(["the", "a", "an", "and", "or", "of", "in", "on", "at", "to", "for", "from", "by", "is", "are", "was", "were", "be", "been", "being", "this", "that", "these", "those", "there", "here", "with", "about", "as", "it", "its", "i", "you", "he", "she", "they", "we", "not", "no", "yes", "do", "does", "did", "done", "have", "has", "had", "can", "could", "should", "would", "will", "just", "also", "too", "very"]);
-
-const normalizeArabic = s =>
-  s.replace(AR_DIACRITICS, "")
-    .replace(/[\u0622\u0623\u0625]/g, "ا")
-    .replace(/\u0649/g, "ي")
-    .replace(/\u0640/g, "");
-
-const normalizeEnglish = s =>
-  s.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-const normalizeMixed = s =>
-  normalizeEnglish(
-    normalizeArabic((s || "").replace(NON_AR_EN, " ").replace(/\s+/g, " ").trim())
-  );
-
-function escapeRegExp(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function tokenizeBasic(text) {
-  const toks = normalizeMixed(text).split(/\s+/).filter(Boolean);
-  return Array.from(
-    new Set(toks.filter(t => t.length >= 2 && !AR_STOP.has(t) && !EN_STOP.has(t)))
-  ).slice(0, 8);
-}
-
-function dateFromBucket(key) {
-  const now = new Date();
-  const d = new Date(now);
-  if (key === "last_24h") { d.setDate(now.getDate() - 1); return d; }
-  if (key === "last_7d") { d.setDate(now.getDate() - 7); return d; }
-  if (key === "last_30d") { d.setDate(now.getDate() - 30); return d; }
-  return null;
-}
-
-function parseIds(v) {
-  if (!v) return [];
-  if (Array.isArray(v)) return v.map(x => new Types.ObjectId(String(x)));
-  if (typeof v === "string")
-    return v.split(",").map(s => s.trim()).filter(Boolean).map(x => new Types.ObjectId(String(x)));
-  return [];
-}
-
-/* ========= constants ========= */
+const { Types } = mongoose;
 const PUBLIC_BASE = process.env.PUBLIC_BASE_URL || "";
-const Job_TYPE_COLL = JobTypeModel.collection.name;            // "Job_type"
-const COMPANY_COLL = CompanyModel.collection.name;             // "companies"
-const USS_COLL = UserShowJobModel.collection.name;         // "user_show_job" (أو حسب اسمك الفعلي)
 
+const isValidId = (value) => mongoose.isValidObjectId(String(value || ""));
+const toObjectId = (value) => (isValidId(value) ? new Types.ObjectId(String(value)) : null);
+const toIdString = (value) => String(value?._id || value || "").trim();
 
-/* ========= list ========= */
-const get = async (req, res) => {
-  try {
-    // ===== inputs =====
-    const page = Math.max(1, Number(req.query.page || 1));
-    const limit = Math.min(50, Math.max(1, Number(req.query.limit || 10)));
-    const lan = (req.get("lan") || "en").toLowerCase();
-    const rawSearch = String(req.query.search || "").slice(0, 100).trim();
-    const countryIdRaw = (req.query.country_id || "").trim();
-
-    // user_id
-    const userIdParam =
-      req.query.user_id || req.params.user_id || req.get("user_id") || req.user?._id || null;
-    const userObjId = isValidObjectId(userIdParam) ? new Types.ObjectId(String(userIdParam)) : null;
-
-    // ===== parse filters =====
-    const rawFilters = (() => {
-      const f = req.query.filters;
-      if (!f) return {};
-      if (typeof f === "string") { try { return JSON.parse(f); } catch { return {}; } }
-      if (typeof f === "object") return f;
-      return {};
-    })();
-
-    const companyIds = parseIds(rawFilters.companies);
-    const typeIds    = parseIds(rawFilters.types);
-    const publishKey = typeof rawFilters.publish_date === "string" ? rawFilters.publish_date : null;
-    const isRemote   = typeof rawFilters.is_remote === "boolean" ? rawFilters.is_remote : null;
-    const notSeen    = rawFilters.not_seen === true;
-    const createdAtGte = publishKey ? dateFromBucket(publishKey) : null;
-
-    // ===== country condition (يدعم id أو code/اسم) =====
-    let countryCond = {};
-    if (countryIdRaw) {
-      if (isValidObjectId(countryIdRaw)) {
-        // جلب مرجع الدولة لإنتاج بدائل مطابقة مع حقل countries النصّي
-        const cDoc = await CountryModel.findById(countryIdRaw)
-          .select("code name_en name_ar").lean().catch(() => null);
-        const candidates = [
-          String(countryIdRaw),
-          cDoc?.code,
-          cDoc?.code?.toLowerCase?.(),
-          cDoc?.code?.toUpperCase?.(),
-          cDoc?.name_en,
-          cDoc?.name_ar,
-        ].filter(Boolean);
-        if (candidates.length) countryCond = { countries: { $in: candidates } };
-        else countryCond = { countries: { $in: [String(countryIdRaw)] } };
-      } else {
-        countryCond = { countries: { $in: [countryIdRaw] } };
-      }
-    }
-
-    // ===== search tokens & regex =====
-    const tokens = tokenizeBasic(rawSearch);
-    let orConds = [];
-    if (tokens.length) {
-      orConds.push({ keywords_norm: { $in: tokens } });
-      orConds.push({ phrases_norm:  { $in: tokens } });
-      const rx = new RegExp(tokens.map(t => escapeRegExp(t)).join("|"), "i");
-      orConds.push({ job_name: rx }, { description: rx }, { keywords_norm: rx }, { phrases_norm: rx });
-    }
-
-    // ===== match =====
-    const match = {
-      status: true,
-      is_accepted: true,
-      ...countryCond,
-      ...(orConds.length && { $or: orConds }),
-      ...(companyIds.length && { company_id: companyIds[0] }),
-      ...(typeIds.length && { Job_type_id: { $in: typeIds } }),
-      ...(createdAtGte && { createdAt: { $gte: createdAtGte } }),
-      ...(isRemote === true && { is_remote: true }),
-      ...(isRemote === false && { is_remote: false }),
-    };
-
-    // ===== localization =====
-    const L = lan === "ar"
-      ? {
-          companies: "الشركات",
-          types: "أنواع الوظائف",
-          remote: "عن بُعد",
-          remote_yes: "عن بُعد",
-          remote_no: "في المكتب",
-          publish_date: "تاريخ النشر",
-          pd_24h: "آخر 24 ساعة",
-          pd_7d: "آخر 7 أيام",
-          pd_30d: "آخر 30 يومًا",
-          not_seen: "وظائف لم تُشاهد",
-          not_seen_true: "غير مُشاهدة بعد",
-        }
-      : {
-          companies: "Companies",
-          types: "Job types",
-          remote: "Remote",
-          remote_yes: "Remote",
-          remote_no: "On-site",
-          publish_date: "Publish date",
-          pd_24h: "Last 24 hours",
-          pd_7d: "Last 7 days",
-          pd_30d: "Last 30 days",
-          not_seen: "Unseen jobs",
-          not_seen_true: "Not seen yet",
-        };
-
-    const skip = (page - 1) * limit;
-
-    // ===== core pipeline =====
-    const core = [
-      { $match: match },
-      {
-        $lookup: {
-          from: COMPANY_COLL,
-          localField: "company_id",
-          foreignField: "_id",
-          as: "company",
-          pipeline: [{ $project: { company_name: 1, image: 1 } }],
-        },
-      },
-      { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: Job_TYPE_COLL,
-          localField: "Job_type_id",
-          foreignField: "_id",
-          as: "Job_type",
-          pipeline: [{ $project: { [`title_${lan}`]: 1 } }],
-        },
-      },
-      { $unwind: { path: "$Job_type", preserveNullAndEmptyArrays: true } },
-      {
-        $addFields: {
-          company_name: "$company.company_name",
-          company_image: "$company.image",
-          job_type_title: `$Job_type.title_${lan}`,
-          _kwScore: tokens.length
-            ? { $size: { $setIntersection: [{ $ifNull: ["$keywords_norm", []] }, tokens] } }
-            : 0,
-        },
-      },
-    ];
-
-    // not_seen
-    const seenFilter = (notSeen && userObjId)
-      ? [
-          {
-            $lookup: {
-              from: USS_COLL,
-              let: { jid: "$._id" },
-              pipeline: [
-                {
-                  $match: {
-                    $expr: {
-                      $and: [
-                        { $eq: ["$job_id", "$$jid"] },
-                        { $eq: ["$user_id", userObjId] },
-                      ],
-                    },
-                  },
-                },
-                { $limit: 1 },
-              ],
-              as: "seenHit",
-            },
-          },
-          { $match: { seenHit: { $size: 0 } } },
-        ]
-      : [];
-
-    const sortAndProject = [
-      { $sort: { _kwScore: -1, createdAt: -1, _id: -1 } },
-      {
-        $project: {
-          title: "$job_name",
-          company_id: 1,
-          Job_type_id: 1,
-          createdAt: 1,
-          is_remote: 1,
-          countries: 1,
-          company: "$company_name",
-          company_image: 1,
-          job_type: "$job_type_title",
-        },
-      },
-    ];
-
-    const savedJoin = userObjId
-      ? [
-          {
-            $lookup: {
-              from: UserSavedJobModel.collection.name,
-              let: { jid: "$_id", uid: userObjId },
-              pipeline: [
-                {
-                  $match: {
-                    $expr: {
-                      $and: [
-                        { $eq: ["$job_id", "$$jid"] },
-                        { $eq: ["$user_id", "$$uid"] },
-                      ],
-                    },
-                  },
-                },
-                { $limit: 1 },
-              ],
-              as: "savedHit",
-            },
-          },
-          { $addFields: { is_saved: { $gt: [{ $size: "$savedHit" }, 0] } } },
-          { $project: { savedHit: 0 } },
-        ]
-      : [];
-
-    // ===== facets =====
-    const facet = {
-      items: [{ $skip: skip }, { $limit: limit }],
-      meta: [{ $count: "total" }],
-    };
-
-    if (page === 1 && !req.query.filters) {
-      facet.companies = [
-        { $match: { company_id: { $type: "objectId" } } },
-        { $group: { _id: "$company_id", name: { $first: "$company" }, image: { $first: "$company_image" } } },
-        { $sort: { name: 1 } },
-        { $limit: 100 },
-      ];
-      facet.types = [
-        { $match: { Job_type_id: { $type: "objectId" } } },
-        { $group: { _id: "$Job_type_id", title: { $first: "$job_type" } } },
-        { $sort: { title: 1 } },
-        { $limit: 100 },
-      ];
-    }
-
-    const pipeline = [
-      ...core,
-      ...seenFilter,
-      ...sortAndProject,
-      ...savedJoin,
-      { $facet: facet },
-    ];
-
-    // ===== run =====
-    const [agg] = await jobsModel.aggregate(pipeline).allowDiskUse(true);
-
-    const items = agg?.items || [];
-    const total = agg?.meta?.[0]?.total || 0;
-
-    const data = items.map(it => ({
-      id: it._id,
-      title: it.title || "",
-      company: it.company || null,
-      company_image: it.company_image ? buildPublicUrl(PUBLIC_BASE, it.company_image) : null,
-      job_type: it.job_type || null,
-      is_remote: !!it.is_remote,
-      countries: it.countries || [],
-      created_at: it.createdAt,
-      is_saved: !!it.is_saved,
-    }));
-
-    const other = {
-      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
-    };
-
-    if (page === 1 && !req.query.filters) {
-      const companiesOpts = (() => {
-        const seen = new Set();
-        return (agg.companies || [])
-          .filter(c => { const k = String(c._id); if (seen.has(k)) return false; seen.add(k); return true; })
-          .map(c => ({
-            id: c._id,
-            label: c.name || "",
-            image: c.image ? buildPublicUrl(PUBLIC_BASE, c.image) : null,
-          }));
-      })();
-
-      const typesOpts = (agg.types || []).map(t => ({
-        id: t._id,
-        label: t.title || "",
-      }));
-
-      const remoteOpts = [
-        { value: true, label: L.remote_yes },
-        { value: false, label: L.remote_no },
-      ];
-
-      const publishOpts = [
-        { value: "last_24h", label: L.pd_24h },
-        { value: "last_7d", label: L.pd_7d },
-        { value: "last_30d", label: L.pd_30d },
-      ];
-
-      const notSeenOpts = [{ value: true, label: L.not_seen_true }];
-
-      other.filters = {
-        groups: [
-          { key: "companies", title: L.companies, type: "select_one", options: companiesOpts, selected: companyIds[0] || null },
-          { key: "types", title: L.types, type: "select_many", options: typesOpts, selected: typeIds },
-          { key: "remote", title: L.remote, type: "boolean", options: remoteOpts, selected: typeof isRemote === "boolean" ? isRemote : null },
-          { key: "publish_date", title: L.publish_date, type: "select_one", options: publishOpts, selected: publishKey || null },
-          { key: "not_seen", title: L.not_seen, type: "boolean", options: notSeenOpts, selected: notSeen === true ? true : null },
-        ],
-      };
-    }
-
-    return ReturnAppData.getData({ res, data, other });
-  } catch (err) {
-    return ReturnAppData.getError({ res, message: err?.message || "Get failed" });
-  }
+const buildPublicUrl = (rel) => {
+  if (!rel) return null;
+  const value = String(rel || "").trim();
+  if (!value) return null;
+  if (/^https?:\/\//i.test(value)) return value;
+  const clean = value.replace(/^\/+/, "");
+  return PUBLIC_BASE ? `${PUBLIC_BASE.replace(/\/+$/, "")}/${clean}` : `/${clean}`;
 };
 
-/* ========= details ========= */
-const getById = async (req, res) => {
-  try {
-    const lan = (req.get("lan") || "en").toLowerCase();
-    const id = String(req.params.id || "");
-      const userIdParam =
-  req.query.user_id ||        // <-- أضف هذا
-  req.params.user_id ||
-  req.get("user_id") ||
-  req.user?._id ||
-  null;
-const userObjId = isValidObjectId(userIdParam) ? new Types.ObjectId(String(userIdParam)) : null;
+const normalizeText = (value = "") =>
+  String(value || "")
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g, "")
+    .replace(/[\u0622\u0623\u0625]/g, "ا")
+    .replace(/\u0649/g, "ي")
+    .replace(/\u0640/g, "")
+    .replace(/[^a-z0-9\u0600-\u06FF]+/gi, " ")
+    .trim();
 
-    if (!isValidObjectId(id)) {
-      return ReturnAppData.getError({ res, code: 400, message: "invalid id" });
-    }
+const unique = (arr = []) => [...new Set(arr.flat(Infinity).map((x) => String(x || "").trim()).filter(Boolean))];
+const tokenise = (value = "") => unique(normalizeText(value).split(/\s+/).filter((x) => x.length >= 2)).slice(0, 12);
+const parseJsonObject = (value) => {
+  if (!value) return {};
+  if (typeof value === "object") return value;
+  try { return JSON.parse(value); } catch { return {}; }
+};
+const parseArray = (...values) => unique(values.flatMap((value) => {
+  if (value == null || value === "") return [];
+  if (Array.isArray(value)) return value;
+  return String(value).split(",").map((x) => x.trim()).filter(Boolean);
+}));
+const parseBool = (value) => {
+  if (value === true || value === "true" || value === "1" || value === 1) return true;
+  if (value === false || value === "false" || value === "0" || value === 0) return false;
+  return null;
+};
+const parseNumber = (value) => {
+  if (value === undefined || value === null || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+};
+const dateFromBucket = (key) => {
+  const now = new Date();
+  const d = new Date(now);
+  if (key === "last_24h") d.setDate(now.getDate() - 1);
+  else if (key === "last_7d") d.setDate(now.getDate() - 7);
+  else if (key === "last_30d") d.setDate(now.getDate() - 30);
+  else return null;
+  return d;
+};
 
-    const job = await jobsModel.findOne(
-      { _id: id, status: true, is_accepted: true },
-      "job_name description Job_type_id Job_type_info Job_time_id Job_time_info Job_salary_id Job_salary_info currency_id company_id is_out_side out_link"
-    ).lean();
+const langFromReq = (req) => (String(req.get("lan") || req.get("lang") || "en").toLowerCase().startsWith("ar") ? "ar" : "en");
+const labelOf = (value, lang = "en") => {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return String(value?.[`title_${lang}`] || value?.[`name_${lang}`] || value?.title || value?.name || value?.key || "").trim();
+};
 
-    if (!job) {
-      return ReturnAppData.getError({ res, code: 404, message: "Job not found" });
-    }
+const getEmployeeForUser = async (userId) => {
+  if (!userId) return null;
+  return EmployeeModel.findOne({ user_id: userId }).lean();
+};
 
-    const serviceIds = Array.isArray(job.Job_service)
-      ? job.Job_service.filter(Boolean).map(v => (typeof v === "string" ? new Types.ObjectId(v) : v))
-      : [];
-const [salary, currency, workTime, services, company, JobType, isSavedDoc] = await Promise.all([
-  job.Job_salary_id ? JobSalaryModel.findById(job.Job_salary_id).lean() : null,
-  job.currency_id ? CurrencyModel.findById(job.currency_id).lean() : null,
-  job.Job_time_id ? WorkTimeTypeModel.findById(job.Job_time_id).lean() : null,
-  serviceIds.length ? JobServiceModel.find({ _id: { $in: serviceIds } }).lean() : [],
-  job.company_id ? CompanyModel.findById(job.company_id).lean() : null,
-  job.Job_type_id ? JobTypeModel.findById(job.Job_type_id).lean() : null,
- userObjId ? UserSavedJobModel.exists({ job_id: job._id, user_id: userObjId }) : false,
-]);
-const is_saved = !!isSavedDoc;
+const publicJobMatch = () => {
+  const now = new Date();
+  return {
+    status: true,
+    is_accepted: true,
+    publish_status: { $in: ["published", null] },
+    $and: [
+      { $or: [{ started_date: null }, { started_date: { $lte: now } }] },
+      { $or: [{ end_date: null }, { end_date: { $gte: now } }] },
+      { $or: [{ apply_deadline: null }, { apply_deadline: { $gte: now } }] },
+    ],
+  };
+};
 
-    const response = {
+const buildJobSearchMatch = (tokens) => {
+  if (!tokens.length) return {};
+  return {
+    $and: tokens.map((token) => ({
+      $or: [
+        { "search_index.tokens": token },
+        { "search_index.title_tokens": token },
+        { "search_index.skill_tokens": token },
+        { "search_index.company_tokens": token },
+        { "search_index.service_tokens": token },
+        { "search_index.sector_tokens": token },
+        { "search_projection.matching.tokens": token },
+        { "search_index.text_norm": { $regex: token, $options: "i" } },
+        { job_name: { $regex: token, $options: "i" } },
+      ],
+    })),
+  };
+};
+
+const readFilters = (req) => {
+  const body = parseJsonObject(req.query.filters);
+  return {
+    q: String(req.query.search || req.query.q || body.search || body.q || "").trim(),
+    company_ids: parseArray(req.query.company_id, req.query.company_ids, body.company_id, body.company_ids, body.companies),
+    job_type_ids: parseArray(req.query.job_type_id, req.query.job_type_ids, body.job_type_id, body.job_type_ids, body.types),
+    work_mode_ids: parseArray(req.query.work_mode_id, req.query.work_mode_ids, body.work_mode_id, body.work_mode_ids, body.work_modes),
+    job_time_ids: parseArray(req.query.job_time_id, req.query.job_time_ids, body.job_time_id, body.job_time_ids, body.work_times),
+    salary_type_ids: parseArray(req.query.job_salary_id, req.query.job_salary_ids, body.job_salary_id, body.job_salary_ids, body.salary_types),
+    experience_level_ids: parseArray(req.query.experience_level_id, req.query.experience_level_ids, body.experience_level_id, body.experience_level_ids),
+    education_level_ids: parseArray(req.query.education_level_id, req.query.education_level_ids, body.education_level_id, body.education_level_ids),
+    countries: parseArray(req.query.country, req.query.countries, req.query.country_id, body.country, body.countries, body.country_id),
+    cities: parseArray(req.query.city, req.query.cities, body.city, body.cities),
+    skills: parseArray(req.query.skill, req.query.skills, body.skill, body.skills).map(normalizeText).filter(Boolean),
+    languages: parseArray(req.query.language, req.query.languages, body.language, body.languages).map(normalizeText).filter(Boolean),
+    services: parseArray(req.query.service, req.query.services, body.service, body.services).map(normalizeText).filter(Boolean),
+    candidate_target: parseArray(req.query.candidate_target, body.candidate_target),
+    is_remote: parseBool(req.query.is_remote ?? body.is_remote ?? body.remote),
+    not_seen: parseBool(req.query.not_seen ?? body.not_seen) === true,
+    not_applied: parseBool(req.query.not_applied ?? body.not_applied) === true,
+    saved_only: parseBool(req.query.saved_only ?? body.saved_only) === true,
+    publish_date: String(req.query.publish_date || body.publish_date || "").trim(),
+    salary_min_usd: parseNumber(req.query.salary_min_usd ?? body.salary_min_usd),
+    salary_max_usd: parseNumber(req.query.salary_max_usd ?? body.salary_max_usd),
+    min_match_score: parseNumber(req.query.min_match_score ?? body.min_match_score),
+    sort: String(req.query.sort || body.sort || "recommended").trim(),
+  };
+};
+
+const buildFilterMatch = (filters) => {
+  const match = publicJobMatch();
+  const and = [...(match.$and || [])];
+  delete match.$and;
+
+  const search = buildJobSearchMatch(tokenise(filters.q));
+  if (search.$and) and.push(...search.$and);
+
+  const objectIdIn = (field, ids) => {
+    const values = ids.filter(isValidId).map((id) => new Types.ObjectId(String(id)));
+    if (values.length) match[field] = { $in: values };
+  };
+
+  objectIdIn("company_id", filters.company_ids);
+  objectIdIn("job_type_id", filters.job_type_ids);
+  objectIdIn("work_mode_id", filters.work_mode_ids);
+  objectIdIn("job_time_id", filters.job_time_ids);
+  objectIdIn("job_salary_id", filters.salary_type_ids);
+  objectIdIn("experience_level_id", filters.experience_level_ids);
+  objectIdIn("education_level_id", filters.education_level_ids);
+
+  if (filters.countries.length) {
+    and.push({ $or: [
+      { countries: { $in: filters.countries } },
+      { "search_index.filters.countries": { $in: filters.countries } },
+      { "search_projection.company.country": { $in: filters.countries } },
+    ] });
+  }
+  if (filters.cities.length) {
+    and.push({ $or: [
+      { cities: { $in: filters.cities } },
+      { city: { $in: filters.cities } },
+      { "search_index.filters.cities": { $in: filters.cities } },
+      { "search_index.filters.city": { $in: filters.cities } },
+    ] });
+  }
+  if (filters.skills.length) and.push({ "search_index.filters.skills": { $in: filters.skills } });
+  if (filters.languages.length) and.push({ "search_index.filters.languages": { $in: filters.languages } });
+  if (filters.services.length) and.push({ "search_index.filters.services": { $in: filters.services } });
+  if (filters.candidate_target.length) and.push({ candidate_target: { $in: [...filters.candidate_target, "all"] } });
+  if (filters.is_remote !== null) match.is_remote = filters.is_remote;
+  if (filters.salary_min_usd !== null) and.push({ $or: [{ "salary.max_usd": null }, { "salary.max_usd": { $gte: filters.salary_min_usd } }] });
+  if (filters.salary_max_usd !== null) and.push({ $or: [{ "salary.min_usd": null }, { "salary.min_usd": { $lte: filters.salary_max_usd } }] });
+  const createdAt = dateFromBucket(filters.publish_date);
+  if (createdAt) match.createdAt = { $gte: createdAt };
+  if (and.length) match.$and = and;
+  return match;
+};
+
+const employeeSoftMatch = (employee) => {
+  if (!employee?.matching_profile) return [];
+  const p = employee.matching_profile;
+  const or = [];
+  if (p.normalized_skills?.length) or.push({ "search_index.filters.skills": { $in: p.normalized_skills } });
+  if (p.normalized_languages?.length) or.push({ "search_index.filters.languages": { $in: p.normalized_languages } });
+  if (p.normalized_titles?.length) or.push({ "search_projection.matching.normalized_titles": { $in: p.normalized_titles } });
+  if (p.preferred_country_values?.length) or.push({ "search_index.filters.countries": { $in: p.preferred_country_values } });
+  if (p.preferred_work_mode_keys?.length) or.push({ "search_index.filters.work_mode": { $in: p.preferred_work_mode_keys } });
+  if (employee.candidate_stage && employee.candidate_stage !== "unknown") {
+    const stageMap = { student: "students", graduate: "graduates", fresh_graduate: "fresh_graduates", experienced: "experienced", career_changer: "career_changers" };
+    or.push({ candidate_target: { $in: [stageMap[employee.candidate_stage], "all"].filter(Boolean) } });
+  }
+  return or;
+};
+
+const sortStage = (sort) => {
+  if (sort === "newest") return { createdAt: -1, _id: -1 };
+  if (sort === "popular") return { "search_projection.ranking.popularity_score": -1, user_show: -1, user_saved: -1, createdAt: -1 };
+  if (sort === "salary_high") return { "salary.max_usd": -1, "salary.min_usd": -1, createdAt: -1 };
+  return { _match_score: -1, _search_score: -1, "search_projection.ranking.total_score": -1, priority: -1, createdAt: -1, _id: -1 };
+};
+
+const decorateJobs = async (jobs, userId, employee) => {
+  const jobIds = jobs.map((j) => j._id);
+  const [saved, applied, seen, storedMatches] = await Promise.all([
+    userId ? UserSavedJobModel.find({ user_id: userId, job_id: { $in: jobIds } }).select("job_id").lean() : [],
+    userId ? UserApplyingJobModel.find({ user_id: userId, job_id: { $in: jobIds } }).select("job_id status createdAt").lean() : [],
+    userId ? UserShowJobModel.find({ user_id: userId, job_id: { $in: jobIds } }).select("job_id").lean() : [],
+    employee?._id ? JobEmployeeMatchModel.find({ employee_id: employee._id, job_id: { $in: jobIds } }).lean() : [],
+  ]);
+  const savedSet = new Set(saved.map((x) => toIdString(x.job_id)));
+  const seenSet = new Set(seen.map((x) => toIdString(x.job_id)));
+  const appliedMap = new Map(applied.map((x) => [toIdString(x.job_id), x]));
+  const matchMap = new Map(storedMatches.map((x) => [toIdString(x.job_id), x]));
+
+  return jobs.map((job) => {
+    const key = toIdString(job._id);
+    const stored = matchMap.get(key);
+    const calculated = employee ? calculateJobEmployeeMatch(job, employee) : null;
+    const match = stored || calculated;
+    const companyProjection = job.search_projection?.company || {};
+    const appliedDoc = appliedMap.get(key);
+    return {
       id: job._id,
       title: job.job_name || "",
       description: job.description || "",
-      job_type: JobType?.[`title_${lan}`] || null,
-      Job_type_info: job.Job_type_info ?? null,
-      salary_type: salary?.[`title_${lan}`] || null,
-      is_saved,
-      currency: currency
-        ? {
-          title: currency[`name_${lan}`] ?? null,
-          symbol: currency[`symbol_${lan}`] ?? null,
-          code: currency.code ?? null,
-        }
-        : null,
-      Job_time: workTime ? { title: workTime[`title_${lan}`] ?? null } : null,
-      Job_time_info: job.Job_time_info ?? null,
-      Job_salary_info: job.Job_salary_info ?? null,
-      is_out_side: !!job.is_out_side,
-      out_link: job.out_link || null,
-      Job_services: (services || []).map(s => ({ title: s?.[`title_${lan}`] || null })),
-      company: company
-        ? {
-          name: company.company_name ?? null,
-          email: company.company_email ?? null,
-          company_address: company.company_address ?? null,
-          company_image: company?.image ? buildPublicUrl(PUBLIC_BASE, company.image) : null,
-        }
-        : null,
+      company: {
+        id: job.company_id || companyProjection.id || null,
+        name: companyProjection.name || job.company?.company_name || "",
+        image: buildPublicUrl(companyProjection.logo || job.company?.image || job.company?.logo),
+        industry_name: companyProjection.industry_name || "",
+        verified: Boolean(companyProjection.verified),
+        rating: Number(companyProjection.rating || 0),
+      },
+      location: {
+        countries: job.countries || job.search_index?.filters?.countries || [],
+        cities: job.cities || job.search_index?.filters?.cities || [],
+        city: job.city || job.search_index?.filters?.city || "",
+        is_remote: Boolean(job.is_remote),
+      },
+      job_type: labelOf(job.job_type_info) || job.search_index?.filters?.job_type || "",
+      work_mode: labelOf(job.work_mode_info) || job.search_index?.filters?.work_mode || "",
+      work_time: labelOf(job.job_time_info) || job.search_index?.filters?.work_time || "",
+      salary: {
+        min: job.salary?.min ?? null,
+        max: job.salary?.max ?? null,
+        min_usd: job.salary?.min_usd ?? null,
+        max_usd: job.salary?.max_usd ?? null,
+        currency_code: job.salary?.currency_code || "",
+        is_visible: job.salary?.is_visible !== false,
+        is_negotiable: Boolean(job.salary?.is_negotiable),
+      },
+      counters: {
+        views: Number(job.user_show || 0),
+        saves: Number(job.user_saved || 0),
+        applies: Number(job.user_applying || 0),
+        reviews: Number(job.user_review || 0),
+        rating: Number(job.rating || 0),
+      },
+      match: match ? {
+        score: Number(match.score || 0),
+        breakdown: match.breakdown || {},
+        matched_skills: match.matched_skills || [],
+        missing_skills: match.missing_skills || [],
+        matched_languages: match.matched_languages || [],
+        missing_languages: match.missing_languages || [],
+      } : null,
+      flags: {
+        is_saved: savedSet.has(key),
+        is_seen: seenSet.has(key),
+        is_applied: Boolean(appliedDoc),
+        application_status: appliedDoc?.status || null,
+        is_out_side: Boolean(job.is_out_side),
+        is_cv_required: job.is_cv_required !== false,
+      },
+      created_at: job.createdAt,
+      apply_deadline: job.apply_deadline || null,
+    };
+  });
+};
+
+const markSeen = async (userId, jobIds = []) => {
+  if (!userId || !jobIds.length) return;
+  const operations = jobIds.map((jobId) => ({ updateOne: { filter: { user_id: userId, job_id: jobId }, update: { $setOnInsert: { user_id: userId, job_id: jobId } }, upsert: true } }));
+  await UserShowJobModel.bulkWrite(operations, { ordered: false }).catch(() => null);
+  await jobsModel.updateMany({ _id: { $in: jobIds } }, { $inc: { user_show: 1, "search_index.score_signals.views": 1 } }).catch(() => null);
+};
+
+const get = async (req, res, next) => {
+  try {
+    const userId = toObjectId(req.user?._id || req.query.user_id);
+    const employee = await getEmployeeForUser(userId);
+    const filters = readFilters(req);
+    const page = Math.max(1, Number(req.query.page || 1));
+    const limit = Math.min(50, Math.max(1, Number(req.query.limit || 10)));
+    const skip = (page - 1) * limit;
+
+    const match = buildFilterMatch(filters);
+    const employeeOr = employeeSoftMatch(employee);
+    if (!filters.q && filters.sort === "recommended" && employeeOr.length) {
+      match.$and = [...(match.$and || []), { $or: employeeOr }];
+    }
+
+    const restrictedByUserLookups = [];
+    if (userId && (filters.not_seen || filters.not_applied || filters.saved_only)) {
+      restrictedByUserLookups.push(
+        { $lookup: { from: UserSavedJobModel.collection.name, let: { jid: "$_id" }, pipeline: [{ $match: { $expr: { $and: [{ $eq: ["$job_id", "$$jid"] }, { $eq: ["$user_id", userId] }] } } }, { $limit: 1 }], as: "__saved" } },
+        { $lookup: { from: UserShowJobModel.collection.name, let: { jid: "$_id" }, pipeline: [{ $match: { $expr: { $and: [{ $eq: ["$job_id", "$$jid"] }, { $eq: ["$user_id", userId] }] } } }, { $limit: 1 }], as: "__seen" } },
+        { $lookup: { from: UserApplyingJobModel.collection.name, let: { jid: "$_id" }, pipeline: [{ $match: { $expr: { $and: [{ $eq: ["$job_id", "$$jid"] }, { $eq: ["$user_id", userId] }] } } }, { $limit: 1 }], as: "__applied" } },
+      );
+      if (filters.saved_only) restrictedByUserLookups.push({ $match: { "__saved.0": { $exists: true } } });
+      if (filters.not_seen) restrictedByUserLookups.push({ $match: { "__seen.0": { $exists: false } } });
+      if (filters.not_applied) restrictedByUserLookups.push({ $match: { "__applied.0": { $exists: false } } });
+    }
+
+    const tokens = tokenise(filters.q);
+    const addScores = {
+      $addFields: {
+        _search_score: tokens.length ? { $size: { $setIntersection: [{ $ifNull: ["$search_index.tokens", []] }, tokens] } } : 0,
+        _match_score: 0,
+      },
     };
 
-    return ReturnAppData.getData({ res, data: response });
-  } catch (err) {
-    return ReturnAppData.getError({ res, message: err?.message || "Get by id failed" });
+    const pipeline = [
+      { $match: match },
+      ...restrictedByUserLookups,
+      addScores,
+    ];
+
+    if (employee?._id) {
+      pipeline.push({ $lookup: { from: JobEmployeeMatchModel.collection.name, let: { jid: "$_id" }, pipeline: [{ $match: { $expr: { $and: [{ $eq: ["$job_id", "$$jid"] }, { $eq: ["$employee_id", employee._id] }] } } }, { $limit: 1 }], as: "__match" } });
+      pipeline.push({ $addFields: { _match_score: { $ifNull: [{ $arrayElemAt: ["$__match.score", 0] }, 0] } } });
+      if (filters.min_match_score !== null) pipeline.push({ $match: { _match_score: { $gte: filters.min_match_score } } });
+    }
+
+    pipeline.push(
+      { $sort: sortStage(filters.sort) },
+      { $facet: { items: [{ $skip: skip }, { $limit: limit }], meta: [{ $count: "total" }] } },
+    );
+
+    const [agg] = await jobsModel.aggregate(pipeline).allowDiskUse(true);
+    const rawItems = agg?.items || [];
+    const total = agg?.meta?.[0]?.total || 0;
+    const data = await decorateJobs(rawItems, userId, employee);
+
+    if (parseBool(req.query.mark_seen) === true) await markSeen(userId, rawItems.map((x) => x._id));
+
+    return ReturnAppData.getData({
+      res,
+      data,
+      other: { pagination: { page, limit, total, pages: Math.ceil(total / limit), has_more: page * limit < total }, employee_profile_ready: Boolean(employee?.matching_profile) },
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
-export default { get, getById };
+const optionLabel = (value, fallback = "") => String(value || fallback || "").trim();
+const buildFacetOptions = (rows = [], key = "_id") => rows.filter((x) => x?._id !== null && x?._id !== "").map((x) => ({ value: x._id, id: x.id || null, label: optionLabel(x.label, x._id), count: x.count }));
 
-// const get = (req, res, next) => {
-//   try {
-//     const data = analyze(req.body.data);
-//     return res.json(data);
-//   } catch (error) {
-//     console.error(error);
-//     next(error);
-//   }
-// };
+const getFilters = async (req, res, next) => {
+  try {
+    const lang = langFromReq(req);
+    const filters = readFilters(req);
+    const baseMatch = buildFilterMatch({ ...filters, company_ids: [], job_type_ids: [], work_mode_ids: [], job_time_ids: [], salary_type_ids: [], experience_level_ids: [], education_level_ids: [], countries: [], cities: [], skills: [], languages: [], services: [], candidate_target: [], is_remote: null, salary_min_usd: null, salary_max_usd: null, publish_date: "" });
+
+    const pipeline = [
+      { $match: baseMatch },
+      {
+        $facet: {
+          companies: [
+            { $group: { _id: "$company_id", label: { $first: "$search_projection.company.name" }, image: { $first: "$search_projection.company.logo" }, count: { $sum: 1 } } },
+            { $sort: { count: -1, label: 1 } }, { $limit: 80 },
+          ],
+          job_types: [
+            { $group: { _id: "$search_index.filters.job_type", id: { $first: "$search_index.filters.job_type_id" }, count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
+          ],
+          work_modes: [
+            { $group: { _id: "$search_index.filters.work_mode", id: { $first: "$search_index.filters.work_mode_id" }, count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } },
+          ],
+          work_times: [
+            { $group: { _id: "$search_index.filters.work_time", id: { $first: "$search_index.filters.job_time_id" }, count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } },
+          ],
+          salary_types: [
+            { $group: { _id: "$search_index.filters.salary_type", id: { $first: "$search_index.filters.job_salary_id" }, count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } },
+          ],
+          countries: [
+            { $unwind: "$search_index.filters.countries" },
+            { $group: { _id: "$search_index.filters.countries", count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
+          ],
+          cities: [
+            { $unwind: "$search_index.filters.cities" },
+            { $group: { _id: "$search_index.filters.cities", count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
+          ],
+          skills: [
+            { $unwind: "$search_index.filters.skills" },
+            { $group: { _id: "$search_index.filters.skills", count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } }, { $limit: 100 },
+          ],
+          languages: [
+            { $unwind: "$search_index.filters.languages" },
+            { $group: { _id: "$search_index.filters.languages", count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
+          ],
+          services: [
+            { $unwind: "$search_index.filters.services" },
+            { $group: { _id: "$search_index.filters.services", count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
+          ],
+          candidate_target: [
+            { $unwind: "$candidate_target" },
+            { $group: { _id: "$candidate_target", count: { $sum: 1 } } },
+            { $sort: { count: -1, _id: 1 } },
+          ],
+          salary_range: [
+            { $group: { _id: null, min: { $min: "$salary.min_usd" }, max: { $max: "$salary.max_usd" } } },
+          ],
+          remote: [
+            { $group: { _id: "$is_remote", count: { $sum: 1 } } },
+          ],
+        },
+      },
+    ];
+
+    const [agg] = await jobsModel.aggregate(pipeline).allowDiskUse(true);
+    const t = (ar, en) => lang === "ar" ? ar : en;
+    const groups = [
+      { key: "company_ids", title: t("الشركات", "Companies"), type: "multi_select", options: (agg.companies || []).map((x) => ({ value: toIdString(x._id), label: x.label || "", image: buildPublicUrl(x.image), count: x.count })) },
+      { key: "job_type_ids", title: t("نوع الوظيفة", "Job type"), type: "multi_select", options: buildFacetOptions(agg.job_types) },
+      { key: "work_mode_ids", title: t("نمط العمل", "Work mode"), type: "multi_select", options: buildFacetOptions(agg.work_modes) },
+      { key: "job_time_ids", title: t("دوام العمل", "Work time"), type: "multi_select", options: buildFacetOptions(agg.work_times) },
+      { key: "salary_type_ids", title: t("نوع الراتب", "Salary type"), type: "multi_select", options: buildFacetOptions(agg.salary_types) },
+      { key: "countries", title: t("الدول", "Countries"), type: "multi_select", options: buildFacetOptions(agg.countries) },
+      { key: "cities", title: t("المدن", "Cities"), type: "multi_select", options: buildFacetOptions(agg.cities) },
+      { key: "skills", title: t("المهارات", "Skills"), type: "multi_select", options: buildFacetOptions(agg.skills) },
+      { key: "languages", title: t("اللغات", "Languages"), type: "multi_select", options: buildFacetOptions(agg.languages) },
+      { key: "services", title: t("الخدمات", "Services"), type: "multi_select", options: buildFacetOptions(agg.services) },
+      { key: "candidate_target", title: t("الفئة المستهدفة", "Candidate target"), type: "multi_select", options: buildFacetOptions(agg.candidate_target) },
+      { key: "is_remote", title: t("عن بعد", "Remote"), type: "boolean", options: (agg.remote || []).map((x) => ({ value: x._id === true, label: x._id === true ? t("عن بعد", "Remote") : t("ليس عن بعد", "Not remote"), count: x.count })) },
+      { key: "publish_date", title: t("تاريخ النشر", "Publish date"), type: "single_select", options: [{ value: "last_24h", label: t("آخر 24 ساعة", "Last 24 hours") }, { value: "last_7d", label: t("آخر 7 أيام", "Last 7 days") }, { value: "last_30d", label: t("آخر 30 يوم", "Last 30 days") }] },
+      { key: "salary_usd", title: t("نطاق الراتب بالدولار", "Salary range USD"), type: "range", min: agg.salary_range?.[0]?.min ?? null, max: agg.salary_range?.[0]?.max ?? null },
+    ];
+
+    return ReturnAppData.getData({ res, data: { groups, raw: agg } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getById = async (req, res, next) => {
+  try {
+    const userId = toObjectId(req.user?._id || req.query.user_id);
+    const employee = await getEmployeeForUser(userId);
+    const id = toObjectId(req.params.id);
+    if (!id) return ReturnAppData.getError({ res, status: 400, message: "invalid job id" });
+
+    const job = await jobsModel.findOne({ _id: id, ...publicJobMatch() }).lean();
+    if (!job) return ReturnAppData.getError({ res, status: 404, message: "job not found" });
+
+    await markSeen(userId, [job._id]);
+    const [item] = await decorateJobs([job], userId, employee);
+    return ReturnAppData.getData({ res, data: { ...item, questions: job.questions || [], out_link: job.is_out_side ? job.out_link || null : null, requirements: job.search_projection?.requirements || {}, job_services: job.job_services || [] } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { get, getFilters, getById };

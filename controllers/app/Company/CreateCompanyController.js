@@ -148,7 +148,7 @@ const uploadFile = async (req, res, next) => {
 
     // إن لم تكن هناك شركة، ننشئ واحدة مع الملف
     if (!company) {
-      const role = await RoleModel.findOne({ role_number: 11 });
+      const role = await RoleModel.findOne({ role_number: 3 });
       company = await CompanyModel.create({
         user_id: user._id,
         role_id: role?._id,

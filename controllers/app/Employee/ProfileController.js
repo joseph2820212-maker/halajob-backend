@@ -10,7 +10,7 @@ const profile = async (req, res, next) => {
  const lan = (req.get("lan") || "en").toLowerCase();
  let employee = await EmployeeModel.findOne({ user_id: user._id });
  if (!employee) {
-  const role = await RoleModel.findOne({ role_number: 21 })
+  const role = await RoleModel.findOne({ role_number: 4 })
   employee = await EmployeeModel.create({
    user_id: user._id,
    role_id: role._id

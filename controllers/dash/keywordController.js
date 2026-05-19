@@ -64,7 +64,7 @@ const logKeyword = async (req, res, next) => {
     title_en: en[key] ?? ""
   }));
 
-  const currentItem = await KeywordModel.create({ inputs: result });
+  const currentItem = await KeywordModel.create({type:"app", inputs: result });
   return res.json(currentItem);
 };
 

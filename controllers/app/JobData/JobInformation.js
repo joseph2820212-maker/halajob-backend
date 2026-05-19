@@ -7,369 +7,180 @@ import {
   UserRatingJobModel,
   UserSavedJobModel,
 } from "../../../models/index.js";
-import { job_applied_notification, job_rated_notification, job_reviewed_notification, job_seeker_saved_notification } from "../../../notification/JobCompanyNotifications.js";
+import {
+  job_applied_notification,
+  job_rated_notification,
+  job_reviewed_notification,
+  job_seeker_saved_notification,
+} from "../../../notification/JobCompanyNotifications.js";
 
-/* أدوات مساعدة */
-const incJob = (jobId, inc) => jobsModel.updateOne({ _id: jobId }, { $inc: inc });
-const clampSavedMinus1 = (jobId) =>
-  jobsModel.updateOne(
-    { _id: jobId },
-    [
-      {
-        $set: {
-          user_saved: {
-            $max: [0, { $add: ["$user_saved", -1] }],
-          },
-        },
-      },
-    ]
-  );
+const { Types } = mongoose;
+const toObjectId = (value) => (mongoose.isValidObjectId(String(value || "")) ? new Types.ObjectId(String(value)) : null);
+const msg = (req, ar, en) => (String(req.get("lan") || "en").toLowerCase().startsWith("ar") ? ar : en);
 
-/* يحسب المتوسط ويحدّث jobs.rating */
-async function recomputeJobRating(jobId) {
+const publicJobFilter = () => {
+  const now = new Date();
+  return {
+    status: true,
+    is_accepted: true,
+    publish_status: { $in: ["published", null] },
+    $and: [
+      { $or: [{ started_date: null }, { started_date: { $lte: now } }] },
+      { $or: [{ end_date: null }, { end_date: { $gte: now } }] },
+      { $or: [{ apply_deadline: null }, { apply_deadline: { $gte: now } }] },
+    ],
+  };
+};
+
+const clampInc = (jobId, field, value) => {
+  if (value >= 0) return jobsModel.updateOne({ _id: jobId }, { $inc: { [field]: value, [`search_index.score_signals.${field === "user_saved" ? "saves" : field === "user_review" ? "reviews" : "views"}`]: value } });
+  return jobsModel.updateOne({ _id: jobId }, [{ $set: { [field]: { $max: [0, { $add: [`$${field}`, value] }] } } }]);
+};
+
+const recomputeJobRating = async (jobId) => {
   const agg = await UserRatingJobModel.aggregate([
-    { $match: { job_id: new mongoose.Types.ObjectId(jobId) } },
-    { $group: { _id: "$job_id", avg: { $avg: "$rating" } } },
+    { $match: { job_id: new Types.ObjectId(jobId) } },
+    { $group: { _id: "$job_id", avg: { $avg: "$rating" }, total: { $sum: 1 } } },
   ]);
-  const avg = agg[0]?.avg ?? 0;
-  await jobsModel.updateOne({ _id: jobId }, { $set: { rating: Number(avg.toFixed(1)) } });
-  return avg;
-}
+  const avg = Number((agg[0]?.avg || 0).toFixed(1));
+  await jobsModel.updateOne({ _id: jobId }, { $set: { rating: avg, "search_index.score_signals.rating": avg } });
+  return { avg, total: agg[0]?.total || 0 };
+};
 
-/* -------------------------------------------
-   مراجعة وظيفة: يزيد user_review عند الإنشاء فقط
-------------------------------------------- */
- const reviewJob = async (req, res, next) => {
+const reviewJob = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const lan = (req.get("lan") || "en").toLowerCase();
-    const user = req.user;
-    const { message } = req.body;
+    const jobId = toObjectId(req.params.id);
+    const message = String(req.body.message || "").trim();
+    if (!jobId || !message) return ReturnAppData.getError({ res, status: 400, message: msg(req, "البيانات ناقصة.", "Missing data.") });
 
-    const MSG = {
-      MISSING: lan === "ar" ? "البيانات ناقصة." : "Missing required fields.",
-      JOB_404: lan === "ar" ? "الوظيفة غير موجودة." : "Job not found.",
-      OK_NEW: lan === "ar" ? "تم إضافة المراجعة." : "Review created.",
-      OK_UPDATE: lan === "ar" ? "تم تحديث المراجعة." : "Review updated.",
-    };
+    const job = await jobsModel.findOne({ _id: jobId, ...publicJobFilter() });
+    if (!job) return ReturnAppData.getError({ res, status: 404, message: msg(req, "الوظيفة غير موجودة.", "Job not found.") });
 
-    if (!mongoose.isValidObjectId(id) || !message?.trim()) {
-      return ReturnAppData.createError({ res, status: 400, message: MSG.MISSING });
-    }
-
-    const job = await jobsModel.findById(id).select("_id");
-    if (!job) return ReturnAppData.createError({ res, status: 404, message: MSG.JOB_404 });
-
-    const raw = await UserReviewJobModel.findOneAndUpdate(
-      { user_id: user._id, job_id: id },
-      { $set: { message: message.trim() } },
-      { upsert: true, new: true, rawResult: true }
+    const old = await UserReviewJobModel.findOne({ user_id: req.user._id, job_id: jobId });
+    const doc = await UserReviewJobModel.findOneAndUpdate(
+      { user_id: req.user._id, job_id: jobId },
+      { $set: { message } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
     );
+    if (!old) await clampInc(jobId, "user_review", 1);
+    job_reviewed_notification(job).catch?.(console.error);
+    return ReturnAppData.createData({ res, data: doc, message: old ? msg(req, "تم تحديث المراجعة.", "Review updated.") : msg(req, "تم إضافة المراجعة.", "Review created.") });
+  } catch (error) { next(error); }
+};
 
-    const created = Boolean(raw?.lastErrorObject?.upserted);
-    if (created) await incJob(id, { user_review: 1 });
-    job_reviewed_notification(job)
-    return ReturnAppData.createData({
-      res,
-      data: raw.value,
-      message: created ? MSG.OK_NEW : MSG.OK_UPDATE,
-    });
-  } catch (e) {
-    next(e);
+const applyOutsideJob = async (req, res, next) => {
+  try {
+    const jobId = toObjectId(req.params.id);
+    if (!jobId) return ReturnAppData.getError({ res, status: 400, message: msg(req, "معرّف غير صالح.", "Invalid id.") });
+
+    const job = await jobsModel.findOne({ _id: jobId, ...publicJobFilter() });
+    if (!job) return ReturnAppData.getError({ res, status: 404, message: msg(req, "الوظيفة غير موجودة.", "Job not found.") });
+    if (!job.is_out_side || !job.out_link) return ReturnAppData.getError({ res, status: 400, message: msg(req, "هذه الوظيفة ليست وظيفة خارجية.", "This job is not external.") });
+
+    const existed = await UserOutSideApplyingJobModel.findOne({ user_id: req.user._id, job_id: jobId });
+    if (existed) return ReturnAppData.getError({ res, status: 409, message: msg(req, "تم تسجيل التقديم الخارجي مسبقاً.", "External application already recorded."), other: { out_link: job.out_link } });
+
+    const doc = await UserOutSideApplyingJobModel.create({ user_id: req.user._id, job_id: jobId });
+    await jobsModel.updateOne({ _id: jobId }, { $inc: { out_side_applying: 1, "search_index.score_signals.applies": 1 } });
+    job_applied_notification(job).catch?.(console.error);
+    return ReturnAppData.createData({ res, data: { application: doc, out_link: job.out_link }, message: msg(req, "تم تسجيل التقديم الخارجي.", "External application recorded.") });
+  } catch (error) {
+    if (error?.code === 11000) return ReturnAppData.getError({ res, status: 409, message: msg(req, "تم تسجيل التقديم الخارجي مسبقاً.", "External application already recorded.") });
+    next(error);
   }
 };
 
-/* -------------------------------------------
-   طلب توظيف خارجي: يزيد out_side_applying
-------------------------------------------- */
- const applyOutsideJob = async (req, res, next) => {
+const rateJob = async (req, res, next) => {
   try {
-    const lan = (req.get("lan") || "en").toLowerCase();
-    const user = req.user;
-    const id = req.params.id;
+    const jobId = toObjectId(req.params.id);
+    const rating = Number(req.body.rating);
+    if (!jobId || !Number.isFinite(rating) || rating < 1 || rating > 5) return ReturnAppData.getError({ res, status: 400, message: msg(req, "تقييم غير صالح.", "Invalid rating.") });
 
-    const MSG = {
-      MISSING: lan === "ar" ? "البيانات ناقصة." : "Missing fields.",
-      BAD_ID: lan === "ar" ? "معرّف الوظيفة غير صالح." : "Invalid job id.",
-      JOB_404: lan === "ar" ? "الوظيفة غير موجودة." : "Job not found.",
-      OK: lan === "ar" ? "تم تقديم الطلب." : "Application submitted.",
-    };
+    const job = await jobsModel.findOne({ _id: jobId, ...publicJobFilter() });
+    if (!job) return ReturnAppData.getError({ res, status: 404, message: msg(req, "الوظيفة غير موجودة.", "Job not found.") });
 
-    if (!mongoose.isValidObjectId(id)) {
-      return ReturnAppData.createError({ res, status: 400, message: MSG.MISSING });
-    }
-    const job = await jobsModel.findById(id).select("_id");
-    if (!job) return ReturnAppData.createError({ res, status: 404, message: MSG.JOB_404 });
-
-    const doc = await UserOutSideApplyingJobModel.create({
-      user_id: user._id,
-      job_id:id,
-    });
-    job_applied_notification(job)
-    await incJob(id, { out_side_applying: 1 });
-
-    return ReturnAppData.createData({ res, data: doc, message: MSG.OK });
-  } catch (e) {
-    next(e);
-  }
-};
-
-/* -------------------------------------------
-   تقييم وظيفة: يحدّث متوسط rating في jobs
-------------------------------------------- */
- const rateJob = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    const lan = (req.get("lan") || "en").toLowerCase();
-    const user = req.user;
-    const { rating } = req.body;
-
-    const MSG = {
-      INVALID: lan === "ar" ? "تقييم غير صالح." : "Invalid rating.",
-      OK_NEW: lan === "ar" ? "تم إضافة التقييم." : "Rating added.",
-      OK_UPDATE: lan === "ar" ? "تم تحديث التقييم." : "Rating updated.",
-    };
-
-    if (!mongoose.isValidObjectId(id) || typeof rating !== "number" || rating < 1 || rating > 5) {
-      return ReturnAppData.createError({ res, status: 400, message: MSG.INVALID });
-    }
-
-    const raw = await UserRatingJobModel.findOneAndUpdate(
-      { user_id: user._id, job_id: id },
+    const old = await UserRatingJobModel.findOne({ user_id: req.user._id, job_id: jobId });
+    const doc = await UserRatingJobModel.findOneAndUpdate(
+      { user_id: req.user._id, job_id: jobId },
       { $set: { rating } },
-      { upsert: true, new: true, rawResult: true }
+      { upsert: true, new: true, setDefaultsOnInsert: true }
     );
-    const created = Boolean(raw?.lastErrorObject?.upserted);
-
-    const avg = await recomputeJobRating(id);
-    const job=await jobsModel.findById(id);
-     job_rated_notification(job);
-    return ReturnAppData.createData({
-      res,
-      data: { ratingDoc: raw.value, jobRatingAvg: avg, created },
-      message: created ? MSG.OK_NEW : MSG.OK_UPDATE,
-    });
-  } catch (e) {
-    next(e);
-  }
+    const ratingInfo = await recomputeJobRating(jobId);
+    job_rated_notification(job).catch?.(console.error);
+    return ReturnAppData.createData({ res, data: { rating: doc, job_rating: ratingInfo.avg, total: ratingInfo.total }, message: old ? msg(req, "تم تحديث التقييم.", "Rating updated.") : msg(req, "تم إضافة التقييم.", "Rating created.") });
+  } catch (error) { next(error); }
 };
 
-/* -------------------------------------------
-   حفظ/إلغاء حفظ وظيفة: يعدّل user_saved
-------------------------------------------- */
- const toggleSaveJob = async (req, res, next) => {
+const toggleSaveJob = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const lan = (req.get("lan") || "en").toLowerCase();
-    const user = req.user;
+    const jobId = toObjectId(req.params.id);
+    if (!jobId) return ReturnAppData.getError({ res, status: 400, message: msg(req, "معرّف غير صالح.", "Invalid id.") });
+    const job = await jobsModel.findOne({ _id: jobId, ...publicJobFilter() });
+    if (!job) return ReturnAppData.getError({ res, status: 404, message: msg(req, "الوظيفة غير موجودة.", "Job not found.") });
 
-    const MSG = {
-      SAVED: lan === "ar" ? "تم حفظ الوظيفة." : "Job saved.",
-      REMOVED: lan === "ar" ? "تم إزالة الوظيفة من المحفوظات." : "Job removed.",
-    };
-
-    if (!mongoose.isValidObjectId(id)) {
-      return ReturnAppData.createError({ res, status: 400, message: "bad id" });
-    }
-
-    const existing = await UserSavedJobModel.findOne({ user_id: user._id, job_id: id });
-
+    const existing = await UserSavedJobModel.findOne({ user_id: req.user._id, job_id: jobId });
     if (existing) {
       await UserSavedJobModel.deleteOne({ _id: existing._id });
-      // إنقاص مع عدم السماح بالسالب
-      await clampSavedMinus1(id);
-      return ReturnAppData.createData({ res, message: MSG.REMOVED });
-    }else{
-    const job=await jobsModel.findById(id);
-      job_seeker_saved_notification(job);
+      await clampInc(jobId, "user_saved", -1);
+      return ReturnAppData.createData({ res, data: { is_saved: false }, message: msg(req, "تم إزالة الوظيفة من المحفوظات.", "Job removed from saved.") });
     }
 
-    await UserSavedJobModel.create({ user_id: user._id, job_id: id });
-    await incJob(id, { user_saved: 1 });
-    return ReturnAppData.createData({ res, message: MSG.SAVED });
-  } catch (e) {
-    next(e);
+    await UserSavedJobModel.create({ user_id: req.user._id, job_id: jobId });
+    await clampInc(jobId, "user_saved", 1);
+    job_seeker_saved_notification(job).catch?.(console.error);
+    return ReturnAppData.createData({ res, data: { is_saved: true }, message: msg(req, "تم حفظ الوظيفة.", "Job saved.") });
+  } catch (error) {
+    if (error?.code === 11000) return ReturnAppData.createData({ res, data: { is_saved: true }, message: msg(req, "الوظيفة محفوظة مسبقاً.", "Job already saved.") });
+    next(error);
   }
 };
 
-//-------------------------------------------
-
-/* ========== 1) جلب آخر التعليقات 5 مع اسم المستخدم ========== */
- const listJobReviews = async (req, res, next) => {
+const listJobReviews = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
-    const limit = 5;
-
-    if (!mongoose.isValidObjectId(id)) {
-      return ReturnAppData.createError({ res, status: 400, message: "bad id" });
-    }
-
-    // lookup على مجموعة users لإرجاع الاسم ومعرّف المستخدم
+    const jobId = toObjectId(req.params.id);
+    const page = Math.max(1, Number(req.query.page || 1));
+    const limit = Math.min(30, Math.max(1, Number(req.query.limit || 5)));
+    if (!jobId) return ReturnAppData.getError({ res, status: 400, message: "bad id" });
     const rows = await UserReviewJobModel.aggregate([
-      { $match: { job_id: new mongoose.Types.ObjectId(id) } },
-      { $sort: { createdAt: -1, _id: -1 } },
-      { $skip: page * limit },
-      { $limit: limit },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user_id",
-          foreignField: "_id",
-          as: "u",
-          pipeline: [{ $project: { first_name: 1, last_name: 1 } }],
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          message: 1,
-          createdAt: 1,
-          user: {
-            _id: "$user_id",
-            name: {
-              $trim: {
-                input: {
-                  $concat: [
-                    { $ifNull: [{ $arrayElemAt: ["$u.first_name", 0] }, ""] },
-                    " ",
-                    { $ifNull: [{ $arrayElemAt: ["$u.last_name", 0] }, ""] },
-                  ],
-                },
-              },
-            },
-          },
-        },
-      },
+      { $match: { job_id: jobId } }, { $sort: { createdAt: -1, _id: -1 } }, { $skip: (page - 1) * limit }, { $limit: limit },
+      { $lookup: { from: "users", localField: "user_id", foreignField: "_id", as: "user", pipeline: [{ $project: { first_name: 1, last_name: 1, image: 1 } }] } },
+      { $set: { user: { $first: "$user" } } },
+      { $project: { message: 1, createdAt: 1, user: { id: "$user_id", first_name: "$user.first_name", last_name: "$user.last_name", image: "$user.image" } } },
     ]);
-
-    return ReturnAppData.getData({
-      res,
-      data:rows,
-      other: { page, hasMore: rows.length === limit }
-    });
-  } catch (e) {
-    next(e);
-  }
+    return ReturnAppData.getData({ res, data: rows, other: { pagination: { page, limit, has_more: rows.length === limit } } });
+  } catch (error) { next(error); }
 };
 
-/* ========== 2) إعادة احتساب تقييم الوظيفة مع تفصيل العدّادات ========== */
-/**
- * يحسب توزيع التقييمات 1..5 من UserRatingJobModel
- * ويحدّث jobs.rating و jobs.rating_counts و jobs.rating_total
- */
- const recomputeJobRatingBreakdown = async (req, res, next) => {
+const recomputeJobRatingBreakdown = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    if (!mongoose.isValidObjectId(id)) {
-      return ReturnAppData.createError({ res, status: 400, message: "bad id" });
-    }
-
-    const agg = await UserRatingJobModel.aggregate([
-      { $match: { job_id: new mongoose.Types.ObjectId(id) } },
-      { $group: { _id: "$rating", c: { $sum: 1 } } },
-    ]);
-
-    // بناء counts بشكل ثابت للمستويات 1..5
+    const jobId = toObjectId(req.params.id);
+    if (!jobId) return ReturnAppData.getError({ res, status: 400, message: "bad id" });
+    const agg = await UserRatingJobModel.aggregate([{ $match: { job_id: jobId } }, { $group: { _id: "$rating", count: { $sum: 1 } } }]);
     const counts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    for (const r of agg) {
-      const key = String(r._id);
-      if (counts[key] !== undefined) counts[key] = r.c;
-    }
-
-    const total =
-      counts[1] + counts[2] + counts[3] + counts[4] + counts[5];
-
-    const weighted =
-      total === 0
-        ? 0
-        : (1 * counts[1] +
-           2 * counts[2] +
-           3 * counts[3] +
-           4 * counts[4] +
-           5 * counts[5]) / total;
-
-    const avg = Number(weighted.toFixed(1));
-
-    await jobsModel.updateOne(
-      { _id: id },
-      {
-        $set: {
-          rating: avg,
-          rating_counts: counts, // مثال: {1:2, 2:6, 3:7, 4:8, 5:56}
-          rating_total: total,
-        },
-      }
-    );
-
-    return ReturnAppData.getData({
-      res,
-      data: { avg, counts, total },
-      message: "rating recomputed",
-    });
-  } catch (e) {
-    next(e);
-  }
+    for (const row of agg) if (counts[String(row._id)] !== undefined) counts[String(row._id)] = row.count;
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    const avg = total ? Number(((1 * counts[1] + 2 * counts[2] + 3 * counts[3] + 4 * counts[4] + 5 * counts[5]) / total).toFixed(1)) : 0;
+    await jobsModel.updateOne({ _id: jobId }, { $set: { rating: avg, rating_counts: counts, rating_total: total, "search_index.score_signals.rating": avg } });
+    return ReturnAppData.getData({ res, data: { avg, counts, total } });
+  } catch (error) { next(error); }
 };
 
-/* ========== 3) جلب من حفظ الوظيفة 5 بالأحدث مع الاسم والمعرّف ========== */
- const listJobSavers = async (req, res, next) => {
+const listJobSavers = async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
-    const limit = 5;
-
-    if (!mongoose.isValidObjectId(id)) {
-      return ReturnAppData.createError({ res, status: 400, message: "bad id" });
-    }
-
+    const jobId = toObjectId(req.params.id);
+    const page = Math.max(1, Number(req.query.page || 1));
+    const limit = Math.min(30, Math.max(1, Number(req.query.limit || 5)));
+    if (!jobId) return ReturnAppData.getError({ res, status: 400, message: "bad id" });
     const rows = await UserSavedJobModel.aggregate([
-      { $match: { job_id: new mongoose.Types.ObjectId(id) } },
-      { $sort: { createdAt: -1, _id: -1 } },
-      { $skip: page * limit },
-      { $limit: limit },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user_id",
-          foreignField: "_id",
-          as: "u",
-          pipeline: [{ $project: { first_name: 1, last_name: 1 } }],
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          createdAt: 1,
-          user: {
-            _id: "$user_id",
-            name: {
-              $trim: {
-                input: {
-                  $concat: [
-                    { $ifNull: [{ $arrayElemAt: ["$u.first_name", 0] }, ""] },
-                    " ",
-                    { $ifNull: [{ $arrayElemAt: ["$u.last_name", 0] }, ""] },
-                  ],
-                },
-              },
-            },
-          },
-        },
-      },
+      { $match: { job_id: jobId } }, { $sort: { createdAt: -1, _id: -1 } }, { $skip: (page - 1) * limit }, { $limit: limit },
+      { $lookup: { from: "users", localField: "user_id", foreignField: "_id", as: "user", pipeline: [{ $project: { first_name: 1, last_name: 1, image: 1 } }] } },
+      { $set: { user: { $first: "$user" } } },
+      { $project: { createdAt: 1, user: { id: "$user_id", first_name: "$user.first_name", last_name: "$user.last_name", image: "$user.image" } } },
     ]);
-
-    return ReturnAppData.getData({
-      res,
-      data:rows ,
-      other:{ page, hasMore: rows.length === limit }
-    });
-  } catch (e) {
-    next(e);
-  }
+    return ReturnAppData.getData({ res, data: rows, other: { pagination: { page, limit, has_more: rows.length === limit } } });
+  } catch (error) { next(error); }
 };
 
-/* ========== صدّر مع الدوال السابقة لديك ========== */
 export default {
   reviewJob,
   applyOutsideJob,
@@ -379,4 +190,3 @@ export default {
   recomputeJobRatingBreakdown,
   listJobSavers,
 };
-

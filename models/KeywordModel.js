@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const KeywordsSchema = new mongoose.Schema(
   {
+    type:{type:String,enum:["app","web","employee_dash","company_dash","admin_dash"], default:"app",unique:true},
     inputs: [
       {
         name: { type: String, required: true, unique: true },

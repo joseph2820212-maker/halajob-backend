@@ -169,7 +169,7 @@ const register = async (req, res, next) => {
     const domain = emailNorm.split("@")[1];
     const is_company = !PUBLIC_EMAIL_DOMAINS.has(domain);
 
-    const roleDoc = await RoleModel.findOne({ role_number: is_company ? 11 : 21 }).lean();
+    const roleDoc = await RoleModel.findOne({ role_number: is_company ? 3 : 4 }).lean();
     if (!roleDoc?._id) {
       return ReturnAppData.createError({
         res,
