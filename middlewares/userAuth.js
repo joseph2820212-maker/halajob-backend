@@ -1,4 +1,4 @@
-import APIError from '../utils/apiError.js';
+import ApiError from '../utils/apiError.js';
 import { UserModel, RefreshTokenModel } from '../models/index.js';
 import httpStatus from 'http-status';
 import { tokenTypes } from '../config/tokens.js';
@@ -9,18 +9,18 @@ const authUser = async (req, res, next) => {
     // Extract Authorization header
     const authHeader = req.get('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new APIError(httpStatus.UNAUTHORIZED, 'Authorization header missing or malformed');
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Authorization header missing or malformed');
     }
 
     // Extract the token from the header
     const accessToken = authHeader.split(' ')[1];
     if (!accessToken) {
-      throw new APIError(httpStatus.UNAUTHORIZED, 'Access token missing');
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Access token missing');
     }
 
     const tokenPayload = await verify(accessToken, process.env.JWT_SECRET);
     if (!tokenPayload) {
-      throw new APIError(httpStatus.UNAUTHORIZED, 'Invalid or expired access token');
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid or expired access token');
     }
 
     // Debugging: Log payload
@@ -28,14 +28,14 @@ const authUser = async (req, res, next) => {
 
     // Check if the token is of the correct type
     if (tokenPayload.type !== tokenTypes.ACCESS) {
-      throw new APIError(httpStatus.UNAUTHORIZED, 'Token type is invalid');
+      throw new ApiError(httpStatus.UNAUTHORIZED, 'Token type is invalid');
     }
 
     // Validate the user exists
     const user = await UserModel.findById(tokenPayload.userId.toString()).lean();
     // const userExists = await UserModel.exists({ _id: tokenPayload.userId,status:true,user_type: { $in: ["admin", "representative"] } });
     if (!user) {
-      throw new APIError(httpStatus.FORBIDDEN, 'User not found. Please log in again.');
+      throw new ApiError(httpStatus.FORBIDDEN, 'User not found. Please log in again.');
     }
  
     // Validate the refresh token exists for the user and login time
@@ -44,7 +44,7 @@ const authUser = async (req, res, next) => {
       loginTime: tokenPayload.loginTime,
     });
     if (!refreshTokenExists) {
-      throw new APIError(httpStatus.FORBIDDEN, 'Session expired. Please log in again.');
+      throw new ApiError(httpStatus.FORBIDDEN, 'Session expired. Please log in again.');
     }
 
     // Attach the payload to the request object

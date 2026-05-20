@@ -3,6 +3,17 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import {
   jobsModel,
   EmployeeModel,
+  CompanyModel,
+  JobTypeModel,
+  WorkModeModel,
+  WorkTimeTypeModel,
+  JobSalaryModel,
+  ExperienceLevelModel,
+  EducationLevelModel,
+  CountryModel,
+  SkillModel,
+  LanguageModel,
+  JobServiceModel,
   UserSavedJobModel,
   UserShowJobModel,
   UserApplyingJobModel,
@@ -371,117 +382,394 @@ const get = async (req, res, next) => {
   }
 };
 
+
 const optionLabel = (value, fallback = "") => String(value || fallback || "").trim();
-const buildFacetOptions = (rows = [], key = "_id") => rows.filter((x) => x?._id !== null && x?._id !== "").map((x) => ({ value: x._id, id: x.id || null, label: optionLabel(x.label, x._id), count: x.count }));
+
+const cleanOptionValue = (value) => {
+  const v = toIdString(value);
+  return v && v !== "null" && v !== "undefined" ? v : "";
+};
+
+const isEmptyFacetResponse = (agg = {}) => {
+  const keys = [
+    "companies", "job_types", "work_modes", "work_times", "salary_types",
+    "experience_levels", "education_levels", "countries", "cities",
+    "skills", "languages", "services", "candidate_target", "remote",
+  ];
+  return keys.every((key) => !Array.isArray(agg[key]) || agg[key].length === 0);
+};
+
+const smartLabel = (doc, lang = "en", fallback = "") => {
+  if (!doc) return optionLabel(fallback);
+  return optionLabel(
+    doc[`title_${lang}`] ||
+      doc[`name_${lang}`] ||
+      doc[`country_name_${lang}`] ||
+      doc[`city_name_${lang}`] ||
+      doc.title ||
+      doc.name ||
+      doc.key ||
+      fallback
+  );
+};
+
+const mergeCountRows = (rows = []) => {
+  const map = new Map();
+  for (const row of rows || []) {
+    const value = cleanOptionValue(row.value ?? row._id);
+    if (!value) continue;
+    const current = map.get(value) || { ...row, value, count: 0 };
+    current.count += Number(row.count || 0);
+    current.label = optionLabel(current.label || row.label || value);
+    current.image = current.image || row.image || null;
+    current.id = current.id || row.id || null;
+    map.set(value, current);
+  }
+  return [...map.values()].sort((a, b) => (b.count || 0) - (a.count || 0) || String(a.label).localeCompare(String(b.label)));
+};
+
+const catalogOptions = async (Model, lang, opts = {}) => {
+  const query = opts.includeInactive ? {} : { $or: [{ is_active: true }, { is_active: { $exists: false } }] };
+  const docs = await Model.find(query).sort({ sort_order: 1, title_en: 1, name: 1 }).limit(opts.limit || 200).lean();
+  return docs.map((doc) => ({ value: cleanOptionValue(doc._id), label: smartLabel(doc, lang), count: 0 }));
+};
+
+const withCatalogFallback = (countRows = [], catalogRows = []) => {
+  const counts = new Map(mergeCountRows(countRows).map((x) => [String(x.value), x]));
+  for (const c of catalogRows || []) {
+    if (!c.value) continue;
+    if (!counts.has(String(c.value))) counts.set(String(c.value), c);
+    else counts.set(String(c.value), { ...c, ...counts.get(String(c.value)), label: counts.get(String(c.value)).label || c.label });
+  }
+  return [...counts.values()].sort((a, b) => (b.count || 0) - (a.count || 0) || String(a.label).localeCompare(String(b.label)));
+};
+
+const buildSmartFacetPipeline = (match, lang) => {
+  const titleField = lang === "ar" ? "$title_ar" : "$title_en";
+  const nameField = lang === "ar" ? "$name_ar" : "$name_en";
+  const countryNameField = lang === "ar" ? "$country_name_ar" : "$country_name_en";
+  const cityNameField = lang === "ar" ? "$city_name_ar" : "$city_name_en";
+
+  return [
+    { $match: match },
+    {
+      $facet: {
+        total_jobs: [{ $count: "count" }],
+        companies: [
+          { $match: { company_id: { $ne: null } } },
+          { $group: { _id: "$company_id", count: { $sum: 1 }, snapshot_label: { $first: "$search_projection.company.name" }, snapshot_image: { $first: "$search_projection.company.logo" } } },
+          { $lookup: { from: CompanyModel.collection.name, localField: "_id", foreignField: "_id", as: "doc" } },
+          { $unwind: { path: "$doc", preserveNullAndEmptyArrays: true } },
+          { $project: { value: "$_id", label: { $ifNull: ["$doc.company_name", "$snapshot_label"] }, image: { $ifNull: ["$doc.company_logo", "$snapshot_image"] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } }, { $limit: 80 },
+        ],
+        job_types: [
+          { $match: { job_type_id: { $ne: null } } },
+          { $group: { _id: "$job_type_id", count: { $sum: 1 }, snapshot_label: { $first: "$job_type_info.title" }, index_label: { $first: "$search_index.filters.job_type" } } },
+          { $lookup: { from: JobTypeModel.collection.name, localField: "_id", foreignField: "_id", as: "doc" } },
+          { $unwind: { path: "$doc", preserveNullAndEmptyArrays: true } },
+          { $project: { value: "$_id", label: { $ifNull: [titleField, { $ifNull: ["$snapshot_label", "$index_label"] }] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } }, { $limit: 80 },
+        ],
+        work_modes: [
+          { $match: { work_mode_id: { $ne: null } } },
+          { $group: { _id: "$work_mode_id", count: { $sum: 1 }, snapshot_label: { $first: "$work_mode_info.title" }, index_label: { $first: "$search_index.filters.work_mode" } } },
+          { $lookup: { from: WorkModeModel.collection.name, localField: "_id", foreignField: "_id", as: "doc" } },
+          { $unwind: { path: "$doc", preserveNullAndEmptyArrays: true } },
+          { $project: { value: "$_id", label: { $ifNull: [titleField, { $ifNull: ["$snapshot_label", "$index_label"] }] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } },
+        ],
+        work_times: [
+          { $match: { job_time_id: { $ne: null } } },
+          { $group: { _id: "$job_time_id", count: { $sum: 1 }, snapshot_label: { $first: "$job_time_info.title" }, index_label: { $first: "$search_index.filters.work_time" } } },
+          { $lookup: { from: WorkTimeTypeModel.collection.name, localField: "_id", foreignField: "_id", as: "doc" } },
+          { $unwind: { path: "$doc", preserveNullAndEmptyArrays: true } },
+          { $project: { value: "$_id", label: { $ifNull: [titleField, { $ifNull: ["$snapshot_label", "$index_label"] }] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } },
+        ],
+        salary_types: [
+          { $match: { job_salary_id: { $ne: null } } },
+          { $group: { _id: "$job_salary_id", count: { $sum: 1 }, snapshot_label: { $first: "$job_salary_info.title" }, index_label: { $first: "$search_index.filters.salary_type" } } },
+          { $lookup: { from: JobSalaryModel.collection.name, localField: "_id", foreignField: "_id", as: "doc" } },
+          { $unwind: { path: "$doc", preserveNullAndEmptyArrays: true } },
+          { $project: { value: "$_id", label: { $ifNull: [titleField, { $ifNull: ["$snapshot_label", "$index_label"] }] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } },
+        ],
+        experience_levels: [
+          { $match: { experience_level_id: { $ne: null } } },
+          { $group: { _id: "$experience_level_id", count: { $sum: 1 }, snapshot_label: { $first: "$experience_level_info.title" }, index_label: { $first: "$search_index.filters.experience_level" } } },
+          { $lookup: { from: ExperienceLevelModel.collection.name, localField: "_id", foreignField: "_id", as: "doc" } },
+          { $unwind: { path: "$doc", preserveNullAndEmptyArrays: true } },
+          { $project: { value: "$_id", label: { $ifNull: [titleField, { $ifNull: ["$snapshot_label", "$index_label"] }] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } },
+        ],
+        education_levels: [
+          { $match: { education_level_id: { $ne: null } } },
+          { $group: { _id: "$education_level_id", count: { $sum: 1 }, snapshot_label: { $first: "$education_level_info.title" }, index_label: { $first: "$search_index.filters.education_level" } } },
+          { $lookup: { from: EducationLevelModel.collection.name, localField: "_id", foreignField: "_id", as: "doc" } },
+          { $unwind: { path: "$doc", preserveNullAndEmptyArrays: true } },
+          { $project: { value: "$_id", label: { $ifNull: [titleField, { $ifNull: ["$snapshot_label", "$index_label"] }] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } },
+        ],
+        countries: [
+          { $project: { values: { $setUnion: [{ $ifNull: ["$countries", []] }, { $ifNull: ["$search_index.filters.countries", []] }] } } },
+          { $unwind: "$values" },
+          { $match: { values: { $nin: [null, ""] } } },
+          { $group: { _id: "$values", count: { $sum: 1 } } },
+          { $lookup: { from: CountryModel.collection.name, localField: "_id", foreignField: "country_code", as: "country_docs" } },
+          { $project: { value: "$_id", label: { $ifNull: [{ $arrayElemAt: [countryNameField, 0] }, "$_id"] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } }, { $limit: 80 },
+        ],
+        cities: [
+          { $project: { values: { $setUnion: [{ $ifNull: ["$cities", []] }, { $cond: [{ $ne: ["$city", ""] }, ["$city"], []] }, { $ifNull: ["$search_index.filters.cities", []] }] } } },
+          { $unwind: "$values" },
+          { $match: { values: { $nin: [null, ""] } } },
+          { $group: { _id: "$values", count: { $sum: 1 } } },
+          { $lookup: { from: CountryModel.collection.name, localField: "_id", foreignField: "city_name_en", as: "city_docs_en" } },
+          { $lookup: { from: CountryModel.collection.name, localField: "_id", foreignField: "city_name_ar", as: "city_docs_ar" } },
+          { $project: { value: "$_id", label: { $ifNull: [{ $arrayElemAt: [cityNameField.replace("$", "$city_docs_en.") , 0] }, { $ifNull: [{ $arrayElemAt: [cityNameField.replace("$", "$city_docs_ar."), 0] }, "$_id"] }] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } }, { $limit: 100 },
+        ],
+        skills: [
+          { $project: { values: { $setUnion: [
+            { $map: { input: { $ifNull: ["$skills_required", []] }, as: "s", in: { value: { $ifNull: ["$$s.skill_id", { $ifNull: ["$$s.name", "$$s.title_en"] }] }, label: { $ifNull: [`$$s.title_${lang}`, { $ifNull: ["$$s.title_en", { $ifNull: ["$$s.name", ""] }] }] } } } },
+            { $map: { input: { $ifNull: ["$skills_optional", []] }, as: "s", in: { value: { $ifNull: ["$$s.skill_id", { $ifNull: ["$$s.name", "$$s.title_en"] }] }, label: { $ifNull: [`$$s.title_${lang}`, { $ifNull: ["$$s.title_en", { $ifNull: ["$$s.name", ""] }] }] } } } },
+            { $map: { input: { $ifNull: ["$search_index.filters.skills", []] }, as: "s", in: { value: "$$s", label: "$$s" } } }
+          ] } } },
+          { $unwind: "$values" },
+          { $match: { "values.value": { $nin: [null, ""] } } },
+          { $group: { _id: "$values.value", label: { $first: "$values.label" }, count: { $sum: 1 } } },
+          { $project: { value: "$_id", label: { $ifNull: ["$label", "$_id"] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } }, { $limit: 120 },
+        ],
+        languages: [
+          { $project: { values: { $setUnion: [
+            { $map: { input: { $ifNull: ["$languages", []] }, as: "l", in: { value: { $ifNull: ["$$l.language_id", "$$l.name"] }, label: { $ifNull: ["$$l.name", ""] } } } },
+            { $map: { input: { $ifNull: ["$search_index.filters.languages", []] }, as: "l", in: { value: "$$l", label: "$$l" } } }
+          ] } } },
+          { $unwind: "$values" },
+          { $match: { "values.value": { $nin: [null, ""] } } },
+          { $group: { _id: "$values.value", label: { $first: "$values.label" }, count: { $sum: 1 } } },
+          { $lookup: { from: LanguageModel.collection.name, localField: "_id", foreignField: "_id", as: "doc" } },
+          { $unwind: { path: "$doc", preserveNullAndEmptyArrays: true } },
+          { $project: { value: "$_id", label: { $ifNull: [titleField, { $ifNull: ["$label", "$_id"] }] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } }, { $limit: 80 },
+        ],
+        services: [
+          { $project: { values: { $setUnion: [
+            { $map: { input: { $ifNull: ["$job_services", []] }, as: "s", in: { value: { $ifNull: ["$$s.id", { $ifNull: ["$$s.name", "$$s.title_en"] }] }, label: { $ifNull: [`$$s.title_${lang}`, { $ifNull: ["$$s.title_en", { $ifNull: ["$$s.name", ""] }] }] } } } },
+            { $map: { input: { $ifNull: ["$search_index.filters.services", []] }, as: "s", in: { value: "$$s", label: "$$s" } } }
+          ] } } },
+          { $unwind: "$values" },
+          { $match: { "values.value": { $nin: [null, ""] } } },
+          { $group: { _id: "$values.value", label: { $first: "$values.label" }, count: { $sum: 1 } } },
+          { $lookup: { from: JobServiceModel.collection.name, localField: "_id", foreignField: "_id", as: "doc" } },
+          { $unwind: { path: "$doc", preserveNullAndEmptyArrays: true } },
+          { $project: { value: "$_id", label: { $ifNull: [titleField, { $ifNull: ["$label", "$_id"] }] }, count: 1 } },
+          { $sort: { count: -1, label: 1 } }, { $limit: 80 },
+        ],
+        candidate_target: [
+          { $project: { values: { $setUnion: [{ $ifNull: ["$candidate_target", []] }, { $ifNull: ["$search_index.filters.candidate_target", []] }] } } },
+          { $unwind: "$values" },
+          { $match: { values: { $nin: [null, ""] } } },
+          { $group: { _id: "$values", count: { $sum: 1 } } },
+          { $sort: { count: -1, _id: 1 } },
+        ],
+        salary_range: [
+          { $group: { _id: null, min: { $min: "$salary.min_usd" }, max: { $max: "$salary.max_usd" }, visible_count: { $sum: { $cond: ["$salary.is_visible", 1, 0] } }, negotiable_count: { $sum: { $cond: ["$salary.is_negotiable", 1, 0] } } } },
+        ],
+        remote: [
+          { $group: { _id: "$is_remote", count: { $sum: 1 } } },
+          { $sort: { _id: -1 } },
+        ],
+      },
+    },
+  ];
+};
+
+const normalizeRows = (rows = []) => mergeCountRows((rows || []).map((x) => ({ ...x, value: cleanOptionValue(x.value ?? x._id), label: optionLabel(x.label, x.value ?? x._id), image: buildPublicUrl(x.image), count: x.count })));
+
+const getCatalogFallbacks = async (lang) => {
+  const [jobTypes, workModes, workTimes, salaryTypes, experienceLevels, educationLevels, skills, languages, services] = await Promise.all([
+    catalogOptions(JobTypeModel, lang),
+    catalogOptions(WorkModeModel, lang),
+    catalogOptions(WorkTimeTypeModel, lang),
+    catalogOptions(JobSalaryModel, lang),
+    catalogOptions(ExperienceLevelModel, lang),
+    catalogOptions(EducationLevelModel, lang),
+    catalogOptions(SkillModel, lang),
+    catalogOptions(LanguageModel, lang),
+    catalogOptions(JobServiceModel, lang),
+  ]);
+  return { jobTypes, workModes, workTimes, salaryTypes, experienceLevels, educationLevels, skills, languages, services };
+};
+
+const targetLabels = (lang) => ({
+  all: lang === "ar" ? "الجميع" : "All",
+  students: lang === "ar" ? "طلاب" : "Students",
+  graduates: lang === "ar" ? "خريجون" : "Graduates",
+  fresh_graduates: lang === "ar" ? "حديثو التخرج" : "Fresh graduates",
+  experienced: lang === "ar" ? "ذوو خبرة" : "Experienced",
+  career_changers: lang === "ar" ? "مغيرو المسار المهني" : "Career changers",
+});
+
+const labelCandidateTargets = (rows = [], lang) => {
+  const labels = targetLabels(lang);
+  return normalizeRows(rows).map((x) => ({ ...x, label: labels[x.value] || x.label || x.value }));
+};
+
+const buildFilterGroups = ({ agg, catalogs, lang, diagnostics }) => {
+  const t = (ar, en) => (lang === "ar" ? ar : en);
+  const salaryRange = agg.salary_range?.[0] || {};
+
+  const groups = [
+    { key: "company_ids", title: t("الشركات", "Companies"), type: "multi_select", source: "jobs.company_id", options: normalizeRows(agg.companies) },
+    { key: "job_type_ids", title: t("نوع الوظيفة", "Job type"), type: "multi_select", source: "jobs.job_type_id", options: withCatalogFallback(normalizeRows(agg.job_types), catalogs.jobTypes) },
+    { key: "work_mode_ids", title: t("نمط العمل", "Work mode"), type: "multi_select", source: "jobs.work_mode_id", options: withCatalogFallback(normalizeRows(agg.work_modes), catalogs.workModes) },
+    { key: "job_time_ids", title: t("دوام العمل", "Work time"), type: "multi_select", source: "jobs.job_time_id", options: withCatalogFallback(normalizeRows(agg.work_times), catalogs.workTimes) },
+    { key: "salary_type_ids", title: t("نوع الراتب", "Salary type"), type: "multi_select", source: "jobs.job_salary_id", options: withCatalogFallback(normalizeRows(agg.salary_types), catalogs.salaryTypes) },
+    { key: "experience_level_ids", title: t("مستوى الخبرة", "Experience level"), type: "multi_select", source: "jobs.experience_level_id", options: withCatalogFallback(normalizeRows(agg.experience_levels), catalogs.experienceLevels) },
+    { key: "education_level_ids", title: t("المستوى التعليمي", "Education level"), type: "multi_select", source: "jobs.education_level_id", options: withCatalogFallback(normalizeRows(agg.education_levels), catalogs.educationLevels) },
+    { key: "countries", title: t("الدول", "Countries"), type: "multi_select", source: "jobs.countries + search_index", options: normalizeRows(agg.countries) },
+    { key: "cities", title: t("المدن", "Cities"), type: "multi_select", source: "jobs.cities/city + search_index", options: normalizeRows(agg.cities) },
+    { key: "skills", title: t("المهارات", "Skills"), type: "multi_select", source: "jobs.skills_required/optional", options: withCatalogFallback(normalizeRows(agg.skills), catalogs.skills).slice(0, 120) },
+    { key: "languages", title: t("اللغات", "Languages"), type: "multi_select", source: "jobs.languages", options: withCatalogFallback(normalizeRows(agg.languages), catalogs.languages) },
+    { key: "services", title: t("الخدمات", "Services"), type: "multi_select", source: "jobs.job_services", options: withCatalogFallback(normalizeRows(agg.services), catalogs.services) },
+    { key: "candidate_target", title: t("الفئة المستهدفة", "Candidate target"), type: "multi_select", source: "jobs.candidate_target", options: labelCandidateTargets(agg.candidate_target, lang) },
+    { key: "is_remote", title: t("عن بعد", "Remote"), type: "boolean", source: "jobs.is_remote", options: (agg.remote || []).filter((x) => x._id !== null).map((x) => ({ value: x._id === true, label: x._id === true ? t("عن بعد", "Remote") : t("ليس عن بعد", "Not remote"), count: x.count })) },
+    { key: "publish_date", title: t("تاريخ النشر", "Publish date"), type: "single_select", source: "static", options: [{ value: "last_24h", label: t("آخر 24 ساعة", "Last 24 hours") }, { value: "last_7d", label: t("آخر 7 أيام", "Last 7 days") }, { value: "last_30d", label: t("آخر 30 يوم", "Last 30 days") }] },
+    { key: "salary_usd", title: t("نطاق الراتب بالدولار", "Salary range USD"), type: "range", source: "jobs.salary.min_usd/max_usd", min: salaryRange.min ?? null, max: salaryRange.max ?? null, visible_count: salaryRange.visible_count || 0, negotiable_count: salaryRange.negotiable_count || 0 },
+  ];
+
+  return groups.map((g) => ({ ...g, is_empty: Array.isArray(g.options) ? g.options.length === 0 : false, diagnostics }));
+};
 
 const getFilters = async (req, res, next) => {
   try {
     const lang = langFromReq(req);
     const filters = readFilters(req);
-    const baseMatch = buildFilterMatch({ ...filters, company_ids: [], job_type_ids: [], work_mode_ids: [], job_time_ids: [], salary_type_ids: [], experience_level_ids: [], education_level_ids: [], countries: [], cities: [], skills: [], languages: [], services: [], candidate_target: [], is_remote: null, salary_min_usd: null, salary_max_usd: null, publish_date: "" });
 
-    const pipeline = [
-      { $match: baseMatch },
-      {
-        $facet: {
-          companies: [
-            { $group: { _id: "$company_id", label: { $first: "$search_projection.company.name" }, image: { $first: "$search_projection.company.logo" }, count: { $sum: 1 } } },
-            { $sort: { count: -1, label: 1 } }, { $limit: 80 },
-          ],
-          job_types: [
-            { $group: { _id: "$search_index.filters.job_type", id: { $first: "$search_index.filters.job_type_id" }, count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
-          ],
-          work_modes: [
-            { $group: { _id: "$search_index.filters.work_mode", id: { $first: "$search_index.filters.work_mode_id" }, count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } },
-          ],
-          work_times: [
-            { $group: { _id: "$search_index.filters.work_time", id: { $first: "$search_index.filters.job_time_id" }, count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } },
-          ],
-          salary_types: [
-            { $group: { _id: "$search_index.filters.salary_type", id: { $first: "$search_index.filters.job_salary_id" }, count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } },
-          ],
-          countries: [
-            { $unwind: "$search_index.filters.countries" },
-            { $group: { _id: "$search_index.filters.countries", count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
-          ],
-          cities: [
-            { $unwind: "$search_index.filters.cities" },
-            { $group: { _id: "$search_index.filters.cities", count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
-          ],
-          skills: [
-            { $unwind: "$search_index.filters.skills" },
-            { $group: { _id: "$search_index.filters.skills", count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } }, { $limit: 100 },
-          ],
-          languages: [
-            { $unwind: "$search_index.filters.languages" },
-            { $group: { _id: "$search_index.filters.languages", count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
-          ],
-          services: [
-            { $unwind: "$search_index.filters.services" },
-            { $group: { _id: "$search_index.filters.services", count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } }, { $limit: 80 },
-          ],
-          candidate_target: [
-            { $unwind: "$candidate_target" },
-            { $group: { _id: "$candidate_target", count: { $sum: 1 } } },
-            { $sort: { count: -1, _id: 1 } },
-          ],
-          salary_range: [
-            { $group: { _id: null, min: { $min: "$salary.min_usd" }, max: { $max: "$salary.max_usd" } } },
-          ],
-          remote: [
-            { $group: { _id: "$is_remote", count: { $sum: 1 } } },
-          ],
-        },
+    // Facets should react to search text and non-facet constraints,
+    // but they must not erase themselves by applying their own selected values.
+    const facetFilters = {
+      ...filters,
+      company_ids: [],
+      job_type_ids: [],
+      work_mode_ids: [],
+      job_time_ids: [],
+      salary_type_ids: [],
+      experience_level_ids: [],
+      education_level_ids: [],
+      countries: [],
+      cities: [],
+      skills: [],
+      languages: [],
+      services: [],
+      candidate_target: [],
+      is_remote: null,
+      salary_min_usd: null,
+      salary_max_usd: null,
+      publish_date: "",
+    };
+
+    let match = buildFilterMatch(facetFilters);
+    let [agg = {}] = await jobsModel.aggregate(buildSmartFacetPipeline(match, lang)).allowDiskUse(true);
+    let match_mode = "public_active_jobs";
+
+    // If old data is not aligned with lifecycle fields/dates, do not return empty UI.
+    // Relax only for filters discovery; /job/get still remains strict.
+    if (isEmptyFacetResponse(agg)) {
+      const relaxedAnd = [];
+      const search = buildJobSearchMatch(tokenise(filters.q));
+      if (search.$and) relaxedAnd.push(...search.$and);
+      match = { ...(relaxedAnd.length ? { $and: relaxedAnd } : {}) };
+      [agg = {}] = await jobsModel.aggregate(buildSmartFacetPipeline(match, lang)).allowDiskUse(true);
+      match_mode = "relaxed_discovery_fallback";
+    }
+
+    const catalogs = await getCatalogFallbacks(lang);
+    const total = agg.total_jobs?.[0]?.count || 0;
+    const diagnostics = {
+      match_mode,
+      matched_jobs_count: total,
+      uses_real_job_fields: true,
+      uses_catalog_fallback: true,
+      note: match_mode === "relaxed_discovery_fallback"
+        ? "Public job conditions returned no facet data; filters were discovered from existing job documents and lookup catalogs. Check status/is_accepted/publish_status/date fields."
+        : "Filters are built from real job fields first, then lookup catalogs are used as fallback.",
+    };
+
+    const groups = buildFilterGroups({ agg, catalogs, lang, diagnostics });
+
+    return ReturnAppData.getData({
+      res,
+      data: {
+        groups,
+        meta: diagnostics,
+        raw: process.env.NODE_ENV === "production" ? undefined : agg,
       },
-    ];
-
-    const [agg] = await jobsModel.aggregate(pipeline).allowDiskUse(true);
-    const t = (ar, en) => lang === "ar" ? ar : en;
-    const groups = [
-      { key: "company_ids", title: t("الشركات", "Companies"), type: "multi_select", options: (agg.companies || []).map((x) => ({ value: toIdString(x._id), label: x.label || "", image: buildPublicUrl(x.image), count: x.count })) },
-      { key: "job_type_ids", title: t("نوع الوظيفة", "Job type"), type: "multi_select", options: buildFacetOptions(agg.job_types) },
-      { key: "work_mode_ids", title: t("نمط العمل", "Work mode"), type: "multi_select", options: buildFacetOptions(agg.work_modes) },
-      { key: "job_time_ids", title: t("دوام العمل", "Work time"), type: "multi_select", options: buildFacetOptions(agg.work_times) },
-      { key: "salary_type_ids", title: t("نوع الراتب", "Salary type"), type: "multi_select", options: buildFacetOptions(agg.salary_types) },
-      { key: "countries", title: t("الدول", "Countries"), type: "multi_select", options: buildFacetOptions(agg.countries) },
-      { key: "cities", title: t("المدن", "Cities"), type: "multi_select", options: buildFacetOptions(agg.cities) },
-      { key: "skills", title: t("المهارات", "Skills"), type: "multi_select", options: buildFacetOptions(agg.skills) },
-      { key: "languages", title: t("اللغات", "Languages"), type: "multi_select", options: buildFacetOptions(agg.languages) },
-      { key: "services", title: t("الخدمات", "Services"), type: "multi_select", options: buildFacetOptions(agg.services) },
-      { key: "candidate_target", title: t("الفئة المستهدفة", "Candidate target"), type: "multi_select", options: buildFacetOptions(agg.candidate_target) },
-      { key: "is_remote", title: t("عن بعد", "Remote"), type: "boolean", options: (agg.remote || []).map((x) => ({ value: x._id === true, label: x._id === true ? t("عن بعد", "Remote") : t("ليس عن بعد", "Not remote"), count: x.count })) },
-      { key: "publish_date", title: t("تاريخ النشر", "Publish date"), type: "single_select", options: [{ value: "last_24h", label: t("آخر 24 ساعة", "Last 24 hours") }, { value: "last_7d", label: t("آخر 7 أيام", "Last 7 days") }, { value: "last_30d", label: t("آخر 30 يوم", "Last 30 days") }] },
-      { key: "salary_usd", title: t("نطاق الراتب بالدولار", "Salary range USD"), type: "range", min: agg.salary_range?.[0]?.min ?? null, max: agg.salary_range?.[0]?.max ?? null },
-    ];
-
-    return ReturnAppData.getData({ res, data: { groups, raw: agg } });
+    });
   } catch (error) {
     next(error);
   }
 };
 
+
 const getById = async (req, res, next) => {
   try {
     const userId = toObjectId(req.user?._id || req.query.user_id);
     const employee = await getEmployeeForUser(userId);
-    const id = toObjectId(req.params.id);
-    if (!id) return ReturnAppData.getError({ res, status: 400, message: "invalid job id" });
 
-    const job = await jobsModel.findOne({ _id: id, ...publicJobMatch() }).lean();
-    if (!job) return ReturnAppData.getError({ res, status: 404, message: "job not found" });
+    const id = toObjectId(req.params.id);
+    if (!id) {
+      return ReturnAppData.getError({
+        res,
+        status: 400,
+        message: "invalid job id",
+      });
+    }
+
+    const job = await jobsModel.findOne({
+      _id: id,
+      ...publicJobMatch(),
+    }).lean();
+
+    if (!job) {
+      return ReturnAppData.getError({
+        res,
+        status: 404,
+        message: "job not found",
+      });
+    }
 
     await markSeen(userId, [job._id]);
+
     const [item] = await decorateJobs([job], userId, employee);
-    return ReturnAppData.getData({ res, data: { ...item, questions: job.questions || [], out_link: job.is_out_side ? job.out_link || null : null, requirements: job.search_projection?.requirements || {}, job_services: job.job_services || [] } });
+
+    const shouldShowCompanyInformation =
+      job.show_company_information === true;
+
+    const responseData = {
+      ...item,
+      out_link: job.is_out_side ? job.out_link || null : null,
+      requirements: job.search_projection?.requirements || {},
+      job_services: job.job_services || [],
+    };
+
+    if (!shouldShowCompanyInformation) {
+      delete responseData.company;
+      delete responseData.company_id;
+      delete responseData.companyImage;
+      delete responseData.company_image;
+      delete responseData.company_logo;
+      delete responseData.company_name;
+      delete responseData.companyName;
+    }
+
+    return ReturnAppData.getData({
+      res,
+      data: responseData,
+    });
   } catch (error) {
     next(error);
   }
