@@ -21,6 +21,7 @@ import { seedIndustries } from "./seedIndustries.js";
 import { seedSkillsFromEsco } from "./seedSkills.js";
 import { seedEducationLevels } from "./seedEducationLevels.js";
 import { seedJobsAndApplications } from "./seedJobsAndApplications.js";
+import { seedBanners } from "./seedBanner.js";
 
 dotenv.config();
 
@@ -44,6 +45,7 @@ const seeders = {
   industries:seedIndustries,
   skills:seedSkillsFromEsco,
   educationLevel:seedEducationLevels,
+  banners:seedBanners,
   jobsAndApplications:seedJobsAndApplications
 };
 
@@ -68,7 +70,8 @@ const executionOrder = [
   "company",
   "skills",
   "educationLevel",
-  "jobsAndApplications"
+  "jobsAndApplications",
+  "banners"
 
 ];
 
