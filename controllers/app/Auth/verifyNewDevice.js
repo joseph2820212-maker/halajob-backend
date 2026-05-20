@@ -1,5 +1,6 @@
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { UserModel } from "../../../models/index.js";
+import { generateAuthTokens } from "../../../services/tokenService.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 
@@ -99,7 +100,8 @@ export const verifyNewDevice = async (req, res) => {
       });
     }
 
-    addOrUpdateDevice(user, user.pending_device, { makeDefault: false });
+    const verifiedDevice = user.pending_device;
+    addOrUpdateDevice(user, verifiedDevice, { makeDefault: true });
 
     user.another_device_code = undefined;
     user.another_device_expires_at = undefined;
@@ -108,9 +110,11 @@ export const verifyNewDevice = async (req, res) => {
     user.markModified?.("device");
     await user.save();
 
+    const tokens = await generateAuthTokens(user, verifiedDevice);
+
     return ReturnAppData.createData({
       res, status: 200,
-      data: { user_id: user._id, device_added: true },
+      data: { user_id: user._id, device_added: true, tokens },
       message: lan === "ar" ? "تم اعتماد الجهاز وإضافته إلى قائمة الأجهزة." : "Device verified and added."
     });
   } catch (err) {

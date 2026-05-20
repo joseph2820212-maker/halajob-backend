@@ -23,14 +23,10 @@ function isDeviceMatch(a = {}, b = {}) {
   const modelA = normStr(a.model_name), modelB = normStr(b.model_name);
   const isDevA = !!a.is_device, isDevB = !!b.is_device;
 
-  if (!brandA || !modelA) return false;
-  if (brandA !== brandB || modelA !== modelB || isDevA !== isDevB) return false;
-
-  const midA = normStr(a.model_id || "");
-  const midB = normStr(b.model_id || "");
-  if (midA && midB && midA !== midB) return false;
-
-  return true;
+  // Important: do NOT use build_id/model_id as hard identity keys.
+  // They can change after OS/app updates and would make the same phone look like a new device.
+  if (!brandA || !modelA || !brandB || !modelB) return false;
+  return brandA === brandB && modelA === modelB && isDevA === isDevB;
 }
 
 /** لتجنّب كشف وجود المستخدم (اختياري) */

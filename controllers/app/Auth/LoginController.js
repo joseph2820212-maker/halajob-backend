@@ -6,9 +6,8 @@ import { CompanyModel, RoleModel, UserModel } from "../../../models/index.js";
 import { verifyUserFromRefreshTokenPayload } from "../../../services/authService.js";
 import {
   clearRefreshToken,
-  generateAccessTokenFromRefreshTokenPayload,
   generateAuthTokens,
-  verifyRefreshToken,
+  rotateRefreshToken,
 } from "../../../services/tokenService.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
@@ -32,12 +31,11 @@ function isDeviceMatch(a = {}, b = {}) {
   const brandA = normStr(a.brand), brandB = normStr(b.brand);
   const modelA = normStr(a.model_name), modelB = normStr(b.model_name);
   const isDevA = !!a.is_device, isDevB = !!b.is_device;
-  if (!brandA || !modelA) return false;
-  if (brandA !== brandB || modelA !== modelB || isDevA !== isDevB) return false;
-  const midA = normStr(a.model_id || "");
-  const midB = normStr(b.model_id || "");
-  if (midA && midB && midA !== midB) return false;
-  return true;
+
+  // Important: do NOT use build_id/model_id as hard identity keys.
+  // They can change after OS/app updates and would make the same phone look like a new device.
+  if (!brandA || !modelA || !brandB || !modelB) return false;
+  return brandA === brandB && modelA === modelB && isDevA === isDevB;
 }
 
 function ensureDeviceArray(user) {
@@ -278,14 +276,13 @@ const refreshToken = async (req, res, next) => {
         message: lan === "ar" ? "رمز التحديث مطلوب." : "Refresh token is required.",
       });
     }
-    const refreshTokenPayload = await verifyRefreshToken(refreshToken);
-    await verifyUserFromRefreshTokenPayload(refreshTokenPayload);
-    const newAccessToken = await generateAccessTokenFromRefreshTokenPayload(refreshTokenPayload);
+    const { tokenPayload, tokens } = await rotateRefreshToken(refreshToken);
+    await verifyUserFromRefreshTokenPayload(tokenPayload);
 
     return ReturnAppData.createData({
       res,
       status: 200,
-      data: { accessToken: newAccessToken },
+      data: tokens,
     });
   } catch (error) {
     return next(error);
