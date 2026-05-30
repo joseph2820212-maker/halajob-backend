@@ -1,4 +1,4 @@
-import { CompanyModel, RoleModel, UserModel } from "../../../models/index.js";
+import { RoleModel, UserModel, CompanyModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
 
@@ -61,30 +61,69 @@ function addOrUpdateDevice(user, dev, { makeDefault = true } = {}) {
   return { inserted: true, updated: false, index: user.device.length - 1 };
 }
 
-async function buildAuthPayload(user, device) {
-  const tokens = await generateAuthTokens(user, device);
-  const role = user.role_id ? await RoleModel.findById(user.role_id).lean() : null;
-  const company = await CompanyModel.findOne({ user_id: user._id, status: true }).lean();
-
+function buildUserDto(user) {
   return {
-    user_id: user._id,
+    id: user._id,
     first_name: user.first_name,
     mid_name: user.mid_name,
     last_name: user.last_name,
-    phone_code: user.phone_code,
+    full_name: [user.first_name, user.mid_name, user.last_name].filter(Boolean).join(" "),
     image: user.image ? buildPublicUrl(process.env.PUBLIC_BASE_URL, user.image) : null,
+    phone_code: user.phone_code,
     phone: user.phone_national,
     gender: user.gender,
+  };
+}
+
+async function buildAuthPayload(user, device) {
+  const tokens = await generateAuthTokens(user, device);
+
+  const role = user.role_id
+    ? await RoleModel.findById(user.role_id).lean()
+    : null;
+
+  const employee = buildUserDto(user);
+
+  const logTo = role?.log_to; // employee | company | dash
+  const isCompany = logTo === "company";
+
+  const company = isCompany
+    ? await CompanyModel.findOne({ user_id: user._id }).lean()
+    : null;
+
+  return {
+    user: employee,
+
     role: role
       ? {
           id: role._id,
+          name: role.name,
+          log_to: role.log_to,
           title_ar: role.title_ar,
           title_en: role.title_en,
           permissions: user.permissions || [],
         }
       : null,
+
+    accountType: isCompany ? "company" : "employee",
+
+    employee: isCompany ? null : employee,
+
+    company:
+      isCompany && company
+        ? {
+            id: company._id,
+            user_id: company.user_id,
+            name: company.name,
+            image: company.image
+              ? buildPublicUrl(process.env.PUBLIC_BASE_URL, company.image)
+              : null,
+            status: company.status,
+            accepted: company.accepted,
+          }
+        : null,
+
     tokens,
-    company,
   };
 }
 

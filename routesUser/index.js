@@ -13,6 +13,7 @@ import FcmRote from './FcmRote.js';
 import HandleAppliedJobRote from './HandleAppliedJobRote.js';
 import KeywordRote from './KeywordRote.js';
 import bannerRote from './bannerRote.js';
+import AppUserOverviewRote from './AppUserOverviewRote.js';
 
 const router = express.Router();
 router.use('/auth', AuthRote);
@@ -29,4 +30,5 @@ router.use('/fcm', FcmRote);
 router.use('/handle-applied-job', HandleAppliedJobRote);
 router.use('/keyword', KeywordRote);
 router.use('/banner', bannerRote);
+router.use('/app/dashboard', AppUserOverviewRote);
 export default router;

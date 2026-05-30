@@ -177,19 +177,23 @@ const buildFilterMatch = (filters) => {
   objectIdIn("education_level_id", filters.education_level_ids);
 
   if (filters.countries.length) {
-    and.push({ $or: [
-      { countries: { $in: filters.countries } },
-      { "search_index.filters.countries": { $in: filters.countries } },
-      { "search_projection.company.country": { $in: filters.countries } },
-    ] });
+    and.push({
+      $or: [
+        { countries: { $in: filters.countries } },
+        { "search_index.filters.countries": { $in: filters.countries } },
+        { "search_projection.company.country": { $in: filters.countries } },
+      ]
+    });
   }
   if (filters.cities.length) {
-    and.push({ $or: [
-      { cities: { $in: filters.cities } },
-      { city: { $in: filters.cities } },
-      { "search_index.filters.cities": { $in: filters.cities } },
-      { "search_index.filters.city": { $in: filters.cities } },
-    ] });
+    and.push({
+      $or: [
+        { cities: { $in: filters.cities } },
+        { city: { $in: filters.cities } },
+        { "search_index.filters.cities": { $in: filters.cities } },
+        { "search_index.filters.city": { $in: filters.cities } },
+      ]
+    });
   }
   if (filters.skills.length) and.push({ "search_index.filters.skills": { $in: filters.skills } });
   if (filters.languages.length) and.push({ "search_index.filters.languages": { $in: filters.languages } });
@@ -295,8 +299,8 @@ const decorateJobs = async (jobs, userId, employee) => {
       flags: {
         is_saved: savedSet.has(key),
         is_seen: seenSet.has(key),
-        is_applied: Boolean(appliedDoc),
-        application_status: appliedDoc?.status || null,
+        is_applied: job.is_out_side ? false : Boolean(appliedDoc),
+        application_status: job.is_out_side ? null : appliedDoc?.status || null,
         is_out_side: Boolean(job.is_out_side),
         is_cv_required: job.is_cv_required !== false,
       },
@@ -403,13 +407,13 @@ const smartLabel = (doc, lang = "en", fallback = "") => {
   if (!doc) return optionLabel(fallback);
   return optionLabel(
     doc[`title_${lang}`] ||
-      doc[`name_${lang}`] ||
-      doc[`country_name_${lang}`] ||
-      doc[`city_name_${lang}`] ||
-      doc.title ||
-      doc.name ||
-      doc.key ||
-      fallback
+    doc[`name_${lang}`] ||
+    doc[`country_name_${lang}`] ||
+    doc[`city_name_${lang}`] ||
+    doc.title ||
+    doc.name ||
+    doc.key ||
+    fallback
   );
 };
 
@@ -527,15 +531,21 @@ const buildSmartFacetPipeline = (match, lang) => {
           { $group: { _id: "$values", count: { $sum: 1 } } },
           { $lookup: { from: CountryModel.collection.name, localField: "_id", foreignField: "city_name_en", as: "city_docs_en" } },
           { $lookup: { from: CountryModel.collection.name, localField: "_id", foreignField: "city_name_ar", as: "city_docs_ar" } },
-          { $project: { value: "$_id", label: { $ifNull: [{ $arrayElemAt: [cityNameField.replace("$", "$city_docs_en.") , 0] }, { $ifNull: [{ $arrayElemAt: [cityNameField.replace("$", "$city_docs_ar."), 0] }, "$_id"] }] }, count: 1 } },
+          { $project: { value: "$_id", label: { $ifNull: [{ $arrayElemAt: [cityNameField.replace("$", "$city_docs_en."), 0] }, { $ifNull: [{ $arrayElemAt: [cityNameField.replace("$", "$city_docs_ar."), 0] }, "$_id"] }] }, count: 1 } },
           { $sort: { count: -1, label: 1 } }, { $limit: 100 },
         ],
         skills: [
-          { $project: { values: { $setUnion: [
-            { $map: { input: { $ifNull: ["$skills_required", []] }, as: "s", in: { value: { $ifNull: ["$$s.skill_id", { $ifNull: ["$$s.name", "$$s.title_en"] }] }, label: { $ifNull: [`$$s.title_${lang}`, { $ifNull: ["$$s.title_en", { $ifNull: ["$$s.name", ""] }] }] } } } },
-            { $map: { input: { $ifNull: ["$skills_optional", []] }, as: "s", in: { value: { $ifNull: ["$$s.skill_id", { $ifNull: ["$$s.name", "$$s.title_en"] }] }, label: { $ifNull: [`$$s.title_${lang}`, { $ifNull: ["$$s.title_en", { $ifNull: ["$$s.name", ""] }] }] } } } },
-            { $map: { input: { $ifNull: ["$search_index.filters.skills", []] }, as: "s", in: { value: "$$s", label: "$$s" } } }
-          ] } } },
+          {
+            $project: {
+              values: {
+                $setUnion: [
+                  { $map: { input: { $ifNull: ["$skills_required", []] }, as: "s", in: { value: { $ifNull: ["$$s.skill_id", { $ifNull: ["$$s.name", "$$s.title_en"] }] }, label: { $ifNull: [`$$s.title_${lang}`, { $ifNull: ["$$s.title_en", { $ifNull: ["$$s.name", ""] }] }] } } } },
+                  { $map: { input: { $ifNull: ["$skills_optional", []] }, as: "s", in: { value: { $ifNull: ["$$s.skill_id", { $ifNull: ["$$s.name", "$$s.title_en"] }] }, label: { $ifNull: [`$$s.title_${lang}`, { $ifNull: ["$$s.title_en", { $ifNull: ["$$s.name", ""] }] }] } } } },
+                  { $map: { input: { $ifNull: ["$search_index.filters.skills", []] }, as: "s", in: { value: "$$s", label: "$$s" } } }
+                ]
+              }
+            }
+          },
           { $unwind: "$values" },
           { $match: { "values.value": { $nin: [null, ""] } } },
           { $group: { _id: "$values.value", label: { $first: "$values.label" }, count: { $sum: 1 } } },
@@ -543,10 +553,16 @@ const buildSmartFacetPipeline = (match, lang) => {
           { $sort: { count: -1, label: 1 } }, { $limit: 120 },
         ],
         languages: [
-          { $project: { values: { $setUnion: [
-            { $map: { input: { $ifNull: ["$languages", []] }, as: "l", in: { value: { $ifNull: ["$$l.language_id", "$$l.name"] }, label: { $ifNull: ["$$l.name", ""] } } } },
-            { $map: { input: { $ifNull: ["$search_index.filters.languages", []] }, as: "l", in: { value: "$$l", label: "$$l" } } }
-          ] } } },
+          {
+            $project: {
+              values: {
+                $setUnion: [
+                  { $map: { input: { $ifNull: ["$languages", []] }, as: "l", in: { value: { $ifNull: ["$$l.language_id", "$$l.name"] }, label: { $ifNull: ["$$l.name", ""] } } } },
+                  { $map: { input: { $ifNull: ["$search_index.filters.languages", []] }, as: "l", in: { value: "$$l", label: "$$l" } } }
+                ]
+              }
+            }
+          },
           { $unwind: "$values" },
           { $match: { "values.value": { $nin: [null, ""] } } },
           { $group: { _id: "$values.value", label: { $first: "$values.label" }, count: { $sum: 1 } } },
@@ -556,10 +572,16 @@ const buildSmartFacetPipeline = (match, lang) => {
           { $sort: { count: -1, label: 1 } }, { $limit: 80 },
         ],
         services: [
-          { $project: { values: { $setUnion: [
-            { $map: { input: { $ifNull: ["$job_services", []] }, as: "s", in: { value: { $ifNull: ["$$s.id", { $ifNull: ["$$s.name", "$$s.title_en"] }] }, label: { $ifNull: [`$$s.title_${lang}`, { $ifNull: ["$$s.title_en", { $ifNull: ["$$s.name", ""] }] }] } } } },
-            { $map: { input: { $ifNull: ["$search_index.filters.services", []] }, as: "s", in: { value: "$$s", label: "$$s" } } }
-          ] } } },
+          {
+            $project: {
+              values: {
+                $setUnion: [
+                  { $map: { input: { $ifNull: ["$job_services", []] }, as: "s", in: { value: { $ifNull: ["$$s.id", { $ifNull: ["$$s.name", "$$s.title_en"] }] }, label: { $ifNull: [`$$s.title_${lang}`, { $ifNull: ["$$s.title_en", { $ifNull: ["$$s.name", ""] }] }] } } } },
+                  { $map: { input: { $ifNull: ["$search_index.filters.services", []] }, as: "s", in: { value: "$$s", label: "$$s" } } }
+                ]
+              }
+            }
+          },
           { $unwind: "$values" },
           { $match: { "values.value": { $nin: [null, ""] } } },
           { $group: { _id: "$values.value", label: { $first: "$values.label" }, count: { $sum: 1 } } },
@@ -749,12 +771,13 @@ const getById = async (req, res, next) => {
     const shouldShowCompanyInformation =
       job.show_company_information === true;
 
-    const responseData = {
-      ...item,
-      out_link: job.is_out_side ? job.out_link || null : null,
-      requirements: job.search_projection?.requirements || {},
-      job_services: job.job_services || [],
-    };
+  const responseData = {
+  ...item,
+  out_link: job.is_out_side ? job.out_link || null : null,
+  requirements: job.search_projection?.requirements || {},
+  job_services: job.job_services || [],
+  questions: job.questions || [],
+};
 
     if (!shouldShowCompanyInformation) {
       delete responseData.company;

@@ -5,6 +5,7 @@ import JobInformationController from "../controllers/app/JobData/JobInformation.
 const router = express.Router();
 
 router.post("/review-job/:id", authUser, JobInformationController.reviewJob);
+router.post("/report-job/:id", authUser, JobInformationController.reportJob);
 router.post("/rate-job/:id", authUser, JobInformationController.rateJob);
 router.post("/apply-outside/:id", authUser, JobInformationController.applyOutsideJob);
 router.post("/toggle-save-job/:id", authUser, JobInformationController.toggleSaveJob);

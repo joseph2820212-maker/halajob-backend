@@ -11,7 +11,7 @@ const OTP_EXPIRE_MINUTES = 10;
 const RESEND_COOLDOWN_SECONDS = 60;
 
 function createPasscode() {
-  return 12345; // For testing purposes, replace with actual random code generation in production
+  return 12345; // For testing only
   return crypto.randomInt(10000, 100000);
 }
 
@@ -28,7 +28,7 @@ const resendOtp = async (req, res, next) => {
   const lan = req.get("lan") || "en";
 
   try {
-    const { email, type = "verify_account" } = req.body || {};
+    const { email, type = "auto" } = req.body || {};
     const identifier = safeStr(email);
 
     if (!identifier) {
@@ -58,6 +58,33 @@ const resendOtp = async (req, res, next) => {
         message: lan === "ar" ? "لا يوجد بريد إلكتروني لهذا الحساب." : "This account has no email.",
       });
     }
+let otpType = String(type || "auto").trim();
+
+if (otpType === "auto") {
+  if (user.pending_device) {
+    otpType = "new_device";
+  } else if (!user.status || user.passcode_active === false) {
+    otpType = "verify_account";
+  } else {
+    return ReturnAppData.createError({
+      res,
+      status: 400,
+      message:
+        lan === "ar"
+          ? "لا توجد عملية تحقق حالية لإعادة إرسال الرمز."
+          : "There is no active verification process to resend OTP.",
+    });
+  }
+}
+
+if (
+  otpType === "verify_account" &&
+  user.status === true &&
+  user.passcode_active === true &&
+  user.pending_device
+) {
+  otpType = "new_device";
+}
 
     const remainingSeconds = getRemainingSeconds(user.otp_last_sent_at);
 
@@ -78,8 +105,15 @@ const resendOtp = async (req, res, next) => {
     const passcode = createPasscode();
     const expiresAt = new Date(Date.now() + OTP_EXPIRE_MINUTES * 60 * 1000);
     const now = new Date();
-
-    if (type === "verify_account") {
+console.log("RESEND OTP DEBUG:", {
+  email: user.email,
+  requestedType: type,
+  otpType,
+  status: user.status,
+  passcode_active: user.passcode_active,
+  hasPendingDevice: !!user.pending_device,
+});
+    if (otpType === "verify_account") {
       if (user.status && user.passcode_active) {
         return ReturnAppData.createError({
           res,
@@ -90,11 +124,11 @@ const resendOtp = async (req, res, next) => {
 
       user.passcode = passcode;
       user.passcode_expires_at = expiresAt;
-    } else if (type === "forgot_password") {
+    } else if (otpType === "forgot_password") {
       user.passcode = passcode;
       user.passcode_expires_at = expiresAt;
       user.can_update_password = false;
-    } else if (type === "new_device") {
+    } else if (otpType === "new_device") {
       if (!user.pending_device) {
         return ReturnAppData.createError({
           res,
@@ -122,7 +156,8 @@ const resendOtp = async (req, res, next) => {
       res,
       status: 200,
       data: {
-        step: type === "new_device" ? "VERIFY_NEW_DEVICE" : "ENTER_PASSCODE",
+        step: otpType === "new_device" ? "VERIFY_NEW_DEVICE" : "ENTER_PASSCODE",
+        type: otpType,
         expires_in_seconds: OTP_EXPIRE_MINUTES * 60,
         resend_after_seconds: RESEND_COOLDOWN_SECONDS,
       },

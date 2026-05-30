@@ -6,6 +6,7 @@ import {
   UserOutSideApplyingJobModel,
   UserRatingJobModel,
   UserSavedJobModel,
+  JobReportModel,
 } from "../../../models/index.js";
 import {
   job_applied_notification,
@@ -180,7 +181,63 @@ const listJobSavers = async (req, res, next) => {
     return ReturnAppData.getData({ res, data: rows, other: { pagination: { page, limit, has_more: rows.length === limit } } });
   } catch (error) { next(error); }
 };
+const reportJob = async (req, res, next) => {
+  try {
+    const jobId = toObjectId(req.params.id);
+    const messageText = String(req.body.message || "").trim();
 
+    if (!jobId || !messageText) {
+      return ReturnAppData.getError({
+        res,
+        status: 400,
+        message: msg(req, "رسالة البلاغ مطلوبة.", "Report message is required."),
+      });
+    }
+
+    const job = await jobsModel.findOne({
+      _id: jobId,
+      ...publicJobFilter(),
+    });
+
+    if (!job) {
+      return ReturnAppData.getError({
+        res,
+        status: 404,
+        message: msg(req, "الوظيفة غير موجودة.", "Job not found."),
+      });
+    }
+
+    const doc = await JobReportModel.findOneAndUpdate(
+      {
+        user_id: req.user._id,
+        job_id: jobId,
+      },
+      {
+        $set: {
+          reason: "other",
+          message: messageText,
+          company_id: job.company_id || null,
+          status: "pending",
+          reviewed_by: null,
+          reviewed_at: null,
+        },
+      },
+      {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+
+    return ReturnAppData.createData({
+      res,
+      data: doc,
+      message: msg(req, "تم إرسال البلاغ بنجاح.", "Job report submitted successfully."),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 export default {
   reviewJob,
   applyOutsideJob,
@@ -188,5 +245,6 @@ export default {
   toggleSaveJob,
   listJobReviews,
   recomputeJobRatingBreakdown,
+  reportJob,
   listJobSavers,
 };
