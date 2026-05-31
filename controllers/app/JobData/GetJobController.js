@@ -230,7 +230,57 @@ const sortStage = (sort) => {
   if (sort === "salary_high") return { "salary.max_usd": -1, "salary.min_usd": -1, createdAt: -1 };
   return { _match_score: -1, _search_score: -1, "search_projection.ranking.total_score": -1, priority: -1, createdAt: -1, _id: -1 };
 };
+const buildJobSalary = (job = {}) => {
+  const salary = job.salary || {};
+  const requirements = job.search_projection?.requirements || {};
 
+  const isVisible =
+    salary.is_visible !== false &&
+    requirements.salary_is_visible !== false &&
+    job.salary_is_visible !== false;
+
+  return {
+    min:
+      salary.min ??
+      job.salary_min ??
+      requirements.salary_min ??
+      null,
+
+    max:
+      salary.max ??
+      job.salary_max ??
+      requirements.salary_max ??
+      null,
+
+    min_usd:
+      salary.min_usd ??
+      job.salary_min_usd ??
+      requirements.salary_min_usd ??
+      null,
+
+    max_usd:
+      salary.max_usd ??
+      job.salary_max_usd ??
+      requirements.salary_max_usd ??
+      null,
+
+    currency_code:
+      salary.currency_code ||
+      job.salary_currency_code ||
+      requirements.salary_currency_code ||
+      requirements.currency_code ||
+      "",
+
+    is_visible: isVisible,
+
+    is_negotiable: Boolean(
+      salary.is_negotiable ??
+      job.salary_is_negotiable ??
+      requirements.salary_is_negotiable ??
+      false
+    ),
+  };
+};
 const decorateJobs = async (jobs, userId, employee) => {
   const jobIds = jobs.map((j) => j._id);
   const [saved, applied, seen, storedMatches] = await Promise.all([
@@ -272,15 +322,7 @@ const decorateJobs = async (jobs, userId, employee) => {
       job_type: labelOf(job.job_type_info) || job.search_index?.filters?.job_type || "",
       work_mode: labelOf(job.work_mode_info) || job.search_index?.filters?.work_mode || "",
       work_time: labelOf(job.job_time_info) || job.search_index?.filters?.work_time || "",
-      salary: {
-        min: job.salary?.min ?? null,
-        max: job.salary?.max ?? null,
-        min_usd: job.salary?.min_usd ?? null,
-        max_usd: job.salary?.max_usd ?? null,
-        currency_code: job.salary?.currency_code || "",
-        is_visible: job.salary?.is_visible !== false,
-        is_negotiable: Boolean(job.salary?.is_negotiable),
-      },
+      salary: buildJobSalary(job),
       counters: {
         views: Number(job.user_show || 0),
         saves: Number(job.user_saved || 0),

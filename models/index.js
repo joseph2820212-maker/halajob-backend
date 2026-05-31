@@ -52,6 +52,7 @@ import BannerModel from './BannerModel.js';
 import SearchHistoryModel from './SearchHistoryModel.js';
 import AppSettingsModel from './AppSettingsModel.js';
 import JobZainTalentRequestModel from './JobZainTalentRequestModel.js';
+import PageModel from './PageModel.js';
 
 // cv
 
@@ -106,6 +107,7 @@ export {
   SearchHistoryModel,
   AppSettingsModel,
   JobZainTalentRequestModel,
+  PageModel,
   //cv
   CvTemplateModel,
   EmployeeCvModel

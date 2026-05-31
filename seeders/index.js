@@ -22,6 +22,7 @@ import { seedSkillsFromEsco } from "./seedSkills.js";
 import { seedEducationLevels } from "./seedEducationLevels.js";
 import { seedJobsAndApplications } from "./seedJobsAndApplications.js";
 import { seedBanners } from "./seedBanner.js";
+import { seedStaticPages } from "./staticPagesSeeder.js";
 
 dotenv.config();
 
@@ -46,7 +47,8 @@ const seeders = {
   skills:seedSkillsFromEsco,
   educationLevel:seedEducationLevels,
   banners:seedBanners,
-  jobsAndApplications:seedJobsAndApplications
+  jobsAndApplications:seedJobsAndApplications,
+  staticPages:seedStaticPages
 };
 
 // ترتيب التشغيل
