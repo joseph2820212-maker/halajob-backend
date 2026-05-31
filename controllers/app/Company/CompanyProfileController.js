@@ -9,9 +9,6 @@ import {
   UserShowJobModel,
 } from "../../../models/index.js";
 
-const t = (lan, ar, en) => (lan === "ar" ? ar : en);
-const getLan = (req) => String(req.get("lan") || "en").toLowerCase();
-
 const getCompanyRequestState = (company) => {
   if (!company) return "none";
 
@@ -28,70 +25,80 @@ const getCompanyRequestState = (company) => {
   return "unknown";
 };
 
-const requestStateMessage = (lan, state) => {
-  const messages = {
-    none: ["لم يتم إنشاء حساب شركة بعد", "A company account has not been created yet"],
-    draft: ["لم يتم إكمال طلب الشركة بعد", "The company request has not been completed yet"],
-    pending: ["طلب الشركة قيد المراجعة", "The company request is under review"],
-    rejected: ["تم رفض طلب الشركة، يمكنك تعديل البيانات وإعادة الإرسال", "The company request was rejected. You can update it and resubmit"],
-    suspended: ["تم إيقاف حساب الشركة مؤقتًا", "The company account has been temporarily suspended"],
-    unknown: ["حالة الشركة غير معروفة", "Unknown company state"],
+const stateMessage = (lan, state) => {
+  const ar = {
+    none: "لم يتم إنشاء طلب شركة بعد",
+    draft: "طلب الشركة غير مكتمل بعد",
+    pending: "طلب الشركة قيد المراجعة",
+    rejected: "تم رفض طلب الشركة",
+    suspended: "تم إيقاف حساب الشركة مؤقتًا",
+    unknown: "حالة حساب الشركة غير معروفة",
   };
 
-  const message = messages[state] || messages.unknown;
-  return t(lan, message[0], message[1]);
+  const en = {
+    none: "A company request has not been created yet",
+    draft: "Company request is not completed yet",
+    pending: "Company request is under review",
+    rejected: "Company request was rejected",
+    suspended: "Company account has been temporarily suspended",
+    unknown: "Unknown company account state",
+  };
+
+  return lan === "ar" ? ar[state] || ar.unknown : en[state] || en.unknown;
 };
 
-const companyStatus = async (lan, user_id) => {
-  const company = await CompanyModel.findOne({ user_id }).lean();
+/* حالة الشركة */
+const companyStatus = async (lan, owner_user_id) => {
+  const company = await CompanyModel.findOne({ owner_user_id }).lean();
   const state = getCompanyRequestState(company);
 
   if (state !== "approved") {
     return {
       is_error: true,
       status: state === "none" ? 404 : 403,
-      request_state: state,
-      message: requestStateMessage(lan, state),
+      message: stateMessage(lan, state),
+      data: {
+        request_state: state,
+        accepted: company?.accepted === true,
+        status: company?.status === true,
+        can_upload: company?.can_upload === true,
+      },
     };
   }
 
-  return { is_error: false, request_state: state, company };
+  return { is_error: false, company };
 };
 
+/* إحصائيات سريعة للوحة الشركة */
 const companyData = async (req, res) => {
   try {
     const user = req.user;
-    const lan = getLan(req);
+    const lan = (req.get("lan") || "en").toLowerCase();
 
     const state = await companyStatus(lan, user._id);
     if (state.is_error) {
       return ReturnAppData.getError({
         res,
-        status: state.status,
         message: state.message,
-        data: { request_state: state.request_state },
+        status: state.status,
+        data: state.data,
       });
     }
 
     const company = state.company;
-    const companyId = new mongoose.Types.ObjectId(company._id);
 
-    const [totalJob, activeJobs, applied, interviewed] = await Promise.all([
-      jobsModel.countDocuments({ company_id: companyId }),
-      jobsModel.countDocuments({ company_id: companyId, status: true }),
-      UserApplyingJobModel.countDocuments({ company_id: companyId }),
-      UserApplyingJobModel.countDocuments({ company_id: companyId, is_send_interview: true }),
+    const [totalJob, applied, interviewed] = await Promise.all([
+      jobsModel.countDocuments({ company_id: company._id }),
+      UserApplyingJobModel.countDocuments({ company_id: company._id }),
+      UserApplyingJobModel.countDocuments({
+        company_id: company._id,
+        is_send_interview: true,
+      }),
     ]);
 
     return ReturnAppData.getData({
       res,
-      data: {
-        request_state: state.request_state,
-        totalJob,
-        activeJobs,
-        applied,
-        interviewed,
-      },
+      data: { totalJob, applied, interviewed },
     });
   } catch (error) {
     return ReturnAppData.getError({
@@ -103,52 +110,76 @@ const companyData = async (req, res) => {
   }
 };
 
+/* تفاصيل وظيفة محددة */
 const getJobDetails = async (req, res) => {
   try {
     const user = req.user;
-    const lan = getLan(req);
+    const lan = (req.get("lan") || "en").toLowerCase();
     const id = String(req.params.id || "").trim();
 
     const state = await companyStatus(lan, user._id);
     if (state.is_error) {
       return ReturnAppData.getError({
         res,
-        status: state.status,
         message: state.message,
-        data: { request_state: state.request_state },
+        status: state.status,
+        data: state.data,
       });
     }
+
+    const company = state.company;
 
     if (!mongoose.isValidObjectId(id)) {
       return ReturnAppData.getError({
         res,
         status: 400,
-        message: t(lan, "معرّف غير صالح", "Invalid id"),
+        message: lan === "ar" ? "معرّف غير صالح" : "Invalid id",
       });
     }
 
-    const company = state.company;
-    const companyId = new mongoose.Types.ObjectId(company._id);
-    const jobId = new mongoose.Types.ObjectId(id);
-
-    const job = await jobsModel.findOne({ _id: jobId, company_id: companyId }).lean();
+    const job = await jobsModel.findById(id).lean();
     if (!job) {
       return ReturnAppData.getError({
         res,
         status: 404,
-        message: t(lan, "لم يتم العثور على الوظيفة ضمن شركتك", "Job was not found under your company"),
+        message: lan === "ar" ? "لم يتم العثور على الوظيفة" : "Job not found",
       });
     }
 
+    if (String(job.company_id) !== String(company._id)) {
+      return ReturnAppData.getError({
+        res,
+        status: 403,
+        message: lan === "ar" ? "ليست ضمن صلاحياتك" : "Forbidden",
+      });
+    }
+
+    const jobId = new mongoose.Types.ObjectId(job._id);
+
     const [saved, applying, interviews, show, ratingAgg] = await Promise.all([
       UserSavedJobModel.countDocuments({ job_id: jobId }),
-      UserApplyingJobModel.countDocuments({ job_id: jobId, company_id: companyId }),
-      UserApplyingJobModel.countDocuments({ job_id: jobId, company_id: companyId, is_send_interview: true }),
+      UserApplyingJobModel.countDocuments({ job_id: jobId }),
+      UserApplyingJobModel.countDocuments({
+        job_id: jobId,
+        is_send_interview: true,
+      }),
       UserShowJobModel.countDocuments({ job_id: jobId }),
       UserRatingJobModel.aggregate([
         { $match: { job_id: jobId } },
-        { $group: { _id: "$job_id", count: { $sum: 1 }, avg: { $avg: "$rating" } } },
-        { $project: { _id: 0, count: 1, avg: { $ifNull: ["$avg", 0] } } },
+        {
+          $group: {
+            _id: "$job_id",
+            count: { $sum: 1 },
+            avg: { $avg: "$rating" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            count: 1,
+            avg: { $ifNull: ["$avg", 0] },
+          },
+        },
       ]),
     ]);
 
@@ -157,23 +188,7 @@ const getJobDetails = async (req, res) => {
 
     return ReturnAppData.getData({
       res,
-      data: {
-        request_state: state.request_state,
-        job: {
-          id: job._id,
-          title: job.title || job.job_title || job.name || "",
-          status: job.status,
-          createdAt: job.createdAt,
-        },
-        metrics: {
-          saved,
-          applying,
-          interviews,
-          show,
-          rating_count,
-          rating_avg,
-        },
-      },
+      data: { saved, applying, interviews, show, rating_count, rating_avg },
     });
   } catch (error) {
     return ReturnAppData.getError({

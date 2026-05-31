@@ -1,29 +1,23 @@
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { CompanyModel } from "../../../models/index.js";
 import fs from "fs/promises";
+import { existsSync } from "fs";
 import path from "path";
 
 const UPLOADS_DIR = path.resolve(process.cwd(), "uploads");
 
 const getLan = (req) => String(req.get("lan") || "en").toLowerCase();
 const t = (lan, ar, en) => (lan === "ar" ? ar : en);
-const provided = (value) => value !== undefined && value !== null;
-const trimStr = (value) => (typeof value === "string" ? value.trim() : value);
-const normalizeEmail = (value) => String(value || "").trim().toLowerCase();
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const phoneCodeRegex = /^\+\d{1,4}$/;
-const e164Regex = /^\+[1-9]\d{7,14}$/;
-
-const ALLOWED_IMAGE_MIME_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
-const ALLOWED_IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
 
 function buildPublicUrl(base, rel) {
   if (!rel) return null;
+  if (/^https?:\/\//i.test(rel)) return rel;
+
   const cleaned = String(rel).replace(/^\/+/, "");
   if (!base) return cleaned;
-  const normalizedBase = String(base).replace(/\/+$/, "");
-  return `${normalizedBase}/${cleaned}`;
+
+  const cleanBase = String(base).replace(/\/+$/, "");
+  return `${cleanBase}/${cleaned}`;
 }
 
 const getCompanyRequestState = (company) => {
@@ -42,188 +36,122 @@ const getCompanyRequestState = (company) => {
   return "unknown";
 };
 
-const isCompanyApproved = (company) => getCompanyRequestState(company) === "approved";
-
 const requestStateMessage = (lan, state) => {
   const messages = {
-    none: ["لم يتم إنشاء حساب شركة بعد", "A company account has not been created yet"],
-    draft: ["لم يتم إكمال طلب الشركة بعد", "The company request has not been completed yet"],
-    pending: ["طلب الشركة قيد المراجعة", "The company request is under review"],
-    rejected: ["تم رفض طلب الشركة، يمكنك تعديل البيانات وإعادة الإرسال", "The company request was rejected. You can update it and resubmit"],
-    suspended: ["تم إيقاف حساب الشركة مؤقتًا", "The company account has been temporarily suspended"],
-    unknown: ["حالة الشركة غير معروفة", "Unknown company state"],
+    none: [
+      "لم يتم إنشاء طلب شركة بعد",
+      "A company request has not been created yet",
+    ],
+    draft: [
+      "طلب الشركة غير مكتمل بعد",
+      "Company request is not completed yet",
+    ],
+    pending: [
+      "طلب الشركة قيد المراجعة",
+      "Company request is under review",
+    ],
+    rejected: [
+      "تم رفض طلب الشركة",
+      "Company request was rejected",
+    ],
+    suspended: [
+      "تم إيقاف حساب الشركة مؤقتًا",
+      "Company account has been temporarily suspended",
+    ],
+    unknown: [
+      "حالة حساب الشركة غير معروفة",
+      "Unknown company account state",
+    ],
   };
 
-  const message = messages[state] || messages.unknown;
-  return t(lan, message[0], message[1]);
+  const pair = messages[state] || messages.unknown;
+  return t(lan, pair[0], pair[1]);
 };
 
-const fail = (res, lan, status, ar, en) =>
+const serializeCompany = (company) => ({
+  id: company._id,
+  request_state: getCompanyRequestState(company),
+  name: company.company_name || "",
+  company_name: company.company_name || "",
+  image: company?.image ? buildPublicUrl(process.env.PUBLIC_BASE_URL, company.image) : null,
+  logo: company?.logo ? buildPublicUrl(process.env.PUBLIC_BASE_URL, company.logo) : null,
+  cover_image: company?.cover_image ? buildPublicUrl(process.env.PUBLIC_BASE_URL, company.cover_image) : null,
+  company_email: company.company_email || "",
+  created_year: company.created_year ?? null,
+  description: company.description || "",
+  company_size: company.company_size ?? null,
+  company_size_type: company.company_size_type || "unknown",
+  company_type: company.company_type || "",
+  company_country: company.company_country || "",
+  company_city: company.company_city || "",
+  company_address: company.company_address || "",
+  company_contact: Array.isArray(company.company_contact) ? company.company_contact : [],
+  company_phone: company.company_phone || "",
+  company_phone_code: company.company_phone_code || "",
+  company_website: company.company_website || "",
+  accepted: company.accepted === true,
+  status: company.status === true,
+  can_upload: company.can_upload === true,
+  is_verified: company.is_verified === true,
+  profile_completion: company.profile_completion ?? 0,
+});
+
+const fail = (res, lan, status, ar, en, data) =>
   ReturnAppData.getError({
     res,
     status,
     message: t(lan, ar, en),
+    ...(data ? { data } : {}),
   });
 
-const serializeCompany = (company) => {
-  const requestState = getCompanyRequestState(company);
-  const files = Array.isArray(company.files) ? company.files : [];
+const getApprovedCompanyOrError = async (req, res) => {
+  const lan = getLan(req);
+  const user = req.user;
 
-  return {
-    id: company._id,
-    request_state: requestState,
-    can_access_dashboard: requestState === "approved",
-    can_upload_files: requestState === "draft" || requestState === "rejected",
-    can_update_profile: requestState === "approved",
+  if (!user?._id) {
+    ReturnAppData.getError({
+      res,
+      status: 401,
+      message: t(lan, "غير مصرح", "Unauthorized"),
+    });
+    return null;
+  }
 
-    name: company.company_name || "",
-    company_name: company.company_name || "",
-    image: company.image ? buildPublicUrl(process.env.PUBLIC_BASE_URL, company.image) : null,
-    company_email: company.company_email || "",
-    created_year: company.created_year ?? null,
-    description: company.description || "",
-    company_size: company.company_size ?? null,
-    company_type: company.company_type || "",
-    company_country: company.company_country || "",
-    company_address: company.company_address || "",
-    company_contact: Array.isArray(company.company_contact) ? company.company_contact : [],
-    company_phone: company.company_phone || "",
-    company_phone_code: company.company_phone_code || "",
-    company_website: company.company_website || "",
-    show_on_all: company.show_on_all === true,
+  const company = await CompanyModel.findOne({ owner_user_id: user._id });
+  const state = getCompanyRequestState(company);
 
-    files_count: files.length,
-    accepted: company.accepted === true,
-    status: company.status === true,
-    can_upload: company.can_upload === true,
-  };
+  if (state !== "approved") {
+    ReturnAppData.getError({
+      res,
+      status: state === "none" ? 404 : 403,
+      message: requestStateMessage(lan, state),
+      data: company
+        ? {
+            request_state: state,
+            accepted: company.accepted === true,
+            status: company.status === true,
+            can_upload: company.can_upload === true,
+          }
+        : { request_state: "none" },
+    });
+    return null;
+  }
+
+  return company;
 };
 
-const normalizePhone = ({ company_phone, company_phone_code }) => {
-  const phoneCode = String(company_phone_code || "").trim();
-  const phone = String(company_phone || "").trim().replace(/[\s-]/g, "");
-
-  if (!phoneCodeRegex.test(phoneCode)) return null;
-  if (phone.startsWith("+")) return e164Regex.test(phone) ? phone : null;
-
-  const national = phone.replace(/^0+/, "");
-  const fullPhone = `${phoneCode}${national}`;
-  return e164Regex.test(fullPhone) ? fullPhone : null;
-};
-
-const validateAndNormalizeUpdatePayload = (payload, lan) => {
-  if (provided(payload.company_name)) {
-    payload.company_name = trimStr(payload.company_name);
-    if (!payload.company_name || payload.company_name.length < 2 || payload.company_name.length > 100) {
-      return { valid: false, message: t(lan, "اسم الشركة يجب أن يكون بين 2 و 100 حرف", "Company name must be 2-100 characters") };
-    }
-  }
-
-  if (provided(payload.company_email)) {
-    payload.company_email = normalizeEmail(payload.company_email);
-    if (!emailRegex.test(payload.company_email)) {
-      return { valid: false, message: t(lan, "البريد الإلكتروني غير صالح", "Invalid email format") };
-    }
-  }
-
-  if (provided(payload.description)) {
-    payload.description = trimStr(payload.description);
-    if (typeof payload.description !== "string" || payload.description.length > 2000) {
-      return { valid: false, message: t(lan, "الوصف يجب أن يكون نصًا وبحد أقصى 2000 حرف", "Description must be a string up to 2000 characters") };
-    }
-  }
-
-  if (provided(payload.company_size)) {
-    const n = Number(payload.company_size);
-    if (!Number.isInteger(n) || n < 1 || n > 1000000) {
-      return { valid: false, message: t(lan, "حجم الشركة يجب أن يكون عددًا صحيحًا بين 1 و 1,000,000", "company_size must be an integer between 1 and 1,000,000") };
-    }
-    payload.company_size = n;
-  }
-
-  if (provided(payload.created_year) && payload.created_year !== "") {
-    const year = Number(payload.created_year);
-    const currentYear = new Date().getFullYear();
-    if (!Number.isInteger(year) || year < 1800 || year > currentYear) {
-      return { valid: false, message: t(lan, "سنة تأسيس الشركة غير صالحة", "Invalid company creation year") };
-    }
-    payload.created_year = year;
-  }
-
-  for (const field of ["company_type", "company_country", "company_address", "company_phone_code", "company_website"]) {
-    if (provided(payload[field])) payload[field] = trimStr(payload[field]);
-  }
-
-  if (provided(payload.company_type) && (payload.company_type.length < 2 || payload.company_type.length > 150)) {
-    return { valid: false, message: t(lan, "نوع الشركة يجب أن يكون بين 2 و 150 حرفًا", "company_type must be 2-150 characters") };
-  }
-
-  if (provided(payload.company_country) && (payload.company_country.length < 2 || payload.company_country.length > 150)) {
-    return { valid: false, message: t(lan, "الدولة يجب أن تكون بين 2 و 150 حرفًا", "company_country must be 2-150 characters") };
-  }
-
-  if (provided(payload.company_address) && (payload.company_address.length < 5 || payload.company_address.length > 250)) {
-    return { valid: false, message: t(lan, "العنوان يجب أن يكون بين 5 و 250 حرفًا", "company_address must be 5-250 characters") };
-  }
-
-  if (provided(payload.company_phone) || provided(payload.company_phone_code)) {
-    const normalizedPhone = normalizePhone(payload);
-    if (!normalizedPhone) {
-      return { valid: false, message: t(lan, "رقم الهاتف أو كود الدولة غير صالح", "Invalid company phone or phone code") };
-    }
-    payload.company_phone = normalizedPhone;
-  }
-
-  if (provided(payload.company_website) && String(payload.company_website).trim() !== "") {
-    try {
-      const url = new URL(payload.company_website);
-      if (!["http:", "https:"].includes(url.protocol)) throw new Error("invalid protocol");
-      payload.company_website = url.toString().replace(/\/+$/, "");
-    } catch {
-      return { valid: false, message: t(lan, "رابط الموقع غير صالح", "Invalid website URL") };
-    }
-  }
-
-  if (provided(payload.company_contact)) {
-    if (!Array.isArray(payload.company_contact)) {
-      return { valid: false, message: t(lan, "جهات الاتصال يجب أن تكون مصفوفة", "company_contact must be an array") };
-    }
-
-    const normalizedContacts = payload.company_contact
-      .map((item) => String(item || "").trim())
-      .filter(Boolean);
-
-    if (normalizedContacts.length > 10 || normalizedContacts.some((item) => item.length > 200)) {
-      return { valid: false, message: t(lan, "جهات الاتصال غير صالحة", "Invalid company_contact values") };
-    }
-
-    payload.company_contact = [...new Set(normalizedContacts)];
-  }
-
-  if (provided(payload.show_on_all) && typeof payload.show_on_all !== "boolean") {
-    return { valid: false, message: t(lan, "قيمة show_on_all يجب أن تكون boolean", "show_on_all must be a boolean") };
-  }
-
-  return { valid: true };
-};
-
-const get = async (req, res) => {
+/**
+ * GET /company
+ * يرجع بيانات الشركة فقط إذا كانت approved.
+ */
+const get = async (req, res, next) => {
   try {
-    const user = req.user;
-    const lan = getLan(req);
+    const company = await getApprovedCompanyOrError(req, res);
+    if (!company) return;
 
-    const company = await CompanyModel.findOne({ user_id: user._id }).lean();
-    if (!company) {
-      return fail(res, lan, 404, "لم يتم إنشاء حساب شركة بعد", "A company account has not been created yet");
-    }
-
-    const requestState = getCompanyRequestState(company);
     return ReturnAppData.getData({
       res,
-      data: {
-        ...serializeCompany(company),
-        message: requestState === "approved" ? null : requestStateMessage(lan, requestState),
-      },
+      data: serializeCompany(company),
     });
   } catch (err) {
     return ReturnAppData.getError({
@@ -235,79 +163,292 @@ const get = async (req, res) => {
   }
 };
 
-const update = async (req, res) => {
+/**
+ * PATCH /company
+ * تعديل بيانات شركة مقبولة فقط.
+ */
+const update = async (req, res, next) => {
   try {
-    const user = req.user;
     const lan = getLan(req);
+    const company = await getApprovedCompanyOrError(req, res);
+    if (!company) return;
 
-    const allowedFields = [
-      "company_name",
-      "company_email",
-      "description",
-      "company_size",
-      "created_year",
-      "company_type",
-      "company_country",
-      "company_address",
-      "company_contact",
-      "company_phone",
-      "company_phone_code",
-      "company_website",
-      "show_on_all",
-    ];
+    let {
+      company_name,
+      company_email,
+      description,
+      company_size,
+      company_size_type,
+      company_type,
+      company_country,
+      company_city,
+      company_address,
+      company_contact,
+      company_phone,
+      company_phone_code,
+      company_website,
+      created_year,
+    } = req.body || {};
 
-    const payload = Object.fromEntries(
-      allowedFields
-        .filter((field) => provided(req.body?.[field]))
-        .map((field) => [field, req.body[field]])
-    );
+    const provided = (v) => v !== undefined && v !== null;
+    const trimStr = (v) => (typeof v === "string" ? v.trim() : v);
 
-    if (!Object.keys(payload).length) {
-      return fail(res, lan, 400, "يرجى إرسال حقل واحد على الأقل للتحديث", "Provide at least one field to update");
-    }
-
-    const company = await CompanyModel.findOne({ user_id: user._id });
-    if (!company) {
-      return fail(res, lan, 404, "لم يتم إنشاء حساب شركة بعد", "A company account has not been created yet");
-    }
-
-    if (!isCompanyApproved(company)) {
-      return ReturnAppData.getError({
+    if (
+      ![
+        company_name,
+        company_email,
+        description,
+        company_size,
+        company_size_type,
+        company_type,
+        company_country,
+        company_city,
+        company_address,
+        company_contact,
+        company_phone,
+        company_phone_code,
+        company_website,
+        created_year,
+      ].some(provided)
+    ) {
+      return fail(
         res,
-        status: 403,
-        message: requestStateMessage(lan, getCompanyRequestState(company)),
-      });
+        lan,
+        400,
+        "يرجى إرسال حقل واحد على الأقل للتحديث",
+        "Provide at least one field to update"
+      );
     }
 
-    const validation = validateAndNormalizeUpdatePayload(payload, lan);
-    if (!validation.valid) {
-      return ReturnAppData.getError({ res, status: 400, message: validation.message });
-    }
+    company_name = trimStr(company_name);
+    company_email =
+      typeof company_email === "string" ? company_email.trim().toLowerCase() : company_email;
+    description = trimStr(description);
+    company_size_type = trimStr(company_size_type);
+    company_type = trimStr(company_type);
+    company_country = trimStr(company_country);
+    company_city = trimStr(company_city);
+    company_address = trimStr(company_address);
+    company_phone = trimStr(company_phone);
+    company_phone_code = trimStr(company_phone_code);
+    company_website = trimStr(company_website);
 
-    if (provided(payload.company_email)) {
-      const duplicateEmail = await CompanyModel.findOne({
-        company_email: payload.company_email,
-        _id: { $ne: company._id },
-      }).collation({ locale: "en", strength: 2 });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneCodeRegex = /^\+\d{1,4}$/;
+    const allowedCompanySizeTypes = new Set([
+      "startup",
+      "small",
+      "medium",
+      "large",
+      "enterprise",
+      "unknown",
+    ]);
 
-      if (duplicateEmail) {
-        return fail(res, lan, 400, "البريد الإلكتروني مستخدم بالفعل", "Company email already exists");
+    if (provided(company_name)) {
+      if (!company_name || company_name.length < 2 || company_name.length > 100) {
+        return fail(
+          res,
+          lan,
+          400,
+          "اسم الشركة يجب أن يكون بين 2 و 100 حرف",
+          "Company name must be 2-100 characters"
+        );
       }
-    }
 
-    if (provided(payload.company_name)) {
-      const duplicateName = await CompanyModel.findOne({
-        company_name: payload.company_name,
+      const exists = await CompanyModel.findOne({
+        company_name,
         _id: { $ne: company._id },
       }).collation({ locale: "en", strength: 2 });
 
-      if (duplicateName) {
+      if (exists) {
         return fail(res, lan, 400, "اسم الشركة مستخدم بالفعل", "Company name already exists");
       }
+
+      company.company_name = company_name;
     }
 
-    for (const [field, value] of Object.entries(payload)) {
-      company[field] = value;
+    if (provided(company_email)) {
+      if (!emailRegex.test(company_email)) {
+        return fail(res, lan, 400, "البريد الإلكتروني غير صالح", "Invalid email format");
+      }
+
+      const exists = await CompanyModel.findOne({
+        company_email,
+        _id: { $ne: company._id },
+      }).collation({ locale: "en", strength: 2 });
+
+      if (exists) {
+        return fail(res, lan, 400, "البريد الإلكتروني مستخدم بالفعل", "Company email already exists");
+      }
+
+      company.company_email = company_email;
+    }
+
+    if (provided(description)) {
+      if (typeof description !== "string" || description.length > 2000) {
+        return fail(
+          res,
+          lan,
+          400,
+          "الوصف يجب أن يكون نصًا وبحد أقصى 2000 حرف",
+          "Description must be a string up to 2000 characters"
+        );
+      }
+      company.description = description;
+    }
+
+    if (provided(company_size)) {
+      const n = Number(company_size);
+      if (!Number.isInteger(n) || n < 1 || n > 1_000_000) {
+        return fail(
+          res,
+          lan,
+          400,
+          "حجم الشركة يجب أن يكون عددًا صحيحًا بين 1 و 1,000,000",
+          "company_size must be an integer between 1 and 1,000,000"
+        );
+      }
+      company.company_size = n;
+    }
+
+    if (provided(company_size_type)) {
+      if (!allowedCompanySizeTypes.has(company_size_type)) {
+        return fail(
+          res,
+          lan,
+          400,
+          "نوع حجم الشركة غير صالح",
+          "Invalid company_size_type"
+        );
+      }
+      company.company_size_type = company_size_type;
+    }
+
+    if (provided(company_type)) {
+      if (typeof company_type !== "string" || company_type.length > 150) {
+        return fail(
+          res,
+          lan,
+          400,
+          "نوع الشركة يجب ألا يتجاوز 150 حرفًا",
+          "company_type must not exceed 150 characters"
+        );
+      }
+      company.company_type = company_type;
+    }
+
+    if (provided(company_country)) {
+      if (typeof company_country !== "string" || company_country.length > 150) {
+        return fail(
+          res,
+          lan,
+          400,
+          "الدولة يجب ألا تتجاوز 150 حرفًا",
+          "company_country must not exceed 150 characters"
+        );
+      }
+      company.company_country = company_country;
+    }
+
+    if (provided(company_city)) {
+      if (typeof company_city !== "string" || company_city.length > 150) {
+        return fail(
+          res,
+          lan,
+          400,
+          "المدينة يجب ألا تتجاوز 150 حرفًا",
+          "company_city must not exceed 150 characters"
+        );
+      }
+      company.company_city = company_city;
+    }
+
+    if (provided(company_address)) {
+      if (typeof company_address !== "string" || company_address.length > 250) {
+        return fail(
+          res,
+          lan,
+          400,
+          "العنوان يجب ألا يتجاوز 250 حرفًا",
+          "company_address must not exceed 250 characters"
+        );
+      }
+      company.company_address = company_address;
+    }
+
+    if (provided(company_phone_code)) {
+      if (company_phone_code !== "" && !phoneCodeRegex.test(company_phone_code)) {
+        return fail(
+          res,
+          lan,
+          400,
+          "كود الهاتف يجب أن يكون بصيغة +<رمز> مثل +963",
+          "company_phone_code must be like +963"
+        );
+      }
+      company.company_phone_code = company_phone_code;
+    }
+
+    if (provided(company_phone)) {
+      if (typeof company_phone !== "string" || company_phone.length > 30) {
+        return fail(
+          res,
+          lan,
+          400,
+          "رقم الهاتف غير صالح",
+          "Invalid company phone"
+        );
+      }
+      company.company_phone = company_phone;
+    }
+
+    if (provided(company_website)) {
+      if (String(company_website).trim() === "") {
+        company.company_website = "";
+      } else {
+        try {
+          const url = new URL(company_website);
+          if (!["http:", "https:"].includes(url.protocol)) throw new Error("invalid protocol");
+          company.company_website = url.toString().replace(/\/+$/, "");
+        } catch {
+          return fail(res, lan, 400, "رابط الموقع غير صالح", "Invalid website URL");
+        }
+      }
+    }
+
+    if (provided(company_contact)) {
+      if (!Array.isArray(company_contact)) {
+        return fail(
+          res,
+          lan,
+          400,
+          "جهات الاتصال يجب أن تكون مصفوفة نصوص",
+          "company_contact must be an array of strings"
+        );
+      }
+
+      const normalized = company_contact
+        .map((item) => String(item || "").trim())
+        .filter(Boolean);
+
+      if (normalized.length > 10 || normalized.some((item) => item.length > 200)) {
+        return fail(res, lan, 400, "جهات الاتصال غير صالحة", "Invalid company_contact values");
+      }
+
+      company.company_contact = [...new Set(normalized)];
+    }
+
+    if (provided(created_year)) {
+      if (created_year === "" || created_year === null) {
+        company.created_year = null;
+      } else {
+        const year = Number(created_year);
+        const currentYear = new Date().getFullYear();
+        if (!Number.isInteger(year) || year < 1800 || year > currentYear) {
+          return fail(res, lan, 400, "سنة التأسيس غير صالحة", "Invalid created_year");
+        }
+        company.created_year = year;
+      }
     }
 
     await company.save();
@@ -338,70 +479,58 @@ const update = async (req, res) => {
   }
 };
 
-const deleteUploadedImage = async (filename) => {
-  if (!filename) return;
-  const imagePath = path.resolve(UPLOADS_DIR, path.basename(filename));
-  await fs.unlink(imagePath).catch((err) => {
-    if (err?.code !== "ENOENT") throw err;
-  });
-};
-
-const updateImage = async (req, res) => {
+const updateImage = async (req, res, next) => {
   const lan = getLan(req);
 
   try {
-    const user = req.user;
+    const company = await getApprovedCompanyOrError(req, res);
+    if (!company) return;
+
     const file = req.file;
 
-    if (!user?._id) {
-      return fail(res, lan, 401, "غير مصرح", "Unauthorized");
+    if (!file?.filename) {
+      return fail(res, lan, 400, "الصورة غير موجودة.", "Image not found.");
     }
 
-    if (!file?.filename) {
-      return fail(res, lan, 400, "الصورة غير موجودة", "Image not found");
-    }
+    const allowedMime = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
+    const allowedExt = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
 
     const ext = path.extname(file.originalname || file.filename).toLowerCase();
-    if (!ALLOWED_IMAGE_MIME_TYPES.has(file.mimetype) || !ALLOWED_IMAGE_EXTENSIONS.has(ext)) {
-      await deleteUploadedImage(file.filename);
-      return fail(res, lan, 400, "نوع ملف الصورة غير مسموح", "Unsupported image type");
-    }
+    if (!allowedMime.has(file.mimetype) || !allowedExt.has(ext)) {
+      const tempPath = path.resolve(UPLOADS_DIR, path.basename(file.filename));
+      if (existsSync(tempPath)) await fs.unlink(tempPath).catch(() => {});
 
-    const company = await CompanyModel.findOne({ user_id: user._id });
-    if (!company) {
-      await deleteUploadedImage(file.filename);
-      return fail(res, lan, 404, "لم يتم إنشاء حساب شركة بعد", "A company account has not been created yet");
-    }
-
-    if (!isCompanyApproved(company)) {
-      await deleteUploadedImage(file.filename);
-      return ReturnAppData.getError({
+      return fail(
         res,
-        status: 403,
-        message: requestStateMessage(lan, getCompanyRequestState(company)),
-      });
+        lan,
+        400,
+        "نوع ملف الصورة غير مسموح.",
+        "Unsupported image type."
+      );
     }
 
     if (company.image) {
-      await deleteUploadedImage(company.image);
+      const oldName = path.basename(company.image);
+      const oldPath = path.resolve(UPLOADS_DIR, oldName);
+      if (existsSync(oldPath)) await fs.unlink(oldPath).catch(() => {});
     }
 
     company.image = path.basename(file.filename);
     await company.save();
 
-    const imageUrl = buildPublicUrl(process.env.PUBLIC_BASE_URL, company.image);
-
     return ReturnAppData.getData({
       res,
       status: 200,
-      data: { image: imageUrl },
-      message: t(lan, "تم تحديث الصورة بنجاح", "Image updated successfully"),
+      data: {
+        image: buildPublicUrl(process.env.PUBLIC_BASE_URL, company.image),
+      },
+      message: t(lan, "تم تحديث الصورة بنجاح.", "Image updated successfully."),
     });
   } catch (err) {
     return ReturnAppData.getError({
       res,
       status: 500,
-      message: t(lan, "حدث خطأ غير متوقع", "An unexpected error occurred"),
+      message: t(lan, "حدث خطأ غير متوقع.", "An unexpected error occurred."),
       meta: { error: err?.message },
     });
   }

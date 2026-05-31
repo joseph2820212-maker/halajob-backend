@@ -309,7 +309,7 @@ const EmployeeSchema = new Schema(
     current_job_title: { type: String, default: "", trim: true },
     about_me: { type: String, default: "", trim: true },
     profile_completion: { type: Number, default: 0, min: 0, max: 100 },
-
+    birthday: { type: Date, default: null, index: true },
     candidate_stage: {
       type: String,
       enum: [
