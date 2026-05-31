@@ -1,26 +1,26 @@
 import bcryptjs from "bcryptjs";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import RoleModel from "../../../models/RoleModel.js";
-import { UserModel } from "../../../models/index.js";
+import { EmployeeModel, UserModel } from "../../../models/index.js";
 import { createNewUser, fetchUserFromEmail } from "../../../services/authService.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import crypto from "crypto";
 
-const PUBLIC_EMAIL_DOMAINS = new Set([
-  "gmail.com",
-  "outlook.com",
-  "hotmail.com",
-  "live.com",
-  "yahoo.com",
-  "icloud.com",
-  "aol.com",
-]);
-
 const strongPasswordRe =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMPLOYEE_ROLE_NUMBER = 4;
+
+// التسجيل يحتاج حالة دراسية حقيقية، لذلك لا نقبل unknown في إنشاء الحساب.
+const REGISTER_CANDIDATE_STAGES = [
+  "student",
+  "graduate",
+  "fresh_graduate",
+  "experienced",
+  "career_changer",
+];
 
 function normalizeCode(code = "") {
   const c = String(code).trim();
@@ -31,13 +31,69 @@ function normalizeCode(code = "") {
 function toBool(v) {
   if (typeof v === "boolean") return v;
   if (typeof v === "number") return v !== 0;
-  if (typeof v === "string") return ["true", "1", "yes", "y"].includes(v.trim().toLowerCase());
+  if (typeof v === "string") {
+    return ["true", "1", "yes", "y"].includes(v.trim().toLowerCase());
+  }
   return false;
 }
 
+function parseBirthday(value) {
+  if (!value) return null;
+
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(date.getTime())) return null;
+
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // لا نقبل تاريخ ميلاد في المستقبل أو تاريخاً غير منطقي جداً.
+  const oldestAllowed = new Date(today);
+  oldestAllowed.setFullYear(today.getFullYear() - 120);
+
+  if (normalized > today || normalized < oldestAllowed) return null;
+  return normalized;
+}
+
+function normalizeCandidateStage(value) {
+  if (typeof value !== "string") return "";
+  return value.trim().toLowerCase();
+}
+
 function createPasscode() {
-  return 12345; // For testing purposes, replace with actual random code generation in production
+  if (process.env.NODE_ENV !== "production") return 12345;
   return crypto.randomInt(10000, 100000);
+}
+
+async function getEmployeeRole() {
+  return RoleModel.findOne({
+    role_number: EMPLOYEE_ROLE_NUMBER,
+    log_to: "employee",
+    status: true,
+  }).lean();
+}
+
+async function ensureEmployeeProfile({ userId, roleId, candidateStage, isStudent }) {
+  return EmployeeModel.findOneAndUpdate(
+    { user_id: userId },
+    {
+      $setOnInsert: {
+        user_id: userId,
+        role_id: roleId,
+        status: true,
+        accepted: false,
+      },
+      $set: {
+        candidate_stage: candidateStage,
+        is_student: isStudent,
+        "search_filters.career.candidate_stage": candidateStage,
+        "search_filters.career.is_student": isStudent,
+      },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true }
+  );
 }
 
 const register = async (req, res, next) => {
@@ -51,12 +107,17 @@ const register = async (req, res, next) => {
       last_name,
       mid_name,
       gender,
+      birthday,
+      candidate_stage,
+      is_student,
       device = {},
       phone_code,
       phone_number,
     } = req.body || {};
-
-    if (!email || !password || !first_name || !last_name || !gender) {
+console.log('====================================');
+console.log(req.body);
+console.log('====================================');
+    if (!email || !password || !first_name || !last_name || !gender || !birthday || !candidate_stage) {
       return ReturnAppData.createError({
         res,
         status: 400,
@@ -102,6 +163,53 @@ const register = async (req, res, next) => {
         res,
         status: 400,
         message: lan === "ar" ? "الاسم يجب أن لا يقل عن حرفين." : "Name must be at least 2 characters long.",
+      });
+    }
+
+    const birthdayDate = parseBirthday(birthday);
+    if (!birthdayDate) {
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message:
+          lan === "ar"
+            ? "تاريخ الميلاد مطلوب ويجب أن يكون تاريخاً صحيحاً وغير مستقبلي."
+            : "Birthday is required and must be a valid non-future date.",
+      });
+    }
+
+    const candidateStage = normalizeCandidateStage(candidate_stage);
+    if (!REGISTER_CANDIDATE_STAGES.includes(candidateStage)) {
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message:
+          lan === "ar"
+            ? `الحالة الدراسية غير صالحة. القيم المقبولة: ${REGISTER_CANDIDATE_STAGES.join(", ")}`
+            : `Invalid candidate_stage. Allowed values: ${REGISTER_CANDIDATE_STAGES.join(", ")}`,
+      });
+    }
+
+    const isStudent = is_student === undefined ? candidateStage === "student" : toBool(is_student);
+    if (candidateStage === "student" && isStudent !== true) {
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message:
+          lan === "ar"
+            ? "عند اختيار student يجب أن تكون is_student = true."
+            : "When candidate_stage is student, is_student must be true.",
+      });
+    }
+
+    if (candidateStage !== "student" && isStudent === true) {
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message:
+          lan === "ar"
+            ? "لا يمكن إرسال is_student = true مع حالة دراسية ليست student."
+            : "is_student cannot be true when candidate_stage is not student.",
       });
     }
 
@@ -166,15 +274,14 @@ const register = async (req, res, next) => {
       });
     }
 
-    const domain = emailNorm.split("@")[1];
-    const is_company = !PUBLIC_EMAIL_DOMAINS.has(domain);
-
-    const roleDoc = await RoleModel.findOne({ role_number: is_company ? 3 : 4 }).lean();
+    // التسجيل في تطبيق الموظفين يجب أن يكون Employee فقط.
+    // لا تعتمد على دومين البريد لتحديد شركة/موظف.
+    const roleDoc = await getEmployeeRole();
     if (!roleDoc?._id) {
       return ReturnAppData.createError({
         res,
         status: 500,
-        message: lan === "ar" ? "تعذر تحديد صلاحية المستخدم." : "Unable to resolve user role.",
+        message: lan === "ar" ? "تعذر تحديد صلاحية الموظف." : "Unable to resolve employee role.",
       });
     }
 
@@ -196,6 +303,7 @@ const register = async (req, res, next) => {
         last_name: lastName,
         lan,
         gender,
+        birthday: birthdayDate,
         status: false,
         passcode_active: false,
         phone_e164,
@@ -213,6 +321,13 @@ const register = async (req, res, next) => {
             last_seen_at: new Date(),
           },
         ],
+      });
+
+      await ensureEmployeeProfile({
+        userId: newUser._id,
+        roleId: roleDoc._id,
+        candidateStage,
+        isStudent,
       });
     } catch (err) {
       if (err && err.code === 11000) {
@@ -247,11 +362,18 @@ const register = async (req, res, next) => {
     return ReturnAppData.createData({
       res,
       status: 201,
-      data: { user_id: newUser?._id, step: "ENTER_PASSCODE" },
+      data: {
+        user_id: newUser?._id,
+        step: "ENTER_PASSCODE",
+        accountType: "employee",
+        birthday: birthdayDate,
+        candidate_stage: candidateStage,
+        is_student: isStudent,
+      },
       message:
         lan === "ar"
-          ? "تم إنشاء الحساب بنجاح، يرجى إدخال رمز التحقق المرسل إلى البريد الإلكتروني."
-          : "The account has been created successfully. Please enter the verification code sent to your email.",
+          ? "تم إنشاء حساب الموظف بنجاح، يرجى إدخال رمز التحقق المرسل إلى البريد الإلكتروني."
+          : "The employee account has been created successfully. Please enter the verification code sent to your email.",
     });
   } catch (err) {
     console.error("register error:", err);

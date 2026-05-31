@@ -1,10 +1,11 @@
-import { RoleModel, UserModel, CompanyModel } from "../../../models/index.js";
+import { RoleModel, UserModel, EmployeeModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
 const normEmail = (e) => (e || "").trim().toLowerCase();
+const EMPLOYEE_ROLE_NUMBER = 4;
 
 function buildPublicUrl(base, rel) {
   if (!base) return rel;
@@ -72,57 +73,64 @@ function buildUserDto(user) {
     phone_code: user.phone_code,
     phone: user.phone_national,
     gender: user.gender,
+    birthday: user.birthday || null,
   };
+}
+
+async function getEmployeeRole() {
+  return RoleModel.findOne({
+    role_number: EMPLOYEE_ROLE_NUMBER,
+    log_to: "employee",
+    status: true,
+  }).lean();
+}
+
+async function ensureEmployeeProfile(user, role) {
+  await EmployeeModel.findOneAndUpdate(
+    { user_id: user._id },
+    {
+      $setOnInsert: {
+        user_id: user._id,
+        role_id: role._id,
+        status: true,
+        accepted: false,
+      },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
 }
 
 async function buildAuthPayload(user, device) {
   const tokens = await generateAuthTokens(user, device);
 
-  const role = user.role_id
-    ? await RoleModel.findById(user.role_id).lean()
-    : null;
+  // هذا الكنترولر خاص بتطبيق الموظفين، لذلك الاستجابة لا ترجع company نهائياً.
+  const role = await getEmployeeRole();
+  if (!role?._id) {
+    throw new Error("EMPLOYEE_ROLE_NOT_FOUND");
+  }
+
+  if (!user.role_id || String(user.role_id) !== String(role._id)) {
+    user.role_id = role._id;
+    await user.save();
+  }
+
+  await ensureEmployeeProfile(user, role);
 
   const employee = buildUserDto(user);
 
-  const logTo = role?.log_to; // employee | company | dash
-  const isCompany = logTo === "company";
-
-  const company = isCompany
-    ? await CompanyModel.findOne({ user_id: user._id }).lean()
-    : null;
-
   return {
     user: employee,
-
-    role: role
-      ? {
-          id: role._id,
-          name: role.name,
-          log_to: role.log_to,
-          title_ar: role.title_ar,
-          title_en: role.title_en,
-          permissions: user.permissions || [],
-        }
-      : null,
-
-    accountType: isCompany ? "company" : "employee",
-
-    employee: isCompany ? null : employee,
-
-    company:
-      isCompany && company
-        ? {
-            id: company._id,
-            user_id: company.user_id,
-            name: company.name,
-            image: company.image
-              ? buildPublicUrl(process.env.PUBLIC_BASE_URL, company.image)
-              : null,
-            status: company.status,
-            accepted: company.accepted,
-          }
-        : null,
-
+    role: {
+      id: role._id,
+      name: role.name,
+      log_to: role.log_to,
+      title_ar: role.title_ar,
+      title_en: role.title_en,
+      permissions: user.permissions || [],
+    },
+    accountType: "employee",
+    employee,
+    company: null,
     tokens,
   };
 }
@@ -244,7 +252,14 @@ export const passcodeVerify = async (req, res, next) => {
     return ReturnAppData.createError({
       res,
       status: 500,
-      message: lan === "ar" ? "حدث خطأ غير متوقع." : "An unexpected error occurred.",
+      message:
+        err.message === "EMPLOYEE_ROLE_NOT_FOUND"
+          ? lan === "ar"
+            ? "تعذر تحديد صلاحية الموظف."
+            : "Unable to resolve employee role."
+          : lan === "ar"
+          ? "حدث خطأ غير متوقع."
+          : "An unexpected error occurred.",
     });
   }
 };

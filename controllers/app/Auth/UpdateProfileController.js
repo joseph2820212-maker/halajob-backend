@@ -100,6 +100,25 @@ function normalizeCode(code = "") {
   return c.startsWith("+") ? c : `+${c}`;
 }
 
+function parseBirthday(value) {
+  if (!value) return null;
+
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(date.getTime())) return null;
+
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const oldestAllowed = new Date(today);
+  oldestAllowed.setFullYear(today.getFullYear() - 120);
+
+  if (normalized > today || normalized < oldestAllowed) return null;
+  return normalized;
+}
+
  const updateProfile = async (req, res, next) => {
   const lan = req.get("lan") || "en";
 
@@ -120,6 +139,7 @@ function normalizeCode(code = "") {
       phone_number,
       email,
       password,
+      birthday,
     } = req.body || {};
 
     const user = await UserModel.findById(req.user._id);
@@ -162,6 +182,20 @@ function normalizeCode(code = "") {
         });
       }
       user.mid_name = safeStr(mid_name); // ممكن يكون فارغ
+    }
+
+    if (birthday !== undefined) {
+      const birthdayDate = parseBirthday(birthday);
+      if (!birthdayDate) {
+        return ReturnAppData.createError({
+          res, status: 400,
+          message:
+            lan === "ar"
+              ? "تاريخ الميلاد غير صالح أو مستقبلي."
+              : "Birthday is invalid or in the future.",
+        });
+      }
+      user.birthday = birthdayDate;
     }
 
     // --------- phone (must come as a pair) ---------
@@ -279,6 +313,7 @@ function normalizeCode(code = "") {
         mid_name: user.mid_name,
         last_name: user.last_name,
         email: user.email,
+        birthday: user.birthday || null,
         phone_code: user.phone_code,
         image:user.image?buildPublicUrl(process.env.PUBLIC_BASE_URL, user.image):null,
         phone_national: user.phone_national,
