@@ -51,21 +51,20 @@ router.patch("/hiring/invitations/:invitationId/cancel", upload.none(), controll
    Job Reviews - Read Only For Company
 ========================= */
 router.get("/hiring/reviews", upload.none(), controllerHiring.getCompanyJobReviews);
-router.get("/hiring/:jobId/reviews", upload.none(), controllerHiring.getCompanyJobReviews);
 
 /* =========================
    Talent Search
 ========================= */
 router.get("/talent/employees", upload.none(), controllerTalent.searchEmployees);
-router.get("/talent/employees/:employeeId/cv", upload.none(), controllerTalent.downloadEmployeeCv);
-router.get("/talent/employees/:employeeId/cv/:cvId", upload.none(), controllerTalent.downloadEmployeeCv);
 router.get("/talent/employees/:employeeId", upload.none(), controllerTalent.getEmployeeDetails);
 
 /* =========================
    JobZain Talent Help Requests
 ========================= */
 router.post("/talent/help-requests", upload.none(), controllerTalent.requestJobZainTalentHelp);
+router.post("/talent/:jobId/help-requests", upload.none(), controllerTalent.requestJobZainTalentHelp);
 router.get("/talent/help-requests", upload.none(), controllerTalent.getMyJobZainTalentRequests);
+router.get("/talent/:jobId/help-requests", upload.none(), controllerTalent.getMyJobZainTalentRequests);
 router.get("/talent/help-requests/:requestId", upload.none(), controllerTalent.getJobZainTalentRequestDetails);
 router.patch("/talent/help-requests/:requestId/cancel", upload.none(), controllerTalent.cancelJobZainTalentRequest);
 

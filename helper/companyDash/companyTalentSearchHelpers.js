@@ -9,35 +9,61 @@ import {
   isValidObjectId,
   normalizeJob,
 } from "../../helper/companyDash/companyDashHelpers.js";
-import { sanitizeEmployeeCvs } from "./secureCvDownloadHelpers.js";
 
-export const cleanText = (value = "") => String(value || "").trim();
+export const stripQueryNoise = (value = "") =>
+  String(value ?? "")
+    .trim()
+    .replace(/[?]+$/g, "")
+    .trim();
+
+export const cleanText = (value = "") => stripQueryNoise(value);
 
 export const escapeRegex = (value = "") =>
   String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 export const toNumber = (value, fallback = 0) => {
-  const n = Number(value);
+  const text = stripQueryNoise(value);
+  const n = Number(text);
   return Number.isFinite(n) ? n : fallback;
 };
 
 export const toNumberOrNull = (value) => {
   if (value === undefined || value === null || value === "") return null;
-  const n = Number(value);
+  const text = stripQueryNoise(value);
+  if (!text) return null;
+  const n = Number(text);
   return Number.isFinite(n) ? n : null;
+};
+
+export const toBoolean = (value, fallback = false) => {
+  if (value === undefined || value === null || value === "") return fallback;
+  if (typeof value === "boolean") return value;
+  const text = stripQueryNoise(value).toLowerCase();
+  if (["true", "1", "yes", "on"].includes(text)) return true;
+  if (["false", "0", "no", "off"].includes(text)) return false;
+  return fallback;
+};
+
+export const firstValue = (...values) => {
+  for (const value of values) {
+    if (value !== undefined && value !== null && value !== "") return value;
+  }
+  return undefined;
 };
 
 export const toArray = (value) => {
   if (value === undefined || value === null || value === "") return [];
-  if (Array.isArray(value)) return value;
+  if (Array.isArray(value)) return value.flat(Infinity);
 
   if (typeof value === "string") {
-    const text = value.trim();
+    const text = stripQueryNoise(value);
     if (!text) return [];
 
     try {
       const parsed = JSON.parse(text);
-      return Array.isArray(parsed) ? parsed : [parsed];
+      if (Array.isArray(parsed)) return parsed.flat(Infinity);
+      if (parsed && typeof parsed === "object") return [parsed];
+      return parsed === undefined || parsed === null || parsed === "" ? [] : [parsed];
     } catch {
       return text
         .split(/[,;\n]+/)
@@ -52,8 +78,12 @@ export const toArray = (value) => {
 export const uniqueClean = (value = []) => [
   ...new Set(
     toArray(value)
-      .flat(Infinity)
-      .map((x) => cleanText(x))
+      .map((x) => {
+        if (x && typeof x === "object") {
+          return cleanText(x.title || x.title_ar || x.title_en || x.name || x.label || x.value || x.key || x._id || x.id || "");
+        }
+        return cleanText(x);
+      })
       .filter(Boolean)
   ),
 ];
@@ -71,13 +101,21 @@ export const normalizeSearchToken = (value = "") =>
     .trim();
 
 export const normalizeTokens = (...groups) =>
-  uniqueClean(groups)
+  uniqueClean(groups.flat(Infinity))
     .flatMap((x) => normalizeSearchToken(x).split(/\s+/))
     .map((x) => x.trim())
     .filter(Boolean);
 
 export const toObjectIdArray = (value) =>
-  uniqueClean(toArray(value).map((x) => x?._id || x?.id || x)).filter(isValidObjectId);
+  uniqueClean(toArray(value).map((x) => x?._id || x?.id || x?.value || x)).filter(isValidObjectId);
+
+export const splitObjectIdsAndTexts = (value) => {
+  const values = uniqueClean(value);
+  return {
+    ids: values.filter(isValidObjectId),
+    texts: values.filter((x) => !isValidObjectId(x)),
+  };
+};
 
 export const getJobOrFail = async (req, res, companyData, jobId) => {
   if (!isValidObjectId(jobId)) {
@@ -123,7 +161,7 @@ export const buildEmployeeSearchFilter = (query = {}, companyId = null) => {
     filter.blocked_companies = { $ne: new mongoose.Types.ObjectId(companyId) };
   }
 
-  const search = cleanText(query.search || query.q || query.keyword);
+  const search = cleanText(firstValue(query.search, query.q, query.keyword, query.text));
   if (search) {
     const normalized = normalizeSearchToken(search);
     const tokens = normalized.split(/\s+/).filter(Boolean);
@@ -135,67 +173,105 @@ export const buildEmployeeSearchFilter = (query = {}, companyId = null) => {
       { about_me: regex },
       { "matching_profile.searchable_text": regex },
       { "matching_profile.searchable_tokens": { $in: tokens } },
+      { "matching_profile.normalized_skills": { $in: tokens } },
+      { "matching_profile.normalized_titles": { $in: tokens } },
       { "search_filters.text.all": { $in: tokens } },
       { "search_filters.job_names.keywords": { $in: tokens } },
+      { "search_filters.job_names.titles_ar": { $in: tokens } },
+      { "search_filters.job_names.titles_en": { $in: tokens } },
       { "search_filters.skills.titles_ar": { $in: tokens } },
       { "search_filters.skills.titles_en": { $in: tokens } },
+      { "search_filters.skills.titles_custom": { $in: tokens } },
       { "search_filters.skills.keywords_ar": { $in: tokens } },
       { "search_filters.skills.keywords_en": { $in: tokens } },
       { "skills.title": regex },
     ];
   }
 
-  const candidateStage = cleanText(query.candidate_stage || query.stage);
-  if (candidateStage && candidateStage !== "all") filter.candidate_stage = candidateStage;
+  const stage = cleanText(firstValue(query.candidate_stage, query.stage, query.candidateStage));
+  if (stage) filter.candidate_stage = stage;
 
-  const freeForWorkValue = query.is_free_for_work ?? query.free_for_work ?? query.available;
-  if (freeForWorkValue !== undefined) {
-    filter.is_free_for_work = [true, "true", 1, "1", "yes"].includes(freeForWorkValue);
-  }
+  const freeForWork = firstValue(query.is_free_for_work, query.free_for_work, query.available, query.isAvailable);
+  if (freeForWork !== undefined) filter.is_free_for_work = toBoolean(freeForWork);
 
-  const workLocation = cleanText(query.work_location || query.location_type);
-  if (workLocation && workLocation !== "all") filter.work_location = workLocation;
+  const workLocation = cleanText(firstValue(query.work_location, query.workLocation, query.location_type));
+  if (workLocation) filter.work_location = workLocation;
 
-  const jobNameIds = toObjectIdArray(query.job_name_id || query.job_name_ids || query.jobNameId || query.jobNameIds);
+  const jobNameIds = toObjectIdArray(firstValue(query.job_name_id, query.job_name_ids, query.jobNameId, query.jobNameIds, query.job_names));
   if (jobNameIds.length) filter.job_names = { $in: jobNameIds };
 
-  const jobTypeIds = toObjectIdArray(query.job_type_id || query.job_type_ids || query.jobTypeId || query.jobTypeIds);
+  const jobTypeIds = toObjectIdArray(firstValue(query.job_type_id, query.job_type_ids, query.jobTypeId, query.jobTypeIds, query.job_types));
   if (jobTypeIds.length) filter.job_types = { $in: jobTypeIds };
 
-  const workModeIds = toObjectIdArray(query.work_mode_id || query.work_mode_ids || query.workModeId || query.workModeIds);
+  const workModeIds = toObjectIdArray(firstValue(query.work_mode_id, query.work_mode_ids, query.workModeId, query.workModeIds, query.work_modes));
   if (workModeIds.length) filter.preferred_work_modes = { $in: workModeIds };
 
-  const skillIds = toObjectIdArray(query.skill_id || query.skill_ids || query.skills || query.skillIds);
-  if (skillIds.length) filter["skills.skill_id"] = { $in: skillIds };
-
-  const languageIds = toObjectIdArray(query.language_id || query.language_ids || query.languages || query.languageIds);
-  if (languageIds.length) filter["languages.language_id"] = { $in: languageIds };
-
-  const countryIds = toObjectIdArray(query.country_id || query.country_ids || query.countries || query.countryIds);
-  if (countryIds.length) filter.preferred_countries = { $in: countryIds };
-
-  const experienceLevelId = query.experience_level_id || query.experienceLevelId;
-  if (experienceLevelId && isValidObjectId(experienceLevelId)) {
-    filter.experience_level_id = experienceLevelId;
+  const skillParts = splitObjectIdsAndTexts(firstValue(query.skill_id, query.skill_ids, query.skills, query.skillIds, query.skill));
+  if (skillParts.ids.length) filter["skills.skill_id"] = { $in: skillParts.ids };
+  if (skillParts.texts.length) {
+    const skillTokens = normalizeTokens(skillParts.texts);
+    const skillOr = [
+      { "skills.title": { $in: skillParts.texts.map((x) => new RegExp(escapeRegex(x), "i")) } },
+      { "matching_profile.normalized_skills": { $in: skillTokens } },
+      { "matching_profile.searchable_tokens": { $in: skillTokens } },
+      { "search_filters.skills.titles_ar": { $in: skillTokens } },
+      { "search_filters.skills.titles_en": { $in: skillTokens } },
+      { "search_filters.skills.keywords_ar": { $in: skillTokens } },
+      { "search_filters.skills.keywords_en": { $in: skillTokens } },
+    ];
+    filter.$and = [...(filter.$and || []), { $or: skillOr }];
   }
 
-  const minExp = toNumberOrNull(query.min_experience_years ?? query.min_exp ?? query.minExperience);
-  const maxExp = toNumberOrNull(query.max_experience_years ?? query.max_exp ?? query.maxExperience);
+  const languageParts = splitObjectIdsAndTexts(firstValue(query.language_id, query.language_ids, query.languages, query.languageIds, query.language));
+  if (languageParts.ids.length) filter["languages.language_id"] = { $in: languageParts.ids };
+  if (languageParts.texts.length) {
+    const languageTokens = normalizeTokens(languageParts.texts);
+    filter.$and = [
+      ...(filter.$and || []),
+      {
+        $or: [
+          { "matching_profile.normalized_languages": { $in: languageTokens } },
+          { "search_filters.languages.names": { $in: languageTokens } },
+          { "search_filters.languages.titles_ar": { $in: languageTokens } },
+          { "search_filters.languages.titles_en": { $in: languageTokens } },
+        ],
+      },
+    ];
+  }
+
+  const countryParts = splitObjectIdsAndTexts(firstValue(query.country_id, query.country_ids, query.countries, query.countryIds, query.country));
+  if (countryParts.ids.length) filter.preferred_countries = { $in: countryParts.ids };
+  if (countryParts.texts.length) {
+    const countryTokens = normalizeTokens(countryParts.texts);
+    filter.$and = [
+      ...(filter.$and || []),
+      {
+        $or: [
+          { "matching_profile.preferred_country_values": { $in: countryTokens } },
+          { "search_filters.preferred_countries.values": { $in: countryTokens } },
+          { "search_filters.preferred_countries.country_codes": { $in: countryTokens } },
+          { "search_filters.preferred_countries.country_names_ar": { $in: countryTokens } },
+          { "search_filters.preferred_countries.country_names_en": { $in: countryTokens } },
+          { "search_filters.preferred_countries.city_names_ar": { $in: countryTokens } },
+          { "search_filters.preferred_countries.city_names_en": { $in: countryTokens } },
+        ],
+      },
+    ];
+  }
+
+  const experienceLevelId = firstValue(query.experience_level_id, query.experienceLevelId);
+  if (experienceLevelId && isValidObjectId(experienceLevelId)) filter.experience_level_id = experienceLevelId;
+
+  const minExp = toNumberOrNull(firstValue(query.min_experience_years, query.min_exp, query.minExperience));
+  const maxExp = toNumberOrNull(firstValue(query.max_experience_years, query.max_exp, query.maxExperience));
   if (minExp !== null || maxExp !== null) {
     filter.experience_years = {};
     if (minExp !== null) filter.experience_years.$gte = minExp;
     if (maxExp !== null) filter.experience_years.$lte = maxExp;
   }
 
-  const minProfile = toNumberOrNull(query.min_profile_completion ?? query.minProfileCompletion);
-  if (minProfile !== null) filter.profile_completion = { $gte: minProfile };
-
-  const salaryMin = toNumberOrNull(query.salary_min ?? query.min_salary ?? query.salaryMin);
-  const salaryMax = toNumberOrNull(query.salary_max ?? query.max_salary ?? query.salaryMax);
-  if (salaryMin !== null || salaryMax !== null) {
-    if (salaryMin !== null) filter["expected_salary.max_base"] = { $gte: salaryMin };
-    if (salaryMax !== null) filter["expected_salary.min_base"] = { $lte: salaryMax };
-  }
+  const minCompletion = toNumberOrNull(firstValue(query.min_profile_completion, query.minCompletion));
+  if (minCompletion !== null) filter.profile_completion = { $gte: minCompletion };
 
   return filter;
 };
@@ -231,7 +307,7 @@ export const normalizeEmployeeForCompany = (employee, match = null) => {
     languages: employee.languages || [],
     latest_work_experience: employee.latest_work_experience || null,
     education: employee.education || [],
-    cvs: sanitizeEmployeeCvs(employee.cvs || []),
+    cvs: (employee.cvs || []).filter((cv) => cv.status === "active"),
     match: match
       ? {
           _id: match._id,
@@ -262,33 +338,63 @@ const intersection = (a = [], b = []) => {
   return [...new Set(a.map(String).filter((x) => setB.has(x)))];
 };
 
+const getJobRequiredSkills = (job = {}) => {
+  const structured = (job.skills_required || []).map((x) => ({
+    id: getIdString(x.skill_id),
+    title: getSkillTitle(x),
+  }));
+
+  const projection = uniqueClean(job.search_projection?.requirements?.skills || []);
+  const indexTokens = uniqueClean(job.search_index?.filters?.skills || job.search_index?.skill_tokens || []);
+
+  return {
+    ids: structured.map((x) => x.id).filter(isValidObjectId),
+    titles: uniqueClean([...structured.map((x) => x.title), ...projection, ...indexTokens]),
+  };
+};
+
+const getJobOptionalSkills = (job = {}) => {
+  const structured = (job.skills_optional || []).map((x) => ({
+    id: getIdString(x.skill_id),
+    title: getSkillTitle(x),
+  }));
+
+  return {
+    ids: structured.map((x) => x.id).filter(isValidObjectId),
+    titles: uniqueClean(structured.map((x) => x.title)),
+  };
+};
+
+const getEmployeeSkills = (employee = {}) => ({
+  ids: (employee.skills || []).map((x) => getIdString(x.skill_id)).filter(isValidObjectId),
+  titles: uniqueClean([
+    ...(employee.skills || []).map((x) => getSkillTitle(x)),
+    employee.matching_profile?.normalized_skills || [],
+    employee.search_filters?.skills?.titles_ar || [],
+    employee.search_filters?.skills?.titles_en || [],
+    employee.search_filters?.skills?.titles_custom || [],
+    employee.search_filters?.skills?.keywords_ar || [],
+    employee.search_filters?.skills?.keywords_en || [],
+  ]),
+});
+
 export const calculateEmployeeJobMatch = (job = {}, employee = {}) => {
-  const requiredSkillIds = (job.skills_required || [])
-    .map((x) => getIdString(x.skill_id))
-    .filter(isValidObjectId);
-  const optionalSkillIds = (job.skills_optional || [])
-    .map((x) => getIdString(x.skill_id))
-    .filter(isValidObjectId);
-  const employeeSkillIds = (employee.skills || [])
-    .map((x) => getIdString(x.skill_id))
-    .filter(isValidObjectId);
+  const requiredSkills = getJobRequiredSkills(job);
+  const optionalSkills = getJobOptionalSkills(job);
+  const employeeSkills = getEmployeeSkills(employee);
 
-  const requiredSkillTitles = (job.skills_required || []).map((x) => getSkillTitle(x)).filter(Boolean);
-  const optionalSkillTitles = (job.skills_optional || []).map((x) => getSkillTitle(x)).filter(Boolean);
-  const employeeSkillTitles = (employee.skills || []).map((x) => getSkillTitle(x)).filter(Boolean);
+  const matchedRequiredIds = intersection(requiredSkills.ids, employeeSkills.ids);
+  const matchedOptionalIds = intersection(optionalSkills.ids, employeeSkills.ids);
 
-  const matchedRequiredIds = intersection(requiredSkillIds, employeeSkillIds);
-  const matchedOptionalIds = intersection(optionalSkillIds, employeeSkillIds);
-
-  const requiredTitleTokens = normalizeTokens(requiredSkillTitles);
-  const optionalTitleTokens = normalizeTokens(optionalSkillTitles);
-  const employeeTitleTokens = normalizeTokens(employeeSkillTitles, employee.matching_profile?.normalized_skills || []);
+  const requiredTitleTokens = normalizeTokens(requiredSkills.titles);
+  const optionalTitleTokens = normalizeTokens(optionalSkills.titles);
+  const employeeTitleTokens = normalizeTokens(employeeSkills.titles);
 
   const matchedRequiredByTitle = intersection(requiredTitleTokens, employeeTitleTokens);
   const matchedOptionalByTitle = intersection(optionalTitleTokens, employeeTitleTokens);
 
-  const requiredCount = Math.max(requiredSkillIds.length || requiredTitleTokens.length, 1);
-  const optionalCount = Math.max(optionalSkillIds.length || optionalTitleTokens.length, 1);
+  const requiredCount = Math.max(requiredSkills.ids.length || requiredTitleTokens.length, 1);
+  const optionalCount = Math.max(optionalSkills.ids.length || optionalTitleTokens.length, 1);
 
   const requiredRatio = Math.min(
     1,
@@ -301,25 +407,30 @@ export const calculateEmployeeJobMatch = (job = {}, employee = {}) => {
 
   const skillsScore = Math.round(requiredRatio * 45 + optionalRatio * 10);
 
-  const minExp = toNumber(job.min_experience_years, 0);
-  const maxExp = toNumberOrNull(job.max_experience_years);
+  const minExp = toNumber(job.min_experience_years ?? job.search_projection?.requirements?.min_experience_years, 0);
+  const maxExp = toNumberOrNull(job.max_experience_years ?? job.search_projection?.requirements?.max_experience_years);
   const empExp = toNumber(employee.experience_years, 0);
   let experienceScore = 0;
   if (empExp >= minExp && (maxExp === null || empExp <= maxExp + 2)) experienceScore = 15;
   else if (empExp >= Math.max(minExp - 1, 0)) experienceScore = 10;
   else experienceScore = Math.max(0, Math.round((empExp / Math.max(minExp, 1)) * 8));
 
-  const jobCities = normalizeTokens(job.cities || [], job.city || "");
-  const jobCountries = normalizeTokens(job.countries || []);
+  const jobCities = normalizeTokens(job.cities || [], job.city || "", job.search_index?.filters?.cities || []);
+  const jobCountries = normalizeTokens(job.countries || [], job.search_projection?.requirements?.countries || [], job.search_index?.filters?.countries || []);
   const employeeLocations = normalizeTokens(
     employee.matching_profile?.preferred_country_values || [],
     employee.search_filters?.preferred_countries?.values || [],
+    employee.search_filters?.preferred_countries?.country_codes || [],
     employee.search_filters?.preferred_countries?.country_names_ar || [],
     employee.search_filters?.preferred_countries?.country_names_en || [],
     employee.search_filters?.preferred_countries?.city_names_ar || [],
     employee.search_filters?.preferred_countries?.city_names_en || []
   );
-  const isRemote = Boolean(job.is_remote || String(job.work_mode_info?.key || "").includes("remote"));
+  const isRemote = Boolean(
+    job.is_remote ||
+    job.search_projection?.requirements?.is_remote ||
+    String(job.work_mode_info?.key || job.search_projection?.requirements?.work_mode || "").includes("remote")
+  );
   let locationScore = 0;
   if (isRemote && (employee.matching_profile?.remote_ready || employee.work_location === "remote")) locationScore = 10;
   else if (intersection([...jobCities, ...jobCountries], employeeLocations).length) locationScore = 10;
@@ -327,7 +438,7 @@ export const calculateEmployeeJobMatch = (job = {}, employee = {}) => {
 
   const jobWorkModeId = getIdString(job.work_mode_id);
   const employeeWorkModeIds = (employee.preferred_work_modes || []).map(getIdString).filter(Boolean);
-  const employeeWorkModeKeys = employee.matching_profile?.preferred_work_mode_keys || [];
+  const employeeWorkModeKeys = employee.matching_profile?.preferred_work_mode_keys || employee.search_filters?.preferred_work_modes?.keys || [];
   let workModeScore = 0;
   if (jobWorkModeId && employeeWorkModeIds.includes(jobWorkModeId)) workModeScore = 10;
   else if (isRemote && (employeeWorkModeKeys.includes("remote") || employee.work_location === "remote")) workModeScore = 8;
@@ -336,17 +447,27 @@ export const calculateEmployeeJobMatch = (job = {}, employee = {}) => {
   const jobLangIds = (job.languages || []).map((x) => getIdString(x.language_id)).filter(isValidObjectId);
   const empLangIds = (employee.languages || []).map((x) => getIdString(x.language_id)).filter(isValidObjectId);
   const matchedLangIds = intersection(jobLangIds, empLangIds);
-  const langTitles = (job.languages || []).map(getLanguageTitle).filter(Boolean);
-  const empLangTitles = (employee.languages || []).map(getLanguageTitle).filter(Boolean);
+  const langTitles = uniqueClean([
+    ...(job.languages || []).map(getLanguageTitle),
+    job.search_projection?.requirements?.languages || [],
+    job.search_index?.filters?.languages || [],
+  ]);
+  const empLangTitles = uniqueClean([
+    ...(employee.languages || []).map(getLanguageTitle),
+    employee.matching_profile?.normalized_languages || [],
+    employee.search_filters?.languages?.names || [],
+    employee.search_filters?.languages?.titles_ar || [],
+    employee.search_filters?.languages?.titles_en || [],
+  ]);
   const matchedLangTitles = intersection(normalizeTokens(langTitles), normalizeTokens(empLangTitles));
   const languageScore = jobLangIds.length || langTitles.length
     ? Math.round((Math.max(matchedLangIds.length, matchedLangTitles.length) / Math.max(jobLangIds.length || langTitles.length, 1)) * 5)
     : 5;
 
-  const jobMinSalary = toNumberOrNull(job.salary?.min_usd ?? job.salary?.min);
-  const jobMaxSalary = toNumberOrNull(job.salary?.max_usd ?? job.salary?.max);
-  const empMinSalary = toNumberOrNull(employee.expected_salary?.min_base ?? employee.expected_salary?.min);
-  const empMaxSalary = toNumberOrNull(employee.expected_salary?.max_base ?? employee.expected_salary?.max);
+  const jobMinSalary = toNumberOrNull(job.salary?.min_usd ?? job.salary?.min ?? job.search_projection?.requirements?.salary_min_usd);
+  const jobMaxSalary = toNumberOrNull(job.salary?.max_usd ?? job.salary?.max ?? job.search_projection?.requirements?.salary_max_usd);
+  const empMinSalary = toNumberOrNull(employee.expected_salary?.min_base ?? employee.expected_salary?.min ?? employee.matching_profile?.salary_min_base);
+  const empMaxSalary = toNumberOrNull(employee.expected_salary?.max_base ?? employee.expected_salary?.max ?? employee.matching_profile?.salary_max_base);
   let salaryScore = 5;
   if (jobMaxSalary !== null && empMinSalary !== null && empMinSalary > jobMaxSalary) salaryScore = 1;
   else if (jobMinSalary !== null && empMaxSalary !== null && empMaxSalary < jobMinSalary) salaryScore = 2;
@@ -357,13 +478,13 @@ export const calculateEmployeeJobMatch = (job = {}, employee = {}) => {
   );
 
   const matchedSkills = uniqueClean([
-    ...requiredSkillTitles.filter((x) => employeeSkillTitles.some((s) => normalizeSearchToken(s) === normalizeSearchToken(x))),
+    ...requiredSkills.titles.filter((x) => employeeSkills.titles.some((s) => normalizeSearchToken(s) === normalizeSearchToken(x))),
     ...matchedRequiredByTitle,
     ...matchedOptionalByTitle,
   ]);
 
   const missingSkills = uniqueClean(
-    requiredSkillTitles.filter((x) => !matchedSkills.some((m) => normalizeSearchToken(m) === normalizeSearchToken(x)))
+    requiredSkills.titles.filter((x) => !matchedSkills.some((m) => normalizeSearchToken(m) === normalizeSearchToken(x)))
   );
 
   const matchedLanguages = uniqueClean([
@@ -389,49 +510,58 @@ export const calculateEmployeeJobMatch = (job = {}, employee = {}) => {
     missing_skills: missingSkills,
     matched_languages: matchedLanguages,
     missing_languages: missingLanguages,
-    is_recommended_to_employee: score >= 45,
-    is_recommended_to_company: score >= 45,
-    algorithm_version: "company-smart-match-v1",
+    is_recommended_to_employee: score >= 40,
+    is_recommended_to_company: score >= 40,
+    algorithm_version: "company-smart-match-v2",
     generated_at: new Date(),
   };
 };
 
-export const buildCandidateFilterFromJob = (job = {}, companyId = null) => {
+export const buildCandidateFilterFromJob = (job = {}, companyId = null, { relaxed = false } = {}) => {
   const filter = buildEmployeeSearchFilter({}, companyId);
-  const or = [];
+  if (relaxed) return filter;
 
-  const requiredSkillIds = (job.skills_required || [])
-    .map((x) => getIdString(x.skill_id))
-    .filter(isValidObjectId);
-  const optionalSkillIds = (job.skills_optional || [])
-    .map((x) => getIdString(x.skill_id))
-    .filter(isValidObjectId);
-  const allSkillIds = [...new Set([...requiredSkillIds, ...optionalSkillIds])];
+  const or = [];
+  const requiredSkills = getJobRequiredSkills(job);
+  const optionalSkills = getJobOptionalSkills(job);
+  const allSkillIds = [...new Set([...requiredSkills.ids, ...optionalSkills.ids])];
   if (allSkillIds.length) or.push({ "skills.skill_id": { $in: allSkillIds } });
 
-  const skillTokens = normalizeTokens(
-    (job.skills_required || []).map(getSkillTitle),
-    (job.skills_optional || []).map(getSkillTitle)
-  );
+  const skillTokens = normalizeTokens(requiredSkills.titles, optionalSkills.titles);
   if (skillTokens.length) {
     or.push({ "matching_profile.normalized_skills": { $in: skillTokens } });
     or.push({ "matching_profile.searchable_tokens": { $in: skillTokens } });
+    or.push({ "search_filters.skills.titles_ar": { $in: skillTokens } });
+    or.push({ "search_filters.skills.titles_en": { $in: skillTokens } });
+    or.push({ "search_filters.skills.keywords_ar": { $in: skillTokens } });
+    or.push({ "search_filters.skills.keywords_en": { $in: skillTokens } });
   }
 
   if (job.job_name_id && isValidObjectId(job.job_name_id)) {
     or.push({ job_names: job.job_name_id });
+    or.push({ "search_filters.job_names.ids": job.job_name_id });
   }
   if (job.job_type_id && isValidObjectId(job.job_type_id)) {
     or.push({ job_types: job.job_type_id });
+    or.push({ "search_filters.job_types.ids": job.job_type_id });
   }
   if (job.work_mode_id && isValidObjectId(job.work_mode_id)) {
     or.push({ preferred_work_modes: job.work_mode_id });
+    or.push({ "search_filters.preferred_work_modes.ids": job.work_mode_id });
   }
 
-  const titleTokens = normalizeTokens(job.job_name, job.search_index?.title_tokens || []);
+  const titleTokens = normalizeTokens(
+    job.job_name,
+    job.search_index?.title_tokens || [],
+    job.search_projection?.matching?.normalized_titles || [],
+    job.search_projection?.matching?.tokens || []
+  );
   if (titleTokens.length) {
     or.push({ "matching_profile.normalized_titles": { $in: titleTokens } });
+    or.push({ "matching_profile.normalized_job_names": { $in: titleTokens } });
     or.push({ "matching_profile.searchable_tokens": { $in: titleTokens } });
+    or.push({ "search_filters.job_names.keywords": { $in: titleTokens } });
+    or.push({ "search_filters.text.all": { $in: titleTokens } });
   }
 
   if (or.length) filter.$or = or;
@@ -446,7 +576,7 @@ export const upsertJobEmployeeMatch = async ({ job, employee, companyId }) => {
     {
       $set: {
         company_id: companyId,
-        user_id: employee.user_id?._id || employee.user_id || null,
+        user_id: employee.user_id?._id || (isValidObjectId(employee.user_id) ? employee.user_id : null),
         ...matchData,
       },
     },
@@ -457,38 +587,33 @@ export const upsertJobEmployeeMatch = async ({ job, employee, companyId }) => {
 };
 
 export const normalizeTalentRequestPayload = (body = {}, companyData) => {
-  const requiredSkills = uniqueClean(body.required_skills || body.skills_required || body.skills || []);
-  const preferredSkills = uniqueClean(body.preferred_skills || body.skills_optional || []);
-  const jobId = body.job_id || body.jobId;
-  const workModeId = body.work_mode_id || body.workModeId;
-  const jobTypeId = body.job_type_id || body.jobTypeId;
-  const experienceLevelId = body.experience_level_id || body.experienceLevelId;
-  const educationLevelId = body.education_level_id || body.educationLevelId;
+  const jobId = firstValue(body.job_id, body.jobId, body.job);
+  const noteText = cleanText(firstValue(body.note, body.notes, body.description));
+  const requiredSkills = uniqueClean(firstValue(body.required_skills, body.skills_required, body.skills, body.skill_names));
+  const preferredSkills = uniqueClean(firstValue(body.preferred_skills, body.skills_optional, body.optional_skills));
 
   return {
     company_id: companyData.company._id,
     requested_by_user_id: companyData.userId,
     job_id: isValidObjectId(jobId) ? jobId : null,
-    title: cleanText(body.title || body.job_title || body.jobTitle || ""),
-    description: cleanText(body.description || body.note || body.message || ""),
+    title: cleanText(firstValue(body.title, body.job_title, body.name)),
+    description: cleanText(firstValue(body.description, body.details, body.message, body.note)),
     required_skills: requiredSkills,
     preferred_skills: preferredSkills,
-    countries: uniqueClean(body.countries || body.country || []),
-    cities: uniqueClean(body.cities || body.city || []),
-    work_mode_id: isValidObjectId(workModeId) ? workModeId : null,
-    job_type_id: isValidObjectId(jobTypeId) ? jobTypeId : null,
-    experience_level_id: isValidObjectId(experienceLevelId) ? experienceLevelId : null,
-    education_level_id: isValidObjectId(educationLevelId) ? educationLevelId : null,
-    min_experience_years: toNumber(body.min_experience_years ?? body.minExperience, 0),
-    max_experience_years: toNumberOrNull(body.max_experience_years ?? body.maxExperience),
-    salary_min: toNumberOrNull(body.salary_min ?? body.salaryMin),
-    salary_max: toNumberOrNull(body.salary_max ?? body.salaryMax),
-    currency_code: cleanText(body.currency_code || body.currencyCode || "").toUpperCase(),
-    requested_count: Math.min(Math.max(toNumber(body.requested_count ?? body.requestedCount, 5), 1), 100),
-    priority: ["low", "normal", "high", "urgent"].includes(body.priority) ? body.priority : "normal",
-    notes: cleanText(body.note || body.description)
-      ? [{ by_user_id: companyData.userId, note: cleanText(body.note || body.description), type: "company" }]
-      : [],
+    countries: uniqueClean(firstValue(body.countries, body.country, body.country_names, body.country_ids)),
+    cities: uniqueClean(firstValue(body.cities, body.city, body.city_names, body.city_ids)),
+    work_mode_id: isValidObjectId(firstValue(body.work_mode_id, body.workModeId)) ? firstValue(body.work_mode_id, body.workModeId) : null,
+    job_type_id: isValidObjectId(firstValue(body.job_type_id, body.jobTypeId)) ? firstValue(body.job_type_id, body.jobTypeId) : null,
+    experience_level_id: isValidObjectId(firstValue(body.experience_level_id, body.experienceLevelId)) ? firstValue(body.experience_level_id, body.experienceLevelId) : null,
+    education_level_id: isValidObjectId(firstValue(body.education_level_id, body.educationLevelId)) ? firstValue(body.education_level_id, body.educationLevelId) : null,
+    min_experience_years: toNumber(firstValue(body.min_experience_years, body.minExperience, body.min_exp), 0),
+    max_experience_years: toNumberOrNull(firstValue(body.max_experience_years, body.maxExperience, body.max_exp)),
+    salary_min: toNumberOrNull(firstValue(body.salary_min, body.salaryMin, body.min_salary)),
+    salary_max: toNumberOrNull(firstValue(body.salary_max, body.salaryMax, body.max_salary)),
+    currency_code: cleanText(firstValue(body.currency_code, body.currencyCode, body.currency)).toUpperCase(),
+    requested_count: Math.min(Math.max(toNumber(firstValue(body.requested_count, body.requestedCount, body.count), 5), 1), 100),
+    priority: ["low", "normal", "high", "urgent"].includes(cleanText(body.priority)) ? cleanText(body.priority) : "normal",
+    notes: noteText ? [{ by_user_id: companyData.userId, note: noteText, type: "company" }] : [],
   };
 };
 

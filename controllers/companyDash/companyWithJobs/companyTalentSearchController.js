@@ -24,31 +24,24 @@ import {
   toNumber,
   cleanText,
   escapeRegex,
+  firstValue,
 } from "../../../helper/companyDash/companyTalentSearchHelpers.js";
-import { findCvEntry, sendCvFile } from "../../../helper/companyDash/secureCvDownloadHelpers.js";
 
 const parseSort = (value = "") => {
-  const aliases = {
-    createdAt: "createdAt",
-    created_at: "createdAt",
-    updatedAt: "updatedAt",
-    updated_at: "updatedAt",
-    experience_years: "experience_years",
-    experienceYears: "experience_years",
-    profile_completion: "profile_completion",
-    profileCompletion: "profile_completion",
-    current_job_title: "current_job_title",
-    currentJobTitle: "current_job_title",
-  };
+  const allowed = new Set([
+    "createdAt",
+    "updatedAt",
+    "experience_years",
+    "profile_completion",
+    "current_job_title",
+  ]);
 
   if (!value) return { profile_completion: -1, experience_years: -1, createdAt: -1 };
 
-  const raw = String(value).trim().replace(/[?&]+$/g, "");
-  const cleaned = raw.startsWith("-") ? raw.slice(1) : raw;
-  const [fieldRaw, direction = "desc"] = cleaned.split(":");
-  const field = aliases[fieldRaw];
-  if (!field) return { profile_completion: -1, experience_years: -1, createdAt: -1 };
+  const [field, direction = "desc"] = String(value).replace(/^-/, "").split(":");
+  if (!allowed.has(field)) return { profile_completion: -1, experience_years: -1, createdAt: -1 };
 
+  const raw = String(value).trim();
   const dir = raw.startsWith("-") || direction === "desc" ? -1 : 1;
   return { [field]: dir, _id: dir };
 };
@@ -156,7 +149,11 @@ export const requestJobZainTalentHelp = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
-    let payload = normalizeTalentRequestPayload(req.body, companyData);
+    const body = { ...(req.body || {}) };
+    const routeJobId = req.params?.jobId;
+    if (!body.job_id && !body.jobId && routeJobId) body.job_id = routeJobId;
+
+    let payload = normalizeTalentRequestPayload(body, companyData);
 
     if (payload.job_id) {
       const job = await getJobOrFail(req, res, companyData, payload.job_id);
@@ -168,11 +165,17 @@ export const requestJobZainTalentHelp = async (req, res, next) => {
         description: payload.description || job.description || "",
         required_skills: payload.required_skills.length
           ? payload.required_skills
-          : (job.skills_required || []).map((x) => x.title).filter(Boolean),
+          : [
+              ...(job.skills_required || []).map((x) => x.title).filter(Boolean),
+              ...(job.search_projection?.requirements?.skills || []),
+              ...(job.search_index?.filters?.skills || []),
+            ].filter(Boolean),
         preferred_skills: payload.preferred_skills.length
           ? payload.preferred_skills
           : (job.skills_optional || []).map((x) => x.title).filter(Boolean),
-        countries: payload.countries.length ? payload.countries : job.countries || [],
+        countries: payload.countries.length
+          ? payload.countries
+          : [ ...(job.countries || []), ...(job.search_projection?.requirements?.countries || []) ],
         cities: payload.cities.length ? payload.cities : job.cities || [],
         work_mode_id: payload.work_mode_id || job.work_mode_id || null,
         job_type_id: payload.job_type_id || job.job_type_id || null,
@@ -187,10 +190,12 @@ export const requestJobZainTalentHelp = async (req, res, next) => {
     }
 
     if (!payload.title && !payload.description && !payload.required_skills.length) {
-      return fail(res, "talent_request_missing_requirements", 422);
+      return fail(res, "talent_request_missing_requirements", 422, {
+        required: ["title", "description", "required_skills", "job_id"],
+      });
     }
 
-    const request = await JobZainTalentRequestModel.create(payload);
+    const request = await new JobZainTalentRequestModel(payload).save();
     const populated = await JobZainTalentRequestModel.findById(request._id).populate("job_id");
 
     return success(res, normalizeTalentRequest(populated), "jobzain_talent_request_created", 201);
@@ -205,9 +210,13 @@ export const getMyJobZainTalentRequests = async (req, res, next) => {
     if (!companyData) return;
 
     const filter = { company_id: companyData.company._id };
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.priority) filter.priority = req.query.priority;
-    if (req.query.job_id && isValidObjectId(req.query.job_id)) filter.job_id = req.query.job_id;
+    const status = cleanText(firstValue(req.query.status, req.query.request_status));
+    const priority = cleanText(firstValue(req.query.priority));
+    const jobId = firstValue(req.query.job_id, req.query.jobId, req.params?.jobId);
+
+    if (status) filter.status = status;
+    if (priority) filter.priority = priority;
+    if (jobId && isValidObjectId(jobId)) filter.job_id = jobId;
 
     const result = await paginate(JobZainTalentRequestModel, filter, req, {
       populate: "job_id",
@@ -278,6 +287,42 @@ export const cancelJobZainTalentRequest = async (req, res, next) => {
 };
 
 
+const loadCandidatesForSmartSearch = async ({ job, companyId, limit }) => {
+  const strictFilter = buildCandidateFilterFromJob(job, companyId);
+  let employees = await EmployeeModel.find(strictFilter)
+    .populate(employeePopulate)
+    .limit(limit)
+    .lean();
+
+  if (!employees.length) {
+    const relaxedFilter = buildCandidateFilterFromJob(job, companyId, { relaxed: true });
+    employees = await EmployeeModel.find(relaxedFilter)
+      .populate(employeePopulate)
+      .sort({ profile_completion: -1, experience_years: -1, createdAt: -1 })
+      .limit(limit)
+      .lean();
+  }
+
+  return employees;
+};
+
+const generateMatchesForJob = async ({ job, companyId, limit = 100, minScore = 0 }) => {
+  const employees = await loadCandidatesForSmartSearch({ job, companyId, limit });
+  const generatedMatches = [];
+
+  for (const employee of employees) {
+    try {
+      const match = await upsertJobEmployeeMatch({ job, employee, companyId });
+      if (match && Number(match.score || 0) >= minScore) generatedMatches.push(match);
+    } catch (error) {
+      console.error("generateSmartEmployeesForJob employee error:", employee?._id, error?.message || error);
+    }
+  }
+
+  generatedMatches.sort((a, b) => (b.score || 0) - (a.score || 0));
+  return generatedMatches;
+};
+
 export const getSmartEmployeesForJob = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
@@ -287,46 +332,26 @@ export const getSmartEmployeesForJob = async (req, res, next) => {
     const job = await getJobOrFail(req, res, companyData, jobId);
     if (!job) return;
 
-    const page = Math.max(Number(req.query.page || 1), 1);
-    const limit = Math.min(
-      Math.max(Number(req.query.limit || req.query.paginate || 20), 1),
-      100
-    );
-
+    const page = Math.max(toNumber(req.query.page, 1), 1);
+    const limit = Math.min(Math.max(toNumber(firstValue(req.query.limit, req.query.paginate), 20), 1), 100);
     const skip = (page - 1) * limit;
-    const minScore = Math.min(
-      Math.max(toNumber(req.query.min_score, 0), 0),
-      100
-    );
+    const minScore = Math.min(Math.max(toNumber(firstValue(req.query.min_score, req.query.minScore), 0), 0), 100);
 
     const filter = {
       job_id: job._id,
       company_id: companyData.company._id,
-      is_recommended_to_company: true,
       score: { $gte: minScore },
     };
 
     let total = await JobEmployeeMatchModel.countDocuments(filter);
 
     if (total === 0 && req.query.auto_generate !== "false") {
-      const candidateFilter = buildCandidateFilterFromJob(
+      await generateMatchesForJob({
         job,
-        companyData.company._id
-      );
-
-      const candidates = await EmployeeModel.find(candidateFilter)
-        .populate(employeePopulate)
-        .limit(100)
-        .lean();
-
-      for (const employee of candidates) {
-        await upsertJobEmployeeMatch({
-          job,
-          employee,
-          companyId: companyData.company._id,
-        });
-      }
-
+        companyId: companyData.company._id,
+        limit: Math.max(limit * 5, 50),
+        minScore,
+      });
       total = await JobEmployeeMatchModel.countDocuments(filter);
     }
 
@@ -353,81 +378,41 @@ export const getSmartEmployeesForJob = async (req, res, next) => {
     next(error);
   }
 };
- const generateSmartEmployeesForJob = async (req, res, next) => {
+
+export const generateSmartEmployeesForJob = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
     const { jobId } = req.params;
-
-    const job = await getJobOrFail(
-      req,
-      res,
-      companyData,
-      jobId
-    );
-
+    const job = await getJobOrFail(req, res, companyData, jobId);
     if (!job) return;
 
-    const limit = Math.min(
-      Math.max(Number(req.body.limit || req.query.limit || 100), 1),
-      500
-    );
+    const limit = Math.min(Math.max(toNumber(firstValue(req.body.limit, req.query.limit), 100), 1), 500);
+    const minScore = Math.min(Math.max(toNumber(firstValue(req.body.min_score, req.body.minScore, req.query.min_score, req.query.minScore), 0), 0), 100);
 
-    const minScore = Math.min(
-      Math.max(
-        Number(req.body.min_score || req.query.min_score || 0),
-        0
-      ),
-      100
-    );
-
-    const candidateFilter = buildCandidateFilterFromJob(
+    const generatedMatches = await generateMatchesForJob({
       job,
-      companyData.company._id
-    );
-
-    const employees = await EmployeeModel.find(candidateFilter)
-      .populate(employeePopulate)
-      .limit(limit)
-      .lean();
-
-    const generatedMatches = [];
-
-    for (const employee of employees) {
-      try {
-        const match = await upsertJobEmployeeMatch({
-          job,
-          employee,
-          companyId: companyData.company._id,
-        });
-
-        if (
-          match &&
-          match.score >= minScore &&
-          match.is_recommended_to_company
-        ) {
-          generatedMatches.push(match);
-        }
-      } catch (error) {
-        console.error(
-          "generateSmartEmployeesForJob employee error:",
-          employee?._id,
-          error
-        );
-      }
-    }
-
-    generatedMatches.sort((a, b) => {
-      return (b.score || 0) - (a.score || 0);
+      companyId: companyData.company._id,
+      limit,
+      minScore,
     });
+
+    const populatedMatches = await JobEmployeeMatchModel.find({
+      _id: { $in: generatedMatches.map((match) => match._id) },
+    })
+      .sort({ score: -1, generated_at: -1, _id: -1 })
+      .populate({ path: "employee_id", populate: employeePopulate })
+      .lean();
 
     return success(
       res,
       {
-        generated: generatedMatches.length,
+        generated: populatedMatches.length,
         job_id: job._id,
-        matches: generatedMatches,
+        matches: populatedMatches
+          .filter((match) => match.employee_id)
+          .map((match) => normalizeEmployeeForCompany(match.employee_id, match)),
       },
       "smart_employees_generated"
     );
@@ -435,6 +420,7 @@ export const getSmartEmployeesForJob = async (req, res, next) => {
     next(error);
   }
 };
+
 export const matchEmployeeWithJob = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
@@ -463,42 +449,9 @@ export const matchEmployeeWithJob = async (req, res, next) => {
   }
 };
 
-export const downloadEmployeeCv = async (req, res, next) => {
-  try {
-    const companyData = await getCompanyUserIdOrFail(req, res);
-    if (!companyData) return;
-
-    const employee = await getEmployeeDetailsOrFail(req, res, companyData, req.params.employeeId);
-    if (!employee) return;
-
-    const activeCvs = (employee.cvs || []).filter((cv) => !cv.status || cv.status === "active");
-    const selectedCv = findCvEntry(activeCvs.map((cv) => ({
-      id: String(cv?._id || cv?.id || ""),
-      source: "employee_cv",
-      title: cv?.title || cv?.fileName || "Employee CV",
-      fileName: cv?.fileName || cv?.url || "cv.pdf",
-      raw: cv?.url || cv?.file || cv?.path || cv?.fileName || "",
-    })), { ...req.query, cv_id: req.params.cvId || req.query.cv_id });
-
-    if (!selectedCv) return fail(res, "cv_not_found", 404);
-
-    const sent = await sendCvFile({
-      res,
-      cvEntry: selectedCv,
-      fallbackName: selectedCv.fileName || `employee-${req.params.employeeId}.pdf`,
-      inline: req.query.inline === "true",
-    });
-
-    if (!sent) return fail(res, "cv_file_not_found", 404);
-  } catch (error) {
-    next(error);
-  }
-};
-
 export default {
   searchEmployees,
   getEmployeeDetails,
-  downloadEmployeeCv,
   requestJobZainTalentHelp,
   getMyJobZainTalentRequests,
   getJobZainTalentRequestDetails,
