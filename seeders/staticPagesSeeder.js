@@ -60,7 +60,9 @@ const isArabicMainHeaderNoise = (line = "") => {
 
   return (
     value.startsWith("هلا جوب / Hala Job |") ||
-    value.startsWith("هلا جوب / Hala Job -")
+    value.startsWith("هلا جوب / Hala Job -") ||
+    value === "هلا جوب / Hala Job - صفحة تعريف بالتطبيق" ||
+    value === "ــــــــــــــــــــــــــــــــــــــــ"
   );
 };
 
@@ -69,16 +71,20 @@ const isFooterLine = (line = "") => {
 
   return (
     value.startsWith("هلا جوب / Hala Job - آخر تحديث") ||
-    value.startsWith("Hala Job / هلا جوب - Last updated")
+    value.startsWith("Hala Job / هلا جوب - Last updated") ||
+    value === "Hala Job / هلا جوب" ||
+    value.includes("support@halajob.com | privacy@halajob.com")
   );
 };
 
 const isArabicUpdatedLine = (line = "") => {
-  return cleanValue(line).startsWith("آخر تحديث");
+  const value = cleanValue(line);
+  return value.startsWith("آخر تحديث");
 };
 
 const isEnglishUpdatedLine = (line = "") => {
-  return cleanValue(line).startsWith("Last updated");
+  const value = cleanValue(line);
+  return value.startsWith("Last updated");
 };
 
 const isUpdatedLine = (line = "") => {
@@ -95,11 +101,34 @@ const isNumberedHeading = (line = "") => {
   return /^\d+\.\s+/.test(cleanValue(line));
 };
 
-const isHeadingLine = (line = "") => {
-  return isNumberedHeading(line) || isContactHeading(line);
+const getCustomTitleMarkers = (pageConfig = {}, lang = "ar") => {
+  const key = lang === "ar" ? "ar_title_markers" : "en_title_markers";
+
+  return Array.isArray(pageConfig[key])
+    ? pageConfig[key].map(cleanValue).filter(Boolean)
+    : [];
 };
 
-const getHeadingComparableKey = (line = "") => {
+const isCustomHeadingLine = (line = "", pageConfig = {}, lang = "ar") => {
+  const value = cleanValue(line);
+  const markers = getCustomTitleMarkers(pageConfig, lang);
+
+  return markers.includes(value);
+};
+
+const isHeadingLine = (line = "", pageConfig = {}, lang = "ar") => {
+  if (isConfiguredPageTitle(line, pageConfig, lang)) {
+    return false;
+  }
+
+  return (
+    isNumberedHeading(line) ||
+    isContactHeading(line) ||
+    isCustomHeadingLine(line, pageConfig, lang)
+  );
+};
+
+const getHeadingComparableKey = (line = "", pageConfig = {}, lang = "ar") => {
   const value = cleanValue(line);
 
   const numberMatch = value.match(/^(\d+)\./);
@@ -111,6 +140,19 @@ const getHeadingComparableKey = (line = "") => {
     return "contact_information";
   }
 
+  const arMarkers = getCustomTitleMarkers(pageConfig, "ar");
+  const enMarkers = getCustomTitleMarkers(pageConfig, "en");
+
+  if (lang === "ar") {
+    const index = arMarkers.indexOf(value);
+    if (index !== -1) return `custom:${index}`;
+  }
+
+  if (lang === "en") {
+    const index = enMarkers.indexOf(value);
+    if (index !== -1) return `custom:${index}`;
+  }
+
   return `heading:${value.toLowerCase()}`;
 };
 
@@ -120,7 +162,31 @@ const assertCondition = (condition, message) => {
   }
 };
 
-const splitArabicAndEnglishLines = (lines = [], fileName = "") => {
+const splitArabicAndEnglishLines = (lines = [], fileName = "", pageConfig = {}) => {
+  const customMarker = cleanValue(pageConfig.english_start_marker);
+
+  if (customMarker) {
+    const markerIndex = lines.findIndex((line) => {
+      return cleanValue(line).toLowerCase() === customMarker.toLowerCase();
+    });
+
+    assertCondition(
+      markerIndex !== -1,
+      `Missing english_start_marker "${customMarker}" in file: ${fileName}`
+    );
+
+    const arLines = lines.slice(0, markerIndex);
+    const enLines = lines.slice(markerIndex);
+
+    assertCondition(arLines.length > 0, `Arabic section is empty: ${fileName}`);
+    assertCondition(enLines.length > 0, `English section is empty: ${fileName}`);
+
+    return {
+      arLines,
+      enLines,
+    };
+  }
+
   const englishIndex = lines.findIndex(isEnglishVersionLine);
 
   assertCondition(
@@ -140,12 +206,16 @@ const splitArabicAndEnglishLines = (lines = [], fileName = "") => {
   };
 };
 
-const getArabicTitle = (lines = [], fileName = "") => {
+const getArabicTitle = (lines = [], fileName = "", pageConfig = {}) => {
+  if (pageConfig.title_ar) {
+    return cleanValue(pageConfig.title_ar);
+  }
+
   const title = lines.find((line) => {
     if (isArabicMainHeaderNoise(line)) return false;
     if (isBrandLine(line)) return false;
     if (isUpdatedLine(line)) return false;
-    if (isHeadingLine(line)) return false;
+    if (isHeadingLine(line, pageConfig, "ar")) return false;
     if (isFooterLine(line)) return false;
     return !isEmptyValue(line);
   });
@@ -155,11 +225,15 @@ const getArabicTitle = (lines = [], fileName = "") => {
   return cleanValue(title);
 };
 
-const getEnglishTitle = (lines = [], fileName = "") => {
+const getEnglishTitle = (lines = [], fileName = "", pageConfig = {}) => {
+  if (pageConfig.title_en) {
+    return cleanValue(pageConfig.title_en);
+  }
+
   const title = lines.find((line) => {
     if (isBrandLine(line)) return false;
     if (isUpdatedLine(line)) return false;
-    if (isHeadingLine(line)) return false;
+    if (isHeadingLine(line, pageConfig, "en")) return false;
     if (isFooterLine(line)) return false;
     return !isEmptyValue(line);
   });
@@ -169,55 +243,112 @@ const getEnglishTitle = (lines = [], fileName = "") => {
   return cleanValue(title);
 };
 
+const getFallbackDescriptionAfterFirstHeading = ({
+  lines = [],
+  firstHeadingIndex = 0,
+  pageConfig = {},
+  lang = "ar",
+}) => {
+  const descriptionLines = [];
+
+  for (const rawLine of lines.slice(firstHeadingIndex + 1)) {
+    const line = cleanValue(rawLine);
+
+    if (!line) continue;
+    if (isHeadingLine(line, pageConfig, lang)) break;
+    if (isBrandLine(line)) continue;
+    if (isFooterLine(line)) continue;
+    if (isUpdatedLine(line)) continue;
+    if (isEnglishVersionLine(line)) continue;
+    if (isArabicMainHeaderNoise(line)) continue;
+
+    descriptionLines.push(line);
+  }
+
+  return descriptionLines.join("\n");
+};
+const isConfiguredPageTitle = (line = "", pageConfig = {}, lang = "ar") => {
+  const value = cleanValue(line);
+
+  const configuredTitle =
+    lang === "ar" ? pageConfig.title_ar : pageConfig.title_en;
+
+  return configuredTitle && value === cleanValue(configuredTitle);
+};
 const getSectionDescription = ({
   lines = [],
   title = "",
   fileName = "",
   lang = "ar",
+  pageConfig = {},
 }) => {
+  const manualUpdatedText =
+    lang === "ar" ? pageConfig.updated_text_ar : pageConfig.updated_text_en;
+
   const updatedIndex = lines.findIndex((line) => {
     return lang === "ar" ? isArabicUpdatedLine(line) : isEnglishUpdatedLine(line);
   });
 
   assertCondition(
-    updatedIndex !== -1,
+    updatedIndex !== -1 || manualUpdatedText,
     `Missing ${lang} updated line in file: ${fileName}`
   );
 
-  const firstHeadingIndex = lines.findIndex(isHeadingLine);
+  const firstHeadingIndex = lines.findIndex((line) => {
+    return isHeadingLine(line, pageConfig, lang);
+  });
 
   assertCondition(
     firstHeadingIndex !== -1,
     `Missing ${lang} first heading in file: ${fileName}`
   );
 
-  assertCondition(
-    firstHeadingIndex > updatedIndex,
-    `Invalid ${lang} structure. First heading appears before updated line in file: ${fileName}`
-  );
+  if (updatedIndex !== -1) {
+    assertCondition(
+      firstHeadingIndex > updatedIndex || pageConfig.allow_heading_before_updated === true,
+      `Invalid ${lang} structure. First heading appears before updated line in file: ${fileName}`
+    );
+  }
+
+  const sliceStart = updatedIndex !== -1 ? updatedIndex + 1 : 0;
 
   const descriptionLines = lines
-    .slice(updatedIndex + 1, firstHeadingIndex)
+    .slice(sliceStart, firstHeadingIndex)
     .filter((line) => {
-      if (cleanValue(line) === cleanValue(title)) return false;
-      if (isBrandLine(line)) return false;
-      if (isFooterLine(line)) return false;
-      if (isUpdatedLine(line)) return false;
-      if (isEnglishVersionLine(line)) return false;
-      return !isEmptyValue(line);
+      const value = cleanValue(line);
+
+      if (!value) return false;
+      if (value === cleanValue(title)) return false;
+      if (isBrandLine(value)) return false;
+      if (isFooterLine(value)) return false;
+      if (isUpdatedLine(value)) return false;
+      if (isEnglishVersionLine(value)) return false;
+      if (isArabicMainHeaderNoise(value)) return false;
+
+      return true;
     })
     .map(cleanValue);
 
-  const description = descriptionLines.join("\n");
+  let description = descriptionLines.join("\n");
+
+  if (!description) {
+    description = getFallbackDescriptionAfterFirstHeading({
+      lines,
+      firstHeadingIndex,
+      pageConfig,
+      lang,
+    });
+  }
 
   assertCondition(
     description,
-    `Missing ${lang} description before first heading in file: ${fileName}`
+    `Missing ${lang} description in file: ${fileName}`
   );
 
   return {
     description,
-    updatedText: cleanValue(lines[updatedIndex]),
+    updatedText:
+      updatedIndex !== -1 ? cleanValue(lines[updatedIndex]) : cleanValue(manualUpdatedText),
     firstHeadingIndex,
   };
 };
@@ -228,6 +359,7 @@ const parseContentBlocks = ({
   updatedText = "",
   fileName = "",
   lang = "ar",
+  pageConfig = {},
 }) => {
   const blocks = [];
 
@@ -241,7 +373,10 @@ const parseContentBlocks = ({
   let currentDescriptionLines = [];
 
   const flushDescription = () => {
-    const value = currentDescriptionLines.map(cleanValue).filter(Boolean).join("\n");
+    const value = currentDescriptionLines
+      .map(cleanValue)
+      .filter(Boolean)
+      .join("\n");
 
     if (value) {
       blocks.push({
@@ -257,13 +392,14 @@ const parseContentBlocks = ({
     const line = cleanValue(rawLine);
 
     if (!line) continue;
+    if (isConfiguredPageTitle(line, pageConfig, lang)) continue;
     if (isBrandLine(line)) continue;
     if (isFooterLine(line)) continue;
     if (isEnglishVersionLine(line)) continue;
     if (isUpdatedLine(line)) continue;
     if (isArabicMainHeaderNoise(line)) continue;
 
-    if (isHeadingLine(line)) {
+    if (isHeadingLine(line, pageConfig, lang)) {
       flushDescription();
 
       blocks.push({
@@ -292,14 +428,15 @@ const parseContentBlocks = ({
   return blocks;
 };
 
-const parseArabicPage = (lines = [], fileName = "") => {
-  const title = getArabicTitle(lines, fileName);
+const parseArabicPage = (lines = [], fileName = "", pageConfig = {}) => {
+  const title = getArabicTitle(lines, fileName, pageConfig);
 
   const { description, updatedText, firstHeadingIndex } = getSectionDescription({
     lines,
     title,
     fileName,
     lang: "ar",
+    pageConfig,
   });
 
   const blocks = parseContentBlocks({
@@ -308,6 +445,7 @@ const parseArabicPage = (lines = [], fileName = "") => {
     updatedText,
     fileName,
     lang: "ar",
+    pageConfig,
   });
 
   return {
@@ -317,14 +455,15 @@ const parseArabicPage = (lines = [], fileName = "") => {
   };
 };
 
-const parseEnglishPage = (lines = [], fileName = "") => {
-  const title = getEnglishTitle(lines, fileName);
+const parseEnglishPage = (lines = [], fileName = "", pageConfig = {}) => {
+  const title = getEnglishTitle(lines, fileName, pageConfig);
 
   const { description, updatedText, firstHeadingIndex } = getSectionDescription({
     lines,
     title,
     fileName,
     lang: "en",
+    pageConfig,
   });
 
   const blocks = parseContentBlocks({
@@ -333,6 +472,7 @@ const parseEnglishPage = (lines = [], fileName = "") => {
     updatedText,
     fileName,
     lang: "en",
+    pageConfig,
   });
 
   return {
@@ -342,7 +482,12 @@ const parseEnglishPage = (lines = [], fileName = "") => {
   };
 };
 
-const mergeArabicAndEnglishBlocks = ({ arBlocks = [], enBlocks = [], fileName = "" }) => {
+const mergeArabicAndEnglishBlocks = ({
+  arBlocks = [],
+  enBlocks = [],
+  fileName = "",
+  pageConfig = {},
+}) => {
   assertCondition(
     arBlocks.length === enBlocks.length,
     [
@@ -368,8 +513,17 @@ const mergeArabicAndEnglishBlocks = ({ arBlocks = [], enBlocks = [], fileName = 
     );
 
     if (arBlock.type === "title") {
-      const arComparableKey = getHeadingComparableKey(arBlock.value);
-      const enComparableKey = getHeadingComparableKey(enBlock.value);
+      const arComparableKey = getHeadingComparableKey(
+        arBlock.value,
+        pageConfig,
+        "ar"
+      );
+
+      const enComparableKey = getHeadingComparableKey(
+        enBlock.value,
+        pageConfig,
+        "en"
+      );
 
       assertCondition(
         arComparableKey === enComparableKey,
@@ -394,15 +548,27 @@ const mergeArabicAndEnglishBlocks = ({ arBlocks = [], enBlocks = [], fileName = 
 
 const validatePageConfig = (pageConfig = {}) => {
   assertCondition(pageConfig.key, "Page config missing key");
-  assertCondition(pageConfig.file_name, `Page config missing file_name for key: ${pageConfig.key}`);
+
+  assertCondition(
+    pageConfig.file_name,
+    `Page config missing file_name for key: ${pageConfig.key}`
+  );
 };
 
 const validatePageData = (page = {}) => {
   assertCondition(page.key, "Page data missing key");
   assertCondition(page.title_ar, `Missing title_ar for page: ${page.key}`);
   assertCondition(page.title_en, `Missing title_en for page: ${page.key}`);
-  assertCondition(page.description_ar, `Missing description_ar for page: ${page.key}`);
-  assertCondition(page.description_en, `Missing description_en for page: ${page.key}`);
+
+  assertCondition(
+    page.description_ar,
+    `Missing description_ar for page: ${page.key}`
+  );
+
+  assertCondition(
+    page.description_en,
+    `Missing description_en for page: ${page.key}`
+  );
 
   assertCondition(
     Array.isArray(page.content),
@@ -468,16 +634,18 @@ const buildPageFromDocx = async (pageConfig = {}) => {
 
   const { arLines, enLines } = splitArabicAndEnglishLines(
     lines,
-    pageConfig.file_name
+    pageConfig.file_name,
+    pageConfig
   );
 
-  const arPage = parseArabicPage(arLines, pageConfig.file_name);
-  const enPage = parseEnglishPage(enLines, pageConfig.file_name);
+  const arPage = parseArabicPage(arLines, pageConfig.file_name, pageConfig);
+  const enPage = parseEnglishPage(enLines, pageConfig.file_name, pageConfig);
 
   const content = mergeArabicAndEnglishBlocks({
     arBlocks: arPage.blocks,
     enBlocks: enPage.blocks,
     fileName: pageConfig.file_name,
+    pageConfig,
   });
 
   const pageData = {

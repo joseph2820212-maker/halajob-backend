@@ -64,5 +64,37 @@
     "file_name": "هلا جوب صفحة البلاغات القانونية.docx",
     "status": true,
     "is_ios": false
-  }
+  },
+ {
+  "key": "contact_information",
+  "file_name": "بيانات الاتصال.docx",
+  "title_ar": "معلومات الاتصال",
+  "title_en": "Contact Information",
+  "english_start_marker": "Contact Information",
+  "status": true,
+  "is_ios": false
+},
+ {
+  "key": "about_us",
+  "file_name": "من نحن.docx",
+  "title_ar": "من نحن",
+  "title_en": "About Us",
+  "english_start_marker": "Where Opportunities Begin Clearly",
+  "updated_text_ar": "آخر تحديث: 05-2026",
+  "updated_text_en": "Last updated: 05-2026",
+  "ar_title_markers": [
+    "حيث تبدأ الفرص بوضوح",
+    "رؤيتنا",
+    "رسالتنا",
+    "ما الذي نقدمه؟"
+  ],
+  "en_title_markers": [
+    "Where Opportunities Begin Clearly",
+    "Our Vision",
+    "Our Mission",
+    "What We Provide"
+  ],
+  "status": true,
+  "is_ios": false
+}
 ]
