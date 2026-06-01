@@ -1,7 +1,8 @@
 import {
   EmployeeModel,
   JobEmployeeMatchModel,
-  JobZainTalentRequestModel
+  JobZainTalentRequestModel,
+  UserModel,
 } from "../../../models/index.js";
 import {
   getCompanyUserIdOrFail,
@@ -21,6 +22,8 @@ import {
   normalizeTalentRequest,
   getEmployeeDetailsOrFail,
   toNumber,
+  cleanText,
+  escapeRegex,
 } from "../../../helper/companyDash/companyTalentSearchHelpers.js";
 
 const parseSort = (value = "") => {
@@ -37,8 +40,49 @@ const parseSort = (value = "") => {
   const [field, direction = "desc"] = String(value).replace(/^-/, "").split(":");
   if (!allowed.has(field)) return { profile_completion: -1, experience_years: -1, createdAt: -1 };
 
-  const dir = direction === "asc" || String(value).startsWith("") === false ? 1 : -1;
+  const raw = String(value).trim();
+  const dir = raw.startsWith("-") || direction === "desc" ? -1 : 1;
   return { [field]: dir, _id: dir };
+};
+
+const addUserSearchToEmployeeFilter = async (filter, query = {}) => {
+  const search = cleanText(query.search || query.q || query.keyword);
+  if (!search) return filter;
+
+  const regex = new RegExp(escapeRegex(search), "i");
+  const tokens = search.split(/\s+/).map((x) => cleanText(x)).filter(Boolean);
+
+  const userOr = [
+    { first_name: regex },
+    { mid_name: regex },
+    { last_name: regex },
+    { email: regex },
+    { phone: regex },
+    { phone_e164: regex },
+    { phone_national: regex },
+  ];
+
+  if (tokens.length > 1) {
+    userOr.push({
+      $and: tokens.map((token) => ({
+        $or: [
+          { first_name: new RegExp(escapeRegex(token), "i") },
+          { mid_name: new RegExp(escapeRegex(token), "i") },
+          { last_name: new RegExp(escapeRegex(token), "i") },
+        ],
+      })),
+    });
+  }
+
+  const users = await UserModel.find({ $or: userOr }).select("_id").limit(500).lean();
+  const userIds = users.map((user) => user._id);
+  if (!userIds.length) return filter;
+
+  const userClause = { user_id: { $in: userIds } };
+  if (Array.isArray(filter.$or)) filter.$or.push(userClause);
+  else filter.$or = [userClause];
+
+  return filter;
 };
 
 export const searchEmployees = async (req, res, next) => {
@@ -46,14 +90,29 @@ export const searchEmployees = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
-    const filter = buildEmployeeSearchFilter(req.query, companyData.company._id);
+    const filter = await addUserSearchToEmployeeFilter(
+      buildEmployeeSearchFilter(req.query, companyData.company._id),
+      req.query
+    );
 
     const result = await paginate(EmployeeModel, filter, req, {
       populate: employeePopulate,
       sort: parseSort(req.query.sort),
     });
 
-    const items = result.items.map((employee) => normalizeEmployeeForCompany(employee));
+    let matchesByEmployee = new Map();
+    if (req.query.job_id && isValidObjectId(req.query.job_id) && result.items.length) {
+      const matches = await JobEmployeeMatchModel.find({
+        job_id: req.query.job_id,
+        employee_id: { $in: result.items.map((employee) => employee._id) },
+        company_id: companyData.company._id,
+      }).lean();
+      matchesByEmployee = new Map(matches.map((match) => [String(match.employee_id), match]));
+    }
+
+    const items = result.items.map((employee) =>
+      normalizeEmployeeForCompany(employee, matchesByEmployee.get(String(employee._id)) || null)
+    );
 
     return success(res, items, "employees_search_result", 200, result.meta);
   } catch (error) {

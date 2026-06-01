@@ -298,7 +298,7 @@ export const normalizeApplicant = (application) => {
       languages: employee?.languages || [],
       education: employee?.education || [],
       experience: employee?.experience || [],
-      cvs: employee?.cvs || [],
+      cvs: (employee?.cvs || []).filter((cv) => !cv.status || cv.status === "active"),
       links: employee?.links || [],
     },
   };

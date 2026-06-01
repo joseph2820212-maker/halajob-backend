@@ -20,6 +20,8 @@ router.get("/hiring/:jobId/applications", upload.none(), controllerHiring.getJob
 router.get("/hiring/applicants", upload.none(), controllerHiring.getApplicants);
 router.get("/hiring/:jobId/applicants", upload.none(), controllerHiring.getApplicants);
 
+router.post("/hiring/applications/bulk-cv", upload.none(), controllerHiring.bulkApplicationCvs);
+router.post("/hiring/applications/bulk-export", upload.none(), controllerHiring.bulkExportApplications);
 router.get("/hiring/applications/:applicationId", upload.none(), controllerHiring.getApplicationDetails);
 router.get("/hiring/applications/:applicationId/cv", upload.none(), controllerHiring.getApplicationCv);
 router.patch("/hiring/applications/:applicationId/status", upload.none(), controllerHiring.updateApplicationStatus);
@@ -70,9 +72,4 @@ router.patch("/talent/help-requests/:requestId/cancel", upload.none(), controlle
 router.post("/talent/:jobId/smart-employees/generate", upload.none(), controllerTalent.generateSmartEmployeesForJob);
 router.get("/talent/:jobId/smart-employees", upload.none(), controllerTalent.getSmartEmployeesForJob);
 router.get("/talent/:jobId/employees/:employeeId/match", upload.none(), controllerTalent.matchEmployeeWithJob);
-router.post(
-  "/talent/:jobId/smart-employees/generate",
-  upload.none(),
-  controllerTalent.generateSmartEmployeesForJob
-);
 export default router;

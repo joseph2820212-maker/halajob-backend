@@ -74,6 +74,71 @@ const createStatusHistory = async ({ application, oldStatus, newStatus, companyD
   );
 };
 
+const parseArrayBody = (value) => {
+  if (Array.isArray(value)) return value;
+  if (value === undefined || value === null || value === "") return [];
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      return value.split(/[,;\n]+/).map((x) => x.trim()).filter(Boolean);
+    }
+  }
+  return [value];
+};
+
+const applicationCvFiles = (application) => {
+  const files = [];
+  if (application?.cv) {
+    files.push({
+      type: "application_cv",
+      title: "Application CV",
+      url: application.cv,
+    });
+  }
+
+  const employeeCvs = (application?.employee_id?.cvs || []).filter((cv) => !cv.status || cv.status === "active");
+  for (const cv of employeeCvs) {
+    const url = cv?.url || cv?.file || cv?.path || (typeof cv === "string" ? cv : "");
+    if (!url) continue;
+    files.push({
+      type: "employee_cv",
+      title: cv?.title || cv?.fileName || "Employee CV",
+      fileName: cv?.fileName || "",
+      template_key: cv?.template_key || "",
+      url,
+    });
+  }
+
+  const seen = new Set();
+  return files.filter((file) => {
+    if (!file.url || seen.has(String(file.url))) return false;
+    seen.add(String(file.url));
+    return true;
+  });
+};
+
+const buildBulkApplicationsFilter = async (req, res, companyData) => {
+  const body = req.body || {};
+  const rawIds = parseArrayBody(body.application_ids || body.applications || body.ids);
+  const ids = rawIds.map((id) => String(id?._id || id || "").trim()).filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+  if (ids.length) {
+    return { _id: { $in: ids }, company_id: companyData.company._id };
+  }
+
+  const filter = buildApplicationsFilter(companyData.company._id, { ...req.query, ...body });
+  const jobId = body.job_id || req.query.job_id || req.params.jobId;
+  if (jobId) {
+    const job = await getOwnedJobOrFail(req, res, companyData.company._id, jobId, "_id");
+    if (!job) return null;
+    filter.job_id = job._id;
+  }
+
+  return filter;
+};
+
 export const getHiringSummary = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
@@ -493,6 +558,11 @@ export const getApplicationCv = async (req, res, next) => {
       return fail(res, "cv_not_found", 404);
     }
 
+    await UserApplyingJobModel.updateOne(
+      { _id: application._id, company_id: companyData.company._id },
+      { $set: { cv_download: true, last_activity_at: new Date() } }
+    );
+
     return success(res, {
       application_id: application._id,
       employee_id: application.employee_id?._id || null,
@@ -552,6 +622,91 @@ export const blockApplicationApplicant = async (req, res, next) => {
   }
 };
 
+
+export const bulkApplicationCvs = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const filter = await buildBulkApplicationsFilter(req, res, companyData);
+    if (!filter) return;
+
+    const limit = Math.min(Math.max(Number(req.body?.limit || req.query.limit || 500), 1), 1000);
+    const applications = await populateApplicationQuery(
+      UserApplyingJobModel.find(filter).sort(buildApplicationsSort(req.query)).limit(limit)
+    ).lean();
+
+    const applicationIds = applications.map((application) => application._id);
+    if (applicationIds.length) {
+      await UserApplyingJobModel.updateMany(
+        { _id: { $in: applicationIds }, company_id: companyData.company._id },
+        { $set: { cv_download: true, last_activity_at: new Date() } }
+      );
+    }
+
+    const items = applications.map((application) => {
+      const cvs = applicationCvFiles(application);
+      return {
+        application_id: application._id,
+        employee_id: application.employee_id?._id || null,
+        user_id: application.user_id?._id || application.user_id || null,
+        applicant_name: [application.user_id?.first_name || application.first_name, application.user_id?.mid_name, application.user_id?.last_name || application.last_name]
+          .filter(Boolean)
+          .join(" "),
+        email: application.email || application.user_id?.email || "",
+        phone_code: application.phone_code || application.user_id?.phone_code || "",
+        phone_national: application.phone_national || application.user_id?.phone_national || "",
+        status: application.status,
+        cv_files: cvs,
+        download_urls: cvs.map((cv) => cv.url).filter(Boolean),
+      };
+    });
+
+    return success(
+      res,
+      {
+        count: items.length,
+        download_urls: [...new Set(items.flatMap((item) => item.download_urls))],
+        items,
+      },
+      "application_cvs"
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const bulkExportApplications = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const filter = await buildBulkApplicationsFilter(req, res, companyData);
+    if (!filter) return;
+
+    const limit = Math.min(Math.max(Number(req.body?.limit || req.query.limit || 500), 1), 1000);
+    const applications = await populateApplicationQuery(
+      UserApplyingJobModel.find(filter).sort(buildApplicationsSort(req.query)).limit(limit)
+    ).lean();
+
+    const items = applications.map((application) => ({
+      ...normalizeApplicant(application),
+      cv_files: applicationCvFiles(application),
+    }));
+
+    return success(
+      res,
+      {
+        count: items.length,
+        items,
+      },
+      "applications_export"
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getCompanyJobReviews = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
@@ -589,6 +744,8 @@ export default {
   getApplicationDetails,
   updateApplicationStatus,
   getApplicationCv,
+  bulkApplicationCvs,
+  bulkExportApplications,
   blockApplicationApplicant,
   createInterview,
   getInterviews,

@@ -99,7 +99,7 @@ export const getJobOrFail = async (req, res, companyData, jobId) => {
 export const employeePopulate = [
   {
     path: "user_id",
-    select: "first_name mid_name last_name email image phone phone_code",
+    select: "first_name mid_name last_name email image phone phone_code phone_national phone_e164",
   },
   { path: "experience_level_id" },
   { path: "skills.skill_id" },
