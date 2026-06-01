@@ -28,20 +28,27 @@ import {
 import { findCvEntry, sendCvFile } from "../../../helper/companyDash/secureCvDownloadHelpers.js";
 
 const parseSort = (value = "") => {
-  const allowed = new Set([
-    "createdAt",
-    "updatedAt",
-    "experience_years",
-    "profile_completion",
-    "current_job_title",
-  ]);
+  const aliases = {
+    createdAt: "createdAt",
+    created_at: "createdAt",
+    updatedAt: "updatedAt",
+    updated_at: "updatedAt",
+    experience_years: "experience_years",
+    experienceYears: "experience_years",
+    profile_completion: "profile_completion",
+    profileCompletion: "profile_completion",
+    current_job_title: "current_job_title",
+    currentJobTitle: "current_job_title",
+  };
 
   if (!value) return { profile_completion: -1, experience_years: -1, createdAt: -1 };
 
-  const [field, direction = "desc"] = String(value).replace(/^-/, "").split(":");
-  if (!allowed.has(field)) return { profile_completion: -1, experience_years: -1, createdAt: -1 };
+  const raw = String(value).trim().replace(/[?&]+$/g, "");
+  const cleaned = raw.startsWith("-") ? raw.slice(1) : raw;
+  const [fieldRaw, direction = "desc"] = cleaned.split(":");
+  const field = aliases[fieldRaw];
+  if (!field) return { profile_completion: -1, experience_years: -1, createdAt: -1 };
 
-  const raw = String(value).trim();
   const dir = raw.startsWith("-") || direction === "desc" ? -1 : 1;
   return { [field]: dir, _id: dir };
 };

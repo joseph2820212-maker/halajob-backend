@@ -42,18 +42,49 @@ export const INTERVIEW_STATUSES = new Set([
 export const INTERVIEW_TYPES = new Set(["online", "in_office", "phone", "on_app"]);
 export const INVITATION_STATUSES = new Set(["sent", "seen", "accepted", "declined", "expired", "cancelled"]);
 
-export const cleanText = (value = "") => String(value || "").trim();
+export const cleanText = (value = "") => {
+  if (Array.isArray(value)) return cleanText(value[0]);
+  return String(value ?? "").trim();
+};
+
+const cleanQueryValue = (value = "") => cleanText(value).replace(/[?&]+$/g, "");
+
+const firstValue = (...values) => {
+  for (const value of values) {
+    const cleaned = cleanQueryValue(value);
+    if (cleaned !== "") return cleaned;
+  }
+  return "";
+};
 
 export const toNumber = (value, fallback = null) => {
-  if (value === undefined || value === null || value === "") return fallback;
-  const n = Number(value);
+  const cleaned = cleanQueryValue(value);
+  if (cleaned === "") return fallback;
+  const n = Number(cleaned);
   return Number.isFinite(n) ? n : fallback;
 };
 
 export const toDateOrNull = (value) => {
-  if (!value) return null;
-  const date = new Date(value);
+  const cleaned = cleanQueryValue(value);
+  if (!cleaned) return null;
+  const date = new Date(cleaned);
   return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const toBooleanOrNull = (value) => {
+  const cleaned = cleanQueryValue(value).toLowerCase();
+  if (["true", "1", "yes", "y"].includes(cleaned)) return true;
+  if (["false", "0", "no", "n"].includes(cleaned)) return false;
+  return null;
+};
+
+const toStatusList = (value, allowedSet) => {
+  const raw = cleanQueryValue(value);
+  if (!raw || raw === "all") return [];
+  return raw
+    .split(/[,;|]+/)
+    .map((item) => cleanQueryValue(item))
+    .filter((item) => allowedSet.has(item));
 };
 
 export const isMongoId = (value) => isValidObjectId(value);
@@ -150,41 +181,85 @@ export const findEmployeeForInvitationOrFail = async (req, res) => {
 export const buildApplicationsFilter = (companyId, query = {}) => {
   const filter = { company_id: companyId };
 
-  if (query.job_id && isMongoId(query.job_id)) filter.job_id = query.job_id;
-  if (query.status && APPLICATION_STATUSES.has(String(query.status))) filter.status = String(query.status);
-  if (query.employee_id && isMongoId(query.employee_id)) filter.employee_id = query.employee_id;
-  if (query.user_id && isMongoId(query.user_id)) filter.user_id = query.user_id;
+  const jobId = firstValue(query.job_id, query.jobId, query.job);
+  if (jobId && isMongoId(jobId)) filter.job_id = jobId;
 
-  const from = toDateOrNull(query.from || query.dateFrom);
-  const to = toDateOrNull(query.to || query.dateTo);
+  const statusList = toStatusList(query.status || query.statuses, APPLICATION_STATUSES);
+  if (statusList.length === 1) filter.status = statusList[0];
+  if (statusList.length > 1) filter.status = { $in: statusList };
+
+  const employeeId = firstValue(query.employee_id, query.employeeId);
+  if (employeeId && isMongoId(employeeId)) filter.employee_id = employeeId;
+
+  const userId = firstValue(query.user_id, query.userId);
+  if (userId && isMongoId(userId)) filter.user_id = userId;
+
+  const source = firstValue(query.source);
+  if (source && ["app", "web", "external", "invitation"].includes(source)) filter.source = source;
+
+  const from = toDateOrNull(query.from || query.dateFrom || query.start_date || query.startDate || query.applied_from);
+  const to = toDateOrNull(query.to || query.dateTo || query.end_date || query.endDate || query.applied_to);
   if (from || to) {
     filter.createdAt = {};
     if (from) filter.createdAt.$gte = from;
     if (to) filter.createdAt.$lte = to;
   }
 
-  const search = cleanText(query.search || query.q);
+  const minRating = toNumber(query.min_rating || query.minRating, null);
+  const maxRating = toNumber(query.max_rating || query.maxRating, null);
+  if (minRating !== null || maxRating !== null) {
+    filter.user_job_rating = {};
+    if (minRating !== null) filter.user_job_rating.$gte = minRating;
+    if (maxRating !== null) filter.user_job_rating.$lte = maxRating;
+  }
+
+  const cvDownloaded = toBooleanOrNull(query.cv_download || query.cv_downloaded || query.cvDownloaded);
+  if (cvDownloaded !== null) filter.cv_download = cvDownloaded;
+
+  const hasCv = toBooleanOrNull(query.has_cv || query.hasCv);
+  if (hasCv === true) filter.cv = { $nin: [null, ""] };
+  if (hasCv === false) filter.$or = [{ cv: { $in: [null, ""] } }, { cv: { $exists: false } }];
+
+  const search = firstValue(query.search, query.q, query.keyword);
   if (search) {
     const regex = new RegExp(escapeRegex(search), "i");
-    filter.$or = [
+    const searchOr = [
       { first_name: regex },
       { last_name: regex },
       { email: regex },
       { phone_national: regex },
+      { phone_code: regex },
       { cover_letter: regex },
+      { "answers.question": regex },
+      { "answers.answer": regex },
     ];
+    if (filter.$or) filter.$and = [{ $or: filter.$or }, { $or: searchOr }], delete filter.$or;
+    else filter.$or = searchOr;
   }
 
   return filter;
 };
 
 export const buildApplicationsSort = (query = {}) => {
-  const allowed = new Set(["createdAt", "updatedAt", "status_changed_at", "last_activity_at"]);
-  const sortText = cleanText(query.sort);
+  const aliases = {
+    created_at: "createdAt",
+    createdAt: "createdAt",
+    updated_at: "updatedAt",
+    updatedAt: "updatedAt",
+    status_changed_at: "status_changed_at",
+    statusChangedAt: "status_changed_at",
+    last_activity_at: "last_activity_at",
+    lastActivityAt: "last_activity_at",
+    rating: "user_job_rating",
+    user_job_rating: "user_job_rating",
+  };
+  const sortText = cleanQueryValue(query.sort || query.order_by || query.orderBy);
   if (!sortText) return { createdAt: -1, _id: -1 };
 
-  const [field, dir = "desc"] = sortText.split(":");
-  if (!allowed.has(field)) return { createdAt: -1, _id: -1 };
+  const raw = sortText.startsWith("-") ? sortText.slice(1) : sortText;
+  const [fieldRaw, dir = sortText.startsWith("-") ? "desc" : "desc"] = raw.split(":");
+  const field = aliases[fieldRaw];
+  if (!field) return { createdAt: -1, _id: -1 };
 
   const direction = dir === "asc" ? 1 : -1;
   return { [field]: direction, _id: direction };
@@ -193,14 +268,26 @@ export const buildApplicationsSort = (query = {}) => {
 export const buildInterviewsFilter = (companyId, query = {}) => {
   const filter = { company_id: companyId };
 
-  if (query.job_id && isMongoId(query.job_id)) filter.job_id = query.job_id;
-  if (query.application_id && isMongoId(query.application_id)) filter.application_id = query.application_id;
-  if (query.status && INTERVIEW_STATUSES.has(String(query.status))) filter.status = String(query.status);
-  if (query.type && INTERVIEW_TYPES.has(String(query.type))) filter.type = String(query.type);
-  if (query.upcoming === "true") filter.start_at = { $gte: new Date() };
+  const jobId = firstValue(query.job_id, query.jobId, query.job);
+  if (jobId && isMongoId(jobId)) filter.job_id = jobId;
 
-  const from = toDateOrNull(query.from || query.dateFrom);
-  const to = toDateOrNull(query.to || query.dateTo);
+  const applicationId = firstValue(query.application_id, query.applicationId, query.application);
+  if (applicationId && isMongoId(applicationId)) filter.application_id = applicationId;
+
+  const employeeUserId = firstValue(query.employee_user_id, query.employeeUserId, query.user_id, query.userId);
+  if (employeeUserId && isMongoId(employeeUserId)) filter.employee_user_id = employeeUserId;
+
+  const statusList = toStatusList(query.status || query.statuses, INTERVIEW_STATUSES);
+  if (statusList.length === 1) filter.status = statusList[0];
+  if (statusList.length > 1) filter.status = { $in: statusList };
+
+  const type = firstValue(query.type);
+  if (type && INTERVIEW_TYPES.has(type)) filter.type = type;
+
+  if (toBooleanOrNull(query.upcoming) === true) filter.start_at = { $gte: new Date() };
+
+  const from = toDateOrNull(query.from || query.dateFrom || query.start_date || query.startDate || query.start_from);
+  const to = toDateOrNull(query.to || query.dateTo || query.end_date || query.endDate || query.start_to);
   if (from || to) {
     filter.start_at = { ...(filter.start_at || {}) };
     if (from) filter.start_at.$gte = from;
@@ -213,13 +300,21 @@ export const buildInterviewsFilter = (companyId, query = {}) => {
 export const buildInvitationsFilter = (companyId, query = {}) => {
   const filter = { company_id: companyId };
 
-  if (query.job_id && isMongoId(query.job_id)) filter.job_id = query.job_id;
-  if (query.employee_id && isMongoId(query.employee_id)) filter.employee_id = query.employee_id;
-  if (query.user_id && isMongoId(query.user_id)) filter.user_id = query.user_id;
-  if (query.status && INVITATION_STATUSES.has(String(query.status))) filter.status = String(query.status);
+  const jobId = firstValue(query.job_id, query.jobId, query.job);
+  if (jobId && isMongoId(jobId)) filter.job_id = jobId;
 
-  const from = toDateOrNull(query.from || query.dateFrom);
-  const to = toDateOrNull(query.to || query.dateTo);
+  const employeeId = firstValue(query.employee_id, query.employeeId);
+  if (employeeId && isMongoId(employeeId)) filter.employee_id = employeeId;
+
+  const userId = firstValue(query.user_id, query.userId);
+  if (userId && isMongoId(userId)) filter.user_id = userId;
+
+  const statusList = toStatusList(query.status || query.statuses, INVITATION_STATUSES);
+  if (statusList.length === 1) filter.status = statusList[0];
+  if (statusList.length > 1) filter.status = { $in: statusList };
+
+  const from = toDateOrNull(query.from || query.dateFrom || query.start_date || query.startDate || query.sent_from);
+  const to = toDateOrNull(query.to || query.dateTo || query.end_date || query.endDate || query.sent_to);
   if (from || to) {
     filter.createdAt = {};
     if (from) filter.createdAt.$gte = from;
@@ -230,20 +325,20 @@ export const buildInvitationsFilter = (companyId, query = {}) => {
 };
 
 export const buildInterviewPayload = ({ body = {}, companyData, application, oldInterview = null }) => {
-  const startAt = toDateOrNull(body.start_at || body.startAt);
+  const startAt = toDateOrNull(firstValue(body.start_at, body.startAt, body.date, body.interview_at, body.interviewAt));
   if (!startAt && !oldInterview) return { error: "start_at_required" };
 
-  const endAt = toDateOrNull(body.end_at || body.endAt);
+  const endAt = toDateOrNull(firstValue(body.end_at, body.endAt));
   const finalStartAt = startAt || oldInterview?.start_at;
 
   if (endAt && finalStartAt && endAt <= finalStartAt) {
     return { error: "end_at_must_be_after_start_at" };
   }
 
-  const type = cleanText(body.type || oldInterview?.type || "online");
+  const type = cleanQueryValue(body.type || oldInterview?.type || "online");
   if (!INTERVIEW_TYPES.has(type)) return { error: "invalid_interview_type" };
 
-  const status = cleanText(body.status || oldInterview?.status || "scheduled");
+  const status = cleanQueryValue(body.status || oldInterview?.status || "scheduled");
   if (!INTERVIEW_STATUSES.has(status)) return { error: "invalid_interview_status" };
 
   const payload = {
@@ -267,6 +362,11 @@ export const buildInterviewPayload = ({ body = {}, companyData, application, old
   if (startAt) payload.start_at = startAt;
   if (endAt) payload.end_at = endAt;
   if (body.rating !== undefined) payload.rating = toNumber(body.rating, null);
+
+  if (!payload.meet_link && payload.type === "online") {
+    const suffix = String(application?._id || Date.now()).slice(-8);
+    payload.meet_link = `https://meet.jit.si/JobZain-${suffix}`;
+  }
 
   return { payload };
 };

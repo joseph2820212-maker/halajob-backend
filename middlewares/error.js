@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import yup, { ValidationError } from 'yup';
+import { ValidationError } from 'yup';
 import { v4 as uuidv4 } from 'uuid';
 import logger from '../config/logger.js';
 import ApiError from '../utils/apiError.js';
@@ -27,10 +27,18 @@ const converter = (err, req, res, next) => {
     );
   } else if (!(err instanceof ApiError)) {
     let uuid = uuidv4();
-    logger.error({ uuid, ...err });
+    logger.error({
+      uuid,
+      name: err?.name,
+      message: err?.message,
+      code: err?.code,
+      statusCode: err?.statusCode,
+      stack: err?.stack,
+      errors: err?.errors,
+    });
     convertedError = new ApiError(
       err.statusCode || httpStatus.INTERNAL_SERVER_ERROR,
-      httpStatus[500],
+      process.env.NODE_ENV === 'production' ? httpStatus[500] : (err.message || httpStatus[500]),
       'API Error 2',
       uuid
     );

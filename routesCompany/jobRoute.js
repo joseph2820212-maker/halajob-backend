@@ -51,6 +51,7 @@ router.patch("/hiring/invitations/:invitationId/cancel", upload.none(), controll
    Job Reviews - Read Only For Company
 ========================= */
 router.get("/hiring/reviews", upload.none(), controllerHiring.getCompanyJobReviews);
+router.get("/hiring/:jobId/reviews", upload.none(), controllerHiring.getCompanyJobReviews);
 
 /* =========================
    Talent Search

@@ -49,9 +49,9 @@ export const toArray = (value) => {
   return [value];
 };
 
-export const uniqueClean = (arr = []) => [
+export const uniqueClean = (value = []) => [
   ...new Set(
-    arr
+    toArray(value)
       .flat(Infinity)
       .map((x) => cleanText(x))
       .filter(Boolean)
@@ -145,40 +145,56 @@ export const buildEmployeeSearchFilter = (query = {}, companyId = null) => {
     ];
   }
 
-  if (query.candidate_stage) filter.candidate_stage = query.candidate_stage;
-  if (query.is_free_for_work !== undefined) {
-    filter.is_free_for_work = [true, "true", 1, "1"].includes(query.is_free_for_work);
-  }
-  if (query.work_location) filter.work_location = query.work_location;
+  const candidateStage = cleanText(query.candidate_stage || query.stage);
+  if (candidateStage && candidateStage !== "all") filter.candidate_stage = candidateStage;
 
-  const jobNameIds = toObjectIdArray(query.job_name_id || query.job_name_ids);
+  const freeForWorkValue = query.is_free_for_work ?? query.free_for_work ?? query.available;
+  if (freeForWorkValue !== undefined) {
+    filter.is_free_for_work = [true, "true", 1, "1", "yes"].includes(freeForWorkValue);
+  }
+
+  const workLocation = cleanText(query.work_location || query.location_type);
+  if (workLocation && workLocation !== "all") filter.work_location = workLocation;
+
+  const jobNameIds = toObjectIdArray(query.job_name_id || query.job_name_ids || query.jobNameId || query.jobNameIds);
   if (jobNameIds.length) filter.job_names = { $in: jobNameIds };
 
-  const jobTypeIds = toObjectIdArray(query.job_type_id || query.job_type_ids);
+  const jobTypeIds = toObjectIdArray(query.job_type_id || query.job_type_ids || query.jobTypeId || query.jobTypeIds);
   if (jobTypeIds.length) filter.job_types = { $in: jobTypeIds };
 
-  const workModeIds = toObjectIdArray(query.work_mode_id || query.work_mode_ids);
+  const workModeIds = toObjectIdArray(query.work_mode_id || query.work_mode_ids || query.workModeId || query.workModeIds);
   if (workModeIds.length) filter.preferred_work_modes = { $in: workModeIds };
 
-  const skillIds = toObjectIdArray(query.skill_id || query.skill_ids || query.skills);
+  const skillIds = toObjectIdArray(query.skill_id || query.skill_ids || query.skills || query.skillIds);
   if (skillIds.length) filter["skills.skill_id"] = { $in: skillIds };
 
-  const languageIds = toObjectIdArray(query.language_id || query.language_ids || query.languages);
+  const languageIds = toObjectIdArray(query.language_id || query.language_ids || query.languages || query.languageIds);
   if (languageIds.length) filter["languages.language_id"] = { $in: languageIds };
 
-  const countryIds = toObjectIdArray(query.country_id || query.country_ids || query.countries);
+  const countryIds = toObjectIdArray(query.country_id || query.country_ids || query.countries || query.countryIds);
   if (countryIds.length) filter.preferred_countries = { $in: countryIds };
 
-  if (query.experience_level_id && isValidObjectId(query.experience_level_id)) {
-    filter.experience_level_id = query.experience_level_id;
+  const experienceLevelId = query.experience_level_id || query.experienceLevelId;
+  if (experienceLevelId && isValidObjectId(experienceLevelId)) {
+    filter.experience_level_id = experienceLevelId;
   }
 
-  const minExp = toNumberOrNull(query.min_experience_years ?? query.min_exp);
-  const maxExp = toNumberOrNull(query.max_experience_years ?? query.max_exp);
+  const minExp = toNumberOrNull(query.min_experience_years ?? query.min_exp ?? query.minExperience);
+  const maxExp = toNumberOrNull(query.max_experience_years ?? query.max_exp ?? query.maxExperience);
   if (minExp !== null || maxExp !== null) {
     filter.experience_years = {};
     if (minExp !== null) filter.experience_years.$gte = minExp;
     if (maxExp !== null) filter.experience_years.$lte = maxExp;
+  }
+
+  const minProfile = toNumberOrNull(query.min_profile_completion ?? query.minProfileCompletion);
+  if (minProfile !== null) filter.profile_completion = { $gte: minProfile };
+
+  const salaryMin = toNumberOrNull(query.salary_min ?? query.min_salary ?? query.salaryMin);
+  const salaryMax = toNumberOrNull(query.salary_max ?? query.max_salary ?? query.salaryMax);
+  if (salaryMin !== null || salaryMax !== null) {
+    if (salaryMin !== null) filter["expected_salary.max_base"] = { $gte: salaryMin };
+    if (salaryMax !== null) filter["expected_salary.min_base"] = { $lte: salaryMax };
   }
 
   return filter;
@@ -443,27 +459,32 @@ export const upsertJobEmployeeMatch = async ({ job, employee, companyId }) => {
 export const normalizeTalentRequestPayload = (body = {}, companyData) => {
   const requiredSkills = uniqueClean(body.required_skills || body.skills_required || body.skills || []);
   const preferredSkills = uniqueClean(body.preferred_skills || body.skills_optional || []);
+  const jobId = body.job_id || body.jobId;
+  const workModeId = body.work_mode_id || body.workModeId;
+  const jobTypeId = body.job_type_id || body.jobTypeId;
+  const experienceLevelId = body.experience_level_id || body.experienceLevelId;
+  const educationLevelId = body.education_level_id || body.educationLevelId;
 
   return {
     company_id: companyData.company._id,
     requested_by_user_id: companyData.userId,
-    job_id: isValidObjectId(body.job_id) ? body.job_id : null,
-    title: cleanText(body.title || body.job_title || ""),
-    description: cleanText(body.description || body.note || ""),
+    job_id: isValidObjectId(jobId) ? jobId : null,
+    title: cleanText(body.title || body.job_title || body.jobTitle || ""),
+    description: cleanText(body.description || body.note || body.message || ""),
     required_skills: requiredSkills,
     preferred_skills: preferredSkills,
     countries: uniqueClean(body.countries || body.country || []),
     cities: uniqueClean(body.cities || body.city || []),
-    work_mode_id: isValidObjectId(body.work_mode_id) ? body.work_mode_id : null,
-    job_type_id: isValidObjectId(body.job_type_id) ? body.job_type_id : null,
-    experience_level_id: isValidObjectId(body.experience_level_id) ? body.experience_level_id : null,
-    education_level_id: isValidObjectId(body.education_level_id) ? body.education_level_id : null,
-    min_experience_years: toNumber(body.min_experience_years, 0),
-    max_experience_years: toNumberOrNull(body.max_experience_years),
-    salary_min: toNumberOrNull(body.salary_min),
-    salary_max: toNumberOrNull(body.salary_max),
-    currency_code: cleanText(body.currency_code || "").toUpperCase(),
-    requested_count: Math.min(Math.max(toNumber(body.requested_count, 5), 1), 100),
+    work_mode_id: isValidObjectId(workModeId) ? workModeId : null,
+    job_type_id: isValidObjectId(jobTypeId) ? jobTypeId : null,
+    experience_level_id: isValidObjectId(experienceLevelId) ? experienceLevelId : null,
+    education_level_id: isValidObjectId(educationLevelId) ? educationLevelId : null,
+    min_experience_years: toNumber(body.min_experience_years ?? body.minExperience, 0),
+    max_experience_years: toNumberOrNull(body.max_experience_years ?? body.maxExperience),
+    salary_min: toNumberOrNull(body.salary_min ?? body.salaryMin),
+    salary_max: toNumberOrNull(body.salary_max ?? body.salaryMax),
+    currency_code: cleanText(body.currency_code || body.currencyCode || "").toUpperCase(),
+    requested_count: Math.min(Math.max(toNumber(body.requested_count ?? body.requestedCount, 5), 1), 100),
     priority: ["low", "normal", "high", "urgent"].includes(body.priority) ? body.priority : "normal",
     notes: cleanText(body.note || body.description)
       ? [{ by_user_id: companyData.userId, note: cleanText(body.note || body.description), type: "company" }]

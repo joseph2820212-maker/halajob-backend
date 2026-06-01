@@ -6,6 +6,8 @@ import {
   InterviewModel,
   JobInvitationModel,
   UserApplyingJobModel,
+  UserReviewJobModel,
+  jobsModel,
 } from "../../../models/index.js";
 
 import {
@@ -52,22 +54,13 @@ import {
   toNumber,
 } from "../../../helper/companyDash/companyJobHiringHelpers.js";
 
-const withTransaction = async (handler) => {
-  const session = await mongoose.startSession();
-  try {
-    let result;
-    await session.withTransaction(async () => {
-      result = await handler(session);
-    });
-    return result;
-  } finally {
-    await session.endSession();
-  }
-};
+// This project is deployed on environments that may use a standalone MongoDB server.
+// MongoDB transactions require a replica set, so the hiring flow uses safe sequential
+// writes instead of session.withTransaction to avoid 500 errors in production.
 
-const createStatusHistory = async ({ application, oldStatus, newStatus, companyData, note = "", session = null }) => {
-  return ApplicationStatusHistoryModel.create(
-    [
+const createStatusHistory = async ({ application, oldStatus, newStatus, companyData, note = "" }) => {
+  try {
+    const [history] = await ApplicationStatusHistoryModel.create([
       {
         application_id: application._id,
         job_id: application.job_id,
@@ -79,9 +72,45 @@ const createStatusHistory = async ({ application, oldStatus, newStatus, companyD
         actor_type: "company",
         note,
       },
-    ],
-    session ? { session } : undefined
+    ]);
+    return history;
+  } catch (error) {
+    // History is useful for auditing, but it should never break the primary action
+    // (creating an interview, changing status, blocking applicant).
+    console.error("application_status_history_error", {
+      message: error?.message,
+      name: error?.name,
+      code: error?.code,
+      application_id: String(application?._id || ""),
+      new_status: newStatus,
+    });
+    return null;
+  }
+};
+
+const updateApplicationStatusFields = async ({ application, status }) => {
+  const now = new Date();
+  const result = await UserApplyingJobModel.updateOne(
+    { _id: application._id, company_id: application.company_id },
+    {
+      $set: {
+        status,
+        status_changed_at: now,
+        last_activity_at: now,
+      },
+    },
+    { runValidators: true }
   );
+
+  if (!result?.matchedCount && !result?.n) {
+    const err = new Error("application_status_update_failed");
+    err.statusCode = 404;
+    throw err;
+  }
+
+  application.status = status;
+  application.status_changed_at = now;
+  application.last_activity_at = now;
 };
 
 const parseArrayBody = (value) => {
@@ -155,7 +184,15 @@ const applicationExportRow = (application, index = 1) => {
 
 const buildBulkApplicationsFilter = async (req, res, companyData) => {
   const body = req.body || {};
-  const rawIds = parseArrayBody(body.application_ids || body.applications || body.ids);
+  const rawIds = parseArrayBody(
+    body.application_ids ||
+      body.applicationIds ||
+      body.applications ||
+      body.ids ||
+      req.query.application_ids ||
+      req.query.applicationIds ||
+      req.query.ids
+  );
   const ids = rawIds.map((id) => String(id?._id || id || "").trim()).filter((id) => mongoose.Types.ObjectId.isValid(id));
 
   if (ids.length) {
@@ -163,7 +200,7 @@ const buildBulkApplicationsFilter = async (req, res, companyData) => {
   }
 
   const filter = buildApplicationsFilter(companyData.company._id, { ...req.query, ...body });
-  const jobId = body.job_id || req.query.job_id || req.params.jobId;
+  const jobId = body.job_id || body.jobId || req.query.job_id || req.query.jobId || req.params.jobId;
   if (jobId) {
     const job = await getOwnedJobOrFail(req, res, companyData.company._id, jobId, "_id");
     if (!job) return null;
@@ -312,20 +349,14 @@ export const updateApplicationStatus = async (req, res, next) => {
     if (!APPLICATION_STATUSES.has(status)) return fail(res, "invalid_application_status", 422);
 
     const oldStatus = application.status;
-    application.status = status;
-    application.status_changed_at = new Date();
-    application.last_activity_at = new Date();
 
-    await withTransaction(async (session) => {
-      await application.save({ session });
-      await createStatusHistory({
-        application,
-        oldStatus,
-        newStatus: status,
-        companyData,
-        note: cleanText(req.body.note),
-        session,
-      });
+    await updateApplicationStatusFields({ application, status });
+    await createStatusHistory({
+      application,
+      oldStatus,
+      newStatus: status,
+      companyData,
+      note: cleanText(req.body.note),
     });
 
     return success(res, normalizeApplication(application), "application_status_updated");
@@ -345,24 +376,17 @@ export const createInterview = async (req, res, next) => {
     const { payload, error } = buildInterviewPayload({ body: req.body, companyData, application });
     if (error) return fail(res, error, 422);
 
-    let interview;
-    await withTransaction(async (session) => {
-      [interview] = await InterviewModel.create([payload], { session });
+    const interview = await InterviewModel.create(payload);
 
-      const oldStatus = application.status;
-      application.status = "interview";
-      application.status_changed_at = new Date();
-      application.last_activity_at = new Date();
-      await application.save({ session });
+    const oldStatus = application.status;
+    await updateApplicationStatusFields({ application, status: "interview" });
 
-      await createStatusHistory({
-        application,
-        oldStatus,
-        newStatus: "interview",
-        companyData,
-        note: cleanText(req.body.company_note || req.body.note || "interview_scheduled"),
-        session,
-      });
+    await createStatusHistory({
+      application,
+      oldStatus,
+      newStatus: "interview",
+      companyData,
+      note: cleanText(req.body.company_note || req.body.note || "interview_scheduled"),
     });
 
     const populated = await InterviewModel.findById(interview._id)
@@ -628,20 +652,14 @@ export const blockApplicationApplicant = async (req, res, next) => {
     }
 
     const oldStatus = application.status;
-    application.status = "rejected";
-    application.status_changed_at = new Date();
-    application.last_activity_at = new Date();
 
-    await withTransaction(async (session) => {
-      await application.save({ session });
-      await createStatusHistory({
-        application,
-        oldStatus,
-        newStatus: "rejected",
-        companyData,
-        note,
-        session,
-      });
+    await updateApplicationStatusFields({ application, status: "rejected" });
+    await createStatusHistory({
+      application,
+      oldStatus,
+      newStatus: "rejected",
+      companyData,
+      note,
     });
 
     return success(res, {
@@ -756,17 +774,18 @@ export const getCompanyJobReviews = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
-    const job = req.params.jobId
-      ? await getOwnedJobOrFail(req, res, companyData.company._id, req.params.jobId, "_id")
+    const requestedJobId = req.params.jobId || req.query.job_id || req.query.jobId;
+    const job = requestedJobId
+      ? await getOwnedJobOrFail(req, res, companyData.company._id, requestedJobId, "_id")
       : null;
-    if (req.params.jobId && !job) return;
+    if (requestedJobId && !job) return;
 
-    const jobIds = req.params.jobId
+    const jobIds = requestedJobId
       ? [job._id]
-      : await mongoose.model("jobs").find({ company_id: companyData.company._id }).distinct("_id");
+      : await jobsModel.distinct("_id", { company_id: companyData.company._id });
 
     const filter = { job_id: { $in: jobIds } };
-    const result = await paginate(mongoose.model("user_reviews_jobs"), filter, req, {
+    const result = await paginate(UserReviewJobModel, filter, req, {
       sort: { createdAt: -1, _id: -1 },
       populate: [
         { path: "job_id", select: "job_name company_id" },

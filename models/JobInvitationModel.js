@@ -9,6 +9,8 @@ const JobInvitationSchema = new Schema(
     sent_by: { type: Schema.Types.ObjectId, ref: "users", required: true },
     status: { type: String, enum: ["sent", "seen", "accepted", "declined", "expired", "cancelled"], default: "sent", index: true },
     message: { type: String, default: "", trim: true },
+    salary_offer: { type: Schema.Types.Mixed, default: null },
+    starts_at: { type: Date, default: null, index: true },
     expires_at: { type: Date, default: null, index: true },
     responded_at: { type: Date, default: null },
   },
