@@ -56,6 +56,8 @@ router.get("/hiring/reviews", upload.none(), controllerHiring.getCompanyJobRevie
    Talent Search
 ========================= */
 router.get("/talent/employees", upload.none(), controllerTalent.searchEmployees);
+router.get("/talent/employees/:employeeId/cv", upload.none(), controllerTalent.downloadEmployeeCv);
+router.get("/talent/employees/:employeeId/cv/:cvId", upload.none(), controllerTalent.downloadEmployeeCv);
 router.get("/talent/employees/:employeeId", upload.none(), controllerTalent.getEmployeeDetails);
 
 /* =========================

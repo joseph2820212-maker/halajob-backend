@@ -9,6 +9,7 @@ import {
   isValidObjectId,
   normalizeJob,
 } from "../../helper/companyDash/companyDashHelpers.js";
+import { sanitizeEmployeeCvs } from "./secureCvDownloadHelpers.js";
 
 export const cleanText = (value = "") => String(value || "").trim();
 
@@ -214,7 +215,7 @@ export const normalizeEmployeeForCompany = (employee, match = null) => {
     languages: employee.languages || [],
     latest_work_experience: employee.latest_work_experience || null,
     education: employee.education || [],
-    cvs: (employee.cvs || []).filter((cv) => cv.status === "active"),
+    cvs: sanitizeEmployeeCvs(employee.cvs || []),
     match: match
       ? {
           _id: match._id,

@@ -25,6 +25,7 @@ import {
   cleanText,
   escapeRegex,
 } from "../../../helper/companyDash/companyTalentSearchHelpers.js";
+import { findCvEntry, sendCvFile } from "../../../helper/companyDash/secureCvDownloadHelpers.js";
 
 const parseSort = (value = "") => {
   const allowed = new Set([
@@ -455,9 +456,42 @@ export const matchEmployeeWithJob = async (req, res, next) => {
   }
 };
 
+export const downloadEmployeeCv = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const employee = await getEmployeeDetailsOrFail(req, res, companyData, req.params.employeeId);
+    if (!employee) return;
+
+    const activeCvs = (employee.cvs || []).filter((cv) => !cv.status || cv.status === "active");
+    const selectedCv = findCvEntry(activeCvs.map((cv) => ({
+      id: String(cv?._id || cv?.id || ""),
+      source: "employee_cv",
+      title: cv?.title || cv?.fileName || "Employee CV",
+      fileName: cv?.fileName || cv?.url || "cv.pdf",
+      raw: cv?.url || cv?.file || cv?.path || cv?.fileName || "",
+    })), { ...req.query, cv_id: req.params.cvId || req.query.cv_id });
+
+    if (!selectedCv) return fail(res, "cv_not_found", 404);
+
+    const sent = await sendCvFile({
+      res,
+      cvEntry: selectedCv,
+      fallbackName: selectedCv.fileName || `employee-${req.params.employeeId}.pdf`,
+      inline: req.query.inline === "true",
+    });
+
+    if (!sent) return fail(res, "cv_file_not_found", 404);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   searchEmployees,
   getEmployeeDetails,
+  downloadEmployeeCv,
   requestJobZainTalentHelp,
   getMyJobZainTalentRequests,
   getJobZainTalentRequestDetails,

@@ -14,6 +14,7 @@ import {
   normalizeInterview,
   normalizeJob,
 } from "./companyDashHelpers.js";
+import { sanitizeEmployeeCvs } from "./secureCvDownloadHelpers.js";
 
 export const APPLICATION_STATUSES = new Set([
   "waiting",
@@ -298,7 +299,7 @@ export const normalizeApplicant = (application) => {
       languages: employee?.languages || [],
       education: employee?.education || [],
       experience: employee?.experience || [],
-      cvs: (employee?.cvs || []).filter((cv) => !cv.status || cv.status === "active"),
+      cvs: sanitizeEmployeeCvs(employee?.cvs || []),
       links: employee?.links || [],
     },
   };

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import XLSX from "xlsx";
 import {
   ApplicationStatusHistoryModel,
   EmployeeModel,
@@ -15,6 +16,15 @@ import {
   paginate,
   success,
 } from "../../../helper/companyDash/companyDashHelpers.js";
+
+import {
+  collectApplicationCvEntries,
+  createZipBuffer,
+  findCvEntry,
+  makeZipEntryName,
+  sanitizeCvEntries,
+  sendCvFile,
+} from "../../../helper/companyDash/secureCvDownloadHelpers.js";
 
 import {
   APPLICATION_STATUSES,
@@ -88,35 +98,59 @@ const parseArrayBody = (value) => {
   return [value];
 };
 
-const applicationCvFiles = (application) => {
-  const files = [];
-  if (application?.cv) {
-    files.push({
-      type: "application_cv",
-      title: "Application CV",
-      url: application.cv,
-    });
-  }
+const applicationCvFiles = (application) => sanitizeCvEntries(collectApplicationCvEntries(application));
 
-  const employeeCvs = (application?.employee_id?.cvs || []).filter((cv) => !cv.status || cv.status === "active");
-  for (const cv of employeeCvs) {
-    const url = cv?.url || cv?.file || cv?.path || (typeof cv === "string" ? cv : "");
-    if (!url) continue;
-    files.push({
-      type: "employee_cv",
-      title: cv?.title || cv?.fileName || "Employee CV",
-      fileName: cv?.fileName || "",
-      template_key: cv?.template_key || "",
-      url,
-    });
-  }
+const normalizeApplicationWithCvMeta = (application) => {
+  const normalized = normalizeApplication(application);
+  const cvFiles = applicationCvFiles(application);
+  return {
+    ...normalized,
+    has_cv: cvFiles.length > 0,
+    cv_files_count: cvFiles.length,
+    cv_files: cvFiles,
+  };
+};
 
-  const seen = new Set();
-  return files.filter((file) => {
-    if (!file.url || seen.has(String(file.url))) return false;
-    seen.add(String(file.url));
-    return true;
-  });
+const normalizeApplicantWithCvMeta = (application) => {
+  const normalized = normalizeApplicant(application);
+  const cvFiles = applicationCvFiles(application);
+  return {
+    ...normalized,
+    application: {
+      ...normalized.application,
+      has_cv: cvFiles.length > 0,
+      cv_files_count: cvFiles.length,
+      cv_files: cvFiles,
+    },
+    cv_files_count: cvFiles.length,
+    cv_files: cvFiles,
+  };
+};
+
+const applicationExportRow = (application, index = 1) => {
+  const applicant = application.user_id || {};
+  const employee = application.employee_id || {};
+  const answers = (application.answers || [])
+    .map((item, answerIndex) => `${answerIndex + 1}. ${item.question || ""}: ${Array.isArray(item.answer) ? item.answer.join(", ") : item.answer ?? ""}`)
+    .join("\n");
+
+  return {
+    "#": index,
+    application_id: String(application._id || ""),
+    job_name: application.job_id?.job_name || "",
+    status: application.status || "",
+    applied_at: application.createdAt ? new Date(application.createdAt).toISOString() : "",
+    applicant_name: [applicant.first_name || application.first_name, applicant.mid_name, applicant.last_name || application.last_name].filter(Boolean).join(" "),
+    email: application.email || applicant.email || "",
+    phone: [application.phone_code || applicant.phone_code, application.phone_national || applicant.phone_national].filter(Boolean).join(" "),
+    candidate_stage: employee.candidate_stage || "",
+    experience_years: employee.experience_years ?? "",
+    profile_headline: employee.profile_headline || "",
+    current_job_title: employee.current_job_title || "",
+    cover_letter: application.cover_letter || "",
+    answers,
+    cv_files_count: applicationCvFiles(application).length,
+  };
 };
 
 const buildBulkApplicationsFilter = async (req, res, companyData) => {
@@ -197,7 +231,7 @@ export const getJobApplications = async (req, res, next) => {
     }
 
     const result = await paginateApplications(req, filter, buildApplicationsSort(req.query));
-    return success(res, result.items.map(normalizeApplication), "applications", 200, result.meta);
+    return success(res, result.items.map(normalizeApplicationWithCvMeta), "applications", 200, result.meta);
   } catch (error) {
     next(error);
   }
@@ -217,7 +251,7 @@ export const getApplicants = async (req, res, next) => {
     }
 
     const result = await paginateApplications(req, filter, buildApplicationsSort(req.query));
-    return success(res, result.items.map(normalizeApplicant), "applicants", 200, result.meta);
+    return success(res, result.items.map(normalizeApplicantWithCvMeta), "applicants", 200, result.meta);
   } catch (error) {
     next(error);
   }
@@ -254,7 +288,7 @@ export const getApplicationDetails = async (req, res, next) => {
     return success(
       res,
       {
-        ...normalizeApplicant(application),
+        ...normalizeApplicantWithCvMeta(application),
         interviews: interviews.map(normalizeInterview),
         invitation: invitation ? normalizeCompanyInvitation(invitation) : null,
         histories,
@@ -550,26 +584,24 @@ export const getApplicationCv = async (req, res, next) => {
 
     if (!application) return fail(res, "application_not_found", 404);
 
-    const applicantCv = application.cv || null;
-    const employeeCvs = (application.employee_id?.cvs || []).filter((cv) => !cv.status || cv.status === "active");
-    const firstCv = applicantCv || employeeCvs?.[0]?.url || employeeCvs?.[0]?.file || employeeCvs?.[0]?.path || employeeCvs?.[0] || null;
+    const entries = collectApplicationCvEntries(application);
+    const selectedCv = findCvEntry(entries, req.query);
 
-    if (!firstCv && !employeeCvs.length) {
-      return fail(res, "cv_not_found", 404);
-    }
+    if (!selectedCv) return fail(res, "cv_not_found", 404);
+
+    const sent = await sendCvFile({
+      res,
+      cvEntry: selectedCv,
+      fallbackName: selectedCv.fileName || `application-${applicationId}.pdf`,
+      inline: req.query.inline === "true",
+    });
+
+    if (!sent) return fail(res, "cv_file_not_found", 404);
 
     await UserApplyingJobModel.updateOne(
       { _id: application._id, company_id: companyData.company._id },
       { $set: { cv_download: true, last_activity_at: new Date() } }
     );
-
-    return success(res, {
-      application_id: application._id,
-      employee_id: application.employee_id?._id || null,
-      cv: applicantCv,
-      cvs: employeeCvs,
-      download_url: typeof firstCv === "string" ? firstCv : firstCv?.url || firstCv?.file || firstCv?.path || null,
-    }, "application_cv");
   } catch (error) {
     next(error);
   }
@@ -633,8 +665,28 @@ export const bulkApplicationCvs = async (req, res, next) => {
 
     const limit = Math.min(Math.max(Number(req.body?.limit || req.query.limit || 500), 1), 1000);
     const applications = await populateApplicationQuery(
-      UserApplyingJobModel.find(filter).sort(buildApplicationsSort(req.query)).limit(limit)
+      UserApplyingJobModel.find(filter).sort(buildApplicationsSort({ ...req.query, ...req.body })).limit(limit)
     ).lean();
+
+    const zipFiles = [];
+    applications.forEach((application, appIndex) => {
+      const entries = collectApplicationCvEntries(application);
+      entries.forEach((entry, cvIndex) => {
+        zipFiles.push({
+          ...entry,
+          zipName: makeZipEntryName({
+            application,
+            cvEntry: entry,
+            index: zipFiles.length + 1 || appIndex + cvIndex + 1,
+          }),
+        });
+      });
+    });
+
+    if (!zipFiles.length) return fail(res, "cv_not_found", 404);
+
+    const zipBuffer = await createZipBuffer(zipFiles);
+    if (!zipBuffer.length) return fail(res, "cv_file_not_found", 404);
 
     const applicationIds = applications.map((application) => application._id);
     if (applicationIds.length) {
@@ -644,33 +696,12 @@ export const bulkApplicationCvs = async (req, res, next) => {
       );
     }
 
-    const items = applications.map((application) => {
-      const cvs = applicationCvFiles(application);
-      return {
-        application_id: application._id,
-        employee_id: application.employee_id?._id || null,
-        user_id: application.user_id?._id || application.user_id || null,
-        applicant_name: [application.user_id?.first_name || application.first_name, application.user_id?.mid_name, application.user_id?.last_name || application.last_name]
-          .filter(Boolean)
-          .join(" "),
-        email: application.email || application.user_id?.email || "",
-        phone_code: application.phone_code || application.user_id?.phone_code || "",
-        phone_national: application.phone_national || application.user_id?.phone_national || "",
-        status: application.status,
-        cv_files: cvs,
-        download_urls: cvs.map((cv) => cv.url).filter(Boolean),
-      };
-    });
-
-    return success(
-      res,
-      {
-        count: items.length,
-        download_urls: [...new Set(items.flatMap((item) => item.download_urls))],
-        items,
-      },
-      "application_cvs"
-    );
+    const fileName = `jobzain-cvs-${Date.now()}.zip`;
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`);
+    res.setHeader("Content-Length", zipBuffer.length);
+    res.setHeader("Cache-Control", "private, no-store, max-age=0");
+    return res.status(200).send(zipBuffer);
   } catch (error) {
     next(error);
   }
@@ -686,22 +717,35 @@ export const bulkExportApplications = async (req, res, next) => {
 
     const limit = Math.min(Math.max(Number(req.body?.limit || req.query.limit || 500), 1), 1000);
     const applications = await populateApplicationQuery(
-      UserApplyingJobModel.find(filter).sort(buildApplicationsSort(req.query)).limit(limit)
+      UserApplyingJobModel.find(filter).sort(buildApplicationsSort({ ...req.query, ...req.body })).limit(limit)
     ).lean();
 
-    const items = applications.map((application) => ({
-      ...normalizeApplicant(application),
-      cv_files: applicationCvFiles(application),
-    }));
+    if (req.query.format === "json" || req.body?.format === "json") {
+      return success(
+        res,
+        {
+          count: applications.length,
+          items: applications.map((application) => ({
+            ...normalizeApplicantWithCvMeta(application),
+            cv_files: applicationCvFiles(application),
+          })),
+        },
+        "applications_export"
+      );
+    }
 
-    return success(
-      res,
-      {
-        count: items.length,
-        items,
-      },
-      "applications_export"
-    );
+    const rows = applications.map(applicationExportRow);
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "applications");
+    const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+
+    const fileName = `jobzain-applications-${Date.now()}.xlsx`;
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`);
+    res.setHeader("Content-Length", buffer.length);
+    res.setHeader("Cache-Control", "private, no-store, max-age=0");
+    return res.status(200).send(buffer);
   } catch (error) {
     next(error);
   }
