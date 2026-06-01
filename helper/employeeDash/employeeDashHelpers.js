@@ -142,7 +142,7 @@ export const calculateProfileCompletion = (employee = {}) => {
 
 export const paginate = async (Model, filter = {}, req, options = {}) => {
   const page = Math.max(Number(req.query.page) || 1, 1);
-  const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+  const limit = Math.min(Math.max(Number(req.query.limit || req.query.paginate) || 10, 1), 100);
   const skip = (page - 1) * limit;
   const sort = options.sort || parseSort(req.query.sort) || { createdAt: -1, _id: -1 };
 

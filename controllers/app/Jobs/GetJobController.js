@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { CompanyModel, jobsModel } from "../../../models/index.js";
+import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 
 const { isValidObjectId } = mongoose;
@@ -9,7 +10,7 @@ export async function ensureCompany(req, res) {
   const lan = (req.get("lan") || "en").toLowerCase();
   try {
     const company = await CompanyModel
-      .findOne({ user_id: req.user._id, status: true, accepted: true })
+      .findOne({ ...buildCompanyOwnerQuery(req.user._id), status: true, accepted: true })
       .select("_id")
       .lean();
 

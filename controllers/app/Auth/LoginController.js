@@ -2,7 +2,14 @@ import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
-import { RoleModel, UserModel } from "../../../models/index.js";
+import { UserModel } from "../../../models/index.js";
+import {
+  buildRoleDto,
+  buildUserDto,
+  resolveAppAccount,
+  serializeCompany,
+  serializeEmployee,
+} from "../../../services/appAccount.service.js";
 import { verifyUserFromRefreshTokenPayload } from "../../../services/authService.js";
 import {
   clearRefreshToken,
@@ -41,37 +48,23 @@ function createPasscode() {
 
 async function buildAuthPayload(user, device) {
   const tokens = await generateAuthTokens(user, device);
-  const role = user.role_id ? await RoleModel.findById(user.role_id).lean() : null;
+  const account = await resolveAppAccount(user, {
+    // لا ننشئ بروفايل موظف إلا عندما يكون الحساب موظفًا فعلاً.
+    createMissingEmployee: true,
+  });
 
-  const employee = {
-    id: user._id,
-    first_name: user.first_name,
-    mid_name: user.mid_name,
-    last_name: user.last_name,
-    full_name: [user.first_name, user.mid_name, user.last_name]
-      .filter(Boolean)
-      .join(" "),
-    image: user.image ? buildPublicUrl(process.env.PUBLIC_BASE_URL, user.image) : null,
-    phone_code: user.phone_code,
-    phone: user.phone_national,
-    gender: user.gender,
-  };
+  const userDto = buildUserDto(user);
+  const employee = account.accountType === "employee" ? serializeEmployee(account.employee) : null;
+  const company = account.accountType === "company" ? serializeCompany(account.company) : null;
 
   return {
-    user: employee,
-
-    role: role
-      ? {
-          id: role._id,
-          name: role.name,
-          title_ar: role.title_ar,
-          title_en: role.title_en,
-          permissions: user.permissions || [],
-        }
-      : null,
-
+    user: userDto,
+    role: buildRoleDto(account.role, user),
+    accountType: account.accountType,
+    user_type: account.accountType,
     employee,
-
+    company,
+    available_accounts: account.availableAccounts,
     tokens,
   };
 }

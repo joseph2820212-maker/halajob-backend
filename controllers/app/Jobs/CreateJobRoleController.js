@@ -1,11 +1,12 @@
 import { CompanyModel } from "../../../models/index.js";
+import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 
 const whatIsMyRole=async(req,res,next)=>{
    const user = req.user;
     const lan = (req.get("lan") || "en").toLowerCase();
     const company=await CompanyModel.findOne({
-     user_id:user._id,
+     ...buildCompanyOwnerQuery(user._id),
      status:true,
      accepted:true
     });

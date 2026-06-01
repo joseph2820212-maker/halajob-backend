@@ -1,7 +1,5 @@
-import { EmployeeModel, RoleModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
-
-const EMPLOYEE_ROLE_NUMBER = 4;
+import { resolveAppAccount } from "../../../services/appAccount.service.js";
 
 function buildPublicUrl(base, rel) {
   if (!base) return rel;
@@ -9,31 +7,14 @@ function buildPublicUrl(base, rel) {
   return base.endsWith("/") ? base + cleaned : `${base}/${cleaned}`;
 }
 
-async function getEmployeeRole() {
-  return RoleModel.findOne({
-    role_number: EMPLOYEE_ROLE_NUMBER,
-    log_to: "employee",
-    status: true,
-  }).lean();
-}
-
 async function ensureEmployeeForUser(user) {
-  let employee = await EmployeeModel.findOne({ user_id: user._id });
-  if (employee) return employee;
-
-  const role = await getEmployeeRole();
-  if (!role?._id) {
-    const err = new Error("EMPLOYEE_ROLE_NOT_FOUND");
-    err.statusCode = 500;
+  const account = await resolveAppAccount(user, { createMissingEmployee: true });
+  if (account.accountType !== "employee" || !account.employee?._id) {
+    const err = new Error("APP_ACCOUNT_NOT_EMPLOYEE");
+    err.statusCode = 403;
     throw err;
   }
-
-  return EmployeeModel.create({
-    user_id: user._id,
-    role_id: role._id,
-    status: true,
-    accepted: false,
-  });
+  return account.employee;
 }
 
 function buildEmployeeResponse(employee) {
@@ -115,6 +96,10 @@ const profile = async (req, res, next) => {
           ? lan === "ar"
             ? "تعذر تحديد صلاحية الموظف."
             : "Unable to resolve employee role."
+          : err.message === "APP_ACCOUNT_NOT_EMPLOYEE"
+          ? lan === "ar"
+            ? "هذا الإجراء متاح للموظفين فقط."
+            : "This action is available for employee accounts only."
           : lan === "ar"
           ? "حدث خطأ غير متوقع."
           : "Internal server error.",

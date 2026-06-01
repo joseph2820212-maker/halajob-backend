@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
+import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 import {
   CompanyModel,
   jobsModel,
@@ -10,7 +11,7 @@ import {
 async function ensureCompany(req, res) {
   const lan = (req.get("lan") || "en").toLowerCase();
   const company = await CompanyModel.findOne({
-    user_id: req.user._id,
+    ...buildCompanyOwnerQuery(req.user._id),
     status: true,
     accepted: true,
   }).select("_id");

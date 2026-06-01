@@ -229,7 +229,7 @@ const joinRequest = async (req, res, next) => {
 
     const { company_name, company_email } = validation.payload;
 
-    let company = await CompanyModel.findOne({ owner_user_id: user._id });
+    let company = await CompanyModel.findOne(buildCompanyOwnerQuery(user._id));
     const currentState = getCompanyRequestState(company);
 
     if (["pending", "approved", "suspended"].includes(currentState)) {
@@ -376,7 +376,7 @@ const uploadFile = async (req, res, next) => {
       return fail(res, lan, 400, fileValidation.ar, fileValidation.en);
     }
 
-    const company = await CompanyModel.findOne({ owner_user_id: user._id });
+    const company = await CompanyModel.findOne(buildCompanyOwnerQuery(user._id));
 
     if (!company) {
       await deleteUploadedFile(file.filename);
@@ -439,7 +439,7 @@ const deleteFile = async (req, res, next) => {
       return fail(res, lan, 400, "اسم الملف مفقود", "Filename is required");
     }
 
-    const company = await CompanyModel.findOne({ owner_user_id: user._id });
+    const company = await CompanyModel.findOne(buildCompanyOwnerQuery(user._id));
     if (!company) {
       return fail(res, lan, 404, "الحساب غير موجود", "Company not found");
     }
@@ -489,7 +489,7 @@ const getFileLinks = async (req, res, next) => {
       return fail(res, lan, 401, "غير مصرح", "Unauthorized");
     }
 
-    const company = await CompanyModel.findOne({ owner_user_id: user._id }).lean();
+    const company = await CompanyModel.findOne(buildCompanyOwnerQuery(user._id)).lean();
     if (!company) {
       return fail(res, lan, 404, "الحساب غير موجود", "Company not found");
     }
@@ -524,7 +524,7 @@ const downloadFile = async (req, res, next) => {
       return fail(res, lan, 400, "اسم الملف مفقود", "Filename is required");
     }
 
-    const company = await CompanyModel.findOne({ owner_user_id: user._id }).lean();
+    const company = await CompanyModel.findOne(buildCompanyOwnerQuery(user._id)).lean();
     const files = Array.isArray(company?.files) ? company.files : [];
 
     if (!company || !files.includes(filename)) {

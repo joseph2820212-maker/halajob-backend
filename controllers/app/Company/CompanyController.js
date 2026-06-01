@@ -1,5 +1,6 @@
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { CompanyModel } from "../../../models/index.js";
+import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
@@ -117,7 +118,7 @@ const getApprovedCompanyOrError = async (req, res) => {
     return null;
   }
 
-  const company = await CompanyModel.findOne({ owner_user_id: user._id });
+  const company = await CompanyModel.findOne(buildCompanyOwnerQuery(user._id));
   const state = getCompanyRequestState(company);
 
   if (state !== "approved") {

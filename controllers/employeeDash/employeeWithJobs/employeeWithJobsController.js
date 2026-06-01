@@ -9,7 +9,24 @@ import {
   UserRatingJobModel,
   InterviewModel,
   JobEmployeeMatchModel,
+  JobInvitationModel,
 } from "../../../models/index.js";
+
+import {
+  EMPLOYEE_INTERVIEW_STATUSES,
+  EMPLOYEE_OFFER_STATUSES,
+  buildApplicationFilter,
+  buildInterviewFilter,
+  buildOfferFilter,
+  applicationPopulateForEmployee,
+  interviewPopulateForEmployee,
+  offerPopulateForEmployee,
+  normalizeApplicationForEmployee,
+  normalizeInterviewForEmployee,
+  normalizeOfferForEmployee,
+  cleanText,
+} from "../../../helper/employeeDash/employeeJobActivityHelpers.js";
+
 import {
   getEmployeeUserIdOrFail,
   success,
@@ -380,21 +397,193 @@ export const applyToJob = async (req, res, next) => {
   }
 };
 
+
+const createEmployeeStatusHistory = async ({ application, oldStatus, newStatus, employeeData, note = "" }) => {
+  try {
+    await ApplicationStatusHistoryModel.create({
+      application_id: application._id,
+      job_id: application.job_id?._id || application.job_id,
+      company_id: application.company_id?._id || application.company_id,
+      user_id: employeeData.userId,
+      old_status: oldStatus || null,
+      new_status: newStatus,
+      changed_by: employeeData.userId,
+      actor_type: "employee",
+      note,
+    });
+  } catch {
+    // history must not break the main employee action
+  }
+};
+
+const findOwnedApplication = async (employeeData, applicationId) => {
+  if (!isValidObjectId(applicationId)) return null;
+  return UserApplyingJobModel.findOne({ _id: applicationId, user_id: employeeData.userId });
+};
+
+const findOwnedInterview = async (employeeData, interviewId) => {
+  if (!isValidObjectId(interviewId)) return null;
+  return InterviewModel.findOne({ _id: interviewId, employee_user_id: employeeData.userId });
+};
+
+const findOwnedInvitation = async (employeeData, invitationId) => {
+  if (!isValidObjectId(invitationId)) return null;
+  return JobInvitationModel.findOne({ _id: invitationId, user_id: employeeData.userId });
+};
+
+const getFirstCountryId = (employee, job) => {
+  const preferred = Array.isArray(employee?.preferred_countries) ? employee.preferred_countries : [];
+  const jobCountries = Array.isArray(job?.countries) ? job.countries : [];
+  return preferred.find(isValidObjectId) || jobCountries.find(isValidObjectId) || null;
+};
+
+const createApplicationFromInvitationIfPossible = async ({ employeeData, invitation }) => {
+  const existing = await UserApplyingJobModel.findOne({
+    user_id: employeeData.userId,
+    job_id: invitation.job_id?._id || invitation.job_id,
+  });
+
+  if (existing) return { application: existing, created: false, reason: "already_applied" };
+
+  const job = invitation.job_id && typeof invitation.job_id === "object"
+    ? invitation.job_id
+    : await jobsModel.findById(invitation.job_id).lean();
+
+  const employee = employeeData.employee;
+  const user = employee.user_id || {};
+  const countryId = getFirstCountryId(employee, job);
+
+  if (!countryId) {
+    return { application: null, created: false, reason: "missing_country_id" };
+  }
+
+  const application = await UserApplyingJobModel.create({
+    user_id: employeeData.userId,
+    employee_id: employee._id,
+    job_id: invitation.job_id?._id || invitation.job_id,
+    company_id: invitation.company_id?._id || invitation.company_id,
+    first_name: user.first_name || "Candidate",
+    last_name: user.last_name || user.mid_name || "Candidate",
+    email: user.email || "candidate@example.com",
+    phone_code: user.phone_code || "+963",
+    phone_national: user.phone_national || user.phone || "000000000",
+    country_id: countryId,
+    answers: [],
+    cv: employee.cvs?.find((cv) => cv.status === "active")?.url || employee.cvs?.[0]?.url || "",
+    cover_letter: cleanText(invitation.message),
+    source: "invitation",
+    status: "waiting",
+    status_changed_at: new Date(),
+    last_activity_at: new Date(),
+  });
+
+  await Promise.all([
+    jobsModel.updateOne(
+      { _id: application.job_id },
+      { $inc: { user_applying: 1, "search_index.score_signals.applies": 1 } }
+    ).catch(() => null),
+    createEmployeeStatusHistory({
+      application,
+      oldStatus: null,
+      newStatus: "waiting",
+      employeeData,
+      note: "application_created_from_job_invitation",
+    }),
+  ]);
+
+  return { application, created: true, reason: "created" };
+};
+
 export const myApplications = async (req, res, next) => {
   try {
     const employeeData = await getEmployeeUserIdOrFail(req, res);
     if (!employeeData) return;
 
-    const filter = { user_id: employeeData.userId };
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.job_id && isValidObjectId(req.query.job_id)) filter.job_id = req.query.job_id;
-    if (req.query.company_id && isValidObjectId(req.query.company_id)) filter.company_id = req.query.company_id;
-
+    const filter = buildApplicationFilter(employeeData, req.query);
     const result = await paginate(UserApplyingJobModel, filter, req, {
-      populate: [{ path: "job_id", populate: publicJobPopulate }, { path: "company_id" }],
+      populate: applicationPopulateForEmployee,
+      sort: { last_activity_at: -1, createdAt: -1, _id: -1 },
     });
 
-    return success(res, result.items, "my_applications", 200, result.meta);
+    return success(res, result.items.map(normalizeApplicationForEmployee), "my_applications", 200, result.meta);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const myRejectedApplications = async (req, res, next) => {
+  req.query.status = "rejected";
+  return myApplications(req, res, next);
+};
+
+export const getMyApplicationDetails = async (req, res, next) => {
+  try {
+    const employeeData = await getEmployeeUserIdOrFail(req, res);
+    if (!employeeData) return;
+
+    const { applicationId } = req.params;
+    if (!isValidObjectId(applicationId)) return fail(res, "invalid_application_id", 400);
+
+    const application = await UserApplyingJobModel.findOne({ _id: applicationId, user_id: employeeData.userId })
+      .populate(applicationPopulateForEmployee)
+      .lean();
+
+    if (!application) return fail(res, "application_not_found", 404);
+
+    const [histories, interviews, invitation] = await Promise.all([
+      ApplicationStatusHistoryModel.find({ application_id: application._id, user_id: employeeData.userId })
+        .sort({ createdAt: -1 })
+        .lean(),
+      InterviewModel.find({ application_id: application._id, employee_user_id: employeeData.userId })
+        .sort({ start_at: -1, createdAt: -1 })
+        .populate(interviewPopulateForEmployee)
+        .lean(),
+      JobInvitationModel.findOne({
+        job_id: application.job_id?._id || application.job_id,
+        user_id: employeeData.userId,
+      })
+        .populate(offerPopulateForEmployee)
+        .lean(),
+    ]);
+
+    return success(res, {
+      ...normalizeApplicationForEmployee(application),
+      histories,
+      interviews: interviews.map(normalizeInterviewForEmployee),
+      invitation: invitation ? normalizeOfferForEmployee(invitation) : null,
+    }, "application_details");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelMyApplication = async (req, res, next) => {
+  try {
+    const employeeData = await getEmployeeUserIdOrFail(req, res);
+    if (!employeeData) return;
+
+    const application = await findOwnedApplication(employeeData, req.params.applicationId);
+    if (!application) return fail(res, "application_not_found", 404);
+
+    if (["accepted", "hired", "rejected", "withdrawn", "auto_cancel"].includes(application.status)) {
+      return fail(res, "application_cannot_be_withdrawn", 422);
+    }
+
+    const oldStatus = application.status;
+    application.status = "withdrawn";
+    application.status_changed_at = new Date();
+    application.last_activity_at = new Date();
+    await application.save();
+
+    await createEmployeeStatusHistory({
+      application,
+      oldStatus,
+      newStatus: "withdrawn",
+      employeeData,
+      note: cleanText(req.body.note || "withdrawn_by_candidate"),
+    });
+
+    return success(res, normalizeApplicationForEmployee(application), "application_withdrawn");
   } catch (error) {
     next(error);
   }
@@ -405,21 +594,128 @@ export const myInterviews = async (req, res, next) => {
     const employeeData = await getEmployeeUserIdOrFail(req, res);
     if (!employeeData) return;
 
-    const filter = { employee_user_id: employeeData.userId };
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.upcoming === "true") filter.start_at = { $gte: new Date() };
-
+    const filter = buildInterviewFilter(employeeData, req.query);
+    const upcoming = req.query.upcoming === "true";
     const result = await paginate(InterviewModel, filter, req, {
-      populate: [
-        { path: "application_id" },
-        { path: "job_id", populate: publicJobPopulate },
-        { path: "company_id" },
-      ],
-      sort: { start_at: req.query.upcoming === "true" ? 1 : -1, createdAt: -1 },
+      populate: interviewPopulateForEmployee,
+      sort: { start_at: upcoming ? 1 : -1, createdAt: -1, _id: -1 },
     });
 
-    return success(res, result.items, "my_interviews", 200, result.meta);
+    return success(res, result.items.map(normalizeInterviewForEmployee), "my_interviews", 200, result.meta);
   } catch (error) {
+    next(error);
+  }
+};
+
+export const respondToInterview = async (req, res, next) => {
+  try {
+    const employeeData = await getEmployeeUserIdOrFail(req, res);
+    if (!employeeData) return;
+
+    const interview = await findOwnedInterview(employeeData, req.params.interviewId);
+    if (!interview) return fail(res, "interview_not_found", 404);
+
+    const status = cleanText(req.body.status || req.body.response);
+    if (!EMPLOYEE_INTERVIEW_STATUSES.has(status) || !["accepted", "rejected"].includes(status)) {
+      return fail(res, "invalid_interview_response", 422);
+    }
+
+    if (!["scheduled", "rescheduled", "accepted", "rejected"].includes(interview.status)) {
+      return fail(res, "interview_cannot_be_changed", 422);
+    }
+
+    interview.status = status;
+    if (req.body.candidate_note !== undefined || req.body.note !== undefined) {
+      interview.candidate_note = cleanText(req.body.candidate_note || req.body.note);
+    }
+    await interview.save();
+
+    const populated = await InterviewModel.findById(interview._id).populate(interviewPopulateForEmployee).lean();
+    return success(res, normalizeInterviewForEmployee(populated || interview), "interview_response_saved");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const myJobInvitations = async (req, res, next) => {
+  try {
+    const employeeData = await getEmployeeUserIdOrFail(req, res);
+    if (!employeeData) return;
+
+    const filter = buildOfferFilter(employeeData, req.query);
+    const result = await paginate(JobInvitationModel, filter, req, {
+      populate: offerPopulateForEmployee,
+      sort: { createdAt: -1, _id: -1 },
+    });
+
+    return success(res, result.items.map(normalizeOfferForEmployee), "job_invitations", 200, result.meta);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyJobInvitationDetails = async (req, res, next) => {
+  try {
+    const employeeData = await getEmployeeUserIdOrFail(req, res);
+    if (!employeeData) return;
+
+    const invitation = await findOwnedInvitation(employeeData, req.params.invitationId);
+    if (!invitation) return fail(res, "job_invitation_not_found", 404);
+
+    if (invitation.status === "sent") {
+      invitation.status = "seen";
+      await invitation.save();
+    }
+
+    const populated = await JobInvitationModel.findById(invitation._id).populate(offerPopulateForEmployee).lean();
+    return success(res, normalizeOfferForEmployee(populated || invitation), "job_invitation_details");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const respondToJobInvitation = async (req, res, next) => {
+  try {
+    const employeeData = await getEmployeeUserIdOrFail(req, res);
+    if (!employeeData) return;
+
+    const invitation = await findOwnedInvitation(employeeData, req.params.invitationId);
+    if (!invitation) return fail(res, "job_invitation_not_found", 404);
+
+    const status = cleanText(req.body.status || req.body.response);
+    if (!EMPLOYEE_OFFER_STATUSES.has(status) || !["accepted", "declined"].includes(status)) {
+      return fail(res, "invalid_offer_response", 422);
+    }
+
+    const expired = invitation.expires_at && new Date(invitation.expires_at).getTime() < Date.now();
+    if (expired) {
+      invitation.status = "expired";
+      await invitation.save();
+      return fail(res, "job_invitation_expired", 410);
+    }
+
+    if (!["sent", "seen", "accepted", "declined"].includes(invitation.status)) {
+      return fail(res, "job_invitation_cannot_be_changed", 422);
+    }
+
+    invitation.status = status;
+    invitation.responded_at = new Date();
+    await invitation.save();
+
+    let applicationResult = null;
+    if (status === "accepted") {
+      applicationResult = await createApplicationFromInvitationIfPossible({ employeeData, invitation });
+    }
+
+    const populated = await JobInvitationModel.findById(invitation._id).populate(offerPopulateForEmployee).lean();
+    return success(res, {
+      ...normalizeOfferForEmployee(populated || invitation),
+      application: applicationResult?.application ? normalizeApplicationForEmployee(applicationResult.application) : null,
+      application_created: Boolean(applicationResult?.created),
+      application_reason: applicationResult?.reason || null,
+    }, "job_invitation_response_saved");
+  } catch (error) {
+    if (error.code === 11000) return fail(res, "already_applied_to_job", 409);
     next(error);
   }
 };
@@ -484,7 +780,14 @@ export default {
   savedJobs,
   applyToJob,
   myApplications,
+  myRejectedApplications,
+  getMyApplicationDetails,
+  cancelMyApplication,
   myInterviews,
+  respondToInterview,
+  myJobInvitations,
+  getMyJobInvitationDetails,
+  respondToJobInvitation,
   rateJob,
   reviewJob,
 };

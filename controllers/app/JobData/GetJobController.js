@@ -20,6 +20,7 @@ import {
   JobEmployeeMatchModel,
 } from "../../../models/index.js";
 import { calculateJobEmployeeMatch } from "../../../services/matching/jobEmployeeMatching.js";
+import { resolveAppAccount } from "../../../services/appAccount.service.js";
 
 const { Types } = mongoose;
 const PUBLIC_BASE = process.env.PUBLIC_BASE_URL || "";
@@ -88,9 +89,16 @@ const labelOf = (value, lang = "en") => {
   return String(value?.[`title_${lang}`] || value?.[`name_${lang}`] || value?.title || value?.name || value?.key || "").trim();
 };
 
-const getEmployeeForUser = async (userId) => {
-  if (!userId) return null;
-  return EmployeeModel.findOne({ user_id: userId }).lean();
+const getEmployeeForRequest = async (req) => {
+  const userId = toObjectId(req.user?._id);
+  if (!userId) return { userId: null, employee: null };
+
+  const account = await resolveAppAccount(req.user, { createMissingEmployee: false });
+  if (account.accountType !== "employee" || !account.employee?._id) {
+    return { userId: null, employee: null };
+  }
+
+  return { userId, employee: account.employee };
 };
 
 const publicJobMatch = () => {
@@ -361,8 +369,7 @@ const markSeen = async (userId, jobIds = []) => {
 
 const get = async (req, res, next) => {
   try {
-    const userId = toObjectId(req.user?._id || req.query.user_id);
-    const employee = await getEmployeeForUser(userId);
+    const { userId, employee } = await getEmployeeForRequest(req);
     const filters = readFilters(req);
     const page = Math.max(1, Number(req.query.page || 1));
     const limit = Math.min(50, Math.max(1, Number(req.query.limit || 10)));
@@ -781,8 +788,7 @@ const getFilters = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
   try {
-    const userId = toObjectId(req.user?._id || req.query.user_id);
-    const employee = await getEmployeeForUser(userId);
+    const { userId, employee } = await getEmployeeForRequest(req);
 
     const id = toObjectId(req.params.id);
     if (!id) {

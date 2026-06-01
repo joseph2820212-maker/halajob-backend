@@ -1,7 +1,8 @@
 // controllers/Company.controller.js
 
 import ReturnDashData from "../../helper/ReturnDashData/index.js";
-import { CompanyModel } from "../../models/index.js";
+import { CompanyModel, UserModel } from "../../models/index.js";
+import { getCompanyRole } from "../../services/appAccount.service.js";
 
 /**
  * CREATE
@@ -53,6 +54,14 @@ import { CompanyModel } from "../../models/index.js";
         message: "Company not found",
       });
     }
+
+    if (doc.accepted === true && doc.status === true && doc.owner_user_id) {
+      const companyRole = await getCompanyRole();
+      if (companyRole?._id) {
+        await UserModel.findByIdAndUpdate(doc.owner_user_id, { role_id: companyRole._id });
+      }
+    }
+
     return ReturnDashData.updateData({
       res,
       data: doc,
@@ -93,7 +102,7 @@ const get = async (req, res, next) => {
         .sort(sort) // مثال: "-Company_number" = desc
         .skip(skip)
         .limit(Number(limit))
-         .populate("user_id") ,
+         .populate("owner_user_id") ,
       CompanyModel.countDocuments(filter),
     ]);
 

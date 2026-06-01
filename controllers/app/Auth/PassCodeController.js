@@ -1,18 +1,17 @@
-import { RoleModel, UserModel, EmployeeModel } from "../../../models/index.js";
+import { UserModel } from "../../../models/index.js";
+import {
+  buildRoleDto,
+  buildUserDto,
+  resolveAppAccount,
+  serializeCompany,
+  serializeEmployee,
+} from "../../../services/appAccount.service.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
 const normEmail = (e) => (e || "").trim().toLowerCase();
-const EMPLOYEE_ROLE_NUMBER = 4;
-
-function buildPublicUrl(base, rel) {
-  if (!base) return rel;
-  const cleaned = rel?.replace(/^\/+/, "") || "";
-  return base.endsWith("/") ? base + cleaned : `${base}/${cleaned}`;
-}
-
 const toBool = (v) => {
   if (typeof v === "boolean") return v;
   if (typeof v === "number") return v !== 0;
@@ -62,75 +61,24 @@ function addOrUpdateDevice(user, dev, { makeDefault = true } = {}) {
   return { inserted: true, updated: false, index: user.device.length - 1 };
 }
 
-function buildUserDto(user) {
-  return {
-    id: user._id,
-    first_name: user.first_name,
-    mid_name: user.mid_name,
-    last_name: user.last_name,
-    full_name: [user.first_name, user.mid_name, user.last_name].filter(Boolean).join(" "),
-    image: user.image ? buildPublicUrl(process.env.PUBLIC_BASE_URL, user.image) : null,
-    phone_code: user.phone_code,
-    phone: user.phone_national,
-    gender: user.gender,
-    birthday: user.birthday || null,
-  };
-}
-
-async function getEmployeeRole() {
-  return RoleModel.findOne({
-    role_number: EMPLOYEE_ROLE_NUMBER,
-    log_to: "employee",
-    status: true,
-  }).lean();
-}
-
-async function ensureEmployeeProfile(user, role) {
-  await EmployeeModel.findOneAndUpdate(
-    { user_id: user._id },
-    {
-      $setOnInsert: {
-        user_id: user._id,
-        role_id: role._id,
-        status: true,
-        accepted: false,
-      },
-    },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
-  );
-}
-
 async function buildAuthPayload(user, device) {
   const tokens = await generateAuthTokens(user, device);
+  const account = await resolveAppAccount(user, {
+    createMissingEmployee: true,
+  });
 
-  // هذا الكنترولر خاص بتطبيق الموظفين، لذلك الاستجابة لا ترجع company نهائياً.
-  const role = await getEmployeeRole();
-  if (!role?._id) {
-    throw new Error("EMPLOYEE_ROLE_NOT_FOUND");
-  }
-
-  if (!user.role_id || String(user.role_id) !== String(role._id)) {
-    user.role_id = role._id;
-    await user.save();
-  }
-
-  await ensureEmployeeProfile(user, role);
-
-  const employee = buildUserDto(user);
+  const userDto = buildUserDto(user);
+  const employee = account.accountType === "employee" ? serializeEmployee(account.employee) : null;
+  const company = account.accountType === "company" ? serializeCompany(account.company) : null;
 
   return {
-    user: employee,
-    role: {
-      id: role._id,
-      name: role.name,
-      log_to: role.log_to,
-      title_ar: role.title_ar,
-      title_en: role.title_en,
-      permissions: user.permissions || [],
-    },
-    accountType: "employee",
+    user: userDto,
+    role: buildRoleDto(account.role, user),
+    accountType: account.accountType,
+    user_type: account.accountType,
     employee,
-    company: null,
+    company,
+    available_accounts: account.availableAccounts,
     tokens,
   };
 }

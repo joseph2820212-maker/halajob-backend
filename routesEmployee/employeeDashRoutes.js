@@ -47,7 +47,25 @@ router.post("/jobs/:jobId/review", upload.none(), jobsController.reviewJob);
 
 /* Applications */
 router.get("/applications", jobsController.myApplications);
+router.get("/applications/applied", jobsController.myApplications);
+router.get("/applications/status", jobsController.myApplications);
+router.get("/applications/rejected", jobsController.myRejectedApplications);
+
+/* Interviews */
 router.get("/applications/interviews", jobsController.myInterviews);
+router.patch("/applications/interviews/:interviewId/respond", upload.none(), jobsController.respondToInterview);
+
+/* Job invitations / offers */
+router.get("/applications/offers", jobsController.myJobInvitations);
+router.get("/applications/offers/:invitationId", jobsController.getMyJobInvitationDetails);
+router.patch("/applications/offers/:invitationId/respond", upload.none(), jobsController.respondToJobInvitation);
+router.patch("/applications/offers/:invitationId/reject", upload.none(), (req, res, next) => {
+  req.body.status = "declined";
+  return jobsController.respondToJobInvitation(req, res, next);
+});
+
+router.get("/applications/:applicationId", jobsController.getMyApplicationDetails);
+router.patch("/applications/:applicationId/cancel", upload.none(), jobsController.cancelMyApplication);
 
 /* Companies */
 router.get("/companies", companiesController.browseCompanies);

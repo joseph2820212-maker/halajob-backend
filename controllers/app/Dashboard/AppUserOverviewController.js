@@ -10,6 +10,7 @@ import {
   UserShowJobModel,
   jobsModel,
 } from "../../../models/index.js";
+import { resolveAppAccount } from "../../../services/appAccount.service.js";
 
 const DEFAULT_MONTHS = 6;
 const MAX_MONTHS = 12;
@@ -326,22 +327,21 @@ const getMyAppDashboardOverview = async (req, res, next) => {
 
     const months = clamp(toNumber(req.query.months, DEFAULT_MONTHS), 1, MAX_MONTHS);
 
-    const [company, employee] = await Promise.all([
-      findUserCompany(userId, req.user || {}),
-      findUserEmployee(userId, req.user || {}),
-    ]);
+    const account = await resolveAppAccount(req.user || {}, { createMissingEmployee: false });
 
     /**
-     * Auto account detection by actual profile document existence, not role name.
-     * If the user has a company profile we return company dashboard.
-     * Otherwise, if they have an employee profile we return employee dashboard.
+     * Important: account type is resolved from the authenticated user only.
+     * Priority is: approved company profile -> role_id.log_to -> existing profile.
+     * This prevents returning employee dashboard for company accounts that still have
+     * an old EmployeeModel document, and prevents pending company requests from
+     * hijacking an employee dashboard.
      */
     let overview = null;
 
-    if (company?._id) {
-      overview = await buildCompanyOverview({ company, months });
-    } else if (employee?._id) {
-      overview = await buildEmployeeOverview({ employee, userId, months });
+    if (account.accountType === "company" && account.company?._id && account.companyState === "approved") {
+      overview = await buildCompanyOverview({ company: account.company, months });
+    } else if (account.accountType === "employee" && account.employee?._id) {
+      overview = await buildEmployeeOverview({ employee: account.employee, userId, months });
     }
 
     if (!overview) {
@@ -354,7 +354,10 @@ const getMyAppDashboardOverview = async (req, res, next) => {
           meta: {
             months,
             generated_at: new Date().toISOString(),
-            resolved_from: "req.user",
+            resolved_from: "authenticated_account",
+            account_type: account.accountType,
+            role_type: account.roleType,
+            company_state: account.companyState,
           },
         },
       });
@@ -367,7 +370,10 @@ const getMyAppDashboardOverview = async (req, res, next) => {
         meta: {
           months,
           generated_at: new Date().toISOString(),
-          resolved_from: "req.user",
+          resolved_from: "authenticated_account",
+            account_type: account.accountType,
+            role_type: account.roleType,
+            company_state: account.companyState,
         },
       },
     });

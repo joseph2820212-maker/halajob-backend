@@ -3,6 +3,7 @@ import { setLocale } from "yup";
 import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { CompanyModel, jobsModel, JobNameModel } from "../../../models/index.js";
+import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 import { job_updated_notification } from "../../../notification/JobCompanyNotifications.js";
 
 /* i18n */
@@ -142,7 +143,7 @@ export const update = async (req, res) => {
       return ReturnAppData.createError({ res, status: 400, message: lan === "ar" ? "معرّف غير صالح" : "Invalid id" });
     }
 
-    const company = await CompanyModel.findOne({ user_id: req.user._id, status: true, accepted: true }).lean();
+    const company = await CompanyModel.findOne({ ...buildCompanyOwnerQuery(req.user._id), status: true, accepted: true }).lean();
     if (!company) {
       return ReturnAppData.createError({
         res,

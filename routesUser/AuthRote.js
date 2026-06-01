@@ -3,7 +3,7 @@ import { authUser } from '../middlewares/userAuth.js';
 import multer from '../utils/multer.js';
 import Register from '../controllers/app/Auth/RegisterController.js';
 import Login from '../controllers/app/Auth/LoginController.js';
-import PassCodeController from '../controllers/app/Auth/PassCodeController.js';
+import PassCodeController from '../controllers/app/Auth/passcodeController.js';
 import ResendOtpController from '../controllers/app/Auth/ResendOtpController.js';
 import ForgotPassword from '../controllers/app/Auth/ForgotPasswordController.js';
 import PassCodeForgotPasswordController from '../controllers/app/Auth/PassCodeForgotPasswordController.js';

@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { CompanyModel, jobsModel, JobNameModel } from "../../../models/index.js";
 import { Job_created_notification } from "../../../notification/JobCompanyNotifications.js";
+import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 
 /* ========== i18n ========== */
 const buildLocale = (lan = "en") =>
@@ -222,7 +223,7 @@ export const create = async (req, res) => {
     setLocale(buildLocale(lan));
 
     const company = await CompanyModel.findOne({
-      user_id: req.user._id,
+      ...buildCompanyOwnerQuery(req.user._id),
       status: true,
       accepted: true,
     }).lean();

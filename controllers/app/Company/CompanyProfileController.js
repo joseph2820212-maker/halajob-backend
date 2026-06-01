@@ -8,6 +8,7 @@ import {
   UserSavedJobModel,
   UserShowJobModel,
 } from "../../../models/index.js";
+import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 
 const getCompanyRequestState = (company) => {
   if (!company) return "none";
@@ -49,7 +50,7 @@ const stateMessage = (lan, state) => {
 
 /* حالة الشركة */
 const companyStatus = async (lan, owner_user_id) => {
-  const company = await CompanyModel.findOne({ owner_user_id }).lean();
+  const company = await CompanyModel.findOne(buildCompanyOwnerQuery(owner_user_id)).lean();
   const state = getCompanyRequestState(company);
 
   if (state !== "approved") {

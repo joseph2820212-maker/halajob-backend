@@ -1,6 +1,13 @@
-import { CompanyModel, RefreshTokenModel, RoleModel, UserModel } from "../../../models/index.js";
+import { RefreshTokenModel, UserModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
+import {
+  buildRoleDto,
+  buildUserDto,
+  resolveAppAccount,
+  serializeCompany,
+  serializeEmployee,
+} from "../../../services/appAccount.service.js";
 import bcryptjs from "bcryptjs";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
@@ -145,14 +152,14 @@ export const resetPassword = async (req, res, next) => {
     // Issue fresh tokens
     const tokens = await generateAuthTokens(user, incomingDevice);
 
-    // Load role & company
-    const role = user.role_id ? await RoleModel.findById(user.role_id) : null;
-    const company = await CompanyModel.findOne({ user_id: user._id, status: true });
+    const account = await resolveAppAccount(user, { createMissingEmployee: true });
+    const userDto = buildUserDto(user);
 
     return ReturnAppData.createData({
       res,
       status: 200,
       data: {
+        user: userDto,
         user_id: user._id,
         first_name: user.first_name,
         mid_name: user.mid_name,
@@ -161,16 +168,13 @@ export const resetPassword = async (req, res, next) => {
         phone_code: user.phone_code,
         phone: user.phone_national,
         gender: user.gender,
-        role: role
-          ? {
-              id: role._id,
-              title_ar: role.title_ar,
-              title_en: role.title_en,
-              permissions: user.permissions,
-            }
-          : null,
+        role: buildRoleDto(account.role, user),
+        accountType: account.accountType,
+        user_type: account.accountType,
+        employee: account.accountType === "employee" ? serializeEmployee(account.employee) : null,
+        company: account.accountType === "company" ? serializeCompany(account.company) : null,
+        available_accounts: account.availableAccounts,
         tokens,
-        company,
       },
       message:
         lan === "ar"

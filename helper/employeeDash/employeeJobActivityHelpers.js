@@ -61,6 +61,12 @@ export const safeStatus = (status, allowedSet) => {
   return allowedSet.has(value) ? value : null;
 };
 
+export const buildSearchRegex = (value = "") => {
+  const text = cleanText(value);
+  if (!text) return null;
+  return new RegExp(escapeRegex(text), "i");
+};
+
 export const normalizeCompanyLite = (company) => {
   if (!company) return null;
   return {
@@ -183,6 +189,8 @@ export const normalizeOfferForEmployee = (offer) => {
     _id: offer._id,
     status: expired && ["sent", "seen"].includes(offer.status) ? "expired" : offer.status,
     message: offer.message || "",
+    salary_offer: offer.salary_offer || "",
+    starts_at: offer.starts_at || null,
     expires_at: offer.expires_at || null,
     responded_at: offer.responded_at || null,
     is_expired: Boolean(expired),
@@ -212,14 +220,27 @@ export const buildApplicationFilter = (employeeData, query = {}) => {
   const status = safeStatus(query.status, EMPLOYEE_APPLICATION_STATUSES);
   if (status) filter.status = status;
 
-  if (query.job_id && isValidObjectId(query.job_id)) filter.job_id = query.job_id;
-  if (query.company_id && isValidObjectId(query.company_id)) filter.company_id = query.company_id;
+  const jobId = query.job_id || query.jobId;
+  const companyId = query.company_id || query.companyId;
+  if (jobId && isValidObjectId(jobId)) filter.job_id = jobId;
+  if (companyId && isValidObjectId(companyId)) filter.company_id = companyId;
 
-  const statuses = parseArrayQuery(query.statuses).filter((x) => EMPLOYEE_APPLICATION_STATUSES.has(x));
+  const statuses = parseArrayQuery(query.statuses || query.status_list || query.statusList)
+    .filter((x) => EMPLOYEE_APPLICATION_STATUSES.has(x));
   if (statuses.length) filter.status = { $in: statuses };
 
-  const from = cleanText(query.from || query.date_from);
-  const to = cleanText(query.to || query.date_to);
+  const searchRegex = buildSearchRegex(query.search || query.q || query.keyword);
+  if (searchRegex) {
+    filter.$or = [
+      { first_name: searchRegex },
+      { last_name: searchRegex },
+      { email: searchRegex },
+      { cover_letter: searchRegex },
+    ];
+  }
+
+  const from = cleanText(query.from || query.date_from || query.start_date || query.startDate);
+  const to = cleanText(query.to || query.date_to || query.end_date || query.endDate);
   if (from || to) {
     filter.createdAt = {};
     if (from) filter.createdAt.$gte = new Date(from);
@@ -235,17 +256,20 @@ export const buildInterviewFilter = (employeeData, query = {}) => {
   const status = safeStatus(query.status, EMPLOYEE_INTERVIEW_STATUSES);
   if (status) filter.status = status;
 
-  if (query.job_id && isValidObjectId(query.job_id)) filter.job_id = query.job_id;
-  if (query.application_id && isValidObjectId(query.application_id)) filter.application_id = query.application_id;
-  if (query.company_id && isValidObjectId(query.company_id)) filter.company_id = query.company_id;
+  const jobId = query.job_id || query.jobId;
+  const applicationId = query.application_id || query.applicationId;
+  const companyId = query.company_id || query.companyId;
+  if (jobId && isValidObjectId(jobId)) filter.job_id = jobId;
+  if (applicationId && isValidObjectId(applicationId)) filter.application_id = applicationId;
+  if (companyId && isValidObjectId(companyId)) filter.company_id = companyId;
 
   const upcoming = toBool(query.upcoming);
   const past = toBool(query.past);
   if (upcoming === true) filter.start_at = { $gte: new Date() };
-  if (past === true) filter.start_at = { $lt: new Date() };
+  if (upcoming === false || past === true) filter.start_at = { $lt: new Date() };
 
-  const from = cleanText(query.from || query.date_from);
-  const to = cleanText(query.to || query.date_to);
+  const from = cleanText(query.from || query.date_from || query.start_date || query.startDate);
+  const to = cleanText(query.to || query.date_to || query.end_date || query.endDate);
   if (from || to) {
     filter.start_at = filter.start_at || {};
     if (from) filter.start_at.$gte = new Date(from);
@@ -261,8 +285,10 @@ export const buildOfferFilter = (employeeData, query = {}) => {
   const status = safeStatus(query.status, EMPLOYEE_OFFER_STATUSES);
   if (status) filter.status = status;
 
-  if (query.job_id && isValidObjectId(query.job_id)) filter.job_id = query.job_id;
-  if (query.company_id && isValidObjectId(query.company_id)) filter.company_id = query.company_id;
+  const jobId = query.job_id || query.jobId;
+  const companyId = query.company_id || query.companyId;
+  if (jobId && isValidObjectId(jobId)) filter.job_id = jobId;
+  if (companyId && isValidObjectId(companyId)) filter.company_id = companyId;
 
   const activeOnly = toBool(query.active);
   if (activeOnly === true) {
