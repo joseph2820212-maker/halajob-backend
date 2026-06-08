@@ -1,132 +1,111 @@
-// notifications/jobs.js
-import { sendToTokens } from "./SendNotification.js";
-import tt from "./Translate.js";
-import { FcmTokenModel, NotificationModel } from "../models/index.js";
-import screen from "./screen.js";
-import { Types, isValidObjectId } from "mongoose";
+import { candidateNameFrom, jobNameFrom, notifyUser } from './notificationService.js';
 
-// قسّم مصفوفة إلى دفعات
-const chunk = (arr, n = 500) => {
-  if (!Array.isArray(arr) || n <= 0) return [];
-  const out = [];
-  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
-  return out;
+const getCompanyOwnerUserId = (value = {}) => {
+  const company = value.company_id || value.company || {};
+  return value.company_user_id || value.company_owner_user_id || value.owner_user_id || value.user_id || company.owner_user_id || company.user_id || null;
 };
 
-// علِّم التوكنات غير الصالحة كموقوفة
-async function revokeBadTokens(tokens = [], responses = []) {
-  const BAD = [
-    "messaging/registration-token-not-registered",
-    "messaging/invalid-argument",
-  ];
-  const badTokens = responses
-    .map((r, i) => (!r?.success && BAD.includes(r?.error?.code)) ? tokens[i] : null)
-    .filter(Boolean);
-
-  if (!badTokens.length) return 0;
-
-  await FcmTokenModel.updateMany(
-    { token: { $in: badTokens } },
-    { $set: { revoked: true, last_error: "token_invalid" } }
-  );
-  return badTokens.length;
-}
-
-// خريطة الأنواع ↔ مفاتيح الترجمة
-const TYPE_MAP = {
-  job_saved:    { i18n: "job_saved",    screen: "employer_applicants" },
-  job_created:  { i18n: "job_created",  screen: "employer_applicants" },
-  job_reviewed: { i18n: "job_reviewed", screen: "employer_applicants" },
-  job_applied:  { i18n: "job_applied",  screen: "employer_applicants" },
-  job_updated:  { i18n: "job_updated",  screen: "employer_applicants" },
-  job_deleted:  { i18n: "job_deleted",  screen: "employer_applicants" },
-  job_stopped:  { i18n: "job_stopped",  screen: "employer_applicants" },
+const notifyCompanyAboutJob = (eventKey, job = {}, extra = {}) => {
+  const jobId = job._id || job.job_id || job.id || extra.job_id || '';
+  return notifyUser({
+    userId: getCompanyOwnerUserId({ ...job, ...extra }),
+    eventKey,
+    audience: 'company',
+    routeKey: eventKey === 'job_deleted' || eventKey === 'job_stopped' ? 'jobs.list' : 'jobs.details',
+    routeParams: { id: jobId, jobId },
+    params: {
+      job: jobNameFrom(job),
+      candidate: candidateNameFrom(extra.application || extra),
+    },
+    data: {
+      job_id: jobId,
+      company_id: job.company_id?._id || job.company_id || extra.company_id || '',
+      application_id: extra.application_id || extra.application?._id || '',
+      employee_id: extra.employee_id || extra.application?.employee_id || '',
+      candidate_user_id: extra.candidate_user_id || extra.application?.user_id || '',
+      ...extra.data,
+    },
+    dedupeKey: extra.dedupeKey || null,
+  });
 };
 
-// مُرسِل عام
-async function notifyJob(type, job = {}) {
-  try {
-    const cfg = TYPE_MAP[type];
-    if (!cfg) return { success: 0, failure: 0, note: `unknown type: ${type}` };
+export const job_seeker_saved_notification = (job, extra = {}) => notifyCompanyAboutJob('job_saved', job, extra);
+export const Job_created_notification = (job, extra = {}) => notifyCompanyAboutJob('job_created', job, extra);
+export const job_reviewed_notification = (job, extra = {}) => notifyCompanyAboutJob('job_reviewed', job, extra);
+export const job_updated_notification = (job, extra = {}) => notifyCompanyAboutJob('job_updated', job, extra);
+export const job_deleted_notification = (job, extra = {}) => notifyCompanyAboutJob('job_deleted', job, extra);
+export const job_stopped_notification = (job, extra = {}) => notifyCompanyAboutJob('job_stopped', job, extra);
+export const job_rated_notification = (job, extra = {}) => notifyCompanyAboutJob('job_rated', job, extra);
 
-    // 1) تطبيع المعرّف من أكثر من اسم
-    const rawUserId =
-      job.user_id || job.user || job.created_by || job.owner_id || null;
-    if (!rawUserId) return { success: 0, failure: 0, note: "no user_id" };
+export const job_applied_notification = (job, application = {}) => notifyUser({
+  userId: getCompanyOwnerUserId(job),
+  eventKey: 'job_applied',
+  audience: 'company',
+  routeKey: 'applications.applied',
+  routeParams: { id: job._id || job.id || application.job_id || '', jobId: job._id || application.job_id || '' },
+  params: {
+    job: jobNameFrom(job),
+    candidate: candidateNameFrom(application),
+  },
+  data: {
+    job_id: job._id || application.job_id || '',
+    application_id: application._id || application.id || '',
+    employee_id: application.employee_id || '',
+    candidate_user_id: application.user_id || '',
+    company_id: job.company_id?._id || job.company_id || application.company_id || '',
+  },
+  dedupeKey: application._id ? `application:${application._id}:created` : null,
+});
 
-    const userId = isValidObjectId(rawUserId)
-      ? new Types.ObjectId(String(rawUserId))
-      : rawUserId;
+export const application_withdrawn_company_notification = (application = {}, job = {}) => notifyUser({
+  userId: getCompanyOwnerUserId(job),
+  eventKey: 'application_status_withdrawn_company',
+  audience: 'company',
+  routeKey: 'applications.status',
+  routeParams: { id: application.job_id || job._id || '', applicationId: application._id || '' },
+  params: { job: jobNameFrom(job), candidate: candidateNameFrom(application) },
+  data: {
+    job_id: application.job_id || job._id || '',
+    application_id: application._id || '',
+    employee_id: application.employee_id || '',
+    candidate_user_id: application.user_id || '',
+    status: application.status || 'withdrawn',
+  },
+  dedupeKey: application._id ? `application:${application._id}:withdrawn` : null,
+});
 
-    // 2) اجلب التوكنات بالدعم لكلا الحقلين user / user_id
-    const docs = await FcmTokenModel.find({
-      $or: [{ user: userId }, { user_id: userId }],
-      revoked: false,
-    })
-      .select("token _id")
-      .lean();
-    const tokens = docs.map((d) => d.token);
+export const interview_response_company_notification = ({ interview = {}, application = {}, job = {}, candidate = {} } = {}) => notifyUser({
+  userId: getCompanyOwnerUserId(job),
+  eventKey: 'interview_response_company',
+  audience: 'company',
+  routeKey: 'applications.interviews',
+  routeParams: { id: interview.job_id || job._id || '', interviewId: interview._id || '' },
+  params: { job: jobNameFrom(job), candidate: candidateNameFrom(candidate || application) },
+  data: {
+    interview_id: interview._id || '',
+    application_id: interview.application_id || application._id || '',
+    job_id: interview.job_id || job._id || '',
+    status: interview.status || '',
+  },
+  dedupeKey: interview._id ? `interview:${interview._id}:response:${interview.status}` : null,
+});
 
-    // 3) خزّن الإشعار بالحقل المطلوب من المخطط (user_id)
-    const title = tt("ar", cfg.i18n);
-    const body = job.title ?? job.job_name ?? "";
-    const scr = screen(cfg.screen);
-    const jobId = job._id ?? null;
-
-    const notif = await NotificationModel.create({
-      user_id: userId,              // <-- كان user
-      title,
-      body,
-      screen: scr,
-      order_id: jobId,
-      type,
-      data: { job_id: jobId },
-    });
-
-    if (!tokens.length) {
-      return {
-        success: 0,
-        failure: 0,
-        revoked: 0,
-        saved: notif?._id,
-        note: "no tokens",
-      };
-    }
-
-    let success = 0,
-      failure = 0,
-      revoked = 0;
-
-    for (const batch of chunk(tokens, 500)) {
-      const res = await sendToTokens(batch, {
-        title,
-        body,
-        screen: scr,
-        id: jobId,
-        extraData: { order_id: jobId },
-      });
-
-      success += res?.successCount ?? 0;
-      failure += res?.failureCount ?? 0;
-      revoked += await revokeBadTokens(batch, res?.responses ?? []);
-    }
-
-    return { success, failure, revoked, saved: notif?._id };
-  } catch (err) {
-    console.error(`notifyJob(${type}) error:`, err);
-    return { success: 0, failure: 0, error: String(err?.message || err) };
-  }
-}
-
-// واجهات نوعية رفيعة
-export const job_seeker_saved_notification = (job) => notifyJob("job_saved", job);
-export const Job_created_notification      = (job) => notifyJob("job_created", job);
-export const job_reviewed_notification     = (job) => notifyJob("job_reviewed", job);
-export const job_applied_notification      = (job) => notifyJob("job_applied", job);
-export const job_updated_notification      = (job) => notifyJob("job_updated", job);
-export const job_deleted_notification      = (job) => notifyJob("job_deleted", job);
-export const job_stopped_notification      = (job) => notifyJob("job_stopped", job);
-export const job_rated_notification        = (job) => notifyJob("job_rated", job);
+export const job_invitation_response_company_notification = ({ invitation = {}, job = {}, candidate = {} } = {}) => notifyUser({
+  userId: getCompanyOwnerUserId(job),
+  eventKey: 'job_invitation_response_company',
+  audience: 'company',
+  routeKey: 'applications.offers',
+  routeParams: { id: invitation._id || '', invitationId: invitation._id || '' },
+  params: { job: jobNameFrom(job), candidate: candidateNameFrom(candidate || invitation) },
+  data: {
+    invitation_id: invitation._id || '',
+    job_id: invitation.job_id || job._id || '',
+    employee_id: invitation.employee_id || '',
+    candidate_user_id: invitation.user_id || '',
+    status: invitation.status || '',
+  },
+  dedupeKey: invitation._id ? `job_invitation:${invitation._id}:response:${invitation.status}` : null,
+});
 
 export default {
   job_seeker_saved_notification,
@@ -137,4 +116,7 @@ export default {
   job_deleted_notification,
   job_stopped_notification,
   job_rated_notification,
+  application_withdrawn_company_notification,
+  interview_response_company_notification,
+  job_invitation_response_company_notification,
 };

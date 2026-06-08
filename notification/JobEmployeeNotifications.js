@@ -1,175 +1,139 @@
-// notifications/jobs.js
-import { sendToTokens } from "./SendNotification.js";
-import tt from "./Translate.js";
-import { FcmTokenModel, NotificationModel } from "../models/index.js";
-import screen from "./screen.js";
+import { applicationStatusEventKey, jobNameFrom, notifyUser } from './notificationService.js';
 
-// تقسيم دفعات
-const chunk = (arr, n = 500) => {
-  if (!Array.isArray(arr) || n <= 0) return [];
-  const out = [];
-  for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
-  return out;
+const statusRouteKey = (status = '') => {
+  const value = String(status || '').trim().toLowerCase();
+  if (value === 'interview') return 'applications.interviews';
+  if (value === 'offer') return 'applications.offers';
+  if (value === 'rejected') return 'applications.rejected';
+  return 'applications.status';
 };
 
-// تعليم التوكنات السيئة كموقوفة
-async function revokeBadTokens(tokens = [], responses = []) {
-  const BAD = [
-    "messaging/registration-token-not-registered",
-    "messaging/invalid-argument",
-  ];
-  const badTokens = responses
-    .map((r, i) => (!r?.success && BAD.includes(r?.error?.code)) ? tokens[i] : null)
-    .filter(Boolean);
-
-  if (!badTokens.length) return 0;
-
-  await FcmTokenModel.updateMany(
-    { token: { $in: badTokens } },
-    { $set: { revoked: true, last_error: "token_invalid" } }
-  );
-  return badTokens.length;
-}
-
-// حالات الطلب
-const StatusTypeMap = {
-  waiting:     { i18n: "job_waiting",     screen: "employer_applicants" },
-  accepted:    { i18n: "job_accepted",    screen: "employer_applicants" },
-  rejected:    { i18n: "job_rejected",    screen: "employer_applicants" },
-  auto_cancel: { i18n: "job_auto_cancel", screen: "employer_applicants" },
-};
-
-// أنواع المقابلات
-const InterviewTypeMap = {
-  is_online:    { i18n: "meet_in_online", screen: "employer_applicants" },
-  is_on_app:    { i18n: "meet_on_app",     screen: "employer_applicants" },
-  is_in_office: { i18n: "meet_in_office",  screen: "employer_applicants" },
-};
-
-// إرسال إشعار حالة الطلب
 export async function changeJobStatus(status, job = {}) {
-  try {
-    const cfg = StatusTypeMap[status];
-    if (!cfg) return { success: 0, failure: 0, note: `unknown status: ${status}` };
-
-    const user_id = job.user_id;
-    if (!user_id) return { success: 0, failure: 0, note: "no user_id" };
-
-    const docs = await FcmTokenModel.find({ user: user_id, revoked: false })
-      .select("token _id").lean();
-    const tokens = docs.map(d => d.token);
-
-    const title = tt("ar",cfg.i18n);
-    const body  = job.title ?? job.job_name ?? "";
-    const scr   = screen(cfg.screen);
-    const jobId = job._id ?? null;
-
-    const notif = await NotificationModel.create({
-      user_id,
-      title,
-      body,
-      screen: scr,
-      order_id: jobId,
-      type: status,
-      data: { job_id: jobId },
-    });
-
-    if (!tokens.length) {
-      return { success: 0, failure: 0, revoked: 0, saved: notif?._id, note: "no tokens" };
-    }
-
-    let success = 0, failure = 0, revoked = 0;
-
-    for (const batch of chunk(tokens, 500)) {
-      const res = await sendToTokens(batch, {
-        title,
-        body,
-        screen: scr,
-        id: jobId,
-        extraData: { order_id: jobId },
-      });
-      success += res?.successCount ?? 0;
-      failure += res?.failureCount ?? 0;
-      revoked += await revokeBadTokens(batch, res?.responses ?? []);
-    }
-
-    return { success, failure, revoked, saved: notif?._id };
-  } catch (err) {
-    console.error(`changeJobStatus(${status}) error:`, err);
-    return { success: 0, failure: 0, error: String(err?.message || err) };
-  }
-}
-
-// إرسال إشعار تفاصيل المقابلة
-export async function SendInterViewNotification(job = {}) {
-  try {
-    const user_id = job.user_id;
-    if (!user_id) return { success: 0, failure: 0, note: "no user_id" };
-
-    const docs = await FcmTokenModel.find({ user: user_id, revoked: false })
-      .select("token _id").lean();
-    const tokens = docs.map(d => d.token);
-
-    // حدّد نوع المقابلة حسب الأعلام الممررة
-    const kind =
-      job.is_in_office ? "is_in_office" :
-      job.is_on_app    ? "is_on_app"    :
-      job.is_online    ? "is_online"    : "is_online"; // افتراضي
-
-    const cfg = InterviewTypeMap[kind];
-    const title = tt("ar",cfg.i18n);
-    const body  = job.title ?? job.job_name ?? "";
-    const scr   = screen(cfg.screen);
-    const jobId = job.job_id ?? job._id ?? null;
-
-    const payloadData = {
+  const jobId = job.job_id || job._id || job.id || '';
+  const applicationId = job.application_id || '';
+  return notifyUser({
+    userId: job.user_id,
+    eventKey: applicationStatusEventKey(status),
+    audience: 'employee',
+    routeKey: statusRouteKey(status),
+    routeParams: { id: jobId, jobId, applicationId },
+    params: { job: jobNameFrom(job) },
+    data: {
       job_id: jobId,
-      application_id: job.application_id ?? null,
-      meet_link: job.meet_link ?? "",
-      date: job.date ? String(new Date(job.date).toISOString()) : "",
-      is_online: !!job.is_online,
-      is_on_app: !!job.is_on_app,
-      is_in_office: !!job.is_in_office,
-      office_address: job.office_address ?? "",
-      note: job.note ?? "",
-      longitude: job.longitude != null ? String(job.longitude) : "",
-      latitude: job.latitude != null ? String(job.latitude) : "",
-    };
-
-    const notif = await NotificationModel.create({
-      user_id,
-      title,
-      body,
-      screen: scr,
-      order_id: jobId,
-      type: "interview",
-      data: payloadData,
-    });
-
-    if (!tokens.length) {
-      return { success: 0, failure: 0, revoked: 0, saved: notif?._id, note: "no tokens" };
-    }
-
-    let success = 0, failure = 0, revoked = 0;
-
-    for (const batch of chunk(tokens, 500)) {
-      const res = await sendToTokens(batch, {
-        title,
-        body,
-        screen: scr,
-        id: jobId,
-        extraData: payloadData,
-      });
-      success += res?.successCount ?? 0;
-      failure += res?.failureCount ?? 0;
-      revoked += await revokeBadTokens(batch, res?.responses ?? []);
-    }
-
-    return { success, failure, revoked, saved: notif?._id };
-  } catch (err) {
-    console.error("SendInterViewNotification error:", err);
-    return { success: 0, failure: 0, error: String(err?.message || err) };
-  }
+      application_id: applicationId,
+      status,
+    },
+    dedupeKey: applicationId ? `application:${applicationId}:status:${status}` : null,
+  });
 }
 
-export default { changeJobStatus, SendInterViewNotification };
+export async function SendInterViewNotification(job = {}) {
+  const jobId = job.job_id || job._id || job.id || '';
+  const applicationId = job.application_id || '';
+
+  return notifyUser({
+    userId: job.user_id,
+    eventKey: 'interview_scheduled',
+    audience: 'employee',
+    routeKey: 'applications.interviews',
+    routeParams: { id: jobId, jobId, applicationId, interviewId: job.interview_id || '' },
+    params: { job: jobNameFrom(job) },
+    data: {
+      job_id: jobId,
+      application_id: applicationId,
+      interview_id: job.interview_id || '',
+      meet_link: job.meet_link || '',
+      date: job.date ? new Date(job.date).toISOString() : '',
+      start_at: job.start_at ? new Date(job.start_at).toISOString() : '',
+      end_at: job.end_at ? new Date(job.end_at).toISOString() : '',
+      interview_type: job.type || '',
+      is_online: Boolean(job.is_online),
+      is_on_app: Boolean(job.is_on_app),
+      is_in_office: Boolean(job.is_in_office),
+      office_address: job.office_address || '',
+      note: job.note || '',
+      longitude: job.longitude ?? '',
+      latitude: job.latitude ?? '',
+    },
+    dedupeKey: job.interview_id ? `interview:${job.interview_id}:scheduled` : null,
+  });
+}
+
+export async function SendInterviewUpdatedNotification(job = {}) {
+  return notifyUser({
+    userId: job.user_id,
+    eventKey: 'interview_updated',
+    audience: 'employee',
+    routeKey: 'applications.interviews',
+    routeParams: { id: job.job_id || job._id || '', interviewId: job.interview_id || '' },
+    params: { job: jobNameFrom(job) },
+    data: job,
+    dedupeKey: job.interview_id ? `interview:${job.interview_id}:updated:${Date.now()}` : null,
+  });
+}
+
+export async function SendInterviewCancelledNotification(job = {}) {
+  return notifyUser({
+    userId: job.user_id,
+    eventKey: 'interview_cancelled',
+    audience: 'employee',
+    routeKey: 'applications.interviews',
+    routeParams: { id: job.job_id || job._id || '', interviewId: job.interview_id || '' },
+    params: { job: jobNameFrom(job) },
+    data: job,
+    dedupeKey: job.interview_id ? `interview:${job.interview_id}:cancelled` : null,
+  });
+}
+
+export async function SendJobInvitationNotification(invitation = {}) {
+  const job = invitation.job_id || invitation.job || {};
+  const company = invitation.company || invitation.company_id || {};
+
+  return notifyUser({
+    userId: invitation.user_id,
+    eventKey: 'job_invitation_sent',
+    audience: 'employee',
+    routeKey: 'applications.offers',
+    routeParams: { id: invitation._id || invitation.id || '', invitationId: invitation._id || invitation.id || '' },
+    params: {
+      job: jobNameFrom(job),
+      company: company.company_name || company.name || invitation.company_name || 'Company',
+    },
+    data: {
+      invitation_id: invitation._id || invitation.id || '',
+      job_id: job._id || invitation.job_id || '',
+      company_id: company._id || invitation.company_id || '',
+      status: invitation.status || 'sent',
+    },
+    dedupeKey: invitation._id ? `job_invitation:${invitation._id}:sent` : null,
+  });
+}
+
+export async function SendJobInvitationCancelledNotification(invitation = {}) {
+  const job = invitation.job_id || invitation.job || {};
+
+  return notifyUser({
+    userId: invitation.user_id,
+    eventKey: 'job_invitation_cancelled',
+    audience: 'employee',
+    routeKey: 'applications.offers',
+    routeParams: { id: invitation._id || invitation.id || '', invitationId: invitation._id || invitation.id || '' },
+    params: { job: jobNameFrom(job) },
+    data: {
+      invitation_id: invitation._id || invitation.id || '',
+      job_id: job._id || invitation.job_id || '',
+      company_id: invitation.company_id || '',
+      status: invitation.status || 'cancelled',
+    },
+    dedupeKey: invitation._id ? `job_invitation:${invitation._id}:cancelled` : null,
+  });
+}
+
+export default {
+  changeJobStatus,
+  SendInterViewNotification,
+  SendInterviewUpdatedNotification,
+  SendInterviewCancelledNotification,
+  SendJobInvitationNotification,
+  SendJobInvitationCancelledNotification,
+};

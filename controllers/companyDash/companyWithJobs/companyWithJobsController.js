@@ -1,6 +1,19 @@
 import * as Models from "../../../models/index.js";
 
 import { rebuildJobIntegration } from "../../../services/search/rebuildSearchData.js";
+import {
+  Job_created_notification,
+  job_deleted_notification,
+  job_stopped_notification,
+  job_updated_notification,
+} from "../../../notification/JobCompanyNotifications.js";
+import { notifyUser } from "../../../notification/notificationService.js";
+import {
+  checkCompanyFeature,
+  recordCompanyUsage,
+  shouldJobRequireAdminApproval,
+} from "../../../services/subscriptions/companySubscription.service.js";
+import { writeAuditLog } from "../../../services/auditLog.service.js";
 
 import {
   getCompanyUserIdOrFail,
@@ -41,6 +54,14 @@ const EducationLevelLookupModel = EducationLevelModel;
 
 const TRUE_VALUES = ["on", "true", true, "1", 1, "yes", "y"];
 const FALSE_VALUES = ["off", "false", false, "0", 0, "no", "n"];
+
+const failSubscription = (res, check) => fail(res, check.message || "subscription_not_allowed", check.status || 403, {
+  feature: check.feature,
+  metric: check.metric,
+  limit: check.limit,
+  used: check.used,
+  requested: check.requested,
+});
 const PUBLISHED_STATUSES = new Set(["published", "paused", "closed", "rejected", "archived", "pending_review"]);
 
 const cleanText = (value = "") => String(value || "").trim();
@@ -182,12 +203,42 @@ const normalizeQuestions = (value) =>
         type: item.type || "text",
         options: normalizeQuestionOptions(item.options),
         is_required: Boolean(toBool(item.is_required ?? item.required)),
+        is_knockout: Boolean(toBool(item.is_knockout ?? item.knockout)),
+        weight: Math.min(Math.max(Number(item.weight ?? 1), 0), 100),
+        knockout_expected_answer: item.knockout_expected_answer ?? item.expected_answer ?? null,
+        knockout_action: ["mark_not_match", "needs_manual_review", "reject"].includes(item.knockout_action)
+          ? item.knockout_action
+          : "mark_not_match",
         correct_answer: item.correct_answer ?? null,
         help_text: cleanText(item.help_text || ""),
       };
     })
     .filter(Boolean)
     .slice(0, 5);
+
+const normalizeAtsSettings = (value) => {
+  const parsed = parseMaybeJson(value) || {};
+  const rawWeights = parsed.weights || parsed || {};
+  const clamp = (n, fallback) => {
+    const value = Number(n);
+    return Number.isFinite(value) ? Math.min(Math.max(value, 0), 100) : fallback;
+  };
+  return {
+    weights: {
+      skills: clamp(rawWeights.skills, 35),
+      experience: clamp(rawWeights.experience, 20),
+      education: clamp(rawWeights.education, 10),
+      languages: clamp(rawWeights.languages, 10),
+      location: clamp(rawWeights.location, 10),
+      salary: clamp(rawWeights.salary, 5),
+      questions: clamp(rawWeights.questions, 10),
+    },
+    auto_reject_on_knockout: Boolean(toBool(parsed.auto_reject_on_knockout)),
+    manual_review_on_knockout: parsed.manual_review_on_knockout === undefined ? true : Boolean(toBool(parsed.manual_review_on_knockout)),
+    min_score_for_initial_match: clamp(parsed.min_score_for_initial_match, 80),
+    min_score_for_review: clamp(parsed.min_score_for_review, 50),
+  };
+};
 
 const normalizeEmails = (value) =>
   toArray(value)
@@ -337,6 +388,7 @@ const buildSearchFilter = (search) => {
 
   return {
     $or: [
+      { ref: regex },
       { job_name: regex },
       { description: regex },
       { job_keywords: regex },
@@ -361,6 +413,17 @@ const applyCompanyJobFilters = (filter, query = {}) => {
   if (query.status !== undefined) filter.status = toBool(query.status);
   if (query.is_accepted !== undefined) filter.is_accepted = toBool(query.is_accepted);
   if (query.publish_status) filter.publish_status = query.publish_status;
+  const listType = cleanText(query.type || query.list || query.filter);
+  if (listType === "active") {
+    filter.status = true;
+    filter.publish_status = "published";
+    filter.$and = filter.$and || [];
+    filter.$and.push({ $or: [{ apply_deadline: null }, { apply_deadline: { $gte: new Date() } }] });
+  }
+  if (listType === "archived") filter.publish_status = "archived";
+  if (listType === "ended" || listType === "expired") {
+    filter.$or = [{ publish_status: "closed" }, { apply_deadline: { $lt: new Date() } }, { end_date: { $lt: new Date() } }];
+  }
 
   const countries = parseArrayQuery(query.country || query.countries);
   if (countries.length) filter.countries = { $in: countries };
@@ -384,6 +447,8 @@ const buildJobPayload = async (body = {}, companyData) => {
   const payload = {
     company_id: companyData.company._id,
     user_id: companyData.userId,
+    created_by: companyData.userId,
+    updated_by: companyData.userId,
   };
 
   const jobNameDoc = await createLookupIfMissing(
@@ -403,6 +468,10 @@ const buildJobPayload = async (body = {}, companyData) => {
   if (cleanText(jobNameText)) payload.job_name = cleanText(jobNameText);
 
   if (body.description !== undefined) payload.description = cleanText(body.description);
+  if (body.ref !== undefined) payload.ref = cleanText(body.ref).toUpperCase();
+  if (body.job_keywords !== undefined || body.keywords !== undefined || body.tags !== undefined) {
+    payload.job_keywords = toArray(body.job_keywords ?? body.keywords ?? body.tags).map(cleanText).filter(Boolean);
+  }
 
   const workMode = await createLookupIfMissing(WorkModeModel, body.work_mode_id || body.work_mode);
   if (workMode?._id) {
@@ -452,6 +521,7 @@ const buildJobPayload = async (body = {}, companyData) => {
           body?.salary?.currency_rate_snapshot ||
           1
       ),
+      mode: cleanText(body.salary_mode || body?.salary?.mode || "range") || "range",
       is_visible: body.salary_is_visible !== undefined ? Boolean(toBool(body.salary_is_visible)) : true,
       is_negotiable: body.salary_is_negotiable !== undefined ? Boolean(toBool(body.salary_is_negotiable)) : false,
     };
@@ -468,7 +538,7 @@ const buildJobPayload = async (body = {}, companyData) => {
   if (body.city !== undefined) payload.city = cleanText(body.city);
   if (body.address !== undefined) payload.address = cleanText(body.address);
 
-  ["started_date", "end_date", "apply_deadline"].forEach((field) => {
+  ["started_date", "end_date", "apply_deadline", "closing_mode", "work_location_scope", "gender_requirement"].forEach((field) => {
     if (body[field] !== undefined && body[field] !== "") payload[field] = body[field];
   });
 
@@ -482,6 +552,8 @@ const buildJobPayload = async (body = {}, companyData) => {
     "is_for_students",
     "is_for_graduates",
     "is_for_fresh_graduates",
+    "hide_closing_date",
+    "driving_license_required",
   ].forEach((field) => {
     if (body[field] !== undefined) payload[field] = Boolean(toBool(body[field]));
   });
@@ -500,6 +572,9 @@ const buildJobPayload = async (body = {}, companyData) => {
     payload.job_services = await normalizeServices(body.services || body.job_services);
   }
   if (body.questions !== undefined) payload.questions = normalizeQuestions(body.questions);
+  if (body.ats_settings !== undefined || body.ats_weights !== undefined) {
+    payload.ats_settings = normalizeAtsSettings(body.ats_settings ?? body.ats_weights);
+  }
 
   if (body.experience_level_id !== undefined || body.experience_level !== undefined) {
     const experienceLevel = await createLookupIfMissing(
@@ -529,6 +604,11 @@ const buildJobPayload = async (body = {}, companyData) => {
 
   if (body.min_experience_years !== undefined) payload.min_experience_years = Number(body.min_experience_years || 0);
   if (body.max_experience_years !== undefined) payload.max_experience_years = toNumberOrNull(body.max_experience_years);
+  if (body.age_min !== undefined) payload.age_min = toNumberOrNull(body.age_min);
+  if (body.age_max !== undefined) payload.age_max = toNumberOrNull(body.age_max);
+  if (body.marital_status !== undefined) payload.marital_status = toArray(body.marital_status).map(cleanText).filter(Boolean);
+  if (body.academic_certificates !== undefined) payload.academic_certificates = toArray(body.academic_certificates).map(cleanText).filter(Boolean);
+  if (body.professional_certificates !== undefined) payload.professional_certificates = toArray(body.professional_certificates).map(cleanText).filter(Boolean);
   if (body.vacancies_count !== undefined) payload.vacancies_count = Number(body.vacancies_count || 1);
   if (body.priority !== undefined) payload.priority = Number(body.priority || 0);
 
@@ -538,8 +618,8 @@ const buildJobPayload = async (body = {}, companyData) => {
   }
 
   payload.status = body.status !== undefined ? Boolean(toBool(body.status)) : true;
-  payload.is_accepted = body.is_accepted !== undefined ? Boolean(toBool(body.is_accepted)) : true;
-  payload.publish_status = normalizePublishStatus(body.publish_status);
+  payload.is_accepted = body.is_accepted !== undefined ? Boolean(toBool(body.is_accepted)) : false;
+  payload.publish_status = body.publish_status !== undefined ? normalizePublishStatus(body.publish_status) : "pending_review";
 
   return payload;
 };
@@ -573,23 +653,37 @@ export const getMyJobs = async (req, res, next) => {
     let sort = { createdAt: -1, _id: -1 };
 
     if (req.query.sort) {
-      const [field, direction = "desc"] = String(req.query.sort).split(":");
-
-   
-
-       const sortDirection = direction === "asc" ? 1 : -1;
+      const sortAlias = {
+        latest: "createdAt",
+        newest: "createdAt",
+        oldest: "createdAt",
+        most_viewed: "user_show",
+        views: "user_show",
+        most_rated: "rating",
+        rating: "rating",
+        applications: "user_applying",
+        ref: "ref",
+      };
+      let [field, direction = "desc"] = String(req.query.sort).split(":");
+      if (field === "oldest") direction = "asc";
+      field = sortAlias[field] || field;
+      const allowedSortFields = new Set(["createdAt", "updatedAt", "apply_deadline", "end_date", "user_show", "user_applying", "user_saved", "rating", "ref", "job_name"]);
+      if (allowedSortFields.has(field)) {
+        const sortDirection = direction === "asc" ? 1 : -1;
         sort = { [field]: sortDirection, _id: sortDirection };
+      }
     }
 
     const result = await paginate(jobsModel, filter, req, {
       select:
-        "job_name publish_status status is_accepted cities_count cities city work_mode_info job_time_info salary user_applying user_show user_saved apply_deadline createdAt updatedAt",
+        "ref job_name publish_status status is_accepted cities_count cities city work_mode_info job_time_info salary user_applying user_show user_saved apply_deadline started_date end_date createdAt updatedAt",
       lean: true,
       sort,
     });
 
     const items = result.items.map((job) => ({
       _id: job._id,
+      ref: job.ref || "",
       job_name: job.job_name || "",
       status: Boolean(job.status),
       is_accepted: Boolean(job.is_accepted),
@@ -625,6 +719,9 @@ export const getMyJobs = async (req, res, next) => {
       },
 
       apply_deadline: job.apply_deadline || null,
+      started_date: job.started_date || null,
+      end_date: job.end_date || null,
+      quick_actions: ["edit", "clone", "pause", "republish", "delete", "share"],
       createdAt: job.createdAt,
       updatedAt: job.updatedAt,
     }));
@@ -641,19 +738,20 @@ export const getJobsStatistics = async (req, res, next) => {
 
     const companyId = companyData.company._id;
 
-    const [total, active, published, paused, closed, archived, applications] = await Promise.all([
+    const [total, active, published, paused, closed, archived, ended, applications] = await Promise.all([
       jobsModel.countDocuments({ company_id: companyId }),
       jobsModel.countDocuments({ company_id: companyId, status: true }),
       jobsModel.countDocuments({ company_id: companyId, publish_status: "published" }),
       jobsModel.countDocuments({ company_id: companyId, publish_status: "paused" }),
       jobsModel.countDocuments({ company_id: companyId, publish_status: "closed" }),
       jobsModel.countDocuments({ company_id: companyId, publish_status: "archived" }),
+      jobsModel.countDocuments({ company_id: companyId, $or: [{ publish_status: "closed" }, { end_date: { $lt: new Date() } }, { apply_deadline: { $lt: new Date() } }] }),
       UserApplyingJobModel.countDocuments({ company_id: companyId }),
     ]);
 
     return success(
       res,
-      { total, active, published, paused, closed, archived, applications },
+      { total, active, published, paused, closed, archived, ended, applications },
       "company_jobs_statistics"
     );
   } catch (error) {
@@ -677,8 +775,8 @@ export const getMyJobDetails = async (req, res, next) => {
 
     const [applications_count, waiting_count, interview_count, accepted_count, rejected_count] = await Promise.all([
       UserApplyingJobModel.countDocuments({ job_id: jobId, company_id: companyData.company._id }),
-      UserApplyingJobModel.countDocuments({ job_id: jobId, company_id: companyData.company._id, status: "waiting" }),
-      UserApplyingJobModel.countDocuments({ job_id: jobId, company_id: companyData.company._id, status: "interview" }),
+      UserApplyingJobModel.countDocuments({ job_id: jobId, company_id: companyData.company._id, status: { $in: ["waiting", "new", "reviewing"] } }),
+      UserApplyingJobModel.countDocuments({ job_id: jobId, company_id: companyData.company._id, status: { $in: ["interview", "interview_scheduled", "interview_completed"] } }),
       UserApplyingJobModel.countDocuments({
         job_id: jobId,
         company_id: companyData.company._id,
@@ -711,17 +809,56 @@ export const createJob = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
+    const featureCheck = await checkCompanyFeature(companyData.company._id, "can_post_jobs", "job_posts", 1);
+    if (!featureCheck.allowed) return failSubscription(res, featureCheck);
+
+    const activeJobsCheck = await checkCompanyFeature(companyData.company._id, "can_post_jobs", "active_jobs", 1);
+    if (!activeJobsCheck.allowed) return failSubscription(res, activeJobsCheck);
+
     const payload = await buildJobPayload(req.body, companyData);
+
+    const questionsCheck = await checkCompanyFeature(companyData.company._id, null, null, 1, {
+      maxQuestionsMetric: "max_questions_per_job",
+      questions: payload.questions || [],
+    });
+    if (!questionsCheck.allowed) return failSubscription(res, questionsCheck);
+
+    if (payload.is_out_side) {
+      const externalCheck = await checkCompanyFeature(companyData.company._id, "can_publish_external_jobs", "external_jobs", 1);
+      if (!externalCheck.allowed) return failSubscription(res, externalCheck);
+    }
+
+    const requiresApproval = await shouldJobRequireAdminApproval(companyData.company._id);
+    payload.publish_status = requiresApproval ? "pending_review" : "published";
+    payload.is_accepted = !requiresApproval;
+    payload.status = true;
+
     const job = await jobsModel.create(payload);
+    await recordCompanyUsage(companyData.company._id, "job_posts", 1);
+    if (payload.is_out_side) await recordCompanyUsage(companyData.company._id, "external_jobs", 1);
 
     await rebuildJobAfterSave(job);
 
     const rebuiltJob = await jobsModel.findById(job._id).populate(companyJobPopulate);
-    return success(res, normalizeJob(rebuiltJob || job), "company_job_created", 201);
+    Job_created_notification(job).catch?.(console.error);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: "job_created",
+      entityType: "job",
+      entityId: job._id,
+      jobId: job._id,
+      newValue: payload,
+    });
+    return success(
+      res,
+      normalizeJob(rebuiltJob || job),
+      requiresApproval ? "company_job_created_pending_admin_review" : "company_job_created",
+      201
+    );
   } catch (error) {
-    console.log('====================================');
-    console.log(error);
-    console.log('====================================');
     next(error);
   }
 };
@@ -734,8 +871,17 @@ export const updateJob = async (req, res, next) => {
     const { jobId } = req.params;
     if (!isValidObjectId(jobId)) return fail(res, "invalid_job_id", 400);
 
+    const oldJob = await jobsModel.findOne({ _id: jobId, company_id: companyData.company._id }).lean();
+    if (!oldJob) return fail(res, "job_not_found", 404);
+
     const payload = await buildJobPayload(req.body, companyData);
     payload.is_update = true;
+    const requiresApproval = await shouldJobRequireAdminApproval(companyData.company._id);
+    if (requiresApproval) {
+      payload.publish_status = "pending_review";
+      payload.is_accepted = false;
+      payload.status = true;
+    }
 
     const job = await jobsModel.findOneAndUpdate(
       { _id: jobId, company_id: companyData.company._id },
@@ -748,6 +894,19 @@ export const updateJob = async (req, res, next) => {
     await rebuildJobAfterSave(job);
 
     const rebuiltJob = await jobsModel.findById(job._id).populate(companyJobPopulate);
+    job_updated_notification(job).catch?.(console.error);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: "job_updated",
+      entityType: "job",
+      entityId: job._id,
+      jobId: job._id,
+      oldValue: oldJob,
+      newValue: payload,
+    });
     return success(res, normalizeJob(rebuiltJob || job), "company_job_updated");
   } catch (error) {
     next(error);
@@ -762,10 +921,25 @@ export const deleteJob = async (req, res, next) => {
     const { jobId } = req.params;
     if (!isValidObjectId(jobId)) return fail(res, "invalid_job_id", 400);
 
+    const job = await jobsModel.findOne({ _id: jobId, company_id: companyData.company._id }).select("_id job_name user_id company_id").lean();
+    if (!job) return fail(res, "job_not_found", 404);
+
     const deleted = await jobsModel.deleteOne({ _id: jobId, company_id: companyData.company._id });
     if (!deleted.deletedCount) return fail(res, "job_not_found", 404);
 
     await JobEmployeeMatchModel.deleteMany({ job_id: jobId });
+    job_deleted_notification(job).catch?.(console.error);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: "job_deleted",
+      entityType: "job",
+      entityId: job._id,
+      jobId: job._id,
+      oldValue: job,
+    });
 
     return success(res, { job_id: jobId }, "company_job_deleted");
   } catch (error) {
@@ -794,6 +968,20 @@ export const changeJobStatus = async (req, res, next) => {
 
     await rebuildJobAfterSave(job);
 
+    if (status === false) job_stopped_notification(job).catch?.(console.error);
+    else job_updated_notification(job).catch?.(console.error);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: status ? "job_enabled" : "job_stopped",
+      entityType: "job",
+      entityId: job._id,
+      jobId: job._id,
+      newValue: { status },
+    });
+
     return success(res, normalizeJob(job), "company_job_status_updated");
   } catch (error) {
     next(error);
@@ -810,16 +998,47 @@ const setPublishStatus = (publish_status) => async (req, res, next) => {
 
     const safeStatus = normalizePublishStatus(publish_status);
     const statusPatch = safeStatus === "published" ? { status: true } : {};
+    if (safeStatus === "archived") statusPatch.archived_by = companyData.userId;
+    statusPatch.updated_by = companyData.userId;
 
     const job = await jobsModel.findOneAndUpdate(
       { _id: jobId, company_id: companyData.company._id },
-      { $set: { publish_status: safeStatus, ...statusPatch } },
+      { $set: { publish_status: safeStatus, last_action: `publish_status:${safeStatus}`, ...statusPatch } },
       { new: true, runValidators: true }
     );
 
     if (!job) return fail(res, "job_not_found", 404);
 
     await rebuildJobAfterSave(job);
+
+    if (safeStatus === "published") {
+      notifyUser({
+        userId: job.user_id,
+        eventKey: "job_published",
+        audience: "company",
+        routeKey: "jobs.details",
+        routeParams: { id: job._id, jobId: job._id },
+        params: { job: job.job_name || "" },
+        data: { job_id: job._id, company_id: job.company_id, publish_status: safeStatus },
+        dedupeKey: `job:${job._id}:published:${Date.now()}`,
+      }).catch?.(console.error);
+    } else if (safeStatus === "archived") {
+      job_stopped_notification(job).catch?.(console.error);
+    } else {
+      job_updated_notification(job).catch?.(console.error);
+    }
+
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: `job_${safeStatus}`,
+      entityType: "job",
+      entityId: job._id,
+      jobId: job._id,
+      newValue: { publish_status: safeStatus },
+    });
 
     return success(res, normalizeJob(job), `company_job_${safeStatus}`);
   } catch (error) {
@@ -829,6 +1048,78 @@ const setPublishStatus = (publish_status) => async (req, res, next) => {
 
 export const publishJob = setPublishStatus("pending_review");
 export const archiveJob = setPublishStatus("archived");
+
+
+export const cloneJob = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const { jobId } = req.params;
+    if (!isValidObjectId(jobId)) return fail(res, "invalid_job_id", 400);
+
+    const source = await jobsModel.findOne({ _id: jobId, company_id: companyData.company._id }).lean();
+    if (!source) return fail(res, "job_not_found", 404);
+
+    const { _id, ref, createdAt, updatedAt, user_show, user_review, user_applying, out_side_applying, user_saved, rating, job_lifecycle, ...copy } = source;
+    copy.job_name = `${copy.job_name || "Job"} - Copy`;
+    copy.publish_status = "pending_review";
+    copy.is_accepted = false;
+    copy.status = true;
+    copy.user_id = companyData.userId;
+
+    const job = await jobsModel.create(copy);
+    await rebuildJobAfterSave(job);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: "job_cloned",
+      entityType: "job",
+      entityId: job._id,
+      jobId: job._id,
+      metadata: { source_job_id: source._id },
+    });
+    return success(res, normalizeJob(job), "company_job_cloned", 201);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const restoreJob = setPublishStatus("published");
+
+export const bulkUpdateJobs = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const ids = toArray(req.body.ids || req.body.job_ids).map(String).filter(isValidObjectId);
+    const action = cleanText(req.body.action);
+    if (!ids.length) return fail(res, "job_ids_required", 422);
+
+    const patch = {};
+    if (action === "archive") patch.publish_status = "archived";
+    else if (action === "pause" || action === "stop") patch.publish_status = "paused";
+    else if (action === "delete") {
+      const result = await jobsModel.deleteMany({ _id: { $in: ids }, company_id: companyData.company._id });
+      await writeAuditLog({ req, companyId: companyData.company._id, actorUserId: companyData.userId, actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member", action: "jobs_bulk_deleted", entityType: "job", newValue: { ids, deleted: result.deletedCount || 0 } });
+      return success(res, { deleted: result.deletedCount || 0 }, "company_jobs_bulk_deleted");
+    } else if (action === "republish" || action === "restore") {
+      patch.publish_status = "published";
+      patch.status = true;
+      patch.is_accepted = true;
+    } else {
+      return fail(res, "invalid_bulk_action", 422);
+    }
+
+    const result = await jobsModel.updateMany({ _id: { $in: ids }, company_id: companyData.company._id }, { $set: { ...patch, updated_by: companyData.userId, last_action: `bulk:${action}` } }, { runValidators: true });
+    await writeAuditLog({ req, companyId: companyData.company._id, actorUserId: companyData.userId, actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member", action: `jobs_bulk_${action}`, entityType: "job", newValue: { ids, patch, matched: result.matchedCount || 0, modified: result.modifiedCount || 0 } });
+    return success(res, { matched: result.matchedCount || 0, modified: result.modifiedCount || 0 }, "company_jobs_bulk_updated");
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getRecommendedEmployeesForJob = async (req, res, next) => {
   try {
@@ -887,5 +1178,8 @@ export default {
   changeJobStatus,
   publishJob,
   archiveJob,
+  restoreJob,
+  cloneJob,
+  bulkUpdateJobs,
   getRecommendedEmployeesForJob,
 };

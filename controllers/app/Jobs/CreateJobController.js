@@ -6,6 +6,11 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { CompanyModel, jobsModel, JobNameModel } from "../../../models/index.js";
 import { Job_created_notification } from "../../../notification/JobCompanyNotifications.js";
 import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
+import {
+  checkCompanyFeature,
+  recordCompanyUsage,
+  shouldJobRequireAdminApproval,
+} from "../../../services/subscriptions/companySubscription.service.js";
 
 /* ========== i18n ========== */
 const buildLocale = (lan = "en") =>
@@ -238,6 +243,26 @@ export const create = async (req, res) => {
       });
     }
 
+    const featureCheck = await checkCompanyFeature(company._id, "can_post_jobs", "job_posts", 1);
+    if (!featureCheck.allowed) {
+      return ReturnAppData.createError({
+        res,
+        status: featureCheck.status || 403,
+        message: featureCheck.message || "subscription_not_allowed",
+        other: { feature: featureCheck.feature, metric: featureCheck.metric, limit: featureCheck.limit, used: featureCheck.used },
+      });
+    }
+
+    const activeJobsCheck = await checkCompanyFeature(company._id, "can_post_jobs", "active_jobs", 1);
+    if (!activeJobsCheck.allowed) {
+      return ReturnAppData.createError({
+        res,
+        status: activeJobsCheck.status || 403,
+        message: activeJobsCheck.message || "subscription_limit_reached",
+        other: { feature: activeJobsCheck.feature, metric: activeJobsCheck.metric, limit: activeJobsCheck.limit, used: activeJobsCheck.used },
+      });
+    }
+
     const validated = await jobSchema.validate(req.body, {
       abortEarly: false,
       stripUnknown: true,
@@ -295,6 +320,20 @@ export const create = async (req, res) => {
 
     const out_link = validated.is_out_side ? validated.out_link : undefined;
 
+    if (validated.is_out_side) {
+      const externalCheck = await checkCompanyFeature(company._id, "can_publish_external_jobs", "external_jobs", 1);
+      if (!externalCheck.allowed) {
+        return ReturnAppData.createError({
+          res,
+          status: externalCheck.status || 403,
+          message: externalCheck.message || "subscription_not_allowed",
+          other: { feature: externalCheck.feature, metric: externalCheck.metric, limit: externalCheck.limit, used: externalCheck.used },
+        });
+      }
+    }
+
+    const requiresApproval = await shouldJobRequireAdminApproval(company._id);
+
     const job = await jobsModel.create({
       ...validated,
       emails,
@@ -304,12 +343,19 @@ export const create = async (req, res) => {
       phrases_norm,         // إن احتجت لاحقًا
       company_id: company._id,
       user_id: req.user._id,
+      status: true,
+      is_accepted: !requiresApproval,
+      publish_status: requiresApproval ? "pending_review" : "published",
     });
-Job_created_notification(job);
+    await recordCompanyUsage(company._id, "job_posts", 1);
+    if (validated.is_out_side) await recordCompanyUsage(company._id, "external_jobs", 1);
+Job_created_notification(job).catch?.(console.error);
     return ReturnAppData.createData({
       res,
       data: job,
-      message: lan === "ar" ? "تم إنشاء الوظيفة" : "Job created",
+      message: requiresApproval
+        ? (lan === "ar" ? "تم إرسال الوظيفة للمراجعة" : "Job submitted for admin review")
+        : (lan === "ar" ? "تم إنشاء الوظيفة" : "Job created"),
     });
   } catch (e) {
    if (e.name === "ValidationError") {

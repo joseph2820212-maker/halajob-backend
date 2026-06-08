@@ -83,6 +83,44 @@ const VerificationDocumentSchema = new Schema(
   },
   { _id: true, timestamps: true }
 );
+
+const CompanyLocationSchema = new Schema(
+  {
+    country_id: { type: Schema.Types.ObjectId, ref: "countries", default: null },
+    city_id: { type: Schema.Types.ObjectId, ref: "countries", default: null },
+    country: { type: String, trim: true, default: "" },
+    city: { type: String, trim: true, default: "" },
+    address: { type: String, trim: true, default: "" },
+    site_type: {
+      type: String,
+      enum: ["headquarters", "branch", "representative_office", "remote", "other"],
+      default: "headquarters",
+    },
+    location: {
+      latitude: { type: Number, default: null },
+      longitude: { type: Number, default: null },
+    },
+    visibility: {
+      show_country: { type: Boolean, default: true },
+      show_address: { type: Boolean, default: true },
+      show_map: { type: Boolean, default: true },
+    },
+    is_primary: { type: Boolean, default: false },
+  },
+  { _id: true, timestamps: true }
+);
+
+const CompanyPrivacySettingsSchema = new Schema(
+  {
+    show_contact_info: { type: Boolean, default: true },
+    show_location: { type: Boolean, default: true },
+    show_employees_count: { type: Boolean, default: true },
+    show_reviews: { type: Boolean, default: true },
+    appear_in_search: { type: Boolean, default: true },
+    allow_direct_contact: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
 const CompanySearchFiltersSchema = new Schema(
   {
     text: {
@@ -154,6 +192,21 @@ const CompanySearchFiltersSchema = new Schema(
   },
   { _id: false }
 );
+
+const CompanySubscriptionSnapshotSchema = new Schema(
+  {
+    plan_id: { type: Schema.Types.ObjectId, ref: "subscription_plans", default: null, index: true },
+    subscription_id: { type: Schema.Types.ObjectId, ref: "company_subscriptions", default: null, index: true },
+    plan_key: { type: String, lowercase: true, trim: true, default: "free", index: true },
+    status: { type: String, trim: true, default: "active", index: true },
+    active_until: { type: Date, default: null },
+    features: { type: Schema.Types.Mixed, default: {} },
+    limits: { type: Schema.Types.Mixed, default: {} },
+    jobs_require_admin_approval: { type: Boolean, default: true, index: true },
+  },
+  { _id: false }
+);
+
 const LanguageEmployeeSchema = new Schema(
   {
     language_id: {
@@ -273,24 +326,35 @@ const CompanySchema = new Schema(
       type: String,
       default: "",
       trim: true,
+      maxlength: 1500,
+    },
+
+    company_short_description: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 200,
     },
 
     mission: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 300,
     },
 
     vision: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 300,
     },
 
     culture: {
       type: String,
       default: "",
       trim: true,
+      maxlength: 300,
     },
 
     benefits: {
@@ -326,6 +390,11 @@ const CompanySchema = new Schema(
     company_size_type: {
       type: String,
       enum: [
+        "1_10",
+        "11_50",
+        "51_200",
+        "201_500",
+        "500_plus",
         "startup",
         "small",
         "medium",
@@ -394,6 +463,28 @@ const CompanySchema = new Schema(
       },
     },
 
+    site_type: {
+      type: String,
+      enum: ["headquarters", "branch", "representative_office", "remote", "other"],
+      default: "headquarters",
+    },
+
+    location_visibility: {
+      show_country: { type: Boolean, default: true },
+      show_address: { type: Boolean, default: true },
+      show_map: { type: Boolean, default: true },
+    },
+
+    company_locations: {
+      type: [CompanyLocationSchema],
+      default: [],
+    },
+
+    privacy_settings: {
+      type: CompanyPrivacySettingsSchema,
+      default: () => ({}),
+    },
+
     company_contact: {
       type: [String],
       default: [],
@@ -406,6 +497,12 @@ const CompanySchema = new Schema(
     },
 
     company_phone_code: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    company_whatsapp: {
       type: String,
       default: "",
       trim: true,
@@ -508,6 +605,10 @@ const CompanySchema = new Schema(
       default: null,
     },
 
+    reviewed_at: { type: Date, default: null },
+    reviewed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    rejection_reason: { type: String, trim: true, default: "" },
+
     verification_documents: {
       type: [VerificationDocumentSchema],
       default: [],
@@ -535,6 +636,11 @@ const CompanySchema = new Schema(
       type: Number,
       default: 0,
       min: 0,
+    },
+
+    subscription: {
+      type: CompanySubscriptionSnapshotSchema,
+      default: () => ({}),
     },
   },
   {

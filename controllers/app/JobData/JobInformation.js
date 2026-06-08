@@ -64,7 +64,7 @@ const reviewJob = async (req, res, next) => {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
     if (!old) await clampInc(jobId, "user_review", 1);
-    job_reviewed_notification(job).catch?.(console.error);
+    job_reviewed_notification(job, { candidate_user_id: req.user._id }).catch?.(console.error);
     return ReturnAppData.createData({ res, data: doc, message: old ? msg(req, "تم تحديث المراجعة.", "Review updated.") : msg(req, "تم إضافة المراجعة.", "Review created.") });
   } catch (error) { next(error); }
 };
@@ -83,7 +83,7 @@ const applyOutsideJob = async (req, res, next) => {
 
     const doc = await UserOutSideApplyingJobModel.create({ user_id: req.user._id, job_id: jobId });
     await jobsModel.updateOne({ _id: jobId }, { $inc: { out_side_applying: 1, "search_index.score_signals.applies": 1 } });
-    job_applied_notification(job).catch?.(console.error);
+    job_applied_notification(job, doc).catch?.(console.error);
     return ReturnAppData.createData({ res, data: { application: doc, out_link: job.out_link }, message: msg(req, "تم تسجيل التقديم الخارجي.", "External application recorded.") });
   } catch (error) {
     if (error?.code === 11000) return ReturnAppData.getError({ res, status: 409, message: msg(req, "تم تسجيل التقديم الخارجي مسبقاً.", "External application already recorded.") });
@@ -107,7 +107,7 @@ const rateJob = async (req, res, next) => {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
     const ratingInfo = await recomputeJobRating(jobId);
-    job_rated_notification(job).catch?.(console.error);
+    job_rated_notification(job, { candidate_user_id: req.user._id, data: { rating } }).catch?.(console.error);
     return ReturnAppData.createData({ res, data: { rating: doc, job_rating: ratingInfo.avg, total: ratingInfo.total }, message: old ? msg(req, "تم تحديث التقييم.", "Rating updated.") : msg(req, "تم إضافة التقييم.", "Rating created.") });
   } catch (error) { next(error); }
 };
@@ -128,7 +128,7 @@ const toggleSaveJob = async (req, res, next) => {
 
     await UserSavedJobModel.create({ user_id: req.user._id, job_id: jobId });
     await clampInc(jobId, "user_saved", 1);
-    job_seeker_saved_notification(job).catch?.(console.error);
+    job_seeker_saved_notification(job, { candidate_user_id: req.user._id, dedupeKey: `job:${jobId}:saved:${req.user._id}` }).catch?.(console.error);
     return ReturnAppData.createData({ res, data: { is_saved: true }, message: msg(req, "تم حفظ الوظيفة.", "Job saved.") });
   } catch (error) {
     if (error?.code === 11000) return ReturnAppData.createData({ res, data: { is_saved: true }, message: msg(req, "الوظيفة محفوظة مسبقاً.", "Job already saved.") });

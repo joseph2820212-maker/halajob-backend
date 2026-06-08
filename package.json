@@ -8,7 +8,12 @@
     "start": "node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "seed": "node seeders/index.js",
-    "rebuild:search": "node scripts/rebuildSearchIntegration.js"
+    "rebuild:search": "node scripts/rebuildSearchIntegration.js",
+    "fix:notification-indexes": "node scripts/fixNotificationIndexes.js",
+    "scheduled:run": "node scripts/runScheduledJob.js",
+    "scheduled:close-expired-jobs": "node scripts/runScheduledJob.js close-expired-jobs",
+    "scheduled:job-reminders": "node scripts/runScheduledJob.js send-job-deadline-reminders",
+    "scheduled:sync-company-jobs": "node scripts/runScheduledJob.js sync-company-active-job-counts"
   },
   "keywords": [],
   "author": "",

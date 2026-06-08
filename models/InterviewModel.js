@@ -20,6 +20,16 @@ const InterviewSchema = new Schema(
     candidate_note: { type: String, default: "", trim: true },
     result_note: { type: String, default: "", trim: true },
     rating: { type: Number, default: null, min: 1, max: 5 },
+    scorecard: {
+      technical: { type: Number, default: null, min: 0, max: 100 },
+      communication: { type: Number, default: null, min: 0, max: 100 },
+      culture_fit: { type: Number, default: null, min: 0, max: 100 },
+      overall: { type: Number, default: null, min: 0, max: 100 },
+      recommendation: { type: String, enum: ["", "hire", "maybe", "reject"], default: "" },
+      notes: { type: String, default: "", trim: true },
+    },
+    completed_at: { type: Date, default: null },
+    cancelled_reason: { type: String, default: "", trim: true },
     reschedule_count: { type: Number, default: 0, min: 0 },
   },
   { collection: "interviews", timestamps: true }

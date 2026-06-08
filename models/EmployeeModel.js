@@ -69,6 +69,40 @@ const SimpleCertificateSchema = new Schema(
   { _id: true, timestamps: true }
 );
 
+
+const StudentProjectSchema = new Schema(
+  {
+    name: { type: String, trim: true, default: "" },
+    description: { type: String, trim: true, default: "" },
+    type: { type: String, trim: true, default: "" },
+    technologies: { type: [String], default: [] },
+    url: { type: String, trim: true, default: "" },
+  },
+  { _id: true, timestamps: true }
+);
+
+const StudentProfileSchema = new Schema(
+  {
+    university: { type: String, trim: true, default: "" },
+    specialty: { type: String, trim: true, default: "" },
+    sub_specialty: { type: String, trim: true, default: "" },
+    academic_year: {
+      type: String,
+      enum: ["first", "second", "third", "fourth", "fifth", "sixth", "diploma", "postgraduate", "internship", "graduated", ""],
+      default: "",
+    },
+    gpa: { type: String, trim: true, default: "" },
+    technical_skills: { type: [SkillEmployeeSchema], default: [] },
+    soft_skills: { type: [SkillEmployeeSchema], default: [] },
+    projects: { type: [StudentProjectSchema], default: [] },
+    work_readiness: { type: String, enum: ["immediately", "within_week", "within_month", ""], default: "" },
+    preferred_work_location: { type: String, trim: true, default: "" },
+    mini_cv_ready: { type: Boolean, default: false },
+    readiness_score: { type: Number, default: 0, min: 0, max: 100 },
+  },
+  { _id: false }
+);
+
 const LinkSchema = new Schema(
   {
     title: { type: String, trim: true, default: "" },
@@ -310,6 +344,11 @@ const EmployeeSchema = new Schema(
     about_me: { type: String, default: "", trim: true },
     profile_completion: { type: Number, default: 0, min: 0, max: 100 },
     birthday: { type: Date, default: null, index: true },
+    current_country_id: { type: Schema.Types.ObjectId, ref: "countries", default: null, index: true },
+    current_city_id: { type: Schema.Types.ObjectId, ref: "countries", default: null, index: true },
+    current_country: { type: String, trim: true, default: "" },
+    current_city: { type: String, trim: true, default: "" },
+
     candidate_stage: {
       type: String,
       enum: [
@@ -324,6 +363,7 @@ const EmployeeSchema = new Schema(
       index: true,
     },
     is_student: { type: Boolean, default: false, index: true },
+    student_profile: { type: StudentProfileSchema, default: () => ({}) },
     graduation_year: { type: Number, default: null, index: true },
     experience_years: { type: Number, default: 0, min: 0, index: true },
     experience_level_id: {

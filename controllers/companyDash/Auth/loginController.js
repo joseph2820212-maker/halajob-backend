@@ -9,12 +9,20 @@ const safeStr = (value) => String(value || "").trim();
 
 function ensureDeviceArray(user) {
   if (Array.isArray(user.device)) return;
-  if (user.device && typeof user.device === "object") user.device = [user.device];
-  else user.device = [];
+
+  if (user.device && typeof user.device === "object") {
+    user.device = [user.device];
+    return;
+  }
+
+  user.device = [];
 }
 
 function makeDefaultDevice(user, idx) {
-  user.device = user.device.map((d, i) => ({ ...d, is_default: i === idx }));
+  user.device = user.device.map((d, i) => ({
+    ...d,
+    is_default: i === idx,
+  }));
 }
 
 function isDeviceMatch(oldDevice, incomingDevice) {
@@ -27,13 +35,84 @@ function isDeviceMatch(oldDevice, incomingDevice) {
 
 function buildPublicUrl(base, rel) {
   if (!base) return rel;
+
   const cleaned = rel?.replace(/^\/+/, "") || "";
   return base.endsWith("/") ? base + cleaned : `${base}/${cleaned}`;
 }
 
+function normalizeRoleText(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/-/g, "_");
+}
+
+function roleAllowsCompanyLogin(role) {
+  if (!role) return false;
+
+  const values = [
+    role.log_to,
+    role.login_to,
+    role.loginAs,
+    role.portal,
+    role.type,
+    role.key,
+    role.name,
+    role.slug,
+    role.code,
+    role.title_en,
+    role.title_ar,
+  ];
+
+  const normalizedValues = values.map(normalizeRoleText).filter(Boolean);
+
+  const directMatch = normalizedValues.some((value) => {
+    return (
+      value === "company" ||
+      value === "employer" ||
+      value === "company_owner" ||
+      value === "owner_company" ||
+      value === "company_admin" ||
+      value === "recruiter" ||
+      value.includes("company") ||
+      value.includes("employer") ||
+      value.includes("recruiter") ||
+      value.includes("شركة")
+    );
+  });
+
+  if (directMatch) return true;
+
+  const rolePermissions = Array.isArray(role.permissions) ? role.permissions : [];
+
+  return rolePermissions.some((permission) => {
+    const value = normalizeRoleText(
+      permission?.key ||
+        permission?.name ||
+        permission?.code ||
+        permission?.title_en ||
+        permission?.title_ar ||
+        permission
+    );
+
+    return (
+      value.includes("company") ||
+      value.includes("employer") ||
+      value.includes("recruiter") ||
+      value.includes("شركة")
+    );
+  });
+}
+
 async function buildAuthPayload(user, device) {
   const tokens = await generateAuthTokens(user, device);
-  const role = user.role_id?._id ? user.role_id : user.role_id ? await RoleModel.findById(user.role_id).lean() : null;
+
+  const role = user.role_id?._id
+    ? user.role_id
+    : user.role_id
+      ? await RoleModel.findById(user.role_id).lean()
+      : null;
 
   return {
     user_id: user._id,
@@ -63,42 +142,119 @@ const login = async (req, res, next) => {
     const { email, password } = req.body || {};
 
     if (!email || !password) {
-      return ReturnAppData.createError({ res, status: 400, message: msg(lan, "البريد وكلمة المرور مطلوبة.", "Email and password are required.") });
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message: msg(
+          lan,
+          "البريد وكلمة المرور مطلوبة.",
+          "Email and password are required."
+        ),
+      });
     }
 
     const identifier = String(email).trim();
+
     const user = identifier.includes("@")
       ? await UserModel.findOne({ email: normEmail(identifier) }).populate("role_id")
       : await UserModel.findOne({ phone_national: identifier }).populate("role_id");
 
     if (!user) {
-      return ReturnAppData.createError({ res, status: 400, message: msg(lan, "البيانات المرسلة غير صحيحة.", "The data sent is incorrect.") });
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message: msg(
+          lan,
+          "البيانات المرسلة غير صحيحة.",
+          "The data sent is incorrect."
+        ),
+      });
     }
 
     const ok = await bcryptjs.compare(String(password), user.password || "");
+
     if (!ok) {
-      return ReturnAppData.createError({ res, status: 400, message: msg(lan, "البيانات المرسلة غير صحيحة.", "The data sent is incorrect.") });
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message: msg(
+          lan,
+          "البيانات المرسلة غير صحيحة.",
+          "The data sent is incorrect."
+        ),
+      });
     }
 
-    const isCompanyRole = user.role_id?.log_to === "company" || String(user.role_id?.name || "").toLowerCase() === "company";
-    if (!isCompanyRole) {
-      return ReturnAppData.createError({ res, status: 403, message: msg(lan, "هذا الحساب لا يملك صلاحية الدخول كشركة.", "This account does not have permission to login as a company.") });
-    }
-
+    /*
+      Important:
+      Do not reject company login using role only.
+      Some old company users may have role names like:
+      employer, company_owner, recruiter, or roles without log_to.
+      The real company access proof is that this user owns a company profile.
+    */
     const company = await CompanyModel.findOne({ owner_user_id: user._id })
       .populate("role_id")
-      .populate("owner_user_id", "-password -passcode -another_device_code -pending_device");
+      .populate(
+        "owner_user_id",
+        "-password -passcode -another_device_code -pending_device"
+      );
 
     if (!company) {
-      return ReturnAppData.createError({ res, status: 404, message: msg(lan, "لم يتم العثور على بيانات الشركة المرتبطة بهذا الحساب.", "Company profile linked to this account was not found.") });
+      return ReturnAppData.createError({
+        res,
+        status: 404,
+        message: msg(
+          lan,
+          "لم يتم العثور على بيانات الشركة المرتبطة بهذا الحساب.",
+          "Company profile linked to this account was not found."
+        ),
+      });
     }
 
-    if (!user.status || company.status === false) {
-      return ReturnAppData.createError({ res, status: 403, message: msg(lan, "هذا الحساب غير فعال حالياً.", "This account is currently inactive.") });
+    const isCompanyRole = roleAllowsCompanyLogin(user.role_id);
+
+    /*
+      If the company exists by owner_user_id, allow login.
+      This prevents old/incorrect role records from breaking company login.
+      You can log this for cleanup instead of blocking the user.
+    */
+    if (!isCompanyRole) {
+      console.warn("Company login with non-company role:", {
+        user_id: String(user._id),
+        email: user.email,
+        role_id: user.role_id?._id,
+        role_name: user.role_id?.name,
+        role_log_to: user.role_id?.log_to,
+      });
+    }
+
+    /*
+      Use strict false check.
+      Some old users may have status undefined.
+      !user.status would block them incorrectly.
+    */
+    if (user.status === false || company.status === false) {
+      return ReturnAppData.createError({
+        res,
+        status: 403,
+        message: msg(
+          lan,
+          "هذا الحساب غير فعال حالياً.",
+          "This account is currently inactive."
+        ),
+      });
     }
 
     if (company.accepted === false) {
-      return ReturnAppData.createError({ res, status: 403, message: msg(lan, "حساب الشركة بانتظار الموافقة.", "Company account is pending approval.") });
+      return ReturnAppData.createError({
+        res,
+        status: 403,
+        message: msg(
+          lan,
+          "حساب الشركة بانتظار الموافقة.",
+          "Company account is pending approval."
+        ),
+      });
     }
 
     const incomingDevice = {
@@ -112,17 +268,29 @@ const login = async (req, res, next) => {
     };
 
     ensureDeviceArray(user);
+
     const idx = user.device.findIndex((d) => isDeviceMatch(d, incomingDevice));
     let authDevice;
 
     if (idx >= 0) {
       user.device[idx].last_seen_at = new Date();
-      if (incomingDevice.build_id) user.device[idx].build_id = incomingDevice.build_id;
-      if (incomingDevice.model_id && !user.device[idx].model_id) user.device[idx].model_id = incomingDevice.model_id;
+
+      if (incomingDevice.build_id) {
+        user.device[idx].build_id = incomingDevice.build_id;
+      }
+
+      if (incomingDevice.model_id && !user.device[idx].model_id) {
+        user.device[idx].model_id = incomingDevice.model_id;
+      }
+
       makeDefaultDevice(user, idx);
       authDevice = user.device[idx];
     } else {
-      user.device.push({ ...incomingDevice, is_default: true });
+      user.device.push({
+        ...incomingDevice,
+        is_default: true,
+      });
+
       makeDefaultDevice(user, user.device.length - 1);
       authDevice = user.device[user.device.length - 1];
     }
@@ -131,10 +299,32 @@ const login = async (req, res, next) => {
     await user.save();
 
     const authPayload = await buildAuthPayload(user, authDevice);
-    return ReturnAppData.createData({ res, status: 200, data: { ...authPayload, company }, message: msg(lan, "تم تسجيل الدخول بنجاح.", "Logged in successfully.") });
+
+    return ReturnAppData.createData({
+      res,
+      status: 200,
+      data: {
+        ...authPayload,
+        company,
+      },
+      message: msg(
+        lan,
+        "تم تسجيل الدخول بنجاح.",
+        "Logged in successfully."
+      ),
+    });
   } catch (err) {
     console.error("company login error:", err);
-    return ReturnAppData.createError({ res, status: 500, message: msg(lan, "حدث خطأ غير متوقع.", "An unexpected error occurred.") });
+
+    return ReturnAppData.createError({
+      res,
+      status: 500,
+      message: msg(
+        lan,
+        "حدث خطأ غير متوقع.",
+        "An unexpected error occurred."
+      ),
+    });
   }
 };
 

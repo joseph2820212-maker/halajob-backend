@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-// import { seedPermissions } from "./permissionSeeder.js";
+import { seedPermissions } from "./permissionSeeder.js";
 import { seedRoles } from "./roleSeeder.js";
 import { seedAdmins } from "./adminSeeder.js";
 import { seedEmployees } from "./employeeSeed.js";
@@ -23,11 +23,12 @@ import { seedEducationLevels } from "./seedEducationLevels.js";
 import { seedJobsAndApplications } from "./seedJobsAndApplications.js";
 import { seedBanners } from "./seedBanner.js";
 import { seedStaticPages } from "./staticPagesSeeder.js";
+import { seedSubscriptionPlans } from "./seedSubscriptionPlans.js";
 
 dotenv.config();
 
 const seeders = {
-  // permissions: seedPermissions,
+  permissions: seedPermissions,
   roles: seedRoles,
   admin: seedAdmins,
   employee:seedEmployees,
@@ -48,13 +49,15 @@ const seeders = {
   educationLevel:seedEducationLevels,
   banners:seedBanners,
   jobsAndApplications:seedJobsAndApplications,
-  staticPages:seedStaticPages
+  staticPages:seedStaticPages,
+  subscriptions:seedSubscriptionPlans
 };
 
 // ترتيب التشغيل
 const executionOrder = [
-  // "permissions",
+  "permissions",
   "roles",
+  "subscriptions",
   "admin",
   "employee",
   "city",

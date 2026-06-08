@@ -1,27 +1,38 @@
 export const checkPermission = (requiredPermission) => {
   return async (req, res, next) => {
     try {
-      const user = req.authData;
+      const user = req.authData || req.admin || req.user;
 
       if (!user) {
         return res.status(401).json({
-          success: false,
-          message: "Unauthorized",
+          status: false,
+          message: 'Unauthorized',
         });
       }
 
-      const rolePermissions =
-        user.role_id?.permissions?.map((permission) => permission.key) || [];
+      const roleName = String(user.role_id?.name || '').toLowerCase();
+      if (roleName === 'admin') return next();
 
-      const userPermissions =
-        user.permissions?.map((permission) => permission.key) || [];
+      const normalizePermission = (permission) => {
+        if (!permission) return null;
+        if (typeof permission === 'string') return permission;
+        return permission.key || null;
+      };
 
-      const allPermissions = [...rolePermissions, ...userPermissions];
+      const rolePermissions = (user.role_id?.permissions || [])
+        .map(normalizePermission)
+        .filter(Boolean);
 
-      if (!allPermissions.includes(requiredPermission)) {
+      const userPermissions = (user.permissions || [])
+        .map(normalizePermission)
+        .filter(Boolean);
+
+      const allPermissions = new Set([...rolePermissions, ...userPermissions]);
+
+      if (!allPermissions.has(requiredPermission) && !allPermissions.has('*')) {
         return res.status(403).json({
-          success: false,
-          message: "Forbidden: missing permission",
+          status: false,
+          message: 'Forbidden: missing permission',
           requiredPermission,
         });
       }

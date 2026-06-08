@@ -62,6 +62,14 @@ const JobQuestionSchema = new Schema(
     },
 
     is_required: { type: Boolean, default: false },
+    is_knockout: { type: Boolean, default: false, index: true },
+    weight: { type: Number, default: 1, min: 0, max: 100 },
+    knockout_expected_answer: { type: Schema.Types.Mixed, default: null },
+    knockout_action: {
+      type: String,
+      enum: ["mark_not_match", "needs_manual_review", "reject"],
+      default: "mark_not_match",
+    },
 
     correct_answer: {
       type: Schema.Types.Mixed,
@@ -83,6 +91,28 @@ const SkillRequirementSchema = new Schema(
   { _id: false }
 );
 
+
+const JobLifecycleSchema = new Schema(
+  {
+    auto_closed_at: { type: Date, default: null, index: true },
+    auto_close_reason: { type: String, trim: true, default: "" },
+    last_deadline_checked_at: { type: Date, default: null },
+    reminders: {
+      company_7d_at: { type: Date, default: null },
+      company_3d_at: { type: Date, default: null },
+      company_72h_at: { type: Date, default: null },
+      company_24h_at: { type: Date, default: null },
+      saved_7d_at: { type: Date, default: null },
+      saved_3d_at: { type: Date, default: null },
+      saved_72h_at: { type: Date, default: null },
+      saved_24h_at: { type: Date, default: null },
+      closed_company_at: { type: Date, default: null },
+      closed_applicants_at: { type: Date, default: null },
+    },
+  },
+  { _id: false }
+);
+
 const JobServiceSnapshotSchema = new Schema(
   {
     service_id: { type: Schema.Types.ObjectId, ref: "job_service", default: null },
@@ -90,6 +120,30 @@ const JobServiceSnapshotSchema = new Schema(
     name: { type: String, trim: true },
     title_ar: { type: String, trim: true },
     title_en: { type: String, trim: true },
+  },
+  { _id: false }
+);
+
+const AtsWeightsSchema = new Schema(
+  {
+    skills: { type: Number, default: 35, min: 0, max: 100 },
+    experience: { type: Number, default: 20, min: 0, max: 100 },
+    education: { type: Number, default: 10, min: 0, max: 100 },
+    languages: { type: Number, default: 10, min: 0, max: 100 },
+    location: { type: Number, default: 10, min: 0, max: 100 },
+    salary: { type: Number, default: 5, min: 0, max: 100 },
+    questions: { type: Number, default: 10, min: 0, max: 100 },
+  },
+  { _id: false }
+);
+
+const AtsSettingsSchema = new Schema(
+  {
+    weights: { type: AtsWeightsSchema, default: () => ({}) },
+    auto_reject_on_knockout: { type: Boolean, default: false },
+    manual_review_on_knockout: { type: Boolean, default: true },
+    min_score_for_initial_match: { type: Number, default: 80, min: 0, max: 100 },
+    min_score_for_review: { type: Number, default: 50, min: 0, max: 100 },
   },
   { _id: false }
 );
@@ -198,26 +252,44 @@ const JobsSchema = new Schema(
 
     job_name: { type: String, required: true, trim: true },
     job_name_id: { type: Schema.Types.ObjectId, ref: "job_name", default: null },
-    description: { type: String, required: true, trim: true },
-    ref: { type: String, trim: true, index: true },
+    description: { type: String, required: true, trim: true, minlength: 50, maxlength: 5000 },
+    ref: { type: String, trim: true, unique: true, sparse: true, index: true },
     job_keywords: { type: [String], default: [] },
     keywords_norm: { type: [String], default: [] },
     phrases_norm: { type: [String], default: [] },
 
     status: { type: Boolean, default: true, index: true },
-    is_accepted: { type: Boolean, default: true, index: true },
-    publish_status: { type: String, enum: ["pending_review", "published", "paused", "closed", "rejected", "archived"], default: "published", index: true },
+    is_accepted: { type: Boolean, default: false, index: true },
+    publish_status: { type: String, enum: ["pending_review", "published", "paused", "closed", "rejected", "archived"], default: "pending_review", index: true },
     started_date: { type: Date, default: null },
     end_date: { type: Date, default: null },
     apply_deadline: { type: Date, default: null, index: true },
+    closing_mode: {
+      type: String,
+      enum: ["fixed_date", "continuous_until_filled", "immediate_hiring"],
+      default: "fixed_date",
+      index: true,
+    },
+    hide_closing_date: { type: Boolean, default: false },
     is_update: { type: Boolean, default: false },
     vacancies_count: { type: Number, default: 1, min: 1 },
     priority: { type: Number, default: 0, min: 0 },
+    reviewed_at: { type: Date, default: null },
+    reviewed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    rejection_reason: { type: String, trim: true, default: "" },
+
+    job_lifecycle: { type: JobLifecycleSchema, default: () => ({}) },
 
     countries: { type: [String], default: [] },
     cities: { type: [String], default: [], index: true },
     city: { type: String, default: "", trim: true },
     address: { type: String, default: "", trim: true },
+    work_location_scope: {
+      type: String,
+      enum: ["local", "international", "both"],
+      default: "local",
+      index: true,
+    },
 
     work_mode_id: { type: Schema.Types.ObjectId, ref: "work_modes", required: true },
     work_mode_info: { type: Schema.Types.Mixed, default: {} },
@@ -236,6 +308,13 @@ const JobsSchema = new Schema(
     max_experience_years: { type: Number, default: null, min: 0 },
     education_level_id: { type: Schema.Types.ObjectId, ref: "education_levels", default: null, index: true },
     education_level_info: { type: Schema.Types.Mixed, default: {} },
+    age_min: { type: Number, default: null, min: 14, max: 100 },
+    age_max: { type: Number, default: null, min: 14, max: 100 },
+    gender_requirement: { type: String, enum: ["any", "male", "female"], default: "any" },
+    marital_status: { type: [String], default: [] },
+    academic_certificates: { type: [String], default: [] },
+    professional_certificates: { type: [String], default: [] },
+    driving_license_required: { type: Boolean, default: false },
 
     candidate_target: { type: [String], enum: ["students", "graduates", "fresh_graduates", "experienced", "career_changers", "all"], default: ["all"], index: true },
     is_for_students: { type: Boolean, default: false, index: true },
@@ -254,6 +333,7 @@ const JobsSchema = new Schema(
       currency_rate_snapshot: { type: Number, required: true, min: 0, default: 1 },
       min_usd: { type: Number, default: null, min: 0 },
       max_usd: { type: Number, default: null, min: 0 },
+      mode: { type: String, enum: ["fixed", "range", "negotiable", "depends_on_experience", "hidden"], default: "range" },
       is_visible: { type: Boolean, default: true },
       is_negotiable: { type: Boolean, default: false },
     },
@@ -285,7 +365,15 @@ const JobsSchema = new Schema(
     user_saved: { type: Number, default: 0, min: 0 },
     rating: { type: Number, default: 0, min: 0, max: 5 },
 
-    questions: { type: [JobQuestionSchema], validate: [{ validator: (v) => !v || v.length <= 5, message: "questions max length is 5" }], default: [] },
+    questions: { type: [JobQuestionSchema], validate: [{ validator: (v) => !v || v.length <= 50, message: "questions max length is 50" }], default: [] },
+    ats_settings: { type: AtsSettingsSchema, default: () => ({}) },
+    created_by: { type: Schema.Types.ObjectId, ref: "users", default: null, index: true },
+    updated_by: { type: Schema.Types.ObjectId, ref: "users", default: null, index: true },
+    stopped_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    archived_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    deleted_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    deleted_at: { type: Date, default: null, index: true },
+    last_action: { type: String, trim: true, default: "" },
     company_id: { type: Schema.Types.ObjectId, ref: "companies", required: true, index: true },
     user_id: { type: Schema.Types.ObjectId, ref: "users", required: true, index: true },
   },
@@ -386,10 +474,57 @@ const rebuildJobSearchFilters = (job) => {
   };
 };
 
-JobsSchema.pre("validate", function (next) {
-  if (this.publish_status === "draft") this.publish_status = "published";
-  if (!this.publish_status) this.publish_status = "published";
 
+const buildJobRef = (year, seq) => `HJ-${year}-${String(seq).padStart(4, "0")}`;
+
+JobsSchema.pre("validate", async function (next) {
+  try {
+    if (!this.ref) {
+      const year = new Date().getFullYear();
+      const count = await this.constructor.countDocuments({ ref: new RegExp(`^HJ-${year}-`) });
+      for (let i = 1; i <= 25; i += 1) {
+        const candidate = buildJobRef(year, count + i);
+        const exists = await this.constructor.exists({ ref: candidate });
+        if (!exists) {
+          this.ref = candidate;
+          break;
+        }
+      }
+      if (!this.ref) this.ref = `HJ-${year}-${Date.now().toString().slice(-6)}`;
+    }
+
+    if (this.description && (this.description.length < 50 || this.description.length > 5000)) {
+      return next(new Error("job_description_length_must_be_between_50_and_5000"));
+    }
+
+    if (this.started_date && this.end_date && new Date(this.started_date) > new Date(this.end_date)) {
+      return next(new Error("started_date_cannot_be_after_end_date"));
+    }
+
+    if (this.apply_deadline && this.end_date && new Date(this.apply_deadline) > new Date(this.end_date)) {
+      return next(new Error("apply_deadline_must_be_before_or_equal_end_date"));
+    }
+
+    if (this.age_min != null && this.age_max != null && Number(this.age_min) > Number(this.age_max)) {
+      return next(new Error("age_min_cannot_be_greater_than_age_max"));
+    }
+  } catch (error) {
+    return next(error);
+  }
+
+  if (this.publish_status === "draft") this.publish_status = "pending_review";
+  if (!this.publish_status) this.publish_status = "pending_review";
+
+  if (this.publish_status === "published") {
+    this.is_accepted = true;
+    this.status = true;
+  } else if (["pending_review", "rejected"].includes(this.publish_status)) {
+    this.is_accepted = false;
+    if (this.publish_status === "rejected") this.status = false;
+  }
+
+  if (this.salary?.mode === "hidden") this.salary.is_visible = false;
+  if (["negotiable", "depends_on_experience"].includes(this.salary?.mode)) this.salary.is_negotiable = true;
   if (this.salary?.min != null && this.salary?.max != null && this.salary.min > this.salary.max) return next(new Error("salary.min cannot be greater than salary.max"));
   if (this.min_experience_years != null && this.max_experience_years != null && this.min_experience_years > this.max_experience_years) return next(new Error("min_experience_years cannot be greater than max_experience_years"));
   if (this.salary && this.salary.currency_rate_snapshot > 0) {
@@ -416,8 +551,13 @@ JobsSchema.pre("validate", function (next) {
   next();
 });
 
+JobsSchema.index({ ref: 1 }, { unique: true, sparse: true });
 JobsSchema.index({ status: 1, is_accepted: 1, publish_status: 1, createdAt: -1 });
+JobsSchema.index({ publish_status: 1, status: 1, apply_deadline: 1 });
+JobsSchema.index({ publish_status: 1, status: 1, end_date: 1 });
+JobsSchema.index({ "job_lifecycle.auto_closed_at": 1 });
 JobsSchema.index({ company_id: 1, status: 1, is_accepted: 1 });
+JobsSchema.index({ company_id: 1, deleted_at: 1, createdAt: -1 });
 JobsSchema.index({ countries: 1, status: 1, is_accepted: 1, createdAt: -1 });
 JobsSchema.index({ cities: 1, status: 1, is_accepted: 1, createdAt: -1 });
 JobsSchema.index({ candidate_target: 1, createdAt: -1 });

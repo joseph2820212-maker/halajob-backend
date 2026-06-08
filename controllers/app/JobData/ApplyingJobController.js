@@ -8,6 +8,9 @@ import {
   JobEmployeeMatchModel,
 } from "../../../models/index.js";
 import { calculateJobEmployeeMatch } from "../../../services/matching/jobEmployeeMatching.js";
+import { calculateAtsApplicationResult } from "../../../services/matching/atsScoring.service.js";
+import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { ApplicationStatusHistoryModel } from "../../../models/index.js";
 import { job_applied_notification } from "../../../notification/JobCompanyNotifications.js";
 
 const { Types } = mongoose;
@@ -501,6 +504,10 @@ const applyJob = async (req, res, next) => {
     const coverLetter = cleanText(req.body.cover_letter);
 
     const matchResult = calculateJobEmployeeMatch(job, employee);
+    const atsResult = calculateAtsApplicationResult({ job, employee, answers });
+    const initialStatus = atsResult.questions.knockout.has_failed
+      ? (atsResult.questions.knockout.action === "reject" && job.ats_settings?.auto_reject_on_knockout ? "rejected" : "not_match")
+      : "new";
 
     const payload = {
       user_id: user._id,
@@ -520,6 +527,8 @@ const applyJob = async (req, res, next) => {
       cv: activeCv?.url || "",
 
       source: "app",
+      status: initialStatus,
+      status_changed_at: new Date(),
       is_filter: Boolean(matchResult),
       filter_on: Boolean(matchResult),
       filter_result: matchResult
@@ -530,6 +539,12 @@ const applyJob = async (req, res, next) => {
             reason: "calculated_from_employee_profile",
           }
         : undefined,
+      ats_score: atsResult.score,
+      ats_summary: atsResult.summary,
+      matching_details: atsResult,
+      knockout_result: atsResult.questions.knockout,
+      rejection_reason_code: initialStatus === "rejected" ? "failed_knockout" : "",
+      rejection_reason: initialStatus === "rejected" ? "failed_knockout_question" : "",
       last_activity_at: new Date(),
     };
 
@@ -554,6 +569,31 @@ const applyJob = async (req, res, next) => {
     }
 
     await Promise.all([
+      ApplicationStatusHistoryModel.create({
+        application_id: created._id,
+        job_id: job._id,
+        company_id: job.company_id,
+        user_id: user._id,
+        old_status: null,
+        new_status: initialStatus,
+        changed_by: user._id,
+        actor_type: "employee",
+        action: "application_created",
+        note: atsResult.summary || "application_created_by_candidate",
+        metadata: { ats_score: atsResult.score, knockout: atsResult.questions.knockout },
+      }).catch(() => null),
+      writeAuditLog({
+        req,
+        companyId: job.company_id,
+        actorUserId: user._id,
+        actorType: "employee",
+        action: "application_created",
+        entityType: "application",
+        entityId: created._id,
+        jobId: job._id,
+        applicationId: created._id,
+        newValue: { status: initialStatus, ats_score: atsResult.score, knockout: atsResult.questions.knockout },
+      }),
       jobsModel.updateOne(
         { _id: job._id },
         {
@@ -579,7 +619,7 @@ const applyJob = async (req, res, next) => {
         : null,
     ]);
 
-    job_applied_notification(job).catch?.(console.error);
+    job_applied_notification(job, created).catch?.(console.error);
 
     return ReturnAppData.createData({
       res,

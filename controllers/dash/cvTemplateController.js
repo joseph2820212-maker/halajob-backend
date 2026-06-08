@@ -1,5 +1,5 @@
-import CvTemplateModel from "../../../models/CvTemplateModel.js";
-import { cleanCvTemplateHtml } from "../services/cvTemplateSanitize.service.js";
+import CvTemplateModel from "../../models/CvTemplateModel.js";
+import { cleanCvTemplateHtml } from "../../services/cv/cvTemplateSanitize.service.js";
 
 export const createCvTemplate = async (req, res, next) => {
   try {

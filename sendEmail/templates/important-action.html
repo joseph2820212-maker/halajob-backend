@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="{{lang}}" dir="{{direction}}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{title}}</title>
+</head>
+<body style="margin:0;background:#f5f7fb;font-family:Arial,Tahoma,sans-serif;color:#182033;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fb;padding:32px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #e7ecf5;">
+          <tr>
+            <td style="padding:28px;background:#9b111e;color:#ffffff;">
+              <h1 style="margin:0;font-size:24px;line-height:1.4;">JobZain</h1>
+              <p style="margin:8px 0 0;font-size:14px;opacity:.9;">{{title}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 28px;">
+              <p style="margin:0 0 24px;font-size:16px;line-height:1.9;color:#334155;">{{message}}</p>
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:#9b111e;border-radius:12px;">
+                    <a href="{{action_url}}" style="display:inline-block;padding:14px 22px;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;">{{action_label}}</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:24px 0 0;font-size:12px;line-height:1.8;color:#94a3b8;word-break:break-all;">{{action_url}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:18px 28px;background:#f8fafc;color:#64748b;font-size:12px;line-height:1.8;">
+              This email was sent by JobZain. For support contact {{support_email}}.<br />
+              © {{year}} JobZain
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -14,7 +14,7 @@ import {
   companyPopulate
 } from "../../../helper/companyDash/companyDashHelpers.js";
 
-import { CountryModel, IndustryModel, LanguageModel } from "../../../models/index.js";
+import { CountryModel, IndustryModel, LanguageModel, UserModel } from "../../../models/index.js";
 import normalizeArabicKeyword from "../../../helper/normalizeArabicKeyword.js";
 import { deleteImage, processUploadImage } from "../../../services/imageService.js";
 import { applyCompanyProjection, rebuildCompanyJobsProjection } from "../../../services/search/rebuildSearchData.js";
@@ -26,6 +26,7 @@ const SINGLE_FIELDS = new Set([
   "company_email",
   "created_year",
   "description",
+  "company_short_description",
   "mission",
   "vision",
   "culture",
@@ -40,7 +41,9 @@ const SINGLE_FIELDS = new Set([
   "company_city",
   "company_address",
   "timezone",
+  "site_type",
   "company_phone",
+  "company_whatsapp",
   "company_phone_code",
   "company_website",
   "hr_name",
@@ -49,8 +52,9 @@ const SINGLE_FIELDS = new Set([
   "is_hiring",
 ]);
 
-const ARRAY_FIELDS = new Set(["files", "gallery", "company_contact", "social_links", "benefits", "specialties", "languages", "verification_documents"]);
+const ARRAY_FIELDS = new Set(["files", "gallery", "company_contact", "social_links", "benefits", "specialties", "languages", "verification_documents", "company_locations"]);
 const BOOLEAN_FIELDS = new Set(["is_hiring"]);
+const OBJECT_FIELDS = new Set(["location_visibility", "privacy_settings"]);
 const OBJECT_ID_SINGLE_FIELDS = new Set(["industry_id", "country_id", "city_id"]);
 const NUMBER_FIELDS = new Set(["created_year", "company_size"]);
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -87,6 +91,21 @@ const normalizeArrayPayload = (body = {}, key = "items") => {
 const uniqueStringArray = (items = []) => [...new Set(items.flat(Infinity).map((x) => String(x || "").trim()).filter(Boolean))];
 const normalizeSlug = (value = "") => String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
+const validateCompanyTextField = (field, value) => {
+  const text = String(value || "").trim();
+  const rules = {
+    company_short_description: { max: 200 },
+    description: { min: 200, max: 1500 },
+    mission: { min: 100, max: 300 },
+    vision: { min: 100, max: 300 },
+    culture: { min: 100, max: 300 },
+  }[field];
+
+  if (!rules || !text) return;
+  if (rules.min && text.length < rules.min) throw new Error(`${field}_too_short`);
+  if (rules.max && text.length > rules.max) throw new Error(`${field}_too_long`);
+};
+
 const cleanSocialLink = (item = {}) => {
   const parsed = parseJsonIfString(item, item) || {};
   return { type: String(parsed.type || "other").trim().toLowerCase(), url: String(parsed.url || "").trim() };
@@ -96,6 +115,31 @@ const cleanGalleryItem = (item = {}) => {
   const parsed = parseJsonIfString(item, item) || {};
   return { type: ["image", "video"].includes(parsed.type) ? parsed.type : "image", url: String(parsed.url || "").trim(), title: String(parsed.title || "").trim() };
 };
+const cleanCompanyLocation = (item = {}) => {
+  const parsed = parseJsonIfString(item, item) || {};
+  const location = parseJsonIfString(parsed.location, parsed.location) || {};
+  const visibility = parseJsonIfString(parsed.visibility, parsed.visibility) || {};
+
+  return {
+    country_id: parsed.country_id && mongoose.Types.ObjectId.isValid(String(parsed.country_id)) ? parsed.country_id : null,
+    city_id: parsed.city_id && mongoose.Types.ObjectId.isValid(String(parsed.city_id)) ? parsed.city_id : null,
+    country: String(parsed.country || parsed.company_country || "").trim(),
+    city: String(parsed.city || parsed.company_city || "").trim(),
+    address: String(parsed.address || parsed.company_address || "").trim(),
+    site_type: ["headquarters", "branch", "representative_office", "remote", "other"].includes(parsed.site_type) ? parsed.site_type : "headquarters",
+    location: {
+      latitude: location.latitude === "" || location.latitude === undefined ? null : Number(location.latitude),
+      longitude: location.longitude === "" || location.longitude === undefined ? null : Number(location.longitude),
+    },
+    visibility: {
+      show_country: parseBool(visibility.show_country ?? parsed.show_country ?? true) !== false,
+      show_address: parseBool(visibility.show_address ?? parsed.show_address ?? true) !== false,
+      show_map: parseBool(visibility.show_map ?? parsed.show_map ?? true) !== false,
+    },
+    is_primary: parseBool(parsed.is_primary) === true,
+  };
+};
+
 const cleanVerificationDocument = (item = {}, keepStatus = false) => {
   const parsed = parseJsonIfString(item, item) || {};
 
@@ -137,6 +181,10 @@ const normalizeCompanyArrayField = async (section, body = {}) => {
         status: "pending",
         note: "",
       }));
+  }
+
+  if (section === "company_locations") {
+    return raw.map(cleanCompanyLocation).filter((item) => item.country || item.city || item.address || item.location.latitude != null || item.location.longitude != null);
   }
 
   return uniqueStringArray(raw);
@@ -314,6 +362,11 @@ const applySingleField = async (company, field, value) => {
     return;
   }
 
+  if (OBJECT_FIELDS.has(field)) {
+    company[field] = parseJsonIfString(value, value) || {};
+    return;
+  }
+
   if (OBJECT_ID_SINGLE_FIELDS.has(field)) {
     company[field] = value && mongoose.Types.ObjectId.isValid(String(value)) ? value : null;
     return;
@@ -336,8 +389,8 @@ const applySingleField = async (company, field, value) => {
     return;
   }
 
+  validateCompanyTextField(field, value);
   company[field] = value;
-  // باقي الكود كما هو
 };
 
 
@@ -470,7 +523,7 @@ export const updateCompanyContact = async (req, res, next) => {
     const company = await getCompanyPlain(req, res);
     if (!company) return;
     const touchedFields = [];
-    const fields = ["company_email", "company_phone", "company_phone_code", "company_website", "hr_name", "hr_email", "hr_phone"];
+    const fields = ["company_website", "company_email", "company_phone", "company_phone_code", "company_whatsapp", "hr_name", "hr_email", "hr_phone"];
 
     for (const field of fields) {
       if (req.body[field] !== undefined) {
@@ -523,7 +576,7 @@ export const updateCompanyLocation = async (req, res, next) => {
     const company = await getCompanyPlain(req, res);
     if (!company) return;
     const touchedFields = [];
-    const fields = ["company_country", "company_city", "company_address", "timezone"];
+    const fields = ["company_country", "company_city", "company_address", "timezone", "site_type"];
 
     for (const field of fields) {
       if (req.body[field] !== undefined) {
@@ -531,9 +584,17 @@ export const updateCompanyLocation = async (req, res, next) => {
         touchedFields.push(field);
       }
     }
+    if (req.body.country_id !== undefined) {
+      await applySingleField(company, "country_id", req.body.country_id);
+      touchedFields.push("country_id");
+    }
     if (req.body.city_id !== undefined) {
       await applySingleField(company, "city_id", req.body.city_id);
       touchedFields.push("city_id");
+    }
+    if (req.body.location_visibility !== undefined) {
+      await applySingleField(company, "location_visibility", req.body.location_visibility);
+      touchedFields.push("location_visibility");
     }
     if (req.body.latitude !== undefined || req.body.longitude !== undefined || req.body.location !== undefined) {
       const location = parseJsonIfString(req.body.location, req.body.location) || {};
@@ -630,7 +691,7 @@ export const updateCompanyMedia = async (req, res, next) => {
 export const replaceSection = async (req, res, next) => {
   try {
     const { section } = req.params;
-    if (!ARRAY_FIELDS.has(section) && !SINGLE_FIELDS.has(section) && section !== "location") return fail(res, "invalid_company_section", 400);
+    if (!ARRAY_FIELDS.has(section) && !SINGLE_FIELDS.has(section) && !OBJECT_FIELDS.has(section) && section !== "location") return fail(res, "invalid_company_section", 400);
 
     const company = await getCompanyPlain(req, res);
     if (!company) return;
@@ -644,6 +705,8 @@ export const replaceSection = async (req, res, next) => {
         latitude: location.latitude === "" || location.latitude === undefined ? null : Number(location.latitude),
         longitude: location.longitude === "" || location.longitude === undefined ? null : Number(location.longitude),
       };
+    } else if (OBJECT_FIELDS.has(section)) {
+      company[section] = parseJsonIfString(req.body[section], req.body) || {};
     } else {
       await applySingleField(company, section, req.body?.[section] !== undefined ? req.body[section] : req.body);
     }
@@ -670,7 +733,7 @@ export const addSectionItems = async (req, res, next) => {
     const items = await normalizeCompanyArrayField(section, req.body);
     if (!items.length) return fail(res, "no_items_provided", 400);
 
-    if (["social_links", "gallery", "verification_documents"].includes(section)) {
+    if (["social_links", "gallery", "verification_documents", "company_locations"].includes(section)) {
       company[section].push(...items);
     } else {
       company[section] = [...new Set([...(company[section] || []), ...items])];
@@ -692,12 +755,13 @@ export const updateSectionItem = async (req, res, next) => {
     const company = await getCompanyPlain(req, res);
     if (!company) return;
 
-    if (["social_links", "gallery", "verification_documents"].includes(section)) {
+    if (["social_links", "gallery", "verification_documents", "company_locations"].includes(section)) {
       const item = company[section].id?.(itemId);
       if (!item) return fail(res, "company_section_item_not_found", 404);
       if (section === "social_links") item.set(cleanSocialLink(req.body));
       if (section === "gallery") item.set(cleanGalleryItem(req.body));
       if (section === "verification_documents") item.set(cleanVerificationDocument(req.body));
+      if (section === "company_locations") item.set(cleanCompanyLocation(req.body));
     } else {
       return fail(res, "section_item_update_not_supported_for_scalar_arrays", 422);
     }
@@ -723,7 +787,7 @@ export const deleteSectionItem = async (req, res, next) => {
 
     const currentLength = company[section]?.length || 0;
 
-    if (["social_links", "gallery", "verification_documents"].includes(section)) {
+    if (["social_links", "gallery", "verification_documents", "company_locations"].includes(section)) {
       company[section] = (company[section] || []).filter(
         (item) => String(item._id) !== String(itemId)
       );
@@ -782,7 +846,8 @@ export const getMyBasicCompanyProfile = async (req, res, next) => {
         company_name: company.company_name,
         slug: company.slug,
         company_email: company.company_email,
-        image: company.image,
+        image: company.logo || company.image,
+        logo: company.logo,
         cover_image: company.cover_image,
         industry_name: company.industry_name,
         country_id: company.country_id,
@@ -797,6 +862,58 @@ export const getMyBasicCompanyProfile = async (req, res, next) => {
       },
     });
   } catch (error) { next(error); }
+};
+
+
+export const updateMyCompanyUserProfile = async (req, res, next) => {
+  try {
+    const company = await getCompanyPlain(req, res);
+    if (!company) return;
+
+    const user = await UserModel.findById(company.owner_user_id);
+    if (!user) return fail(res, "company_owner_user_not_found", 404);
+
+    ["first_name", "mid_name", "last_name", "email", "gender"].forEach((field) => {
+      if (req.body[field] !== undefined) user[field] = req.body[field];
+    });
+
+    if (req.body.phone !== undefined || req.body.phone_number !== undefined) {
+      const national = String(req.body.phone ?? req.body.phone_number ?? "").replace(/[^0-9]/g, "");
+      const code = String(req.body.phone_code || user.phone_code || "").replace(/[^0-9]/g, "");
+      if (national && code) {
+        user.phone_code = code;
+        user.phone_national = national;
+        user.phone_country = code;
+        user.phone_e164 = `+${code}${national}`;
+        user.phone = `${code}${national}`;
+      }
+    }
+
+    const imageFile = req.file || req.files?.image?.[0];
+    if (imageFile) {
+      const oldImage = user.image;
+      user.image = await processUploadImage(imageFile, { targetDir: "users", webpQuality: 82 });
+      if (oldImage) await deleteImage(oldImage);
+    }
+
+    await user.save();
+
+    return success(res, {
+      id: user._id,
+      first_name: user.first_name,
+      mid_name: user.mid_name,
+      last_name: user.last_name,
+      email: user.email,
+      phone_code: user.phone_code,
+      phone: user.phone_national,
+      gender: user.gender,
+      image: user.image,
+      status: user.status,
+    }, "company_user_profile_updated");
+  } catch (error) {
+    if (error.code === 11000) return fail(res, "user_unique_field_already_exists", 409, error.keyValue);
+    next(error);
+  }
 };
 
 export const getMySection = async (req, res, next) => {
@@ -859,6 +976,7 @@ export default {
   updateSectionItem,
   deleteSectionItem,
   getMyBasicCompanyProfile,
+  updateMyCompanyUserProfile,
   getMySection,
   rebuildMyCompanySearchFilters,
 };

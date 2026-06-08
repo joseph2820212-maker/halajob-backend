@@ -6,11 +6,13 @@ dotenv.config();
 import mongoose from "mongoose";
 import logger from "./config/logger.js";
 import app from "./app.js";
+import { startScheduledJobs, stopScheduledJobs } from "./jobs/scheduler.js";
 
 const CONNECTION_URL = process.env.CONNECTION_URL;
 const PORT = process.env.PORT || 3000;
 
 let server;
+let scheduledJobs;
 
 if (!CONNECTION_URL) {
   logger.error("CONNECTION_URL is missing");
@@ -32,6 +34,8 @@ const startServer = async () => {
 
     logger.info("Connected to MongoDB");
 
+    scheduledJobs = startScheduledJobs();
+
     server = app.listen(PORT, () => {
       logger.info(`Listening on port ${PORT}`);
     });
@@ -45,6 +49,11 @@ startServer();
 
 const exitHandler = async (code = 1) => {
   try {
+    if (scheduledJobs?.started) {
+      stopScheduledJobs();
+      logger.info("Scheduled jobs stopped");
+    }
+
     if (server) {
       await new Promise((resolve) => server.close(resolve));
       logger.info("HTTP server closed");

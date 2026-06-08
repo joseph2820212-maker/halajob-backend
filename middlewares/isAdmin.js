@@ -1,69 +1,85 @@
 import APIError from '../utils/apiError.js';
-import { UserModel, RefreshTokenModel } from '../models/index.js';
+import { RefreshTokenModel, UserModel } from '../models/index.js';
 import httpStatus from 'http-status';
 import { tokenTypes } from '../config/tokens.js';
 import { verify } from '../utils/jwtHelpers.js';
 
+const getBearerToken = (req) => {
+  const authHeader = req.get('Authorization') || '';
+  if (!authHeader.startsWith('Bearer ')) return null;
+  return authHeader.slice(7).trim();
+};
+
+const withoutPassword = (user) => {
+  if (!user) return user;
+  const plain = typeof user.toObject === 'function' ? user.toObject() : { ...user };
+  delete plain.password;
+  delete plain.passcode;
+  delete plain.another_device_code;
+  return plain;
+};
+
 const isAdmin = async (req, res, next) => {
   try {
-    // Extract Authorization header
-    const authHeader = req.get('Authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const accessToken = getBearerToken(req);
+
+    if (!accessToken) {
       throw new APIError(httpStatus.UNAUTHORIZED, 'Authorization header missing or malformed');
     }
 
-    // Extract the token from the header
-    const accessToken = authHeader.split(' ')[1];
-    if (!accessToken) {
-      throw new APIError(httpStatus.UNAUTHORIZED, 'Access token missing');
-    }
-
-    // Debugging: Log token
-    console.log('Received Access Token:', accessToken);
-
-    // Verify the token
     const tokenPayload = await verify(accessToken, process.env.JWT_SECRET);
-    if (!tokenPayload) {
+
+    if (!tokenPayload || tokenPayload.type !== tokenTypes.ACCESS) {
       throw new APIError(httpStatus.UNAUTHORIZED, 'Invalid or expired access token');
     }
 
-    // Debugging: Log payload
-    console.log('Token Payload:', tokenPayload);
+    const user = await UserModel.findById(tokenPayload.userId)
+      .populate({ path: 'role_id', populate: { path: 'permissions' } })
+      .populate('permissions')
+      .lean();
 
-    // Check if the token is of the correct type
-    if (tokenPayload.type !== tokenTypes.ACCESS) {
-      throw new APIError(httpStatus.UNAUTHORIZED, 'Token type is invalid');
+    if (!user) {
+      throw new APIError(httpStatus.FORBIDDEN, 'User not found. Please log in again.');
     }
 
-    // Validate the user exists
-    const userExists = await UserModel.exists({ _id: tokenPayload.userId,is_admin:process.env.Admin_Hash,user_type:"admin" });
-  
-    if (!userExists) {
-      throw new APIError(httpStatus.FORBIDDEN, process.env.Admin_Hash);
+    if (!user.status) {
+      throw new APIError(httpStatus.FORBIDDEN, 'This dashboard account is inactive.');
     }
 
-    // Validate the refresh token exists for the user and login time
+    const role = user.role_id || null;
+    const isDashAccount = role?.log_to === 'dash';
+
+    if (!isDashAccount) {
+      throw new APIError(httpStatus.FORBIDDEN, 'This account is not allowed to access dashboard APIs.');
+    }
+
+    const loginTime = tokenPayload.loginTime ? new Date(tokenPayload.loginTime) : null;
     const refreshTokenExists = await RefreshTokenModel.exists({
       userRef: tokenPayload.userId,
-      loginTime: tokenPayload.loginTime,
+      ...(loginTime && !Number.isNaN(loginTime.valueOf()) ? { loginTime } : {}),
     });
 
     if (!refreshTokenExists) {
       throw new APIError(httpStatus.FORBIDDEN, 'Session expired. Please log in again.');
     }
 
-    // Attach the payload to the request object
-    req.authData = userExists;
+    const safeUser = withoutPassword(user);
 
-    // Debugging: Log success
-    console.log('User authenticated successfully:', tokenPayload);
-    // Proceed to the next middleware or route handler
+    req.user = safeUser;
+    req.admin = safeUser;
+    req.authData = safeUser;
+    req.auth = {
+      userId: tokenPayload.userId,
+      loginTime: tokenPayload.loginTime,
+      token: accessToken,
+      role,
+    };
+
     next();
   } catch (error) {
-    // Log the error for debugging
-    console.error('Authentication error:', error.message);
-    next(error); // Pass the error to the error-handling middleware
+    next(error);
   }
 };
 
 export { isAdmin };
+export default isAdmin;

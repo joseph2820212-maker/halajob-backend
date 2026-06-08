@@ -27,6 +27,15 @@ export const APPLICATION_STATUSES = new Set([
   "rejected",
   "withdrawn",
   "auto_cancel",
+  "new",
+  "reviewing",
+  "initial_match",
+  "not_match",
+  "contacted",
+  "interview_scheduled",
+  "interview_completed",
+  "archived",
+  "offer_declined",
 ]);
 
 export const INTERVIEW_STATUSES = new Set([
@@ -69,6 +78,21 @@ export const toDateOrNull = (value) => {
   if (!cleaned) return null;
   const date = new Date(cleaned);
   return Number.isNaN(date.getTime()) ? null : date;
+};
+
+
+const parseObjectValue = (value, fallback = {}) => {
+  if (value === undefined || value === null || value === "") return fallback;
+  if (typeof value === "object" && !Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+  return fallback;
 };
 
 const toBooleanOrNull = (value) => {
@@ -205,6 +229,28 @@ export const buildApplicationsFilter = (companyId, query = {}) => {
     if (to) filter.createdAt.$lte = to;
   }
 
+  const scoreMin = toNumber(query.score_min || query.scoreMin || query.match_min || query.matchMin, null);
+  const scoreMax = toNumber(query.score_max || query.scoreMax || query.match_max || query.matchMax, null);
+  if (scoreMin !== null || scoreMax !== null) {
+    filter.$and = filter.$and || [];
+    filter.$and.push({
+      $or: [
+        { ats_score: { ...(scoreMin !== null ? { $gte: scoreMin } : {}), ...(scoreMax !== null ? { $lte: scoreMax } : {}) } },
+        { "filter_result.score": { ...(scoreMin !== null ? { $gte: scoreMin } : {}), ...(scoreMax !== null ? { $lte: scoreMax } : {}) } },
+      ],
+    });
+  }
+
+  const knockoutFailed = toBooleanOrNull(query.knockout_failed || query.knockoutFailed || query.failed_knockout);
+  if (knockoutFailed !== null) filter["knockout_result.has_failed"] = knockoutFailed;
+
+  const hasInterview = toBooleanOrNull(query.has_interview || query.hasInterview);
+  if (hasInterview === true) filter.status = { $in: ["interview", "interview_scheduled", "interview_completed"] };
+  if (hasInterview === false) filter.status = { $nin: ["interview", "interview_scheduled", "interview_completed"] };
+
+  const visibleStatus = firstValue(query.visible_status, query.visibleStatus);
+  if (visibleStatus && ["received", "reviewing", "interview_scheduled", "accepted", "not_selected"].includes(visibleStatus)) filter.visible_status = visibleStatus;
+
   const minRating = toNumber(query.min_rating || query.minRating, null);
   const maxRating = toNumber(query.max_rating || query.maxRating, null);
   if (minRating !== null || maxRating !== null) {
@@ -252,6 +298,11 @@ export const buildApplicationsSort = (query = {}) => {
     lastActivityAt: "last_activity_at",
     rating: "user_job_rating",
     user_job_rating: "user_job_rating",
+    match: "ats_score",
+    ats_score: "ats_score",
+    score: "ats_score",
+    application_no: "application_no",
+    applicationNo: "application_no",
   };
   const sortText = cleanQueryValue(query.sort || query.order_by || query.orderBy);
   if (!sortText) return { createdAt: -1, _id: -1 };
@@ -362,6 +413,8 @@ export const buildInterviewPayload = ({ body = {}, companyData, application, old
   if (startAt) payload.start_at = startAt;
   if (endAt) payload.end_at = endAt;
   if (body.rating !== undefined) payload.rating = toNumber(body.rating, null);
+  const scorecard = parseObjectValue(body.scorecard, null);
+  if (scorecard) payload.scorecard = scorecard;
 
   if (!payload.meet_link && payload.type === "online") {
     const suffix = String(application?._id || Date.now()).slice(-8);

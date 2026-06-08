@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="{{lang}}" dir="{{direction}}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{title}}</title>
+</head>
+<body style="margin:0;background:#f5f7fb;font-family:Arial,Tahoma,sans-serif;color:#182033;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fb;padding:32px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #e7ecf5;">
+          <tr>
+            <td style="padding:28px 28px 18px;background:#9b111e;color:#ffffff;">
+              <h1 style="margin:0;font-size:24px;line-height:1.4;">JobZain</h1>
+              <p style="margin:8px 0 0;font-size:14px;opacity:.9;">{{title}}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:30px 28px;">
+              {{content_html}}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:18px 28px;background:#f8fafc;color:#64748b;font-size:12px;line-height:1.8;">
+              This email was sent by JobZain. For support contact {{support_email}}.<br />
+              © {{year}} JobZain
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

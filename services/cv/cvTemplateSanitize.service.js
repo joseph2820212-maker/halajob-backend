@@ -1,16 +1,19 @@
-import sanitizeHtml from "sanitize-html";
+const stripDangerousBlocks = (html = '') =>
+  String(html || '')
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+    .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, '')
+    .replace(/<object[\s\S]*?>[\s\S]*?<\/object>/gi, '')
+    .replace(/<embed[\s\S]*?>[\s\S]*?<\/embed>/gi, '')
+    .replace(/<link[\s\S]*?>/gi, '')
+    .replace(/<meta[\s\S]*?>/gi, '');
 
-export const cleanCvTemplateHtml = (html = "") => {
-  return sanitizeHtml(html, {
-    allowedTags: false,
-    allowedAttributes: false,
-    disallowedTagsMode: "discard",
-    allowedSchemes: ["http", "https", "data", "mailto"],
-  })
-    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
-    .replace(/<iframe[\s\S]*?>[\s\S]*?<\/iframe>/gi, "")
-    .replace(/<object[\s\S]*?>[\s\S]*?<\/object>/gi, "")
-    .replace(/<embed[\s\S]*?>[\s\S]*?<\/embed>/gi, "")
-    .replace(/on\w+="[^"]*"/gi, "")
-    .replace(/on\w+='[^']*'/gi, "");
-};
+const stripDangerousAttributes = (html = '') =>
+  html
+    .replace(/\son\w+\s*=\s*"[^"]*"/gi, '')
+    .replace(/\son\w+\s*=\s*'[^']*'/gi, '')
+    .replace(/\son\w+\s*=\s*[^\s>]+/gi, '')
+    .replace(/javascript\s*:/gi, '')
+    .replace(/vbscript\s*:/gi, '')
+    .replace(/data:text\/html/gi, '');
+
+export const cleanCvTemplateHtml = (html = '') => stripDangerousAttributes(stripDangerousBlocks(html));

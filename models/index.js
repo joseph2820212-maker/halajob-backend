@@ -53,6 +53,14 @@ import SearchHistoryModel from './SearchHistoryModel.js';
 import AppSettingsModel from './AppSettingsModel.js';
 import JobZainTalentRequestModel from './JobZainTalentRequestModel.js';
 import PageModel from './PageModel.js';
+import SubscriptionPlanModel from './SubscriptionPlanModel.js';
+import CompanySubscriptionModel from './CompanySubscriptionModel.js';
+import CompanyInvoiceModel from './CompanyInvoiceModel.js';
+import ScheduledJobLockModel from './ScheduledJobLockModel.js';
+import AuditLogModel from './AuditLogModel.js';
+import CompanyQuestionLibraryModel from './CompanyQuestionLibraryModel.js';
+import CompanyMessageTemplateModel from './CompanyMessageTemplateModel.js';
+import CompanySupportTicketModel from './CompanySupportTicketModel.js';
 
 // cv
 
@@ -108,6 +116,14 @@ export {
   AppSettingsModel,
   JobZainTalentRequestModel,
   PageModel,
+  SubscriptionPlanModel,
+  CompanySubscriptionModel,
+  CompanyInvoiceModel,
+  ScheduledJobLockModel,
+  AuditLogModel,
+  CompanyQuestionLibraryModel,
+  CompanyMessageTemplateModel,
+  CompanySupportTicketModel,
   //cv
   CvTemplateModel,
   EmployeeCvModel

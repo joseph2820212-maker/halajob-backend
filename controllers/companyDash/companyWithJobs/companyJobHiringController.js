@@ -53,12 +53,90 @@ import {
   toDateOrNull,
   toNumber,
 } from "../../../helper/companyDash/companyJobHiringHelpers.js";
+import {
+  SendInterViewNotification,
+  SendInterviewCancelledNotification,
+  SendInterviewUpdatedNotification,
+  SendJobInvitationCancelledNotification,
+  SendJobInvitationNotification,
+  changeJobStatus,
+} from "../../../notification/JobEmployeeNotifications.js";
+
+import {
+  checkCompanyFeature,
+  recordCompanyUsage,
+} from "../../../services/subscriptions/companySubscription.service.js";
+import { writeAuditLog } from "../../../services/auditLog.service.js";
+
+
+const failSubscription = (res, check) => fail(res, check.message || "subscription_not_allowed", check.status || 403, {
+  feature: check.feature,
+  metric: check.metric,
+  limit: check.limit,
+  used: check.used,
+  requested: check.requested,
+});
 
 // This project is deployed on environments that may use a standalone MongoDB server.
 // MongoDB transactions require a replica set, so the hiring flow uses safe sequential
 // writes instead of session.withTransaction to avoid 500 errors in production.
 
-const createStatusHistory = async ({ application, oldStatus, newStatus, companyData, note = "" }) => {
+const normalizeStatusPatch = ({ application, status, body = {} }) => {
+  const now = new Date();
+  const visibleStatusMap = {
+    waiting: "received",
+    new: "received",
+    screening: "reviewing",
+    reviewing: "reviewing",
+    shortlisted: "reviewing",
+    initial_match: "reviewing",
+    not_match: "reviewing",
+    contacted: "reviewing",
+    interview: "interview_scheduled",
+    interview_scheduled: "interview_scheduled",
+    interview_completed: "reviewing",
+    offer: "accepted",
+    accepted: "accepted",
+    hired: "accepted",
+    rejected: "not_selected",
+    auto_cancel: "not_selected",
+    withdrawn: "not_selected",
+    offer_declined: "not_selected",
+    archived: "reviewing",
+  };
+  const patch = {
+    status,
+    visible_status: visibleStatusMap[status] || "reviewing",
+    status_changed_at: now,
+    last_activity_at: now,
+  };
+
+  if (application.status === "archived" && status !== "archived") {
+    patch.archived_at = null;
+    patch.restored_at = now;
+  }
+
+  if (status === "archived") {
+    patch.archived_at = now;
+    patch.archive_reason = cleanText(body.archive_reason || body.reason || body.note || application.archive_reason || "");
+  }
+
+  if (status === "rejected" || status === "not_match") {
+    patch.rejected_at = now;
+    patch.rejection_reason_code = cleanText(body.reason_code || body.rejection_reason_code || "other") || "other";
+    patch.rejection_reason = cleanText(body.reason || body.rejection_reason || application.rejection_reason || "");
+    patch.internal_rejection_note = cleanText(body.internal_note || body.internal_rejection_note || "");
+    patch.candidate_rejection_message = cleanText(body.candidate_message || body.candidate_rejection_message || "");
+    patch.rejection_message_visible_to_candidate = [true, "true", "1", 1].includes(body.visible_to_candidate || body.rejection_message_visible_to_candidate);
+  }
+
+  if (status === "hired" || status === "accepted") patch.hired_at = application.hired_at || now;
+  if (status === "withdrawn" || status === "offer_declined") patch.withdrawn_at = application.withdrawn_at || now;
+
+  return patch;
+};
+
+const createStatusHistory = async ({ application, oldStatus, newStatus, companyData, note = "", action = "status_changed", metadata = {}, visibleToCandidate = false, rejectionReasonCode = "" }) => {
   try {
     const [history] = await ApplicationStatusHistoryModel.create([
       {
@@ -70,7 +148,11 @@ const createStatusHistory = async ({ application, oldStatus, newStatus, companyD
         new_status: newStatus,
         changed_by: companyData?.userId || null,
         actor_type: "company",
+        action,
         note,
+        visible_to_candidate: Boolean(visibleToCandidate),
+        rejection_reason_code: rejectionReasonCode || "",
+        metadata,
       },
     ]);
     return history;
@@ -88,17 +170,11 @@ const createStatusHistory = async ({ application, oldStatus, newStatus, companyD
   }
 };
 
-const updateApplicationStatusFields = async ({ application, status }) => {
-  const now = new Date();
+const updateApplicationStatusFields = async ({ application, status, body = {}, extraPatch = {} }) => {
+  const patch = { ...normalizeStatusPatch({ application, status, body }), ...extraPatch };
   const result = await UserApplyingJobModel.updateOne(
     { _id: application._id, company_id: application.company_id },
-    {
-      $set: {
-        status,
-        status_changed_at: now,
-        last_activity_at: now,
-      },
-    },
+    { $set: patch },
     { runValidators: true }
   );
 
@@ -108,9 +184,7 @@ const updateApplicationStatusFields = async ({ application, status }) => {
     throw err;
   }
 
-  application.status = status;
-  application.status_changed_at = now;
-  application.last_activity_at = now;
+  Object.assign(application, patch);
 };
 
 const parseArrayBody = (value) => {
@@ -220,11 +294,11 @@ export const getHiringSummary = async (req, res, next) => {
 
     const [applications, waiting, interview, offer, accepted, rejected, interviews, upcomingInterviews, invitations, sentInvitations, acceptedInvitations] = await Promise.all([
       UserApplyingJobModel.countDocuments({ company_id: companyId }),
-      UserApplyingJobModel.countDocuments({ company_id: companyId, status: "waiting" }),
-      UserApplyingJobModel.countDocuments({ company_id: companyId, status: "interview" }),
-      UserApplyingJobModel.countDocuments({ company_id: companyId, status: "offer" }),
+      UserApplyingJobModel.countDocuments({ company_id: companyId, status: { $in: ["waiting", "new", "reviewing"] } }),
+      UserApplyingJobModel.countDocuments({ company_id: companyId, status: { $in: ["interview", "interview_scheduled", "interview_completed"] } }),
+      UserApplyingJobModel.countDocuments({ company_id: companyId, status: { $in: ["offer", "initial_match"] } }),
       UserApplyingJobModel.countDocuments({ company_id: companyId, status: { $in: ["accepted", "hired"] } }),
-      UserApplyingJobModel.countDocuments({ company_id: companyId, status: "rejected" }),
+      UserApplyingJobModel.countDocuments({ company_id: companyId, status: { $in: ["rejected", "not_match"] } }),
       InterviewModel.countDocuments({ company_id: companyId }),
       InterviewModel.countDocuments({ company_id: companyId, start_at: { $gte: now }, status: { $in: ["scheduled", "rescheduled"] } }),
       JobInvitationModel.countDocuments({ company_id: companyId }),
@@ -350,14 +424,44 @@ export const updateApplicationStatus = async (req, res, next) => {
 
     const oldStatus = application.status;
 
-    await updateApplicationStatusFields({ application, status });
+    await updateApplicationStatusFields({ application, status, body: req.body });
     await createStatusHistory({
       application,
       oldStatus,
       newStatus: status,
       companyData,
-      note: cleanText(req.body.note),
+      note: cleanText(req.body.note || req.body.reason || req.body.rejection_reason),
+      action: "status_changed",
+      visibleToCandidate: application.rejection_message_visible_to_candidate,
+      rejectionReasonCode: application.rejection_reason_code,
+      metadata: {
+        rejection_reason: application.rejection_reason || "",
+        archive_reason: application.archive_reason || "",
+        candidate_message: application.candidate_rejection_message || "",
+      },
     });
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: "application_status_changed",
+      entityType: "application",
+      entityId: application._id,
+      jobId: application.job_id,
+      applicationId: application._id,
+      oldValue: { status: oldStatus },
+      newValue: { status },
+      note: cleanText(req.body.note || req.body.reason || ""),
+    });
+
+    const job = await jobsModel.findById(application.job_id).select("_id job_name").lean().catch(() => null);
+    changeJobStatus(status, {
+      user_id: application.user_id,
+      application_id: application._id,
+      job_id: application.job_id,
+      job_name: job?.job_name || "",
+    }).catch?.(console.error);
 
     return success(res, normalizeApplication(application), "application_status_updated");
   } catch (error) {
@@ -370,6 +474,9 @@ export const createInterview = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_schedule_interviews", "interviews", 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
+
     const application = await getOwnedApplicationOrFail(req, res, companyData.company._id, req.body.application_id || req.params.applicationId);
     if (!application) return;
 
@@ -379,14 +486,28 @@ export const createInterview = async (req, res, next) => {
     const interview = await InterviewModel.create(payload);
 
     const oldStatus = application.status;
-    await updateApplicationStatusFields({ application, status: "interview" });
+    await updateApplicationStatusFields({ application, status: "interview_scheduled", body: req.body });
 
     await createStatusHistory({
       application,
       oldStatus,
-      newStatus: "interview",
+      newStatus: "interview_scheduled",
       companyData,
       note: cleanText(req.body.company_note || req.body.note || "interview_scheduled"),
+      action: "interview_scheduled",
+      metadata: { interview_id: interview._id },
+    });
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: "interview_scheduled",
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: application.job_id,
+      applicationId: application._id,
+      note: cleanText(req.body.company_note || req.body.note || ""),
     });
 
     const populated = await InterviewModel.findById(interview._id)
@@ -395,6 +516,22 @@ export const createInterview = async (req, res, next) => {
       .populate({ path: "employee_user_id", select: "first_name mid_name last_name email image" })
       .lean();
 
+    SendInterViewNotification({
+      user_id: application.user_id,
+      job_id: application.job_id,
+      application_id: application._id,
+      interview_id: interview._id,
+      job_name: populated?.job_id?.job_name || "",
+      meet_link: interview.meet_link,
+      start_at: interview.start_at,
+      end_at: interview.end_at,
+      date: interview.start_at,
+      type: interview.type,
+      office_address: interview.office_address,
+      note: interview.candidate_note || interview.company_note || "",
+    }).catch?.(console.error);
+
+    await recordCompanyUsage(companyData.company._id, "interviews", 1);
     return success(res, normalizeInterview(populated || interview), "interview_created", 201);
   } catch (error) {
     next(error);
@@ -446,6 +583,21 @@ export const updateInterview = async (req, res, next) => {
     }
 
     await interview.save();
+
+    const job = await jobsModel.findById(interview.job_id).select("_id job_name").lean().catch(() => null);
+    SendInterviewUpdatedNotification({
+      user_id: interview.employee_user_id,
+      job_id: interview.job_id,
+      application_id: interview.application_id,
+      interview_id: interview._id,
+      job_name: job?.job_name || "",
+      meet_link: interview.meet_link,
+      start_at: interview.start_at,
+      end_at: interview.end_at,
+      type: interview.type,
+      office_address: interview.office_address,
+    }).catch?.(console.error);
+
     return success(res, normalizeInterview(interview), "interview_updated");
   } catch (error) {
     next(error);
@@ -463,10 +615,67 @@ export const changeInterviewStatus = async (req, res, next) => {
     const status = cleanText(req.body.status);
     if (!INTERVIEW_STATUSES.has(status)) return fail(res, "invalid_interview_status", 422);
 
+    const oldInterviewStatus = interview.status;
     interview.status = status;
     if (req.body.result_note !== undefined) interview.result_note = cleanText(req.body.result_note);
     if (req.body.rating !== undefined) interview.rating = toNumber(req.body.rating, null);
+    if (req.body.cancelled_reason !== undefined) interview.cancelled_reason = cleanText(req.body.cancelled_reason);
+    const scorecardPatch = parsePlainObjectBody(req.body.scorecard, null);
+    if (scorecardPatch) interview.scorecard = { ...(interview.scorecard || {}), ...scorecardPatch };
+    if (status === "completed") interview.completed_at = new Date();
     await interview.save();
+
+    const application = await UserApplyingJobModel.findOne({ _id: interview.application_id, company_id: companyData.company._id });
+    if (application && status === "completed") {
+      const oldStatus = application.status;
+      await updateApplicationStatusFields({ application, status: "interview_completed", body: req.body });
+      await createStatusHistory({
+        application,
+        oldStatus,
+        newStatus: "interview_completed",
+        companyData,
+        note: cleanText(req.body.result_note || req.body.note || "interview_completed"),
+        action: "interview_completed",
+        metadata: { interview_id: interview._id, scorecard: interview.scorecard || null, rating: interview.rating || null },
+      });
+    }
+
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: `interview_${status}`,
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      oldValue: { status: oldInterviewStatus },
+      newValue: { status, rating: interview.rating || null, scorecard: interview.scorecard || null },
+      note: cleanText(req.body.result_note || req.body.note || req.body.cancelled_reason || ""),
+    });
+
+    const job = await jobsModel.findById(interview.job_id).select("_id job_name").lean().catch(() => null);
+    if (status === "cancelled") {
+      SendInterviewCancelledNotification({
+        user_id: interview.employee_user_id,
+        job_id: interview.job_id,
+        application_id: interview.application_id,
+        interview_id: interview._id,
+        job_name: job?.job_name || "",
+        status,
+        note: interview.result_note || interview.cancelled_reason || "",
+      }).catch?.(console.error);
+    } else {
+      SendInterviewUpdatedNotification({
+        user_id: interview.employee_user_id,
+        job_id: interview.job_id,
+        application_id: interview.application_id,
+        interview_id: interview._id,
+        job_name: job?.job_name || "",
+        status,
+      }).catch?.(console.error);
+    }
 
     return success(res, normalizeInterview(interview), "interview_status_updated");
   } catch (error) {
@@ -478,6 +687,9 @@ export const sendJobInvitation = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
+
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_invite_candidates", "invitations", 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
 
     const job = await getOwnedJobOrFail(req, res, companyData.company._id, req.body.job_id || req.params.jobId, "_id job_name company_id");
     if (!job) return;
@@ -513,6 +725,11 @@ export const sendJobInvitation = async (req, res, next) => {
       .populate({ path: "employee_id", select: "user_id profile_headline current_job_title experience_years" })
       .populate({ path: "user_id", select: "first_name mid_name last_name email image" });
 
+    await recordCompanyUsage(companyData.company._id, "invitations", 1);
+    SendJobInvitationNotification({
+      ...(invitation.toObject?.() || invitation),
+      company: companyData.company,
+    }).catch?.(console.error);
     return success(res, normalizeCompanyInvitation(invitation), "job_invitation_sent", 201);
   } catch (error) {
     if (error?.code === 11000) return fail(res, "job_invitation_already_exists", 409);
@@ -587,6 +804,12 @@ export const cancelJobInvitation = async (req, res, next) => {
     invitation.responded_at = new Date();
     await invitation.save();
 
+    const job = await jobsModel.findById(invitation.job_id).select("_id job_name").lean().catch(() => null);
+    SendJobInvitationCancelledNotification({
+      ...(invitation.toObject?.() || invitation),
+      job_id: job || invitation.job_id,
+    }).catch?.(console.error);
+
     return success(res, normalizeCompanyInvitation(invitation), "job_invitation_cancelled");
   } catch (error) {
     next(error);
@@ -598,6 +821,9 @@ export const getApplicationCv = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
+
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_download_cvs", "cv_downloads", 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
 
     const { applicationId } = req.params;
     if (!ensureObjectId(res, applicationId, "invalid_application_id")) return;
@@ -626,6 +852,7 @@ export const getApplicationCv = async (req, res, next) => {
       { _id: application._id, company_id: companyData.company._id },
       { $set: { cv_download: true, last_activity_at: new Date() } }
     );
+    await recordCompanyUsage(companyData.company._id, "cv_downloads", 1);
   } catch (error) {
     next(error);
   }
@@ -662,6 +889,14 @@ export const blockApplicationApplicant = async (req, res, next) => {
       note,
     });
 
+    const job = await jobsModel.findById(application.job_id).select("_id job_name").lean().catch(() => null);
+    changeJobStatus("rejected", {
+      user_id: application.user_id,
+      application_id: application._id,
+      job_id: application.job_id,
+      job_name: job?.job_name || "",
+    }).catch?.(console.error);
+
     return success(res, {
       application: normalizeApplication(application),
       employee_blocked: Boolean(employee),
@@ -677,6 +912,9 @@ export const bulkApplicationCvs = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
+
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_download_cvs", "cv_downloads", 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
 
     const filter = await buildBulkApplicationsFilter(req, res, companyData);
     if (!filter) return;
@@ -713,6 +951,7 @@ export const bulkApplicationCvs = async (req, res, next) => {
         { $set: { cv_download: true, last_activity_at: new Date() } }
       );
     }
+    await recordCompanyUsage(companyData.company._id, "cv_downloads", Math.max(zipFiles.length, 1));
 
     const fileName = `jobzain-cvs-${Date.now()}.zip`;
     res.setHeader("Content-Type", "application/zip");
@@ -730,6 +969,9 @@ export const bulkExportApplications = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_export_applications", "application_exports", 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
+
     const filter = await buildBulkApplicationsFilter(req, res, companyData);
     if (!filter) return;
 
@@ -737,6 +979,8 @@ export const bulkExportApplications = async (req, res, next) => {
     const applications = await populateApplicationQuery(
       UserApplyingJobModel.find(filter).sort(buildApplicationsSort({ ...req.query, ...req.body })).limit(limit)
     ).lean();
+
+    await recordCompanyUsage(companyData.company._id, "application_exports", 1);
 
     if (req.query.format === "json" || req.body?.format === "json") {
       return success(
@@ -764,6 +1008,159 @@ export const bulkExportApplications = async (req, res, next) => {
     res.setHeader("Content-Length", buffer.length);
     res.setHeader("Cache-Control", "private, no-store, max-age=0");
     return res.status(200).send(buffer);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const getAtsPipeline = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const filter = buildApplicationsFilter(companyData.company._id, req.query);
+    if (req.params.jobId || req.query.job_id || req.query.jobId) {
+      const jobId = req.params.jobId || req.query.job_id || req.query.jobId;
+      const job = await getOwnedJobOrFail(req, res, companyData.company._id, jobId, "_id");
+      if (!job) return;
+      filter.job_id = job._id;
+    }
+
+    const statuses = ["new", "reviewing", "initial_match", "not_match", "contacted", "interview_scheduled", "interview_completed", "offer", "accepted", "hired", "rejected", "archived", "withdrawn", "offer_declined"];
+    const limit = Math.min(Math.max(Number(req.query.limit) || 500, 1), 1000);
+    const applications = await populateApplicationQuery(
+      UserApplyingJobModel.find(filter).sort({ stage_order: 1, ats_score: -1, createdAt: -1 }).limit(limit)
+    ).lean();
+
+    const grouped = Object.fromEntries(statuses.map((status) => [status, []]));
+    applications.forEach((application) => {
+      const status = grouped[application.status] ? application.status : "new";
+      grouped[status].push(normalizeApplicantWithCvMeta(application));
+    });
+
+    const counts = await UserApplyingJobModel.aggregate([
+      { $match: filter },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]).catch(() => []);
+    const countMap = Object.fromEntries(counts.map((item) => [item._id || "new", item.count]));
+
+    return success(res, statuses.map((status) => ({ status, count: countMap[status] || grouped[status].length, items: grouped[status] })), "ats_pipeline");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTalentPool = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const filter = buildApplicationsFilter(companyData.company._id, { ...req.query, status: req.query.status || "archived" });
+    const archivedOr = [{ status: "archived" }, { archived_at: { $ne: null } }];
+    if (filter.$or) {
+      filter.$and = filter.$and || [];
+      filter.$and.push({ $or: filter.$or }, { $or: archivedOr });
+      delete filter.$or;
+    } else {
+      filter.$or = archivedOr;
+    }
+
+    const result = await paginateApplications(req, filter, buildApplicationsSort({ ...req.query, sort: req.query.sort || "match" }));
+    return success(res, result.items.map(normalizeApplicantWithCvMeta), "talent_pool", 200, result.meta);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const restoreApplication = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const application = await getOwnedApplicationOrFail(req, res, companyData.company._id, req.params.applicationId);
+    if (!application) return;
+
+    const oldStatus = application.status;
+    const status = cleanText(req.body.status || "reviewing");
+    if (!APPLICATION_STATUSES.has(status) || status === "archived") return fail(res, "invalid_restore_status", 422);
+
+    await updateApplicationStatusFields({
+      application,
+      status,
+      body: req.body,
+      extraPatch: { archived_at: null, restored_at: new Date(), archive_reason: "" },
+    });
+    await createStatusHistory({ application, oldStatus, newStatus: status, companyData, note: cleanText(req.body.note || "application_restored"), action: "application_restored" });
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: "application_restored",
+      entityType: "application",
+      entityId: application._id,
+      jobId: application.job_id,
+      applicationId: application._id,
+      oldValue: { status: oldStatus },
+      newValue: { status },
+      note: cleanText(req.body.note || ""),
+    });
+
+    return success(res, normalizeApplication(application), "application_restored");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const sendApplicationMessage = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const application = await getOwnedApplicationOrFail(req, res, companyData.company._id, req.params.applicationId);
+    if (!application) return;
+
+    const message = cleanText(req.body.message || req.body.body || req.body.note);
+    if (!message) return fail(res, "message_required", 422);
+
+    application.communication_log.push({
+      channel: cleanText(req.body.channel || "app"),
+      message,
+      created_by: companyData.userId,
+    });
+    application.last_activity_at = new Date();
+    if (req.body.change_status && APPLICATION_STATUSES.has(cleanText(req.body.change_status))) {
+      application.status = cleanText(req.body.change_status);
+      application.status_changed_at = new Date();
+    }
+    await application.save();
+
+    await createStatusHistory({
+      application,
+      oldStatus: application.status,
+      newStatus: application.status,
+      companyData,
+      note: message,
+      action: "message_sent",
+      visibleToCandidate: true,
+      metadata: { channel: cleanText(req.body.channel || "app") },
+    });
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: req.companyAccess?.role === "owner" ? "company_owner" : "company_member",
+      action: "application_message_sent",
+      entityType: "application",
+      entityId: application._id,
+      jobId: application.job_id,
+      applicationId: application._id,
+      note: message,
+      metadata: { channel: cleanText(req.body.channel || "app") },
+    });
+
+    return success(res, normalizeApplication(application), "application_message_sent");
   } catch (error) {
     next(error);
   }
@@ -806,6 +1203,10 @@ export default {
   getApplicants,
   getApplicationDetails,
   updateApplicationStatus,
+  getAtsPipeline,
+  getTalentPool,
+  restoreApplication,
+  sendApplicationMessage,
   getApplicationCv,
   bulkApplicationCvs,
   bulkExportApplications,

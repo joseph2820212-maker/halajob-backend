@@ -27,6 +27,19 @@ import {
   cleanText,
 } from "../../../helper/employeeDash/employeeJobActivityHelpers.js";
 
+
+import {
+  application_withdrawn_company_notification,
+  interview_response_company_notification,
+  job_applied_notification,
+  job_invitation_response_company_notification,
+  job_rated_notification,
+  job_reviewed_notification,
+  job_seeker_saved_notification,
+} from "../../../notification/JobCompanyNotifications.js";
+import { calculateAtsApplicationResult } from "../../../services/matching/atsScoring.service.js";
+import { writeAuditLog } from "../../../services/auditLog.service.js";
+
 import {
   getEmployeeUserIdOrFail,
   success,
@@ -252,7 +265,7 @@ export const saveJob = async (req, res, next) => {
     const { jobId } = req.params;
     if (!isValidObjectId(jobId)) return fail(res, "invalid_job_id", 400);
 
-    const job = await jobsModel.findOne({ _id: jobId, ...publicJobFilter }).select("_id");
+    const job = await jobsModel.findOne({ _id: jobId, ...publicJobFilter }).select("_id job_name user_id company_id");
     if (!job) return fail(res, "job_not_found", 404);
 
     const result = await UserSavedJobModel.updateOne(
@@ -266,6 +279,12 @@ export const saveJob = async (req, res, next) => {
         { _id: jobId },
         { $inc: { user_saved: 1, "search_index.score_signals.saves": 1 } }
       );
+
+      job_seeker_saved_notification(job, {
+        candidate_user_id: employeeData.userId,
+        employee_id: employeeData.employee?._id,
+        dedupeKey: `job:${jobId}:saved:${employeeData.userId}`,
+      }).catch?.(console.error);
     }
 
     return success(res, { job_id: jobId }, "job_saved");
@@ -346,6 +365,15 @@ export const applyToJob = async (req, res, next) => {
 
     const user = employeeData.employee.user_id;
 
+    const atsResult = calculateAtsApplicationResult({
+      job: job.toObject ? job.toObject() : job,
+      employee: employeeData.employee,
+      answers: Array.isArray(req.body.answers) ? req.body.answers : req.body.answers ? JSON.parse(req.body.answers) : [],
+    });
+    const initialStatus = atsResult.questions.knockout.has_failed
+      ? (atsResult.questions.knockout.action === "reject" && job.ats_settings?.auto_reject_on_knockout ? "rejected" : "not_match")
+      : "new";
+
     const payload = {
       user_id: employeeData.userId,
       employee_id: employeeData.employee._id,
@@ -357,12 +385,18 @@ export const applyToJob = async (req, res, next) => {
       phone_code: req.body.phone_code || user?.phone_code,
       phone_national: req.body.phone_national || req.body.phone || user?.phone_national,
       country_id: req.body.country_id,
-      answers: Array.isArray(req.body.answers) ? req.body.answers : req.body.answers ? JSON.parse(req.body.answers) : [],
+      answers: atsResult.questions.details.map((item) => ({ question_id: item.question_id, question: item.question, answer: item.answer })),
       cv: req.body.cv || req.file?.path || "",
       cover_letter: req.body.cover_letter || "",
       source: req.body.source || "app",
-      status: "waiting",
+      status: initialStatus,
       status_changed_at: new Date(),
+      ats_score: atsResult.score,
+      ats_summary: atsResult.summary,
+      matching_details: atsResult,
+      knockout_result: atsResult.questions.knockout,
+      rejection_reason_code: initialStatus === "rejected" ? "failed_knockout" : "",
+      rejection_reason: initialStatus === "rejected" ? "failed_knockout_question" : "",
       last_activity_at: new Date(),
     };
 
@@ -383,11 +417,28 @@ export const applyToJob = async (req, res, next) => {
         company_id: payload.company_id,
         user_id: employeeData.userId,
         old_status: null,
-        new_status: "waiting",
+        new_status: initialStatus,
         changed_by: employeeData.userId,
-        note: "Application created by candidate",
+        actor_type: "employee",
+        action: "application_created",
+        note: atsResult.summary || "Application created by candidate",
+        metadata: { ats_score: atsResult.score, knockout: atsResult.questions.knockout },
       }).catch(() => null),
     ]);
+
+    job_applied_notification(job, application).catch?.(console.error);
+    await writeAuditLog({
+      req,
+      companyId: payload.company_id,
+      actorUserId: employeeData.userId,
+      actorType: "employee",
+      action: "application_created",
+      entityType: "application",
+      entityId: application._id,
+      jobId,
+      applicationId: application._id,
+      newValue: { status: initialStatus, ats_score: atsResult.score, knockout: atsResult.questions.knockout },
+    });
 
     return success(res, application, "job_application_created", 201);
   } catch (error) {
@@ -491,6 +542,8 @@ const createApplicationFromInvitationIfPossible = async ({ employeeData, invitat
     }),
   ]);
 
+  job_applied_notification(job, application).catch?.(console.error);
+
   return { application, created: true, reason: "created" };
 };
 
@@ -583,6 +636,9 @@ export const cancelMyApplication = async (req, res, next) => {
       note: cleanText(req.body.note || "withdrawn_by_candidate"),
     });
 
+    const job = await jobsModel.findById(application.job_id).select("_id job_name user_id company_id").lean().catch(() => null);
+    if (job) application_withdrawn_company_notification(application, job).catch?.(console.error);
+
     return success(res, normalizeApplicationForEmployee(application), "application_withdrawn");
   } catch (error) {
     next(error);
@@ -631,6 +687,14 @@ export const respondToInterview = async (req, res, next) => {
     await interview.save();
 
     const populated = await InterviewModel.findById(interview._id).populate(interviewPopulateForEmployee).lean();
+    const job = await jobsModel.findById(interview.job_id).select("_id job_name user_id company_id").lean().catch(() => null);
+    if (job) {
+      interview_response_company_notification({
+        interview,
+        job,
+        candidate: employeeData.employee?.user_id || employeeData.employee || {},
+      }).catch?.(console.error);
+    }
     return success(res, normalizeInterviewForEmployee(populated || interview), "interview_response_saved");
   } catch (error) {
     next(error);
@@ -708,6 +772,14 @@ export const respondToJobInvitation = async (req, res, next) => {
     }
 
     const populated = await JobInvitationModel.findById(invitation._id).populate(offerPopulateForEmployee).lean();
+    const job = await jobsModel.findById(invitation.job_id).select("_id job_name user_id company_id").lean().catch(() => null);
+    if (job) {
+      job_invitation_response_company_notification({
+        invitation,
+        job,
+        candidate: employeeData.employee?.user_id || employeeData.employee || {},
+      }).catch?.(console.error);
+    }
     return success(res, {
       ...normalizeOfferForEmployee(populated || invitation),
       application: applicationResult?.application ? normalizeApplicationForEmployee(applicationResult.application) : null,
@@ -737,6 +809,9 @@ export const rateJob = async (req, res, next) => {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
+    const job = await jobsModel.findById(jobId).select("_id job_name user_id company_id").lean().catch(() => null);
+    if (job) job_rated_notification(job, { candidate_user_id: employeeData.userId, data: { rating } }).catch?.(console.error);
+
     return success(res, result, "job_rated");
   } catch (error) {
     next(error);
@@ -764,6 +839,9 @@ export const reviewJob = async (req, res, next) => {
       { _id: jobId },
       { $inc: { user_review: 1, "search_index.score_signals.reviews": 1 } }
     );
+
+    const job = await jobsModel.findById(jobId).select("_id job_name user_id company_id").lean().catch(() => null);
+    if (job) job_reviewed_notification(job, { candidate_user_id: employeeData.userId }).catch?.(console.error);
 
     return success(res, result, "job_review_saved");
   } catch (error) {

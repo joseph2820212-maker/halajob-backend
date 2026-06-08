@@ -20,7 +20,7 @@ const handler = (err, req, res, next) => {
 const converter = (err, req, res, next) => {
   let convertedError = err;
   if (err instanceof ValidationError) {
-    convertedError = new APIError(
+    convertedError = new ApiError(
       httpStatus.BAD_REQUEST,
       err?.errors?.join(', ') || 'Validations have failed',
       'Validation Error'

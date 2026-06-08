@@ -6,6 +6,7 @@ import {
   UserApplyingJobModel,
   InterviewModel,
   CompanyReviewModel,
+  CompanyMemberModel,
 } from "../../models/index.js";
 
 export const isValidObjectId = (value) =>
@@ -104,14 +105,32 @@ export const getCompanyPlain = async (req, res) => {
     return null;
   }
 
-  const company = await CompanyModel.findOne({ owner_user_id: userId });
+  const requestedCompanyId = req.headers?.company_id || req.headers?.["x-company-id"] || req.query?.company_id || req.body?.company_id;
 
-  if (!company) {
-    fail(res, "company_profile_not_found", 404);
-    return null;
+  let company = await CompanyModel.findOne({ owner_user_id: userId });
+  if (company) {
+    req.companyAccess = { role: "owner", permissions: ["*"] };
+    return company;
   }
 
-  return company;
+  const memberFilter = { user_id: userId, status: "active" };
+  if (requestedCompanyId && isValidObjectId(requestedCompanyId)) memberFilter.company_id = requestedCompanyId;
+
+  const member = await CompanyMemberModel.findOne(memberFilter).sort({ updatedAt: -1 });
+  if (member) {
+    company = await CompanyModel.findById(member.company_id);
+    if (company) {
+      req.companyAccess = {
+        role: member.member_role,
+        member_id: member._id,
+        permissions: member.permissions || [],
+      };
+      return company;
+    }
+  }
+
+  fail(res, "company_profile_not_found", 404);
+  return null;
 };
 
 export const getCompanyOrFail = async (req, res) => {
@@ -126,8 +145,29 @@ export const getCompanyUserIdOrFail = async (req, res) => {
   const company = await getCompanyOrFail(req, res);
   if (!company) return null;
 
-  const userId = company.owner_user_id?._id || getAuthUserId(req);
+  const userId = getAuthUserId(req) || company.owner_user_id?._id;
   return { company, userId };
+};
+
+export const hasCompanyPermission = (req, permission) => {
+  const access = req.companyAccess || {};
+  if (access.role === "owner") return true;
+  const permissions = access.permissions || [];
+  return permissions.includes("*") || permissions.includes(permission);
+};
+
+export const requireCompanyPermission = (permission) => async (req, res, next) => {
+  try {
+    const company = await getCompanyPlain(req, res);
+    if (!company) return;
+    req.company = company;
+    if (!hasCompanyPermission(req, permission)) {
+      return fail(res, "company_permission_denied", 403, { permission });
+    }
+    return next();
+  } catch (error) {
+    return next(error);
+  }
 };
 
 export const hasValue = (value) => {
@@ -704,6 +744,26 @@ export const normalizeCompany = (company) => {
   };
 };
 
+const QUESTION_TYPE_LABELS_AR = {
+  text: "نص قصير",
+  textarea: "نص طويل",
+  yes_no: "نعم / لا",
+  single_choice: "اختيار واحد",
+  multi_choice: "اختيارات متعددة",
+  number: "رقم",
+  file: "ملف",
+};
+
+const QUESTION_TYPE_LABELS_EN = {
+  text: "Short text",
+  textarea: "Long text",
+  yes_no: "Yes / No",
+  single_choice: "Single choice",
+  multi_choice: "Multiple choice",
+  number: "Number",
+  file: "File",
+};
+
 export const normalizeJob = (job) => {
   if (!job) return null;
 
@@ -747,7 +807,12 @@ export const normalizeJob = (job) => {
     languages: job.languages || [],
     job_services: job.job_services || [],
     services: job.job_services || [],
-    questions: job.questions || [],
+    questions: (job.questions || []).map((question) => ({
+      ...question,
+      type_label_ar: QUESTION_TYPE_LABELS_AR[question.type] || question.type || "",
+      type_label_en: QUESTION_TYPE_LABELS_EN[question.type] || question.type || "",
+    })),
+    ats_settings: job.ats_settings || null,
 
     is_remote: Boolean(job.is_remote),
     show_company_information: job.show_company_information !== false,
@@ -783,6 +848,7 @@ export const normalizeJob = (job) => {
 
 export const normalizeApplication = (application) => ({
   _id: application._id,
+  application_no: application.application_no || "",
   status: application.status,
   status_changed_at: application.status_changed_at,
   applied_at: application.createdAt,
@@ -801,6 +867,29 @@ export const normalizeApplication = (application) => ({
   job: normalizeJob(application.job_id),
   employee: application.employee_id || null,
   user: application.user_id || null,
+  ats: {
+    score: application.ats_score ?? application.filter_result?.score ?? null,
+    summary: application.ats_summary || application.filter_result?.reason || "",
+    details: application.matching_details || {},
+    knockout: application.knockout_result || { has_failed: false, failed_questions: [], action: "none" },
+  },
+  visible_status: application.visible_status || "received",
+  rejection: {
+    reason: application.rejection_reason || "",
+    reason_code: application.rejection_reason_code || "",
+    internal_note: application.internal_rejection_note || "",
+    candidate_message: application.candidate_rejection_message || "",
+    visible_to_candidate: Boolean(application.rejection_message_visible_to_candidate),
+    rejected_at: application.rejected_at || null,
+  },
+  company_note: application.company_note || "",
+  company_rating: application.company_rating ?? null,
+  communication_log: application.communication_log || [],
+  archived_at: application.archived_at || null,
+  archive_reason: application.archive_reason || "",
+  restored_at: application.restored_at || null,
+  hired_at: application.hired_at || null,
+  withdrawn_at: application.withdrawn_at || null,
   filter: {
     is_filter: application.is_filter,
     score: application.filter_result?.score ?? null,
@@ -823,6 +912,9 @@ export const normalizeInterview = (interview) => ({
   candidate_note: interview.candidate_note,
   result_note: interview.result_note || "",
   rating: interview.rating ?? null,
+  scorecard: interview.scorecard || null,
+  completed_at: interview.completed_at || null,
+  cancelled_reason: interview.cancelled_reason || "",
   reschedule_count: interview.reschedule_count || 0,
   job: normalizeJob(interview.job_id),
   application: interview.application_id || null,

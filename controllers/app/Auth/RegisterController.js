@@ -75,7 +75,7 @@ async function getEmployeeRole() {
   }).lean();
 }
 
-async function ensureEmployeeProfile({ userId, roleId, candidateStage, isStudent }) {
+async function ensureEmployeeProfile({ userId, roleId, candidateStage, isStudent, birthdayDate, countryId, cityId, country, city, studentProfile }) {
   return EmployeeModel.findOneAndUpdate(
     { user_id: userId },
     {
@@ -90,6 +90,12 @@ async function ensureEmployeeProfile({ userId, roleId, candidateStage, isStudent
         is_student: isStudent,
         "search_filters.career.candidate_stage": candidateStage,
         "search_filters.career.is_student": isStudent,
+        birthday: birthdayDate,
+        current_country_id: countryId || null,
+        current_city_id: cityId || null,
+        current_country: country || "",
+        current_city: city || "",
+        student_profile: studentProfile || {},
       },
     },
     { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true }
@@ -113,15 +119,26 @@ const register = async (req, res, next) => {
       device = {},
       phone_code,
       phone_number,
+      country_id,
+      city_id,
+      country,
+      city,
+      accept_terms,
+      student_profile = {},
     } = req.body || {};
-console.log('====================================');
-console.log(req.body);
-console.log('====================================');
     if (!email || !password || !first_name || !last_name || !gender || !birthday || !candidate_stage) {
       return ReturnAppData.createError({
         res,
         status: 400,
         message: lan === "ar" ? "هنالك بعض البيانات المفقودة" : "There's some missing data.",
+      });
+    }
+
+    if (accept_terms !== undefined && !toBool(accept_terms)) {
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message: lan === "ar" ? "يجب الموافقة على الشروط والأحكام وسياسة الخصوصية." : "You must accept the terms and privacy policy.",
       });
     }
 
@@ -328,6 +345,12 @@ console.log('====================================');
         roleId: roleDoc._id,
         candidateStage,
         isStudent,
+        birthdayDate,
+        countryId: country_id || null,
+        cityId: city_id || null,
+        country: country || "",
+        city: city || "",
+        studentProfile: student_profile,
       });
     } catch (err) {
       if (err && err.code === 11000) {
@@ -369,6 +392,8 @@ console.log('====================================');
         birthday: birthdayDate,
         candidate_stage: candidateStage,
         is_student: isStudent,
+        country_id: country_id || null,
+        city_id: city_id || null,
       },
       message:
         lan === "ar"

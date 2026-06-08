@@ -26,6 +26,19 @@ import {
   escapeRegex,
   firstValue,
 } from "../../../helper/companyDash/companyTalentSearchHelpers.js";
+import {
+  checkCompanyFeature,
+  recordCompanyUsage,
+} from "../../../services/subscriptions/companySubscription.service.js";
+
+
+const failSubscription = (res, check) => fail(res, check.message || "subscription_not_allowed", check.status || 403, {
+  feature: check.feature,
+  metric: check.metric,
+  limit: check.limit,
+  used: check.used,
+  requested: check.requested,
+});
 
 const parseSort = (value = "") => {
   const allowed = new Set([
@@ -91,6 +104,9 @@ export const searchEmployees = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_search_employees", "talent_searches", 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
+
     const filter = await addUserSearchToEmployeeFilter(
       buildEmployeeSearchFilter(req.query, companyData.company._id),
       req.query
@@ -115,6 +131,7 @@ export const searchEmployees = async (req, res, next) => {
       normalizeEmployeeForCompany(employee, matchesByEmployee.get(String(employee._id)) || null)
     );
 
+    await recordCompanyUsage(companyData.company._id, "talent_searches", 1);
     return success(res, items, "employees_search_result", 200, result.meta);
   } catch (error) {
     next(error);
@@ -125,6 +142,9 @@ export const getEmployeeDetails = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
+
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_view_employee_contacts", null, 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
 
     const employee = await getEmployeeDetailsOrFail(req, res, companyData, req.params.employeeId);
     if (!employee) return;
@@ -148,6 +168,9 @@ export const requestJobZainTalentHelp = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
+
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_request_talent_help", "talent_requests", 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
 
     const body = { ...(req.body || {}) };
     const routeJobId = req.params?.jobId;
@@ -196,6 +219,7 @@ export const requestJobZainTalentHelp = async (req, res, next) => {
     }
 
     const request = await new JobZainTalentRequestModel(payload).save();
+    await recordCompanyUsage(companyData.company._id, "talent_requests", 1);
     const populated = await JobZainTalentRequestModel.findById(request._id).populate("job_id");
 
     return success(res, normalizeTalentRequest(populated), "jobzain_talent_request_created", 201);
@@ -346,6 +370,8 @@ export const getSmartEmployeesForJob = async (req, res, next) => {
     let total = await JobEmployeeMatchModel.countDocuments(filter);
 
     if (total === 0 && req.query.auto_generate !== "false") {
+      const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_use_smart_matching", "smart_matching", 1);
+      if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
       await generateMatchesForJob({
         job,
         companyId: companyData.company._id,
@@ -353,6 +379,7 @@ export const getSmartEmployeesForJob = async (req, res, next) => {
         minScore,
       });
       total = await JobEmployeeMatchModel.countDocuments(filter);
+      await recordCompanyUsage(companyData.company._id, "smart_matching", 1);
     }
 
     const matches = await JobEmployeeMatchModel.find(filter)
@@ -384,6 +411,9 @@ export const generateSmartEmployeesForJob = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_use_smart_matching", "smart_matching", 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
+
     const { jobId } = req.params;
     const job = await getJobOrFail(req, res, companyData, jobId);
     if (!job) return;
@@ -397,6 +427,8 @@ export const generateSmartEmployeesForJob = async (req, res, next) => {
       limit,
       minScore,
     });
+
+    await recordCompanyUsage(companyData.company._id, "smart_matching", 1);
 
     const populatedMatches = await JobEmployeeMatchModel.find({
       _id: { $in: generatedMatches.map((match) => match._id) },
@@ -426,6 +458,9 @@ export const matchEmployeeWithJob = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
 
+    const subscriptionCheck = await checkCompanyFeature(companyData.company._id, "can_use_smart_matching", "smart_matching", 1);
+    if (!subscriptionCheck.allowed) return failSubscription(res, subscriptionCheck);
+
     const { jobId, employeeId } = req.params;
     const job = await getJobOrFail(req, res, companyData, jobId);
     if (!job) return;
@@ -438,6 +473,7 @@ export const matchEmployeeWithJob = async (req, res, next) => {
       employee: employee.toObject ? employee.toObject() : employee,
       companyId: companyData.company._id,
     });
+    await recordCompanyUsage(companyData.company._id, "smart_matching", 1);
 
     return success(
       res,

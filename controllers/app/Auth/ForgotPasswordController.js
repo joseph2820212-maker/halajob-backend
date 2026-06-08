@@ -136,7 +136,7 @@ const forgotPassword = async (req, res, next) => {
       user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000); // 10 دقائق
       await user.save();
 
-      await sendRecoveryEmail({ to: user.email, passcode });
+      await sendRecoveryEmail({ to: user.email, passcode, lang: lan, type: "forgot_password" });
 
       return ReturnAppData.createData({
         res,
@@ -162,7 +162,7 @@ const forgotPassword = async (req, res, next) => {
 
     await user.save();
 
-    await sendRecoveryEmail({ to: user.email, passcode: twofa });
+    await sendRecoveryEmail({ to: user.email, passcode: twofa, lang: lan, type: "forgot_password" });
 
     return ReturnAppData.createData({
       res,

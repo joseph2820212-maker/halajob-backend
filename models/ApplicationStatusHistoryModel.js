@@ -10,7 +10,11 @@ const ApplicationStatusHistorySchema = new Schema(
     new_status: { type: String, required: true, index: true },
     changed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
     actor_type: { type: String, enum: ["system", "company", "employee", "admin"], default: "system" },
+    action: { type: String, trim: true, default: "status_changed", index: true },
     note: { type: String, default: "", trim: true },
+    rejection_reason_code: { type: String, trim: true, default: "" },
+    visible_to_candidate: { type: Boolean, default: false },
+    metadata: { type: Schema.Types.Mixed, default: {} },
   },
   { collection: "application_status_history", timestamps: true }
 );

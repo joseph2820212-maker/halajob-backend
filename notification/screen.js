@@ -1,14 +1,7 @@
-// tt.js
-import dict from './screens.json'  with { type: 'json' };
+import { buildDashboardTarget } from './dashboardRoutes.js';
 
-
-export default function screen( key) {
-  return key;
-  const primary = dict?.routes[key]?.route_key;
-
-  // إحلال متغيّرات بصيغة {name}
-  return String(value).replace(/\{(\w+)\}/g, (_, p) => {
-    const v = primary;
-    return v === undefined || v === null ? '' : String(v);
-  });
+// Backward compatibility for old calls: screen('applications.status') returns a stable route key.
+// New code should use buildDashboardTarget/notifyUser to get full URL + route metadata.
+export default function screen(key = 'dashboard', audience = 'employee', params = {}) {
+  return buildDashboardTarget(audience, key, params).route_key;
 }
