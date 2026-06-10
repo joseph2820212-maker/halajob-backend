@@ -1,37 +1,77 @@
-import express from 'express';
-import JobNameHelperController from '../controllers/app/Helper/JobNameHelperController.js';
-import JobSalaryHelperController from '../controllers/app/Helper/JobSalaryHelperController.js';
-import JobServiceHelperController from '../controllers/app/Helper/JobServiceHelperController.js';
-import JobTypeHelperController from '../controllers/app/Helper/JobTypeHelperController.js';
-import JobLocationHelperController from '../controllers/app/Helper/JobLocationHelperController.js';
-import JobTimeHelperController from '../controllers/app/Helper/JobTimeHelperController.js';
-import CurrencyHelperController from '../controllers/app/Helper/CurrencyHelperController.js';
-import CountryHelperController from '../controllers/app/Helper/CountryHelperController.js';
-
-// إعداد التخزين للملفات
-
-
+import express from "express";
+import AppHelperController from "../controllers/app/Helper/AppHelperController.js";
 
 const router = express.Router();
 
-// رفع ملف واحد مع البيانات
-router.get('/job-name', JobNameHelperController.search);
-router.get('/job-search', JobNameHelperController.search);
-router.get('/job-salary', JobSalaryHelperController.search);
-router.get('/job-salary-get', JobSalaryHelperController.get);
-router.get('/job-service', JobServiceHelperController.search);
-router.get('/job-service-get', JobServiceHelperController.get);
-router.get('/job-type', JobTypeHelperController.search);
-router.get('/job-type-get', JobTypeHelperController.get);
-router.get('/job-location', JobLocationHelperController.search);
-router.get('/job-time', JobTimeHelperController.search);
-router.get('/job-time-get', JobTimeHelperController.get);
-router.get('/currency-search', CurrencyHelperController.search);
-router.get('/currency-get', CurrencyHelperController.get);
-router.get('/country-search', CountryHelperController.search);
-router.get('/country-get', CountryHelperController.get);
+/*
+  Public helper endpoints for the mobile app.
+  Notes:
+  - Supports search, q, keyword, title, name query params.
+  - Empty search returns a safe default list instead of throwing an error.
+  - Supports lan: ar/en header.
+*/
 
-// استرجاع البيانات
+/* ----------------------------- Job helpers ----------------------------- */
+router.get("/job-name", AppHelperController.jobName);
+router.get("/job-search", AppHelperController.jobName);
+router.get("/job-names", AppHelperController.jobName);
 
+router.get("/job-salary", AppHelperController.jobSalary);
+router.get("/job-salary-get", AppHelperController.jobSalary);
+router.get("/job-salaries", AppHelperController.jobSalary);
+router.get("/salaries", AppHelperController.jobSalary);
+
+router.get("/job-service", AppHelperController.jobService);
+router.get("/job-service-get", AppHelperController.jobService);
+router.get("/job-services", AppHelperController.jobService);
+router.get("/services", AppHelperController.jobService);
+
+router.get("/job-type", AppHelperController.jobType);
+router.get("/job-type-get", AppHelperController.jobType);
+router.get("/job-types", AppHelperController.jobType);
+
+router.get("/job-location", AppHelperController.jobLocation);
+router.get("/job-location-get", AppHelperController.jobLocation);
+router.get("/work-location", AppHelperController.jobLocation);
+router.get("/work-locations", AppHelperController.jobLocation);
+
+router.get("/job-time", AppHelperController.jobTime);
+router.get("/job-time-get", AppHelperController.jobTime);
+router.get("/work-time", AppHelperController.jobTime);
+router.get("/work-times", AppHelperController.jobTime);
+
+router.get("/work-mode", AppHelperController.workMode);
+router.get("/work-modes", AppHelperController.workMode);
+
+/* ----------------------------- Profile/taxonomy helpers ----------------------------- */
+router.get("/language", AppHelperController.language);
+router.get("/languages", AppHelperController.language);
+router.get("/language-search", AppHelperController.language);
+
+router.get("/skill", AppHelperController.skill);
+router.get("/skills", AppHelperController.skill);
+router.get("/skill-search", AppHelperController.skill);
+
+router.get("/education-level", AppHelperController.educationLevel);
+router.get("/education-levels", AppHelperController.educationLevel);
+
+router.get("/experience-level", AppHelperController.experienceLevel);
+router.get("/experience-levels", AppHelperController.experienceLevel);
+
+router.get("/industry", AppHelperController.industry);
+router.get("/industries", AppHelperController.industry);
+
+/* ----------------------------- Location/currency helpers ----------------------------- */
+router.get("/currency-search", AppHelperController.currency);
+router.get("/currency-get", AppHelperController.currency);
+router.get("/currency", AppHelperController.currency);
+router.get("/currencies", AppHelperController.currency);
+
+router.get("/country-search", AppHelperController.country);
+router.get("/country-get", AppHelperController.country);
+router.get("/country", AppHelperController.country);
+router.get("/countries", AppHelperController.country);
+router.get("/city-search", AppHelperController.country);
+router.get("/cities", AppHelperController.country);
 
 export default router;
