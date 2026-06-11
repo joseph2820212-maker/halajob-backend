@@ -1,11 +1,12 @@
 import bcryptjs from "bcryptjs";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import RoleModel from "../../../models/RoleModel.js";
-import { EmployeeModel, UserModel } from "../../../models/index.js";
+import { CountryModel, EmployeeModel, UserModel } from "../../../models/index.js";
 import { createNewUser, fetchUserFromEmail } from "../../../services/authService.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import crypto from "crypto";
+import mongoose from "mongoose";
 
 const strongPasswordRe =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -35,6 +36,360 @@ function toBool(v) {
     return ["true", "1", "yes", "y"].includes(v.trim().toLowerCase());
   }
   return false;
+}
+
+
+function safeString(value = "") {
+  return typeof value === "string" ? value.trim() : String(value ?? "").trim();
+}
+
+function asArray(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  return [value];
+}
+
+function objectIdOrNull(value) {
+  const text = safeString(value);
+  return mongoose.Types.ObjectId.isValid(text) ? new mongoose.Types.ObjectId(text) : null;
+}
+
+function uniqueObjectIds(values = []) {
+  const seen = new Set();
+  const result = [];
+
+  for (const value of values) {
+    const objectId = objectIdOrNull(value);
+    if (!objectId) continue;
+
+    const key = String(objectId);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(objectId);
+  }
+
+  return result;
+}
+
+function firstFilled(values = []) {
+  for (const value of values) {
+    const text = safeString(value);
+    if (text) return text;
+  }
+  return "";
+}
+
+function normalizeRegistrationProfile(value = {}) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
+function helperItems(value) {
+  return asArray(value)
+    .filter((item) => item && typeof item === "object")
+    .map((item) => ({
+      id: safeString(item.id || item._id || item.value),
+      key: safeString(item.key || item.name || item.code),
+      title: safeString(item.title || item.label || item.name),
+      level: Number.isFinite(Number(item.level)) ? Number(item.level) : undefined,
+      years: Number.isFinite(Number(item.years)) ? Number(item.years) : undefined,
+    }))
+    .filter((item) => item.id || item.key || item.title);
+}
+
+function normalizeAcademicYear(value = "") {
+  const normalized = safeString(value).toLowerCase();
+  const map = {
+    first_year: "first",
+    second_year: "second",
+    third_year: "third",
+    fourth_year: "fourth",
+    fifth_year: "fifth",
+    sixth_year: "sixth",
+    internship_year: "internship",
+  };
+  return map[normalized] || normalized;
+}
+
+function normalizeReadiness(value = "") {
+  const normalized = safeString(value).toLowerCase();
+  if (["immediately", "immediate", "now"].includes(normalized)) return "immediately";
+  if (["within_week", "within_a_week", "week"].includes(normalized)) return "within_week";
+  if (["within_month", "within_a_month", "month"].includes(normalized)) return "within_month";
+  return "";
+}
+
+function normalizeWorkLocationEnum({ id = "", title = "" } = {}) {
+  const raw = `${id} ${title}`.toLowerCase();
+  if (raw.includes("remote") || raw.includes("عن بعد")) return "remote";
+  if (raw.includes("hybrid") || raw.includes("هجين")) return "hybrid";
+  if (raw.includes("onsite") || raw.includes("on_site") || raw.includes("office") || raw.includes("مقر")) return "onsite";
+  if (raw.includes("field") || raw.includes("ميداني")) return "field";
+  return "unknown";
+}
+
+function skillPayload(items = []) {
+  return helperItems(items).map((item) => ({
+    skill_id: objectIdOrNull(item.id),
+    title: item.title || item.key,
+    years: item.years ?? 0,
+    level: item.level && item.level >= 1 && item.level <= 5 ? item.level : 3,
+  }));
+}
+
+function languagePayload(items = []) {
+  return helperItems(items).map((item) => ({
+    language_id: objectIdOrNull(item.id),
+    level: item.level && item.level >= 1 && item.level <= 5 ? item.level : 3,
+  }));
+}
+
+function splitWords(value = "") {
+  return safeString(value)
+    .split(/[،,;\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function buildPlainSkills(value = "") {
+  return splitWords(value).map((title) => ({
+    skill_id: null,
+    title,
+    years: 0,
+    level: 3,
+  }));
+}
+
+async function resolveLocation({ countryId, cityId, countryCode, countryName, cityName }) {
+  const cleanCountryCode = firstFilled([countryCode, countryId]).toUpperCase();
+  const cleanCountryName = safeString(countryName);
+  const cleanCityName = safeString(cityName);
+
+  let cityDoc = null;
+
+  const cityObjectId = objectIdOrNull(cityId);
+  if (cityObjectId) {
+    cityDoc = await CountryModel.findById(cityObjectId).lean();
+  }
+
+  if (!cityDoc && cleanCountryCode && cleanCityName) {
+    cityDoc = await CountryModel.findOne({
+      country_code: cleanCountryCode,
+      $or: [
+        { city_name_ar: new RegExp(`^${cleanCityName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") },
+        { city_name_en: new RegExp(`^${cleanCityName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") },
+      ],
+    }).lean();
+  }
+
+  let countryDoc = null;
+  const countryObjectId = objectIdOrNull(countryId);
+  if (countryObjectId) {
+    countryDoc = await CountryModel.findById(countryObjectId).lean();
+  }
+
+  if (!countryDoc && cityDoc) countryDoc = cityDoc;
+
+  if (!countryDoc && cleanCountryCode) {
+    countryDoc = await CountryModel.findOne({ country_code: cleanCountryCode }).lean();
+  }
+
+  const resolvedCountryCode = firstFilled([countryDoc?.country_code, cleanCountryCode]).toUpperCase();
+
+  return {
+    countryObjectId: objectIdOrNull(countryDoc?._id),
+    cityObjectId: objectIdOrNull(cityDoc?._id || cityId),
+    countryCode: resolvedCountryCode,
+    countryName: firstFilled([cleanCountryName, countryDoc?.country_name_ar, countryDoc?.country_name_en]),
+    cityName: firstFilled([cleanCityName, cityDoc?.city_name_ar, cityDoc?.city_name_en]),
+    countryNameAr: safeString(countryDoc?.country_name_ar),
+    countryNameEn: safeString(countryDoc?.country_name_en),
+    cityNameAr: safeString(cityDoc?.city_name_ar),
+    cityNameEn: safeString(cityDoc?.city_name_en),
+  };
+}
+
+function buildProfileUpdate({
+  registrationProfile,
+  candidateStage,
+  isStudent,
+  birthdayDate,
+  location,
+}) {
+  const profile = normalizeRegistrationProfile(registrationProfile);
+
+  const selectedSkills = helperItems(profile.skills);
+  const selectedLanguages = helperItems(profile.languages_selected || profile.languages);
+
+  const jobNameId = objectIdOrNull(profile.target_job_name_id || profile.job_name_id);
+  const jobTypeId = objectIdOrNull(profile.preferred_job_type_id || profile.job_type_id);
+  const workModeId = objectIdOrNull(profile.preferred_work_mode_id || profile.work_mode_id);
+  const noticePeriodId = objectIdOrNull(profile.job_time_id || profile.notice_period_id);
+  const educationLevelId = objectIdOrNull(profile.education_level_id);
+  const experienceLevelId = objectIdOrNull(profile.experience_level_id);
+
+  const targetJobTitle = safeString(profile.target_job_name || profile.job_name);
+  const jobTypeTitle = safeString(profile.preferred_job_type || profile.job_type);
+  const workModeTitle = safeString(profile.preferred_work_mode || profile.work_mode);
+  const workLocationTitle = safeString(profile.preferred_work_location || profile.work_location);
+  const educationLevelTitle = safeString(profile.education_level);
+  const experienceLevelTitle = safeString(profile.experience_level);
+
+  const skills = skillPayload(selectedSkills);
+  const languages = languagePayload(selectedLanguages);
+  const technicalSkills = buildPlainSkills(profile.technical_skills);
+  const softSkills = buildPlainSkills(profile.soft_skills);
+
+  const workLocation = normalizeWorkLocationEnum({
+    id: profile.preferred_work_location_id || profile.preferred_work_location_key,
+    title: workLocationTitle,
+  });
+
+  const readiness = normalizeReadiness(profile.work_readiness || profile.job_time_key || profile.job_time_id);
+  const academicYear = normalizeAcademicYear(profile.study_year || profile.academic_year);
+
+  const education = educationLevelId || educationLevelTitle
+    ? [{ education_level_id: educationLevelId, level: educationLevelTitle }]
+    : [];
+
+  const projectsText = safeString(profile.projects);
+  const projects = projectsText
+    ? [{ name: "Student project", description: projectsText, type: "", technologies: [], url: "" }]
+    : [];
+
+  const jobNameIds = jobNameId ? [jobNameId] : [];
+  const jobTypeIds = jobTypeId ? [jobTypeId] : [];
+  const workModeIds = workModeId ? [workModeId] : [];
+  const preferredCountryIds = uniqueObjectIds([location.cityObjectId, location.countryObjectId]);
+  const skillIds = uniqueObjectIds(selectedSkills.map((item) => item.id));
+  const languageIds = uniqueObjectIds(selectedLanguages.map((item) => item.id));
+  const educationIds = educationLevelId ? [educationLevelId] : [];
+
+  const textParts = [
+    targetJobTitle,
+    jobTypeTitle,
+    workModeTitle,
+    workLocationTitle,
+    educationLevelTitle,
+    experienceLevelTitle,
+    ...selectedSkills.map((item) => item.title || item.key),
+    ...selectedLanguages.map((item) => item.title || item.key),
+    location.countryName,
+    location.cityName,
+  ].filter(Boolean);
+
+  const set = {
+    candidate_stage: candidateStage,
+    is_student: isStudent,
+    birthday: birthdayDate,
+    current_country_id: location.countryObjectId,
+    current_city_id: location.cityObjectId,
+    current_country: location.countryName,
+    current_city: location.cityName,
+    "search_filters.career.candidate_stage": candidateStage,
+    "search_filters.career.is_student": isStudent,
+    "search_filters.career.status": true,
+    "search_filters.career.accepted": false,
+    "search_filters.career.profile_visibility": "public",
+    "search_filters.career.work_location": workLocation,
+    work_location: workLocation,
+    "search_filters.text.profile": textParts,
+    "search_filters.text.all": textParts,
+    "search_filters.preferred_countries.values": [location.countryName, location.cityName].filter(Boolean),
+    "search_filters.preferred_countries.country_codes": location.countryCode ? [location.countryCode] : [],
+    "search_filters.preferred_countries.country_names_ar": location.countryNameAr ? [location.countryNameAr] : [],
+    "search_filters.preferred_countries.country_names_en": location.countryNameEn ? [location.countryNameEn] : [],
+    "search_filters.preferred_countries.city_names_ar": location.cityNameAr ? [location.cityNameAr] : [],
+    "search_filters.preferred_countries.city_names_en": location.cityNameEn ? [location.cityNameEn] : [],
+    "matching_profile.searchable_text": textParts.join(" "),
+    "matching_profile.searchable_tokens": textParts,
+    "matching_profile.preferred_country_values": [location.countryName, location.cityName, location.countryCode].filter(Boolean),
+    "matching_profile.free_for_work": true,
+    "matching_profile.remote_ready": workLocation === "remote" || workLocation === "hybrid",
+  };
+
+  if (targetJobTitle) {
+    set.current_job_title = targetJobTitle;
+    set.profile_headline = targetJobTitle;
+    set["matching_profile.normalized_titles"] = [targetJobTitle];
+    set["matching_profile.normalized_job_names"] = [targetJobTitle];
+    set["search_filters.job_names.titles_ar"] = [targetJobTitle];
+    set["search_filters.job_names.titles_en"] = [targetJobTitle];
+  }
+  if (jobNameIds.length) {
+    set.job_names = jobNameIds;
+    set["search_filters.job_names.ids"] = jobNameIds;
+  }
+  if (jobTypeIds.length) {
+    set.job_types = jobTypeIds;
+    set["search_filters.job_types.ids"] = jobTypeIds;
+  }
+  if (jobTypeTitle) {
+    set["matching_profile.normalized_job_types"] = [jobTypeTitle];
+    set["search_filters.job_types.names"] = [jobTypeTitle];
+    set["search_filters.job_types.titles_ar"] = [jobTypeTitle];
+    set["search_filters.job_types.titles_en"] = [jobTypeTitle];
+  }
+  if (workModeIds.length) {
+    set.preferred_work_modes = workModeIds;
+    set["search_filters.preferred_work_modes.ids"] = workModeIds;
+  }
+  if (workModeTitle) {
+    set["matching_profile.preferred_work_mode_keys"] = [workModeTitle];
+    set["search_filters.preferred_work_modes.titles_ar"] = [workModeTitle];
+    set["search_filters.preferred_work_modes.titles_en"] = [workModeTitle];
+  }
+  if (preferredCountryIds.length) {
+    set.preferred_countries = preferredCountryIds;
+  }
+  if (noticePeriodId) {
+    set.notice_period_id = noticePeriodId;
+    set["search_filters.career.notice_period_id"] = noticePeriodId;
+  }
+  if (education.length) {
+    set.education = education;
+    set["search_filters.education.level_ids"] = educationIds;
+    set["search_filters.education.levels"] = educationLevelTitle ? [educationLevelTitle] : [];
+  }
+  if (experienceLevelId) {
+    set.experience_level_id = experienceLevelId;
+    set["search_filters.career.experience_level_id"] = experienceLevelId;
+  }
+  if (skills.length || technicalSkills.length || softSkills.length) {
+    set.skills = [...skills, ...technicalSkills, ...softSkills];
+  }
+  if (skillIds.length || selectedSkills.length) {
+    set["search_filters.skills.ids"] = skillIds;
+    set["search_filters.skills.titles_custom"] = selectedSkills.map((item) => item.title || item.key).filter(Boolean);
+    set["matching_profile.normalized_skills"] = selectedSkills.map((item) => item.title || item.key).filter(Boolean);
+  }
+  if (languages.length) {
+    set.languages = languages;
+  }
+  if (languageIds.length || selectedLanguages.length) {
+    set["search_filters.languages.ids"] = languageIds;
+    set["search_filters.languages.names"] = selectedLanguages.map((item) => item.title || item.key).filter(Boolean);
+    set["matching_profile.normalized_languages"] = selectedLanguages.map((item) => item.title || item.key).filter(Boolean);
+  }
+
+  const studentProfile = {
+    university: safeString(profile.university),
+    specialty: safeString(profile.major || profile.specialty),
+    sub_specialty: safeString(profile.sub_major || profile.sub_specialty),
+    academic_year: ["first", "second", "third", "fourth", "fifth", "sixth", "diploma", "postgraduate", "internship", "graduated", ""].includes(academicYear) ? academicYear : "",
+    gpa: safeString(profile.gpa),
+    technical_skills: technicalSkills,
+    soft_skills: softSkills,
+    projects,
+    work_readiness: readiness,
+    preferred_work_location: workLocationTitle,
+    mini_cv_ready: Boolean(profile.about_me || targetJobTitle || skills.length || technicalSkills.length),
+    readiness_score: Number.isFinite(Number(profile.completion_percent)) ? Number(profile.completion_percent) : 0,
+  };
+
+  set.student_profile = studentProfile;
+  if (safeString(profile.about_me)) set.about_me = safeString(profile.about_me);
+
+  return set;
 }
 
 function parseBirthday(value) {
@@ -75,7 +430,43 @@ async function getEmployeeRole() {
   }).lean();
 }
 
-async function ensureEmployeeProfile({ userId, roleId, candidateStage, isStudent, birthdayDate, countryId, cityId, country, city, studentProfile }) {
+async function ensureEmployeeProfile({
+  userId,
+  roleId,
+  candidateStage,
+  isStudent,
+  birthdayDate,
+  countryId,
+  cityId,
+  countryCode,
+  country,
+  city,
+  studentProfile,
+  registrationProfile,
+}) {
+  const location = await resolveLocation({
+    countryId,
+    cityId,
+    countryCode,
+    countryName: country,
+    cityName: city,
+  });
+
+  const profileSet = buildProfileUpdate({
+    registrationProfile,
+    candidateStage,
+    isStudent,
+    birthdayDate,
+    location,
+  });
+
+  if (studentProfile && Object.keys(studentProfile).length) {
+    profileSet.student_profile = {
+      ...(profileSet.student_profile || {}),
+      ...studentProfile,
+    };
+  }
+
   return EmployeeModel.findOneAndUpdate(
     { user_id: userId },
     {
@@ -85,18 +476,7 @@ async function ensureEmployeeProfile({ userId, roleId, candidateStage, isStudent
         status: true,
         accepted: false,
       },
-      $set: {
-        candidate_stage: candidateStage,
-        is_student: isStudent,
-        "search_filters.career.candidate_stage": candidateStage,
-        "search_filters.career.is_student": isStudent,
-        birthday: birthdayDate,
-        current_country_id: countryId || null,
-        current_city_id: cityId || null,
-        current_country: country || "",
-        current_city: city || "",
-        student_profile: studentProfile || {},
-      },
+      $set: profileSet,
     },
     { upsert: true, new: true, setDefaultsOnInsert: true, runValidators: true }
   );
@@ -121,10 +501,15 @@ const register = async (req, res, next) => {
       phone_number,
       country_id,
       city_id,
+      country_code,
       country,
+      country_name,
       city,
+      city_name,
       accept_terms,
+      terms_accepted,
       student_profile = {},
+      registration_profile = {},
     } = req.body || {};
     if (!email || !password || !first_name || !last_name || !gender || !birthday || !candidate_stage) {
       return ReturnAppData.createError({
@@ -134,7 +519,8 @@ const register = async (req, res, next) => {
       });
     }
 
-    if (accept_terms !== undefined && !toBool(accept_terms)) {
+    const acceptedTermsValue = accept_terms ?? terms_accepted;
+    if (acceptedTermsValue !== undefined && !toBool(acceptedTermsValue)) {
       return ReturnAppData.createError({
         res,
         status: 400,
@@ -348,9 +734,11 @@ const register = async (req, res, next) => {
         birthdayDate,
         countryId: country_id || null,
         cityId: city_id || null,
-        country: country || "",
-        city: city || "",
+        countryCode: country_code || null,
+        country: country_name || country || "",
+        city: city_name || city || "",
         studentProfile: student_profile,
+        registrationProfile: registration_profile,
       });
     } catch (err) {
       if (err && err.code === 11000) {
@@ -394,6 +782,8 @@ const register = async (req, res, next) => {
         is_student: isStudent,
         country_id: country_id || null,
         city_id: city_id || null,
+        country_code: country_code || null,
+        registration_profile_saved: Boolean(registration_profile && Object.keys(registration_profile).length),
       },
       message:
         lan === "ar"

@@ -312,6 +312,7 @@ const runHelper = ({
   mapper = defaultMapper,
   searchLimit = 250,
   defaultLimit = 50,
+  extraQuery = () => ({}),
 }) => {
   const lan = getLanguage(req);
 
@@ -322,7 +323,8 @@ const runHelper = ({
     const skip = (page - 1) * limit;
     let tokens = unique(tokenize(search)).slice(0, 8);
     const phrases = extractPhrases(tokens);
-    const baseQuery = getBaseQuery(model);
+    const extra = extraQuery(req) || {};
+    const baseQuery = { ...getBaseQuery(model), ...extra };
 
     if (!search) {
       const docs = await model
@@ -516,14 +518,31 @@ const currency = createHandler({
   titleFields: ["name_ar", "name_en", "code"],
   mapper: currencyMapper,
 });
+const countryExtraQuery = (req) => {
+  const countryCode = String(req.query.country_code || req.query.code || "").trim().toUpperCase();
+  const countryId = String(req.query.country_id || "").trim();
+  const query = {};
 
+  if (countryCode) query.country_code = countryCode;
+
+  if (countryId) {
+    if (isValidObjectId(countryId)) query._id = new mongoose.Types.ObjectId(countryId);
+    else query.country_code = countryId.toUpperCase();
+  }
+
+  return query;
+};
 const country = createHandler({
   model: CountryModel,
   fields: ["country_code", "country_name_ar", "country_name_en", "city_name_ar", "city_name_en"],
   titleFields: ["city_name_ar", "city_name_en", "country_name_ar", "country_name_en"],
   mapper: countryMapper,
   searchLimit: 500,
+  extraQuery: countryExtraQuery,
 });
+
+
+
 
 const language = createHandler({
   model: LanguageModel,
