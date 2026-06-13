@@ -1,31 +1,66 @@
-// server.js (ESM)
+import fs from 'fs';
+import path from 'path';
 import admin from 'firebase-admin';
-import serviceAccount from './jobzain-firebase-adminsdk-fbsvc-23f2077871.json' with { type: 'json' };
 
-admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-const messaging = admin.messaging();
+const readJsonFile = (filePath) => {
+  const absolutePath = path.resolve(filePath);
+  if (!fs.existsSync(absolutePath)) return null;
+  return JSON.parse(fs.readFileSync(absolutePath, 'utf8'));
+};
 
-// helpers
-const toStr = v => (v === undefined || v === null) ? undefined : String(v);
-const buildDeeplink = (screen, id) =>
-  screen ? `myapp://${screen}${id ? `/${id}` : ''}` : undefined;
+const normalizePrivateKey = (credential) => {
+  if (credential?.private_key) {
+    credential.private_key = String(credential.private_key).replace(/\\n/g, '\n');
+  }
+  return credential;
+};
 
-// يبني الحقول المشتركة لكل الرسائل
+const loadFirebaseCredential = () => {
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    return normalizePrivateKey(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON));
+  }
+
+  const credentialPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH || process.env.GOOGLE_APPLICATION_CREDENTIALS;
+  if (credentialPath) {
+    const credential = readJsonFile(credentialPath);
+    if (credential) return normalizePrivateKey(credential);
+  }
+
+  return null;
+};
+
+let messagingInstance;
+
+const getMessaging = () => {
+  if (messagingInstance) return messagingInstance;
+
+  const credential = loadFirebaseCredential();
+  if (!credential) {
+    throw new Error('firebase_service_account_missing');
+  }
+
+  if (!admin.apps.length) {
+    admin.initializeApp({ credential: admin.credential.cert(credential) });
+  }
+
+  messagingInstance = admin.messaging();
+  return messagingInstance;
+};
+
+const toStr = (value) => (value === undefined || value === null ? undefined : String(value));
+const buildDeeplink = (screen, id) => (screen ? `myapp://${screen}${id ? `/${id}` : ''}` : undefined);
+
 function buildCommonPayload({ title, body, screen, id, imageUrl, extraData = {} } = {}) {
-  // data نصوص فقط
   const data = {
     screen: toStr(screen),
     id: toStr(id),
     deeplink: buildDeeplink(screen, id),
     image_url: toStr(imageUrl),
-    ...Object.fromEntries(
-      Object.entries(extraData).map(([k, v]) => [k, toStr(v)])
-    ),
+    ...Object.fromEntries(Object.entries(extraData).map(([key, value]) => [key, toStr(value)])),
   };
-  // إزالة المفاتيح غير المعرّفة
-  Object.keys(data).forEach(k => data[k] === undefined && delete data[k]);
 
-  // إرفاق الصورة في طبقات المنصات عند توفرها
+  Object.keys(data).forEach((key) => data[key] === undefined && delete data[key]);
+
   const platformImages = imageUrl
     ? {
         android: { notification: { imageUrl } },
@@ -40,69 +75,35 @@ function buildCommonPayload({ title, body, screen, id, imageUrl, extraData = {} 
   };
 }
 
-/**
- * 1) إرسال لتوكن واحد
- */
 export async function sendToToken(token, params = {}) {
-  const common = buildCommonPayload(params);
-  const message = { token, ...common };
-  const res = await messaging.send(message);
-  console.log('sendToToken ->', res);
-  return res;
+  const message = { token, ...buildCommonPayload(params) };
+  return getMessaging().send(message);
 }
 
-/**
- * 2) إرسال لمجموعة توكنات (≤ 500 توكن لكل طلب)
- */
 export async function sendToTokens(tokens = [], params = {}) {
-  if (!Array.isArray(tokens) || tokens.length === 0) throw new Error('tokens[] مطلوب');
-  const common = buildCommonPayload(params);
-  const message = { tokens, ...common };
-  const res = await messaging.sendEachForMulticast(message);
-  console.log(`sendToTokens -> success: ${res.successCount}, failure: ${res.failureCount}`);
-  if (res.failureCount > 0) {
-    res.responses.forEach((r, i) => {
-      if (!r.success) console.warn('Failed token:', tokens[i], r.error?.code, r.error?.message);
-    });
-  }
-  return res;
+  if (!Array.isArray(tokens) || tokens.length === 0) throw new Error('tokens_required');
+  const message = { tokens, ...buildCommonPayload(params) };
+  return getMessaging().sendEachForMulticast(message);
 }
 
-/**
- * 3) إرسال لموضوع Topic
- */
 export async function sendToTopic(topic, params = {}) {
-  const common = buildCommonPayload(params);
-  const message = { topic, ...common };
-  const res = await messaging.send(message);
-  console.log('sendToTopic ->', res);
-  return res;
+  const message = { topic, ...buildCommonPayload(params) };
+  return getMessaging().send(message);
 }
 
-/**
- * 4) إرسال بشرط Condition
- */
 export async function sendToCondition(condition, params = {}) {
-  const common = buildCommonPayload(params);
-  const message = { condition, ...common };
-  const res = await messaging.send(message);
-  console.log('sendToCondition ->', res);
-  return res;
+  const message = { condition, ...buildCommonPayload(params) };
+  return getMessaging().send(message);
 }
 
-/* إدارة الاشتراكات في Topics */
 export async function subscribeTokensToTopic(tokens = [], topic) {
-  if (!Array.isArray(tokens) || tokens.length === 0) throw new Error('tokens[] مطلوب');
-  const res = await messaging.subscribeToTopic(tokens, topic);
-  console.log('subscribeTokensToTopic ->', res);
-  return res;
+  if (!Array.isArray(tokens) || tokens.length === 0) throw new Error('tokens_required');
+  return getMessaging().subscribeToTopic(tokens, topic);
 }
 
 export async function unsubscribeTokensFromTopic(tokens = [], topic) {
-  if (!Array.isArray(tokens) || tokens.length === 0) throw new Error('tokens[] مطلوب');
-  const res = await messaging.unsubscribeFromTopic(tokens, topic);
-  console.log('unsubscribeTokensFromTopic ->', res);
-  return res;
+  if (!Array.isArray(tokens) || tokens.length === 0) throw new Error('tokens_required');
+  return getMessaging().unsubscribeFromTopic(tokens, topic);
 }
 
 export default {

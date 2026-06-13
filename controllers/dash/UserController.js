@@ -1,6 +1,6 @@
 // controllers/Permission.controller.js
 
-import ReturnDashData from "../../helper/ReturnDashData.js";
+import ReturnDashData from "../../helper/ReturnDashData/index.js";
 import { PermissionModel } from "../../models/index.js";
 
 /**

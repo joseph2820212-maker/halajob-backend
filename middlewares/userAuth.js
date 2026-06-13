@@ -23,16 +23,15 @@ const authUser = async (req, res, next) => {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid or expired access token');
     }
 
-    // Debugging: Log payload
-    console.log('Token Payload:', tokenPayload);
-
     // Check if the token is of the correct type
     if (tokenPayload.type !== tokenTypes.ACCESS) {
       throw new ApiError(httpStatus.UNAUTHORIZED, 'Token type is invalid');
     }
 
     // Validate the user exists
-    const user = await UserModel.findById(tokenPayload.userId.toString()).lean();
+    const user = await UserModel.findById(tokenPayload.userId.toString())
+      .select('-password -passcode -another_device_code -pending_device -device')
+      .lean();
     // const userExists = await UserModel.exists({ _id: tokenPayload.userId,status:true,user_type: { $in: ["admin", "representative"] } });
     if (!user) {
       throw new ApiError(httpStatus.FORBIDDEN, 'User not found. Please log in again.');
@@ -51,15 +50,10 @@ const authUser = async (req, res, next) => {
     req.user = user;
    
     req.authHeader = accessToken;
-    // Debugging: Log success
-    console.log('User authenticated successfully:', tokenPayload);
-
     // Proceed to the next middleware or route handler
     next();
   } catch (error) {
-    // Log the error for debugging
-    console.error('Authentication error:', error.message);
-    next(error); // Pass the error to the error-handling middleware
+    next(error);
   }
 };
 

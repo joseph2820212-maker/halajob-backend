@@ -36,9 +36,12 @@ const converter = (err, req, res, next) => {
       stack: err?.stack,
       errors: err?.errors,
     });
+    const statusCode = err.statusCode || httpStatus.INTERNAL_SERVER_ERROR;
     convertedError = new ApiError(
-      err.statusCode || httpStatus.INTERNAL_SERVER_ERROR,
-      process.env.NODE_ENV === 'production' ? httpStatus[500] : (err.message || httpStatus[500]),
+      statusCode,
+      process.env.NODE_ENV === 'production'
+        ? (httpStatus[statusCode] || httpStatus[httpStatus.INTERNAL_SERVER_ERROR])
+        : (err.message || httpStatus[httpStatus.INTERNAL_SERVER_ERROR]),
       'API Error 2',
       uuid
     );

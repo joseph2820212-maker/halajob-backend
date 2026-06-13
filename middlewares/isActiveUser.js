@@ -23,9 +23,6 @@ const isActiveUser = async (req, res, next) => {
       throw new APIError(httpStatus.UNAUTHORIZED, 'Invalid or expired access token');
     }
 
-    // Debugging: Log payload
-    console.log('Token Payload:', tokenPayload);
-
     // Check if the token is of the correct type
     if (tokenPayload.type !== tokenTypes.ACCESS) {
       throw new APIError(httpStatus.UNAUTHORIZED, 'Token type is invalid');
@@ -49,15 +46,10 @@ const isActiveUser = async (req, res, next) => {
 
     // Attach the payload to the request object
     req.authData = userExists;
-    // Debugging: Log success
-    console.log('User authenticated successfully:', tokenPayload);
-
     // Proceed to the next middleware or route handler
     next();
   } catch (error) {
-    // Log the error for debugging
-    console.error('Authentication error:', error.message);
-    next(error); // Pass the error to the error-handling middleware
+    next(error);
   }
 };
 

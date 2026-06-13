@@ -50,9 +50,9 @@ const optionalAuthUser = async (req, res, next) => {
     // =========================
     // FIND USER
     // =========================
-    const user = await UserModel.findById(
-      tokenPayload.userId.toString()
-    ).lean();
+    const user = await UserModel.findById(tokenPayload.userId.toString())
+      .select('-password -passcode -another_device_code -pending_device -device')
+      .lean();
 
     if (!user) {
       req.user = null;
@@ -81,8 +81,6 @@ const optionalAuthUser = async (req, res, next) => {
     next();
   } catch (error) {
     // optional auth -> never throw
-    console.error('Optional auth error:', error.message);
-
     req.user = null;
 
     next();

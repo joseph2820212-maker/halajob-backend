@@ -11,7 +11,6 @@ import adminModerationController from '../controllers/dash/adminModerationContro
 import adminSearchController from '../controllers/dash/adminSearchController.js';
 import cvRoute from './cvRoute.js';
 import { createDashResourceRouter } from './dashResourceRouteFactory.js';
-import resourceController from '../controllers/dash/adminResourceController.js';
 import multer from '../utils/multer.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
 
@@ -19,7 +18,10 @@ const FILES_DIRECTORY = path.resolve(process.env.FILES_DIRECTORY || './uploads')
 const router = express.Router();
 const upload = multer;
 
-const sendDashboardFile = (req, res) => {
+const PUBLIC_IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.svg']);
+const DOCUMENT_EXTENSIONS = new Set(['.pdf']);
+
+const sendDashboardFile = ({ allowDocuments = false } = {}) => (req, res) => {
   const fileName = req.params.name;
 
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -28,9 +30,19 @@ const sendDashboardFile = (req, res) => {
     return res.status(400).json({ status: false, message: 'invalid_file_name' });
   }
 
-  const filePath = fileName.toLowerCase().endsWith('.pdf')
-    ? path.join(FILES_DIRECTORY, 'files', fileName)
-    : path.join(FILES_DIRECTORY, fileName);
+  const extension = path.extname(fileName).toLowerCase();
+  const isDocument = DOCUMENT_EXTENSIONS.has(extension);
+
+  if (!allowDocuments && !PUBLIC_IMAGE_EXTENSIONS.has(extension)) {
+    return res.status(403).json({ status: false, message: 'file_access_forbidden' });
+  }
+
+  const baseDirectory = isDocument ? path.join(FILES_DIRECTORY, 'files') : FILES_DIRECTORY;
+  const filePath = path.resolve(baseDirectory, fileName);
+
+  if (!filePath.startsWith(path.resolve(baseDirectory) + path.sep)) {
+    return res.status(400).json({ status: false, message: 'invalid_file_name' });
+  }
 
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) return res.status(404).json({ status: false, message: 'file_not_found' });
@@ -45,11 +57,13 @@ const sendDashboardFile = (req, res) => {
 
 /* ----------------------------- Public dashboard auth/files ----------------------------- */
 router.use('/auth', authRoute);
-router.get('/image/:name', sendDashboardFile);
-router.get('/image/uploads/:name', sendDashboardFile);
+router.get('/image/:name', sendDashboardFile());
+router.get('/image/uploads/:name', sendDashboardFile());
 
 /* ----------------------------- Protected dashboard area ----------------------------- */
 router.use(isAdmin);
+
+router.get('/file/:name', sendDashboardFile({ allowDocuments: true }));
 
 router.use('/dashboard', dashboardRoute);
 router.use('/statistics', dashboardRoute);

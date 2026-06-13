@@ -14,8 +14,19 @@ const PORT = process.env.PORT || 3000;
 let server;
 let scheduledJobs;
 
-if (!CONNECTION_URL) {
-  logger.error("CONNECTION_URL is missing");
+const requiredEnv = [
+  ["CONNECTION_URL", CONNECTION_URL],
+  ["JWT_SECRET", process.env.JWT_SECRET],
+];
+
+const missingEnv = requiredEnv.filter(([, value]) => !String(value || "").trim());
+if (missingEnv.length) {
+  logger.error(`Missing required environment variables: ${missingEnv.map(([key]) => key).join(", ")}`);
+  process.exit(1);
+}
+
+if (process.env.NODE_ENV === "production" && !String(process.env.CORS_ORIGINS || "").trim()) {
+  logger.error("CORS_ORIGINS is required in production");
   process.exit(1);
 }
 

@@ -1,28 +1,55 @@
 import multer from 'multer';
 import path from 'path';
+import { existsSync, mkdirSync } from 'fs';
 
-// Function to sanitize file name
-const sanitizeFileName = (originalName) => {
-  const extension = path.extname(originalName);
-  const baseName = path.basename(originalName, extension);
-  return `${baseName.replace(/[^a-zA-Z0-9_-]/g, '_').replace(/\s+/g, '_').toLowerCase()}${extension}`;
+const UPLOADS_ROOT = path.resolve('uploads');
+
+const ALLOWED_FILES = {
+  '.jpg': ['image/jpeg'],
+  '.jpeg': ['image/jpeg'],
+  '.png': ['image/png'],
+  '.svg': ['image/svg+xml'],
+  '.webp': ['image/webp'],
+  '.xlsx': ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+  '.csv': ['text/csv', 'application/csv', 'application/vnd.ms-excel'],
+  '.ttf': ['font/ttf', 'application/x-font-ttf'],
+  '.html': ['text/html'],
 };
 
-// Multer config
+const sanitizeFileName = (originalName = '') => {
+  const extension = path.extname(originalName).toLowerCase();
+  const baseName = path.basename(originalName, extension);
+  return `${baseName
+    .replace(/[^a-zA-Z0-9_-]/g, '_')
+    .replace(/\s+/g, '_')
+    .toLowerCase()}${extension}`;
+};
+
+const hasAllowedMime = (file, ext) => {
+  const allowed = ALLOWED_FILES[ext];
+  if (!allowed) return false;
+  if (!file.mimetype) return true;
+  return allowed.includes(file.mimetype);
+};
+
 const upload = multer({
   storage: multer.diskStorage({
-    destination: (req, file, cb) => cb(null, 'uploads'),
-    filename: (req, file, cb) => cb(null, `${Date.now()}-${sanitizeFileName(file.originalname)}`),
+    destination: (req, file, cb) => {
+      if (!existsSync(UPLOADS_ROOT)) mkdirSync(UPLOADS_ROOT, { recursive: true });
+      cb(null, UPLOADS_ROOT);
+    },
+    filename: (req, file, cb) => cb(null, `${Date.now()}-${sanitizeFileName(file.originalname || 'file')}`),
   }),
   fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (!['.jpg', '.jpeg', '.png', '.svg', '.webp',".xlsx",".csv",".ttf",".html"].includes(ext)) {
-      return cb(new Error('Unsupported file type!'), false);
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    if (!hasAllowedMime(file, ext)) {
+      return cb(new Error('unsupported_file_type'), false);
     }
     cb(null, true);
   },
   limits: {
-    fileSize: 4 * 1024 * 1024, // 4MB limit
+    fileSize: 4 * 1024 * 1024,
+    files: 10,
   },
 });
 

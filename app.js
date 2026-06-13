@@ -47,7 +47,9 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    return callback(new Error("not_allowed_by_cors"));
+    const error = new Error("not_allowed_by_cors");
+    error.statusCode = 403;
+    return callback(error);
   },
 
   credentials: true,

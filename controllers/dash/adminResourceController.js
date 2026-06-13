@@ -296,15 +296,36 @@ const toBoolean = (value) => {
 };
 
 
+const dangerousPayloadKeys = new Set(['__proto__', 'prototype', 'constructor', '__v']);
+
+const isSafePayloadKey = (key = '') => {
+  const value = String(key || '').trim();
+  if (!value) return false;
+  if (dangerousPayloadKeys.has(value)) return false;
+  if (value.startsWith('$')) return false;
+  return true;
+};
+
+const sanitizeParsedValue = (value) => {
+  if (Array.isArray(value)) return value.map((item) => sanitizeParsedValue(item));
+  if (!isPlainNestedObject(value)) return value;
+
+  return Object.entries(value).reduce((acc, [key, nestedValue]) => {
+    if (!isSafePayloadKey(key)) return acc;
+    acc[key] = sanitizeParsedValue(nestedValue);
+    return acc;
+  }, {});
+};
+
 const setDeepValue = (target, path, value) => {
   const parts = String(path || '').split('.').map((part) => part.trim()).filter(Boolean);
-  if (!parts.length) return;
+  if (!parts.length || parts.some((part) => !isSafePayloadKey(part))) return;
 
   let cursor = target;
   parts.forEach((part, index) => {
     const isLast = index === parts.length - 1;
     if (isLast) {
-      cursor[part] = value;
+      cursor[part] = sanitizeParsedValue(value);
       return;
     }
     if (!cursor[part] || typeof cursor[part] !== 'object' || Array.isArray(cursor[part])) {
@@ -340,7 +361,10 @@ const normalizePayload = async (req, config) => {
     if (['password_confirmation', 'confirm_password'].includes(key)) return;
     if (shouldDropEmptyValue(key, value)) return;
 
-    const parsed = parseMaybeJson(value);
+    const keyParts = String(key).split('.').map((part) => part.trim()).filter(Boolean);
+    if (!keyParts.length || keyParts.some((part) => !isSafePayloadKey(part))) return;
+
+    const parsed = sanitizeParsedValue(parseMaybeJson(value));
     if (String(key).includes('.')) setDeepValue(payload, key, parsed);
     else payload[key] = parsed;
   });
@@ -385,6 +409,16 @@ const flattenPayload = (input = {}, prefix = '', output = {}) => {
     else output[path] = value;
   });
   return output;
+};
+
+const sanitizeUpdatePayload = (payload = {}) => {
+  const flattened = flattenPayload(payload);
+  return Object.entries(flattened).reduce((acc, [key, value]) => {
+    const parts = String(key).split('.').map((part) => part.trim()).filter(Boolean);
+    if (!parts.length || parts.some((part) => !isSafePayloadKey(part))) return acc;
+    acc[key] = value;
+    return acc;
+  }, {});
 };
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(String(id || ''));
@@ -617,7 +651,7 @@ const update = (resourceName) => async (req, res) => {
       if (!payload.publish_status) payload.publish_status = 'published';
     }
 
-    const doc = await config.model.findByIdAndUpdate(id, flattenPayload(payload), { new: true, runValidators: true });
+    const doc = await config.model.findByIdAndUpdate(id, sanitizeUpdatePayload(payload), { new: true, runValidators: true });
     if (!doc) return ReturnDashData.updateError({ res, status: 404, message: `${config.key}_not_found` });
 
     if (config.model === CompanyModel && doc.accepted === true && doc.status === true) {
@@ -694,7 +728,7 @@ const bulkUpdate = (resourceName) => async (req, res) => {
     const payload = await normalizePayload(req, config);
     delete payload.ids;
 
-    const result = await config.model.updateMany({ _id: { $in: ids } }, { $set: flattenPayload(payload) }, { runValidators: true });
+    const result = await config.model.updateMany({ _id: { $in: ids } }, { $set: sanitizeUpdatePayload(payload) }, { runValidators: true });
 
     return ReturnDashData.updateData({
       res,

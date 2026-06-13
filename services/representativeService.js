@@ -1,4 +1,5 @@
 import RepresentativeModel from "../models/RepresentativeModel.js";
+import httpStatus from "http-status";
 import ApiError from "../utils/apiError.js";
 
 // Create a new representative
@@ -7,7 +8,7 @@ const createNewRepresentative = async (req) => {
     const newRepresentative = await RepresentativeModel.create(req);
     return newRepresentative;
   } catch (error) {
-    throw new ApiError("Error creating a new representative", error);
+    throw new ApiError(httpStatus.BAD_REQUEST, error?.message || "Error creating a new representative");
   }
 };
 const editRepresentative = async (id, updateData) => {
@@ -20,12 +21,12 @@ const editRepresentative = async (id, updateData) => {
     );
 
     if (!updatedRepresentative) {
-      throw new ApiError("Representative not found", 404);
+      throw new ApiError(httpStatus.NOT_FOUND, "Representative not found");
     }
 
     return updatedRepresentative;
   } catch (error) {
-    throw new ApiError("Error updating representative", error.message);
+    throw new ApiError(httpStatus.BAD_REQUEST, error?.message || "Error updating representative");
   }
 };
 
