@@ -14,7 +14,10 @@
     "scheduled:close-expired-jobs": "node scripts/runScheduledJob.js close-expired-jobs",
     "scheduled:job-reminders": "node scripts/runScheduledJob.js send-job-deadline-reminders",
     "scheduled:sync-company-jobs": "node scripts/runScheduledJob.js sync-company-active-job-counts",
-    "smoke:import": "node scripts/smokeImport.js"
+    "smoke:import": "node scripts/smokeImport.js",
+    "smoke:http": "node scripts/smokeHttp.js",
+    "check:syntax": "node scripts/checkSyntax.js",
+    "check:imports": "node scripts/checkRelativeImports.js"
   },
   "keywords": [],
   "author": "",
