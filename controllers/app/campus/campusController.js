@@ -97,7 +97,7 @@ const overview = async (req, res, next) => {
 
 const opportunities = async (req, res, next) => {
   try {
-    const target = String(req.query.target || req.query.candidate_target || "students");
+    const target = String(req.query.target || req.query.candidate_target || "students").toLowerCase();
     const jobs = await jobsModel
       .find(campusJobQuery(target))
       .sort({ priority: -1, createdAt: -1, _id: -1 })
@@ -105,6 +105,32 @@ const opportunities = async (req, res, next) => {
       .lean();
 
     return ReturnAppData.getData({ res, data: jobs, message: "campus_opportunities" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const createCompanyOpportunity = async (req, res, next) => {
+  try {
+    const company = await CompanyModel.findOne(buildCompanyOwnerQuery(req.user._id)).select("_id owner_user_id").lean();
+    if (!company) return ReturnAppData.createError({ res, status: 403, message: "company_not_found" });
+    const target = String(req.body?.target || req.body?.candidate_target || "students").toLowerCase();
+    const candidateTarget = target === "fresh_graduates" ? ["fresh_graduates"] : ["students"];
+
+    const payload = {
+      ...(req.body || {}),
+      company_id: company._id,
+      user_id: req.user._id,
+      candidate_target: candidateTarget,
+      is_for_students: candidateTarget.includes("students"),
+      is_for_fresh_graduates: candidateTarget.includes("fresh_graduates"),
+      publish_status: "pending_review",
+      is_accepted: false,
+      status: true,
+    };
+
+    const job = await jobsModel.create(payload);
+    return ReturnAppData.createData({ res, data: job, message: "campus_opportunity_created" });
   } catch (error) {
     next(error);
   }
@@ -344,6 +370,7 @@ export default {
   resources,
   universityOverview,
   companyOpportunities,
+  createCompanyOpportunity,
   students,
   partners,
   addPartner,

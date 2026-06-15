@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 
 const root = process.cwd();
-const ignoredDirs = new Set([".git", "node_modules", "uploads", "cv", "backups", "logs"]);
+const ignoredDirs = new Set([".git", "node_modules", "uploads", "cv", "backups", "logs", "dist"]);
 
 const walk = (dir, files = []) => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
