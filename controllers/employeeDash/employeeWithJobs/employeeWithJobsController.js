@@ -645,6 +645,45 @@ export const cancelMyApplication = async (req, res, next) => {
   }
 };
 
+export const addApplicationMessage = async (req, res, next) => {
+  try {
+    const employeeData = await getEmployeeUserIdOrFail(req, res);
+    if (!employeeData) return;
+
+    const application = await findOwnedApplication(employeeData, req.params.applicationId);
+    if (!application) return fail(res, "application_not_found", 404);
+
+    const message = cleanText(req.body.message || req.body.note);
+    if (!message) return fail(res, "message_required", 422);
+
+    application.communication_log.push({
+      channel: "internal",
+      message,
+      created_by: employeeData.userId,
+      created_at: new Date(),
+    });
+    application.last_activity_at = new Date();
+
+    await application.save();
+
+    await createEmployeeStatusHistory({
+      application,
+      oldStatus: application.status,
+      newStatus: application.status,
+      employeeData,
+      note: "candidate_message_added",
+    });
+
+    const populated = await UserApplyingJobModel.findById(application._id)
+      .populate(applicationPopulateForEmployee)
+      .lean();
+
+    return success(res, normalizeApplicationForEmployee(populated), "application_message_added");
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const myInterviews = async (req, res, next) => {
   try {
     const employeeData = await getEmployeeUserIdOrFail(req, res);
@@ -861,6 +900,7 @@ export default {
   myRejectedApplications,
   getMyApplicationDetails,
   cancelMyApplication,
+  addApplicationMessage,
   myInterviews,
   respondToInterview,
   myJobInvitations,

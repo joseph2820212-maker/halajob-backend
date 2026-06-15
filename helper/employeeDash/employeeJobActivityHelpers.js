@@ -138,6 +138,7 @@ export const normalizeApplicationForEmployee = (application) => {
     phone_national: application.phone_national || "",
     cv: application.cv || "",
     cover_letter: application.cover_letter || "",
+    communication_log: Array.isArray(application.communication_log) ? application.communication_log : [],
     answers: application.answers || [],
     user_job_rating: application.user_job_rating || 0,
     cv_download: Boolean(application.cv_download),

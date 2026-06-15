@@ -65,6 +65,7 @@ router.patch("/applications/offers/:invitationId/reject", upload.none(), (req, r
 });
 
 router.get("/applications/:applicationId", jobsController.getMyApplicationDetails);
+router.post("/applications/:applicationId/messages", upload.none(), jobsController.addApplicationMessage);
 router.patch("/applications/:applicationId/cancel", upload.none(), jobsController.cancelMyApplication);
 
 /* Companies */
