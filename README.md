@@ -46,6 +46,16 @@ Output Directory: dist
 Install Command: npm ci
 ```
 
+If Vercel does not show the branch/root controls and builds from the repository root, the root `vercel.json` is configured to use:
+
+```text
+Install Command: cd web && npm ci
+Build Command: cd web && npm run build
+Output Directory: web/dist
+```
+
+Do not use `vite build` as the build command in the root project. It will fail because Vite is installed in `web/`, not in the backend root.
+
 Frontend environment variables:
 
 ```text
