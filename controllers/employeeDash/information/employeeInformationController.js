@@ -856,9 +856,6 @@ export const updateBasicEmployeeProfile = async (req, res, next) => {
 
     return success(res, employee, "employee_profile_updated");
   } catch (error) {
-    console.log('====================================');
-    console.log(error);
-    console.log('====================================');
     next(error);
   }
 };
@@ -1026,9 +1023,6 @@ export const addSectionItems = async (req, res, next) => {
 
     return success(res, result, `${section}_items_added`, 201);
   } catch (error) {
-    console.log('====================================');
-    console.log(error);
-    console.log('====================================');
     next(error);
   }
 };
@@ -1257,9 +1251,6 @@ export const getMySection = async (req, res, next) => {
 
     return success(res, serializeSingleField(section, employee[realSection], req), `${section}_section`);
   } catch (error) {
-    console.log('====================================');
-    console.log(error);
-    console.log('====================================');
     next(error);
   }
 };

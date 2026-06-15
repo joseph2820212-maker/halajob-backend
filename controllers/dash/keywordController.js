@@ -9,9 +9,10 @@ const get=async(req,res)=>{
         data: keywords,
       });
  } catch (error) {
-  console.log('====================================');
-  console.log(error);
-  console.log('====================================');
+  return ReturnDashData.getError({
+   res,
+   message: error.message || "Get failed",
+  });
  }
 }
 const updateKeyWord = async (req, res, next) => {

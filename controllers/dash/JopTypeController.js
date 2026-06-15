@@ -46,8 +46,6 @@ const create = async (req, res, next) => {
     return ReturnDashData.createData({ res, data: doc });
 
   } catch (err) {
-   console.log(err);
-   
     // ✅ هندلة خطأ E11000 بشكل واضح
     if (err && err.code === 11000) {
       const field = err.keyPattern ? Object.keys(err.keyPattern)[0] : 'unique field';
@@ -78,7 +76,6 @@ const update = async (req, res, next) => {
    
     // نبني payload من الجسم وننظفه/نطبّعه
     const payload = { ...req.body };
-   console.log(req.body);
 
     // ✅ تحويل keyword إلى Array واستبدال القديمة بالجديدة
     if (payload.keyword !== undefined) {

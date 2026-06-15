@@ -681,9 +681,6 @@ export const updateCompanyMedia = async (req, res, next) => {
 
     return success(res, company, "company_media_updated_successfully");
   } catch (error) {
-    console.log('====================================');
-    console.log(error);
-    console.log('====================================');
     next(error);
   }
 };

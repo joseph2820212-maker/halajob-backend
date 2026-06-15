@@ -107,9 +107,6 @@ const get = async (req, res, next) => {
       },
     });
   } catch (err) {
-   console.log('====================================');
-   console.log(err);
-   console.log('====================================');
     return ReturnDashData.getError({
       res,
       message: err.message || "Get failed",
