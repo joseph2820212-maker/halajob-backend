@@ -421,15 +421,40 @@ const userUniversityOpportunities = async (req, res, next) => {
     const university = await ensureUniversityForRequest(req);
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
     const partnerCompanyIds = (university.partners || []).map((partner) => partner.company_id).filter(Boolean);
-    const jobs = await jobsModel
-      .find({
-        $or: [{ is_for_students: true }, { is_for_fresh_graduates: true }, { candidate_target: { $in: ["students", "fresh_graduates"] } }],
-        ...(partnerCompanyIds.length ? { company_id: { $in: partnerCompanyIds } } : {}),
-      })
-      .sort({ createdAt: -1 })
-      .limit(normalizeLimit(req.query.limit))
-      .lean();
-    return ReturnAppData.getData({ res, data: jobs, message: "campus_university_opportunities" });
+    const limit = normalizeLimit(req.query.limit);
+    const [jobs, requests] = await Promise.all([
+      jobsModel
+        .find({
+          $or: [{ is_for_students: true }, { is_for_fresh_graduates: true }, { candidate_target: { $in: ["students", "fresh_graduates"] } }],
+          ...(partnerCompanyIds.length ? { company_id: { $in: partnerCompanyIds } } : {}),
+        })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .lean(),
+      UniversityOpportunityRequestModel.find({ university_id: university._id })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .lean(),
+    ]);
+
+    const submittedRequests = requests.map((request) => ({
+      ...request,
+      _id: request._id,
+      job_name: request.title,
+      candidate_target: request.target,
+      is_for_students: request.target === "students",
+      is_for_fresh_graduates: request.target === "fresh_graduates",
+      publish_status: request.status,
+      work_mode: "Campus request",
+      location: { city: university.city || "Campus" },
+      source: "university_opportunity_request",
+    }));
+
+    const opportunities = [...submittedRequests, ...jobs]
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+      .slice(0, limit);
+
+    return ReturnAppData.getData({ res, data: opportunities, message: "campus_university_opportunities" });
   } catch (error) {
     next(error);
   }
