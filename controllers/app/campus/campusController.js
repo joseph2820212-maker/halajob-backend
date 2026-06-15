@@ -24,7 +24,7 @@ const publicJobFilter = {
   deleted_at: null,
 };
 
-const allowedTargets = new Set(["students", "graduates", "fresh_graduates"]);
+const allowedTargets = new Set(["all", "students", "graduates", "fresh_graduates"]);
 
 const normalizeLimit = (value, fallback = 12, max = 50) => {
   const number = Number(value);
@@ -51,6 +51,21 @@ const getUniversityForRequest = async (req) => {
 
 const campusJobQuery = (target = "students") => {
   const normalizedTarget = allowedTargets.has(target) ? target : "students";
+  if (normalizedTarget === "all") {
+    return {
+      ...publicJobFilter,
+      $or: [
+        { candidate_target: { $in: ["students", "graduates", "fresh_graduates"] } },
+        { is_for_students: true },
+        { is_for_graduates: true },
+        { is_for_fresh_graduates: true },
+        { "search_index.filters.candidate_target": { $in: ["students", "graduates", "fresh_graduates"] } },
+        { "search_index.filters.is_for_students": true },
+        { "search_index.filters.is_for_graduates": true },
+        { "search_index.filters.is_for_fresh_graduates": true },
+      ],
+    };
+  }
   const flags = {
     students: { is_for_students: true },
     graduates: { is_for_graduates: true },
