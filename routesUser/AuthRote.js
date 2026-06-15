@@ -9,6 +9,7 @@ import ForgotPassword from '../controllers/app/Auth/ForgotPasswordController.js'
 import PassCodeForgotPasswordController from '../controllers/app/Auth/PassCodeForgotPasswordController.js';
 import ForGotPasswordResetPasswordController from '../controllers/app/Auth/ForGotPasswordResetPasswordController.js';
 import UpdateProfileController from '../controllers/app/Auth/UpdateProfileController.js';
+import CampusAuthController from '../controllers/app/Auth/CampusAuthController.js';
 
 // إعداد التخزين للملفات
 
@@ -19,6 +20,8 @@ const router = express.Router();
 
 // رفع ملف واحد مع البيانات
 router.post('/register', upload.none(), Register.register);
+router.post('/campus/register', upload.none(), CampusAuthController.campusRegister);
+router.post('/campus/university-login', upload.none(), CampusAuthController.universityLogin);
 router.post('/login', upload.none(), Login.login);
 router.post('/logout', authUser, Login.logout);
 router.post('/refresh-token', upload.none(), Login.refreshToken);

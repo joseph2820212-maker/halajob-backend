@@ -16,6 +16,7 @@ import bannerRote from './bannerRote.js';
 import AppUserOverviewRote from './AppUserOverviewRote.js';
 import pageRote from './pageRote.js';
 import NotificationRote from './NotificationRote.js';
+import CampusRote from './CampusRote.js';
 
 const router = express.Router();
 router.use('/auth', AuthRote);
@@ -36,5 +37,6 @@ router.use('/app/dashboard', AppUserOverviewRote);
 router.use('/page', pageRote);
 router.use('/notifications', NotificationRote);
 router.use('/notification', NotificationRote);
+router.use('/campus', CampusRote);
 
 export default router;

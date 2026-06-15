@@ -84,6 +84,7 @@ const StudentProjectSchema = new Schema(
 const StudentProfileSchema = new Schema(
   {
     university: { type: String, trim: true, default: "" },
+    university_id: { type: Schema.Types.ObjectId, ref: "universities", default: null, index: true },
     specialty: { type: String, trim: true, default: "" },
     sub_specialty: { type: String, trim: true, default: "" },
     academic_year: {
@@ -92,6 +93,15 @@ const StudentProfileSchema = new Schema(
       default: "",
     },
     gpa: { type: String, trim: true, default: "" },
+    expected_graduation_year: { type: Number, default: null, index: true },
+    enrollment_status: {
+      type: String,
+      enum: ["student", "fresh_graduate", ""],
+      default: "",
+      index: true,
+    },
+    student_email: { type: String, trim: true, lowercase: true, default: "" },
+    student_email_verified: { type: Boolean, default: false, index: true },
     technical_skills: { type: [SkillEmployeeSchema], default: [] },
     soft_skills: { type: [SkillEmployeeSchema], default: [] },
     projects: { type: [StudentProjectSchema], default: [] },

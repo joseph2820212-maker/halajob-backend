@@ -218,6 +218,8 @@ app.use(
     "/employee/v1/profile",
     "/company/v1/profile",
     "/company/v1/media",
+    "/company/v1/global/profile",
+    "/company/v1/global/profile/media",
   ],
   uploadLimiter
 );

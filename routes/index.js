@@ -10,6 +10,7 @@ import dashboardController from '../controllers/dash/adminDashboardController.js
 import adminModerationController from '../controllers/dash/adminModerationController.js';
 import adminSearchController from '../controllers/dash/adminSearchController.js';
 import resourceController from '../controllers/dash/adminResourceController.js';
+import campusController from '../controllers/app/campus/campusController.js';
 import cvRoute from './cvRoute.js';
 import { createDashResourceRouter } from './dashResourceRouteFactory.js';
 import multer from '../utils/multer.js';
@@ -187,6 +188,12 @@ router.use('/JobReport', createDashResourceRouter('jobreports'));
 router.use('/reports', createDashResourceRouter('jobreports'));
 router.use('/TalentRequest', createDashResourceRouter('talentrequests'));
 router.use('/talent-requests', createDashResourceRouter('talentrequests'));
+router.use('/University', createDashResourceRouter('universities'));
+router.use('/Universities', createDashResourceRouter('universities'));
+router.use('/universities', createDashResourceRouter('universities'));
+router.get('/campus/universities', campusController.listUniversities);
+router.post('/campus/universities', upload.none(), campusController.createUniversity);
+router.patch('/campus/universities/:id/status', upload.none(), campusController.updateUniversityStatus);
 
 router.use('/Country', createDashResourceRouter('countries'));
 router.use('/countries', createDashResourceRouter('countries'));
