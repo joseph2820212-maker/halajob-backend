@@ -28,7 +28,7 @@ export const createTicket = async (req, res, next) => {
     const payload = {
       company_id: companyData.company._id,
       created_by: companyData.userId,
-      type: ["support", "feature_request", "bug_report", "faq", "whatsapp"].includes(req.body.type) ? req.body.type : "support",
+      type: ["support", "feature_request", "bug_report", "faq", "whatsapp", "subscription_request"].includes(req.body.type) ? req.body.type : "support",
       subject: cleanText(req.body.subject || req.body.title),
       message: cleanText(req.body.message || req.body.description),
       priority: ["low", "medium", "high", "urgent"].includes(req.body.priority) ? req.body.priority : "medium",

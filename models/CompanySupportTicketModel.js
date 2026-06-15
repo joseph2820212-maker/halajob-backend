@@ -17,7 +17,7 @@ const CompanySupportTicketSchema = new Schema(
     ticket_no: { type: String, trim: true, unique: true, sparse: true, index: true },
     company_id: { type: Schema.Types.ObjectId, ref: "companies", required: true, index: true },
     created_by: { type: Schema.Types.ObjectId, ref: "users", default: null, index: true },
-    type: { type: String, enum: ["support", "feature_request", "bug_report", "faq", "whatsapp"], default: "support", index: true },
+    type: { type: String, enum: ["support", "feature_request", "bug_report", "faq", "whatsapp", "subscription_request"], default: "support", index: true },
     subject: { type: String, required: true, trim: true },
     message: { type: String, required: true, trim: true },
     status: { type: String, enum: ["open", "in_progress", "answered", "closed", "cancelled"], default: "open", index: true },

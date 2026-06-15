@@ -30,6 +30,7 @@ router.get("/subscription", companySubscriptionController.getMySubscription);
 router.get("/subscription/billing-summary", companySubscriptionController.getBillingSummary);
 router.get("/subscription/invoices", companySubscriptionController.getMyInvoices);
 router.get("/subscription/invoices/:invoiceId", companySubscriptionController.getMyInvoiceDetails);
+router.post("/subscription/request", upload.none(), companySubscriptionController.requestPlanChange);
 router.post("/profile/rebuild-search-filters", upload.none(), infoController.rebuildMyCompanySearchFilters);
 
 /* Company profile */
