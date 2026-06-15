@@ -15,6 +15,7 @@ import employeeRoutes from "./routesEmployee/index.js";
 import companyRoutes from "./routesCompany/index.js";
 import routesHealth from "./routesHealth/index.js";
 import error from "./middlewares/error.js";
+import ApiError from "./utils/apiError.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,7 +34,18 @@ const parseOrigins = (value = "") =>
     .map((origin) => origin.trim())
     .filter(Boolean);
 
+const wildcardPatternToRegExp = (pattern) => {
+  const escaped = pattern
+    .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/\*/g, "[^.:/]+");
+  return new RegExp(`^${escaped}$`);
+};
+
 const allowedOrigins = parseOrigins(process.env.CORS_ORIGINS);
+const allowedOriginPatterns = parseOrigins(process.env.CORS_ORIGIN_PATTERNS).map(wildcardPatternToRegExp);
+
+const isAllowedOrigin = (origin) =>
+  allowedOrigins.includes(origin) || allowedOriginPatterns.some((pattern) => pattern.test(origin));
 
 const corsOptions = {
   origin(origin, callback) {
@@ -43,13 +55,11 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    if (allowedOrigins.includes(origin)) {
+    if (isAllowedOrigin(origin)) {
       return callback(null, true);
     }
 
-    const error = new Error("not_allowed_by_cors");
-    error.statusCode = 403;
-    return callback(error);
+    return callback(new ApiError(403, "not_allowed_by_cors", "CORS"));
   },
 
   credentials: true,
