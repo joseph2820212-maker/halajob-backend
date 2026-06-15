@@ -8,6 +8,7 @@ import {
   UserApplyingJobModel,
   UserSavedJobModel,
   InterviewModel,
+  JobZainTalentRequestModel,
   jobsModel,
 } from "../../../models/index.js";
 import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
@@ -128,6 +129,45 @@ const createCompanyOpportunity = async (req, res, next) => {
       is_accepted: false,
       status: true,
     };
+
+    const hasFullJobPayload = [
+      "job_name",
+      "description",
+      "work_mode_id",
+      "job_type_id",
+      "job_time_id",
+      "job_salary_id",
+      "salary",
+    ].every((field) => typeof payload[field] !== "undefined" && payload[field] !== "");
+
+    if (!hasFullJobPayload) {
+      const request = await JobZainTalentRequestModel.create({
+        company_id: company._id,
+        requested_by_user_id: req.user._id,
+        title: req.body?.title || req.body?.job_name || "Campus internship request",
+        description: req.body?.description || req.body?.details || "Campus opportunity request from the university portal.",
+        required_skills: Array.isArray(req.body?.required_skills) ? req.body.required_skills : [],
+        preferred_skills: Array.isArray(req.body?.preferred_skills) ? req.body.preferred_skills : [],
+        countries: req.body?.country ? [req.body.country] : [],
+        cities: req.body?.location ? [req.body.location] : req.body?.city ? [req.body.city] : [],
+        priority: "normal",
+        requested_count: Number(req.body?.requested_count || 5),
+        notes: [
+          {
+            by_user_id: req.user._id,
+            type: "company",
+            note: `Campus target: ${candidateTarget.join(", ")}`,
+          },
+        ],
+      });
+
+      return ReturnAppData.createData({
+        res,
+        status: 202,
+        data: request,
+        message: "campus_opportunity_request_created",
+      });
+    }
 
     const job = await jobsModel.create(payload);
     return ReturnAppData.createData({ res, data: job, message: "campus_opportunity_created" });
