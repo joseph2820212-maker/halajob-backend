@@ -39,6 +39,20 @@ const getEmployee = async (req) =>
 
 const getEmailDomain = (email = "") => String(email).trim().toLowerCase().split("@")[1] || "";
 
+const isAcademicDomain = (domain = "") =>
+  domain.endsWith(".edu") ||
+  domain.includes(".edu.") ||
+  domain.endsWith(".ac") ||
+  domain.includes(".ac.");
+
+const titleFromDomain = (domain = "") =>
+  String(domain || "")
+    .split(".")[0]
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ") || "University";
+
 const getUniversityForRequest = async (req) => {
   const email = String(req.user?.email || "").trim().toLowerCase();
   const domain = getEmailDomain(email);
@@ -47,6 +61,32 @@ const getUniversityForRequest = async (req) => {
     $or: [{ email_domain: domain }, { career_center_email: email }],
     status: { $ne: "suspended" },
   }).lean();
+};
+
+const ensureUniversityForRequest = async (req) => {
+  const existing = await getUniversityForRequest(req);
+  if (existing) return existing;
+  const email = String(req.user?.email || "").trim().toLowerCase();
+  const domain = getEmailDomain(email);
+  if (!domain || !isAcademicDomain(domain)) return null;
+  const existingAnyStatus = await UniversityModel.findOne({
+    $or: [{ email_domain: domain }, { career_center_email: email }],
+  }).lean();
+  if (existingAnyStatus) return existingAnyStatus.status === "suspended" ? null : existingAnyStatus;
+  return UniversityModel.findOneAndUpdate(
+    { email_domain: domain },
+    {
+      $setOnInsert: {
+        name: titleFromDomain(domain),
+        name_en: titleFromDomain(domain),
+        email_domain: domain,
+        career_center_email: email,
+        status: "pending",
+        verified: false,
+      },
+    },
+    { new: true, upsert: true, setDefaultsOnInsert: true, runValidators: true }
+  ).lean();
 };
 
 const campusJobQuery = (target = "students") => {
@@ -344,7 +384,7 @@ const universityOverview = async (req, res, next) => {
 
 const userUniversityOverview = async (req, res, next) => {
   try {
-    const university = await getUniversityForRequest(req);
+    const university = await ensureUniversityForRequest(req);
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
 
     const partnerCompanyIds = (university.partners || []).map((partner) => partner.company_id).filter(Boolean);
@@ -378,7 +418,7 @@ const userUniversityOverview = async (req, res, next) => {
 
 const userUniversityOpportunities = async (req, res, next) => {
   try {
-    const university = await getUniversityForRequest(req);
+    const university = await ensureUniversityForRequest(req);
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
     const partnerCompanyIds = (university.partners || []).map((partner) => partner.company_id).filter(Boolean);
     const jobs = await jobsModel
@@ -397,7 +437,7 @@ const userUniversityOpportunities = async (req, res, next) => {
 
 const userUniversityStudents = async (req, res, next) => {
   try {
-    const university = await getUniversityForRequest(req);
+    const university = await ensureUniversityForRequest(req);
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
     const studentsList = await EmployeeModel.find({ $or: [{ university_id: university._id }, { university: university.name }] })
       .select("profile_headline current_job_title candidate_stage student_profile graduation_year profile_completion user_id")
@@ -413,7 +453,7 @@ const userUniversityStudents = async (req, res, next) => {
 
 const userUniversityPartners = async (req, res, next) => {
   try {
-    const university = await UniversityModel.findOne({ _id: (await getUniversityForRequest(req))?._id })
+    const university = await UniversityModel.findOne({ _id: (await ensureUniversityForRequest(req))?._id })
       .populate({ path: "partners.company_id", select: "company_name logo company_country company_city is_verified" })
       .lean();
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
@@ -425,7 +465,7 @@ const userUniversityPartners = async (req, res, next) => {
 
 const createUniversityOpportunityRequest = async (req, res, next) => {
   try {
-    const university = await getUniversityForRequest(req);
+    const university = await ensureUniversityForRequest(req);
     if (!university) return ReturnAppData.createError({ res, status: 404, message: "campus_university_not_found" });
     const title = String(req.body?.title || req.body?.job_name || "Campus internship request").trim();
     if (!title) return ReturnAppData.createError({ res, status: 422, message: "title_required" });
