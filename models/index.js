@@ -61,6 +61,7 @@ import AuditLogModel from './AuditLogModel.js';
 import CompanyQuestionLibraryModel from './CompanyQuestionLibraryModel.js';
 import CompanyMessageTemplateModel from './CompanyMessageTemplateModel.js';
 import CompanySupportTicketModel from './CompanySupportTicketModel.js';
+import CampusEventRegistrationModel from './CampusEventRegistrationModel.js';
 import UniversityModel from './UniversityModel.js';
 import UniversityOpportunityRequestModel from './UniversityOpportunityRequestModel.js';
 
@@ -126,6 +127,7 @@ export {
   CompanyQuestionLibraryModel,
   CompanyMessageTemplateModel,
   CompanySupportTicketModel,
+  CampusEventRegistrationModel,
   UniversityModel,
   UniversityOpportunityRequestModel,
   //cv

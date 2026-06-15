@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import {
+  CampusEventRegistrationModel,
   CompanyModel,
   EmployeeModel,
   PageModel,
@@ -268,6 +269,37 @@ const resources = async (req, res, next) => {
   }
 };
 
+const registerEvent = async (req, res, next) => {
+  try {
+    const eventId = String(req.params.eventId || req.body?.event_id || "").trim();
+    if (!eventId) return ReturnAppData.createError({ res, status: 422, message: "event_id_required" });
+
+    const employee = await EmployeeModel.findOne({ user_id: req.user._id }).select("_id").lean();
+    const body = req.body || {};
+    const payload = {
+      user_id: req.user._id,
+      employee_id: employee?._id || null,
+      event_id: eventId,
+      title: String(body.title || body.event_title || "Campus event").trim(),
+      organizer: String(body.organizer || "").trim(),
+      kind: String(body.kind || "").trim(),
+      date_label: String(body.date_label || body.date || "").trim(),
+      mode: String(body.mode || "").trim(),
+      status: "registered",
+    };
+
+    const registration = await CampusEventRegistrationModel.findOneAndUpdate(
+      { user_id: req.user._id, event_id: eventId },
+      { $setOnInsert: payload, $set: { status: "registered" } },
+      { new: true, upsert: true, runValidators: true }
+    ).lean();
+
+    return ReturnAppData.createData({ res, data: registration, message: "campus_event_registered" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const universityOverview = async (req, res, next) => {
   try {
     const company = await CompanyModel.findOne(buildCompanyOwnerQuery(req.user._id)).lean();
@@ -524,6 +556,7 @@ export default {
   profile,
   updateProfile,
   resources,
+  registerEvent,
   universityOverview,
   userUniversityOverview,
   userUniversityOpportunities,

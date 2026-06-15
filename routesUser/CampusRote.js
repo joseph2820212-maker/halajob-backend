@@ -12,6 +12,7 @@ router.get("/overview", authUser, campusController.overview);
 router.get("/profile", authUser, campusController.profile);
 router.put("/profile", authUser, upload.none(), campusController.updateProfile);
 router.patch("/profile", authUser, upload.none(), campusController.updateProfile);
+router.post("/events/:eventId/register", authUser, upload.none(), campusController.registerEvent);
 router.get("/university/overview", authUser, campusController.userUniversityOverview);
 router.get("/university/opportunities", authUser, campusController.userUniversityOpportunities);
 router.post("/university/opportunities", authUser, upload.none(), campusController.createUniversityOpportunityRequest);
