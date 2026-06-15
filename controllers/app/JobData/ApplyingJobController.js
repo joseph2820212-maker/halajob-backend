@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import {
   jobsModel,
+  EmployeeCvModel,
   EmployeeModel,
   UserApplyingJobModel,
   UserSavedJobModel,
@@ -117,17 +118,44 @@ const buildApplyMeta = (job = {}) => {
 const hasText = (value) => cleanText(value).length > 0;
 const hasArray = (value) => Array.isArray(value) && value.length > 0;
 
-const getActiveCv = (employee = {}) => {
-  const cvs = Array.isArray(employee.cvs) ? employee.cvs : [];
-  return (
-    cvs.find((cv) => cv.status === "active" && hasText(cv.url)) ||
-    cvs.find((cv) => hasText(cv.url)) ||
-    null
-  );
+const cvUrlFromRecord = (cv = {}) => {
+  const file = cleanText(cv.url || cv.pdf_file || cv.file || cv.path);
+  if (!file) return "";
+  return file.startsWith("/") || /^https?:\/\//i.test(file) ? file : `/${file.replace(/\\/g, "/")}`;
 };
 
-const getEmployee = (userId) =>
-  EmployeeModel.findOne({ user_id: userId }).lean();
+const getActiveCv = (employee = {}) => {
+  const cvs = Array.isArray(employee.cvs) ? employee.cvs : [];
+  const active =
+    cvs.find((cv) => cv.status === "active" && hasText(cv.url)) ||
+    cvs.find((cv) => hasText(cv.url)) ||
+    null;
+  if (!active) return null;
+  return { ...active, url: cvUrlFromRecord(active) || active.url };
+};
+
+const getEmployee = async (userId) => {
+  const employee = await EmployeeModel.findOne({ user_id: userId }).lean();
+  if (!employee?._id) return employee;
+
+  const activeCv = getActiveCv(employee);
+  if (activeCv) return employee;
+
+  const savedCv = await EmployeeCvModel.findOne({ employee_id: employee._id })
+    .sort({ is_default: -1, createdAt: -1 })
+    .lean();
+
+  if (!savedCv) return employee;
+  return {
+    ...employee,
+    cvs: [{
+      _id: savedCv._id,
+      status: savedCv.is_default ? "active" : "saved",
+      title: savedCv.title,
+      url: cvUrlFromRecord(savedCv),
+    }],
+  };
+};
 
 const getEmployeeCountryId = (employee = {}, user = {}, job = {}) => {
   const fromEmployee = Array.isArray(employee.preferred_countries)
