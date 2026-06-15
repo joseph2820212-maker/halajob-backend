@@ -50,8 +50,6 @@ function makeDefaultDevice(user, idx) {
 }
 
 function createPasscode() {
-  // TODO: replace fixed testing code with crypto.randomInt(10000, 100000) in production.
-  return 12345;
   return crypto.randomInt(10000, 100000);
 }
 

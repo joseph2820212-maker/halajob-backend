@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import {
   ApplicationStatusHistoryModel,
   EmployeeModel,
@@ -997,10 +997,16 @@ export const bulkExportApplications = async (req, res, next) => {
     }
 
     const rows = applications.map(applicationExportRow);
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(rows);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "applications");
-    const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("applications");
+    const headers = Object.keys(rows[0] || { empty: "" });
+    worksheet.columns = headers.map((header) => ({
+      header,
+      key: header,
+      width: Math.min(Math.max(header.length + 4, 14), 42),
+    }));
+    worksheet.addRows(rows);
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
 
     const fileName = `jobzain-applications-${Date.now()}.xlsx`;
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

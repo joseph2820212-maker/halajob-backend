@@ -11,7 +11,6 @@ const OTP_EXPIRE_MINUTES = 10;
 const RESEND_COOLDOWN_SECONDS = 60;
 
 function createPasscode() {
-  return 12345; // For testing only
   return crypto.randomInt(10000, 100000);
 }
 
@@ -105,14 +104,6 @@ if (
     const passcode = createPasscode();
     const expiresAt = new Date(Date.now() + OTP_EXPIRE_MINUTES * 60 * 1000);
     const now = new Date();
-console.log("RESEND OTP DEBUG:", {
-  email: user.email,
-  requestedType: type,
-  otpType,
-  status: user.status,
-  passcode_active: user.passcode_active,
-  hasPendingDevice: !!user.pending_device,
-});
     if (otpType === "verify_account") {
       if (user.status && user.passcode_active) {
         return ReturnAppData.createError({

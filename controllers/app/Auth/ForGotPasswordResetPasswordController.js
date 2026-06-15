@@ -104,7 +104,7 @@ export const resetPassword = async (req, res, next) => {
       });
     }
 
-    // Fetch user who is allowed to update password
+    // Fetch user who completed OTP verification recently.
     const user = email.includes("@")
       ? await UserModel.findOne({ email: normEmail(email), can_update_password: true })
       : await UserModel.findOne({ phone_national: email, can_update_password: true });
@@ -116,8 +116,18 @@ export const resetPassword = async (req, res, next) => {
       });
     }
 
-    // Verify recovery passcode & expiry
-  
+    if (!user.passcode_expires_at || new Date() >= new Date(user.passcode_expires_at)) {
+      user.can_update_password = false;
+      user.passcode_expires_at = undefined;
+      await user.save();
+
+      return ReturnAppData.createError({
+        res,
+        status: 403,
+        message: lan === "ar" ? "انتهت صلاحية جلسة استعادة كلمة المرور." : "Password reset session has expired.",
+      });
+    }
+
     // Hash & set the new password
     user.password = await bcryptjs.hash(password, 10);
 

@@ -16,7 +16,9 @@ const router = express.Router();
 router.post('/create', upload.single("file"), controller.create);
 router.post('/csv', upload.single("file"), controller.csv);
 router.post('/exsel', upload.single("file"), UploadJobName.uploadExcel);
-router.get('/insert',InsertDemoDataController.insert);
+if (process.env.NODE_ENV !== 'production') {
+  router.get('/insert', InsertDemoDataController.insert);
+}
 
 // استرجاع البيانات
 

@@ -1,6 +1,7 @@
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { UserModel } from "../../../models/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
+import crypto from "crypto";
 
 /** تطبيع السلاسل */
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
@@ -129,10 +130,9 @@ const forgotPassword = async (req, res, next) => {
       } catch (_) {}
 
       // أرسل رمز استعادة (٥ أرقام)
-      const passcode = Math.floor(10000 + Math.random() * 90000);
-      // user.passcode = passcode;
-      user.passcode = 12345;
-      user.can_update_password = true;
+      const passcode = crypto.randomInt(10000, 100000);
+      user.passcode = passcode;
+      user.can_update_password = false;
       user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000); // 10 دقائق
       await user.save();
 
@@ -150,8 +150,7 @@ const forgotPassword = async (req, res, next) => {
     }
 
     // جهاز جديد → أرسل رمز تحقق قبل السماح بالاستعادة
-    // const twofa = Math.floor(10000 + Math.random() * 90000);
-    const twofa = 12345;
+    const twofa = crypto.randomInt(10000, 100000);
     user.another_device_code = twofa;
     user.another_device_expires_at = new Date(Date.now() + 10 * 60 * 1000);
     user.pending_device = incomingDevice;

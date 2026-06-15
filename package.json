@@ -13,7 +13,8 @@
     "scheduled:run": "node scripts/runScheduledJob.js",
     "scheduled:close-expired-jobs": "node scripts/runScheduledJob.js close-expired-jobs",
     "scheduled:job-reminders": "node scripts/runScheduledJob.js send-job-deadline-reminders",
-    "scheduled:sync-company-jobs": "node scripts/runScheduledJob.js sync-company-active-job-counts"
+    "scheduled:sync-company-jobs": "node scripts/runScheduledJob.js sync-company-active-job-counts",
+    "smoke:import": "node scripts/smokeImport.js"
   },
   "keywords": [],
   "author": "",
@@ -28,13 +29,14 @@
     "body-parser": "^1.19.2",
     "bull": "^4.16.4",
     "cheerio": "^1.2.0",
-    "cloudinary": "^1.29.0",
+    "cloudinary": "^2.10.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "csv-parser": "^3.2.1",
     "dictionary-en": "^3.2.0",
     "dotenv": "^16.6.1",
     "ejs": "^5.0.2",
+    "exceljs": "^4.4.0",
     "express": "^4.17.1",
     "express-list-endpoints": "^7.1.1",
     "express-mongo-sanitize": "^2.2.0",
@@ -49,22 +51,18 @@
     "http-status": "^1.5.0",
     "i": "^0.3.7",
     "joi": "^17.12.3",
-    "js-ffmpeg": "^0.0.38",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.3",
     "libphonenumber-js": "^1.12.17",
     "lodash": "^4.17.21",
     "mammoth": "^1.12.0",
     "maxmind": "^5.0.0",
     "moment": "^2.29.2",
-    "mongodb-backup": "^1.6.9",
-    "mongodb-restore": "^1.6.2",
     "mongoose": "^6.2.9",
     "mongoose-paginate-v2": "^1.8.5",
     "morgan": "^1.10.0",
-    "multer": "^1.4.4",
+    "multer": "^2.1.1",
     "node-cron": "^4.2.1",
-    "nodemailer": "^7.0.3",
-    "npm": "^11.6.0",
+    "nodemailer": "^9.0.0",
     "nspell": "^2.1.5",
     "password-validator": "^5.2.1",
     "puppeteer": "^24.43.1",
@@ -72,15 +70,17 @@
     "sharp": "^0.34.1",
     "trim-request": "^1.0.6",
     "tz-lookup": "^6.1.25",
-    "uuid": "^8.3.2",
+    "uuid": "^11.1.1",
     "wink-eng-lite-web-model": "^1.8.1",
     "wink-nlp": "^2.4.0",
     "winston": "^3.7.2",
-    "xlsx": "^0.18.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
-    "nodemon": "^2.0.15"
+    "nodemon": "^3.1.14"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }

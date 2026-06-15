@@ -118,6 +118,8 @@ export const passcodeVerify = async (req, res, next) => {
       user.another_device_expires_at = undefined;
       user.pending_device = undefined;
       user.can_update_password = true;
+      user.passcode = undefined;
+      user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000);
       user.markModified?.("device");
       await user.save();
 
@@ -134,7 +136,7 @@ export const passcodeVerify = async (req, res, next) => {
 
     if (recoveryCodeValid) {
       user.passcode = undefined;
-      user.passcode_expires_at = undefined;
+      user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000);
       user.can_update_password = true;
       if (incomingDevice?.brand && incomingDevice?.model_name) {
         addOrUpdateDevice(user, incomingDevice, { makeDefault: true });

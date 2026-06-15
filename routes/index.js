@@ -9,6 +9,7 @@ import dashboardRoute from './DashboardRoute.js';
 import dashboardController from '../controllers/dash/adminDashboardController.js';
 import adminModerationController from '../controllers/dash/adminModerationController.js';
 import adminSearchController from '../controllers/dash/adminSearchController.js';
+import resourceController from '../controllers/dash/adminResourceController.js';
 import cvRoute from './cvRoute.js';
 import { createDashResourceRouter } from './dashResourceRouteFactory.js';
 import multer from '../utils/multer.js';

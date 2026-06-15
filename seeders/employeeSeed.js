@@ -157,7 +157,7 @@ const employees = [
   },
 ];
 
-const PASSWORD = "Employee@123456";
+const PASSWORD = process.env.SEED_EMPLOYEE_PASSWORD;
 
 const randomItem = (arr = []) =>
   arr[Math.floor(Math.random() * arr.length)] || null;
@@ -171,6 +171,11 @@ const randomItems = (arr = [], count = 2) => {
 };
 
 export const seedEmployees = async () => {
+  if (!PASSWORD) {
+    console.log("Employee seeding skipped. Set SEED_EMPLOYEE_PASSWORD to create demo employees.");
+    return;
+  }
+
   const employeeRole = await RoleModel.findOne({ log_to: "employee" });
 
   if (!employeeRole) {

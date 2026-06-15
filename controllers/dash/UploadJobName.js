@@ -1,6 +1,6 @@
 // controllers/uploadExcel.controller.js
 import fs from "fs";
-import xlsx from "xlsx";
+import ExcelJS from "exceljs";
 import { SheetModel, JobNameModel } from "../../models/index.js";
 
 const H = {
@@ -20,6 +20,29 @@ const hnorm = (s) =>
 const toUndef = (v) => {
   const s = norm(v);
   return s ? s : undefined;
+};
+
+const cellText = (cell) => {
+  const value = cell?.value;
+  if (value && typeof value === "object") {
+    if (value.text) return String(value.text);
+    if (value.result !== undefined) return String(value.result);
+    if (value.richText) return value.richText.map((part) => part.text || "").join("");
+  }
+  return cell?.text || String(value ?? "");
+};
+
+const worksheetToObjects = (worksheet, headers) => {
+  const rows = [];
+  worksheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return;
+    const item = {};
+    headers.forEach((header, index) => {
+      item[header] = cellText(row.getCell(index + 1));
+    });
+    if (Object.values(item).some((value) => String(value || "").trim())) rows.push(item);
+  });
+  return rows;
 };
 
 function pick(headers, candidatesSet) {
@@ -43,32 +66,25 @@ export const uploadExcel = async (req, res) => {
       return res.status(400).json({ error: "no file" });
     }
 
-    const wb = xlsx.readFile(req.file.path, {
-      cellDates: false,
-      raw: false,
-    });
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.readFile(req.file.path);
 
     fs.unlink(req.file.path, () => {});
 
-    const sheetName =
-      wb.SheetNames.find((n) => n.trim() === "Clean_Jobs") ||
-      wb.SheetNames[0];
+    const ws =
+      wb.worksheets.find((sheet) => sheet.name.trim() === "Clean_Jobs") ||
+      wb.worksheets[0];
 
-    if (!sheetName) {
+    if (!ws) {
       return res.status(400).json({ error: "sheet not found" });
     }
 
-    const ws = wb.Sheets[sheetName];
-
-    const rows = xlsx.utils.sheet_to_json(ws, { defval: "" });
+    const headers = ws.getRow(1).values.slice(1).map(String);
+    const rows = worksheetToObjects(ws, headers);
 
     if (!rows.length) {
       return res.status(400).json({ error: "sheet empty" });
     }
-
-    const headers = (
-      xlsx.utils.sheet_to_json(ws, { header: 1 })[0] || []
-    ).map(String);
 
     const c = {
       title_ar: pick(headers, H.title_ar),
@@ -85,7 +101,7 @@ export const uploadExcel = async (req, res) => {
     await SheetModel.deleteMany({});
 
     const sheetDoc = await SheetModel.create({
-      name: sheetName,
+      name: ws.name,
       totalRows: rows.length,
     });
 

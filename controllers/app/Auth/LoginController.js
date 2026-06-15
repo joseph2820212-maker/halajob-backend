@@ -42,7 +42,6 @@ function ensureDeviceArray(user) {
 }
 
 function createPasscode() {
-  return 12345; // testing
   return crypto.randomInt(10000, 100000);
 }
 

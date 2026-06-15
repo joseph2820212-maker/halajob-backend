@@ -418,7 +418,6 @@ function normalizeCandidateStage(value) {
 }
 
 function createPasscode() {
-  if (process.env.NODE_ENV !== "production") return 12345;
   return crypto.randomInt(10000, 100000);
 }
 

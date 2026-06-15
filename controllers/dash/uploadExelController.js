@@ -1,9 +1,36 @@
 // controllers/uploadController.js
 import fs from "fs";
-import xlsx from "xlsx";
+import ExcelJS from "exceljs";
 import csvParser from "csv-parser"; // npm i csv-parser
 import path from "path";
 import { CountryModel } from "../../models/index.js";
+
+const cellText = (cell) => {
+  const value = cell?.value;
+  if (value && typeof value === "object") {
+    if (value.text) return String(value.text);
+    if (value.result !== undefined) return String(value.result);
+    if (value.richText) return value.richText.map((part) => part.text || "").join("");
+  }
+  return cell?.text || String(value ?? "");
+};
+
+const worksheetToObjects = (worksheet) => {
+  const headers = worksheet.getRow(1).values.slice(1).map((header) => String(header ?? "").trim());
+  const rows = [];
+
+  worksheet.eachRow((row, rowNumber) => {
+    if (rowNumber === 1) return;
+    const item = {};
+    headers.forEach((header, index) => {
+      if (!header) return;
+      item[header] = cellText(row.getCell(index + 1)) || null;
+    });
+    if (Object.values(item).some((value) => value !== null && value !== "")) rows.push(item);
+  });
+
+  return rows;
+};
 
 /** قراءة ملف Excel وإرجاع الصفوف كـ JSON */
 export const create = async (req, res) => {
@@ -11,17 +38,18 @@ export const create = async (req, res) => {
     if (!req.file?.path) return res.status(400).json({ error: "no file" });
 
     // اقرأ المصنف
-    const workbook = xlsx.readFile(req.file.path);
-    const sheetName = workbook.SheetNames[0];
-    if (!sheetName) return res.status(400).json({ error: "empty workbook" });
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(req.file.path);
+    const sheet = workbook.worksheets[0];
+    if (!sheet) return res.status(400).json({ error: "empty workbook" });
 
     // حوّل الورقة الأولى إلى JSON
-    const sheet = workbook.Sheets[sheetName];
-    const rows = xlsx.utils.sheet_to_json(sheet, {
+    const rows = worksheetToObjects(sheet);
+    /* Removed legacy xlsx parser block.
       defval: null, // عيّن القيم الفارغة إلى null
       raw: false,   // صيّغ التواريخ كنص مقروء
       dateNF: "yyyy-mm-dd"
-    });
+    */
 
     // تنظيف الملف المؤقت
     fs.unlink(req.file.path, () => {});

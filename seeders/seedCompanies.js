@@ -8,7 +8,7 @@ import {
   IndustryModel,
 } from "../models/index.js";
 
-const PASSWORD = "Company@123456";
+const PASSWORD = process.env.SEED_COMPANY_PASSWORD;
 
 const companies = [
   {
@@ -242,6 +242,11 @@ const buildCompanySearchFilters = ({
 };
 
 export const seedCompanies = async () => {
+  if (!PASSWORD) {
+    console.log("Company seeding skipped. Set SEED_COMPANY_PASSWORD to create demo companies.");
+    return;
+  }
+
   const companyRole = await RoleModel.findOne({ log_to: "company" });
 
   if (!companyRole) {
