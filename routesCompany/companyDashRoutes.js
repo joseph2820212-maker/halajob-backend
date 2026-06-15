@@ -73,6 +73,7 @@ router.delete("/jobs/:jobId", requireCompanyPermission("jobs.manage"), upload.no
 
 router.patch("/jobs/:jobId/status", requireCompanyPermission("jobs.manage"), upload.none(), jobsController.changeJobStatus);
 router.patch("/jobs/:jobId/publish", requireCompanyPermission("jobs.manage"), upload.none(), jobsController.publishJob);
+router.patch("/jobs/:jobId/pause", requireCompanyPermission("jobs.manage"), upload.none(), jobsController.pauseJob);
 router.patch("/jobs/:jobId/archive", requireCompanyPermission("jobs.manage"), upload.none(), jobsController.archiveJob);
 router.patch("/jobs/:jobId/restore", requireCompanyPermission("jobs.manage"), upload.none(), jobsController.restoreJob);
 router.post("/jobs/:jobId/clone", requireCompanyPermission("jobs.manage"), upload.none(), jobsController.cloneJob);

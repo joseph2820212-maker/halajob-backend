@@ -1083,6 +1083,7 @@ const setPublishStatus = (publish_status) => async (req, res, next) => {
 };
 
 export const publishJob = setPublishStatus("pending_review");
+export const pauseJob = setPublishStatus("paused");
 export const archiveJob = setPublishStatus("archived");
 
 
@@ -1213,6 +1214,7 @@ export default {
   deleteJob,
   changeJobStatus,
   publishJob,
+  pauseJob,
   archiveJob,
   restoreJob,
   cloneJob,
