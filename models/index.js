@@ -62,6 +62,7 @@ import CompanyQuestionLibraryModel from './CompanyQuestionLibraryModel.js';
 import CompanyMessageTemplateModel from './CompanyMessageTemplateModel.js';
 import CompanySupportTicketModel from './CompanySupportTicketModel.js';
 import UniversityModel from './UniversityModel.js';
+import UniversityOpportunityRequestModel from './UniversityOpportunityRequestModel.js';
 
 // cv
 
@@ -126,6 +127,7 @@ export {
   CompanyMessageTemplateModel,
   CompanySupportTicketModel,
   UniversityModel,
+  UniversityOpportunityRequestModel,
   //cv
   CvTemplateModel,
   EmployeeCvModel
