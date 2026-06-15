@@ -286,6 +286,43 @@ const createLookupIfMissing = async (Model, value, extra = {}) => {
   return doc?.toObject ? doc.toObject() : doc;
 };
 
+const resolveCurrency = async (value) => {
+  if (!CurrencyModel || value === undefined || value === null || value === "") return null;
+
+  const id = validObjectIdOrNull(value);
+  if (id) return await CurrencyModel.findById(id).lean();
+
+  const parsed = parseMaybeJson(value);
+  const label = getLabel(parsed) || cleanText(value);
+  const code = cleanText(parsed?.code || parsed?.currency_code || label).toUpperCase();
+  if (!code) return null;
+
+  const existing = await CurrencyModel.findOne({
+    $or: [
+      { code },
+      { name_en: new RegExp(`^${escapeRegex(label)}$`, "i") },
+      { name_ar: new RegExp(`^${escapeRegex(label)}$`, "i") },
+    ],
+  }).lean();
+
+  if (existing) return existing;
+  if (!/^[A-Z]{3}$/.test(code)) return null;
+
+  const created = await CurrencyModel.create({
+    code,
+    name_en: code,
+    name_ar: code,
+    symbol_en: code,
+    symbol_ar: code,
+    rate_base: "USD",
+    rate: 1,
+    is_active: true,
+    is_auto_update: false,
+  });
+
+  return created?.toObject ? created.toObject() : created;
+};
+
 const normalizeSkills = async (value) => {
   const result = [];
 
@@ -497,9 +534,8 @@ const buildJobPayload = async (body = {}, companyData) => {
     payload.job_salary_info = salaryType;
   }
 
-  const currencyDoc = await createLookupIfMissing(
-    CurrencyModel,
-    body.currency_id || body.currency || body?.salary?.currency_id || body["salary.currency_id"]
+  const currencyDoc = await resolveCurrency(
+    body.currency_id || body.currency || body.currency_code || body?.salary?.currency_id || body?.salary?.currency_code || body["salary.currency_id"]
   );
 
   if (currencyDoc?._id || body.min_salary !== undefined || body.max_salary !== undefined || body.salary !== undefined) {
