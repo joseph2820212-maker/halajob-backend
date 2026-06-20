@@ -576,7 +576,6 @@ const addPartner = async (req, res, next) => {
     const {
       university_id: submittedUniversityId,
       university_ref: universityRef,
-      company_id: submittedCompanyId,
       note = "",
     } = req.body || {};
     const ref = String(universityRef || submittedUniversityId || "").trim();
@@ -592,11 +591,8 @@ const addPartner = async (req, res, next) => {
             { name_en: new RegExp(`^${escapeRegExp(ref)}$`, "i") },
           ],
         }).select("_id").lean();
-    let companyId = submittedCompanyId;
-    if (!companyId && req.user?._id) {
-      const company = await getCompanyForRequest(req, "_id");
-      companyId = company?._id;
-    }
+    const company = await getCompanyForRequest(req, "_id");
+    const companyId = company?._id;
 
     if (!university?._id || !isValidObjectId(companyId)) {
       return ReturnAppData.createError({ res, status: 400, message: "invalid_university_or_company_id" });
