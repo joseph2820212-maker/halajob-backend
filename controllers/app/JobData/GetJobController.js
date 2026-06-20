@@ -60,7 +60,18 @@ const parseJsonObject = (value) => {
 const parseArray = (...values) => unique(values.flatMap((value) => {
   if (value == null || value === "") return [];
   if (Array.isArray(value)) return value;
-  return String(value).split(",").map((x) => x.trim()).filter(Boolean);
+  if (typeof value === "string") {
+    const text = value.trim();
+    if ((text.startsWith("[") && text.endsWith("]")) || (text.startsWith("{") && text.endsWith("}"))) {
+      try {
+        const parsed = JSON.parse(text);
+        if (Array.isArray(parsed)) return parsed;
+        if (parsed && typeof parsed === "object") return Object.values(parsed);
+      } catch {}
+    }
+    return text.split(/[\s,;|]+/).map((x) => x.trim()).filter(Boolean);
+  }
+  return [value];
 }));
 const parseBool = (value) => {
   if (value === true || value === "true" || value === "1" || value === 1) return true;
@@ -71,6 +82,11 @@ const parseNumber = (value) => {
   if (value === undefined || value === null || value === "") return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
+};
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
 };
 const dateFromBucket = (key) => {
   const now = new Date();
@@ -371,8 +387,8 @@ const get = async (req, res, next) => {
   try {
     const { userId, employee } = await getEmployeeForRequest(req);
     const filters = readFilters(req);
-    const page = Math.max(1, Number(req.query.page || 1));
-    const limit = Math.min(50, Math.max(1, Number(req.query.limit || 10)));
+    const page = parseIntBounded(req.query.page, 1, 1, 100000);
+    const limit = parseIntBounded(req.query.limit, 10, 1, 50);
     const skip = (page - 1) * limit;
 
     const match = buildFilterMatch(filters);
