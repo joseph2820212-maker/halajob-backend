@@ -20,6 +20,11 @@ const toObjectId = (value) =>
   mongoose.isValidObjectId(String(value || "")) ? new Types.ObjectId(String(value)) : null;
 
 const cleanText = (value = "") => String(value || "").trim();
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
 
 const getId = (value) => value?._id || value?.id || value || null;
 
@@ -672,8 +677,8 @@ const applyJob = async (req, res, next) => {
 const getAppliedJobs = async (req, res, next) => {
   try {
     const user = req.user;
-    const page = Math.max(1, Number(req.query.page || 1));
-    const limit = Math.min(50, Math.max(1, Number(req.query.limit || 10)));
+    const page = parseIntBounded(req.query.page, 1, 1, 100000);
+    const limit = parseIntBounded(req.query.limit, 10, 1, 50);
     const skip = (page - 1) * limit;
     const status = cleanText(req.query.status);
 

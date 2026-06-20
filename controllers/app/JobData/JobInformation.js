@@ -18,6 +18,11 @@ import {
 const { Types } = mongoose;
 const toObjectId = (value) => (mongoose.isValidObjectId(String(value || "")) ? new Types.ObjectId(String(value)) : null);
 const msg = (req, ar, en) => (String(req.get("lan") || "en").toLowerCase().startsWith("ar") ? ar : en);
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
 
 const publicJobFilter = () => {
   const now = new Date();
@@ -139,8 +144,8 @@ const toggleSaveJob = async (req, res, next) => {
 const listJobReviews = async (req, res, next) => {
   try {
     const jobId = toObjectId(req.params.id);
-    const page = Math.max(1, Number(req.query.page || 1));
-    const limit = Math.min(30, Math.max(1, Number(req.query.limit || 5)));
+    const page = parseIntBounded(req.query.page, 1, 1, 100000);
+    const limit = parseIntBounded(req.query.limit, 5, 1, 30);
     if (!jobId) return ReturnAppData.getError({ res, status: 400, message: "bad id" });
     const rows = await UserReviewJobModel.aggregate([
       { $match: { job_id: jobId } }, { $sort: { createdAt: -1, _id: -1 } }, { $skip: (page - 1) * limit }, { $limit: limit },
@@ -169,8 +174,8 @@ const recomputeJobRatingBreakdown = async (req, res, next) => {
 const listJobSavers = async (req, res, next) => {
   try {
     const jobId = toObjectId(req.params.id);
-    const page = Math.max(1, Number(req.query.page || 1));
-    const limit = Math.min(30, Math.max(1, Number(req.query.limit || 5)));
+    const page = parseIntBounded(req.query.page, 1, 1, 100000);
+    const limit = parseIntBounded(req.query.limit, 5, 1, 30);
     if (!jobId) return ReturnAppData.getError({ res, status: 400, message: "bad id" });
     const rows = await UserSavedJobModel.aggregate([
       { $match: { job_id: jobId } }, { $sort: { createdAt: -1, _id: -1 } }, { $skip: (page - 1) * limit }, { $limit: limit },

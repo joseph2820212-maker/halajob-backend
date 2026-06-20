@@ -37,6 +37,7 @@ import {
   job_reviewed_notification,
   job_seeker_saved_notification,
 } from "../../../notification/JobCompanyNotifications.js";
+
 import { calculateAtsApplicationResult } from "../../../services/matching/atsScoring.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
 
@@ -49,6 +50,12 @@ import {
   buildRecommendedJobFilter,
   isValidObjectId,
 } from "../../../helper/employeeDash/employeeDashHelpers.js";
+
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
 
 const publicJobFilter = {
   status: true,
@@ -162,8 +169,8 @@ export const recommendedJobs = async (req, res, next) => {
     if (!employeeData) return;
 
     const employeeId = employeeData.employee._id;
-    const page = Math.max(Number(req.query.page || 1), 1);
-    const limit = Math.min(Math.max(Number(req.query.limit || req.query.paginate || 20), 1), 50);
+    const page = parseIntBounded(req.query.page, 1, 1, 100000);
+    const limit = parseIntBounded(req.query.limit || req.query.paginate, 20, 1, 50);
     const skip = (page - 1) * limit;
 
     const hasExtraFilters = Object.keys(req.query || {}).some(

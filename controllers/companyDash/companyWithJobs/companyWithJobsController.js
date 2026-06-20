@@ -55,6 +55,12 @@ const EducationLevelLookupModel = EducationLevelModel;
 const TRUE_VALUES = ["on", "true", true, "1", 1, "yes", "y"];
 const FALSE_VALUES = ["off", "false", false, "0", 0, "no", "n"];
 
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
+
 const failSubscription = (res, check) => fail(res, check.message || "subscription_not_allowed", check.status || 403, {
   feature: check.feature,
   metric: check.metric,
@@ -1169,8 +1175,8 @@ export const getRecommendedEmployeesForJob = async (req, res, next) => {
     const exists = await jobsModel.exists({ _id: jobId, company_id: companyData.company._id });
     if (!exists) return fail(res, "job_not_found", 404);
 
-    const page = Math.max(Number(req.query.page || 1), 1);
-    const limit = Math.min(Math.max(Number(req.query.limit || req.query.paginate || 20), 1), 50);
+    const page = parseIntBounded(req.query.page, 1, 1, 100000);
+    const limit = parseIntBounded(req.query.limit || req.query.paginate, 20, 1, 50);
     const skip = (page - 1) * limit;
 
     const filter = {
