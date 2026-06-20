@@ -32,6 +32,17 @@ const normalizeLimit = (value, fallback = 12, max = 50) => {
   return Math.min(Math.floor(number), max);
 };
 
+const toStringArray = (value) => {
+  if (Array.isArray(value)) return value.map((item) => String(item || "").trim()).filter(Boolean);
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
 const getEmployee = async (req) =>
   EmployeeModel.findOne({ user_id: req.user._id })
     .populate({ path: "user_id", select: "first_name mid_name last_name email image" })
@@ -196,62 +207,40 @@ const createCompanyOpportunity = async (req, res, next) => {
   try {
     const company = await getCompanyForRequest(req, "_id owner_user_id");
     if (!company) return ReturnAppData.createError({ res, status: 403, message: "company_not_found" });
+    const body = req.body || {};
+    const title = String(body.title || body.job_name || "").trim();
+    if (!title) return ReturnAppData.createError({ res, status: 422, message: "title_required" });
+
     const target = String(req.body?.target || req.body?.candidate_target || "students").toLowerCase();
     const candidateTarget = target === "fresh_graduates" ? ["fresh_graduates"] : ["students"];
+    const requestedCount = normalizeLimit(body.requested_count, 5, 500);
 
-    const payload = {
-      ...(req.body || {}),
+    const request = await JobZainTalentRequestModel.create({
       company_id: company._id,
-      user_id: req.user._id,
-      candidate_target: candidateTarget,
-      is_for_students: candidateTarget.includes("students"),
-      is_for_fresh_graduates: candidateTarget.includes("fresh_graduates"),
-      publish_status: "pending_review",
-      is_accepted: false,
-      status: true,
-    };
+      requested_by_user_id: req.user._id,
+      title,
+      description: String(body.description || body.details || "Campus opportunity request from the company campus portal.").trim(),
+      required_skills: toStringArray(body.required_skills),
+      preferred_skills: toStringArray(body.preferred_skills),
+      countries: toStringArray(body.country || body.countries),
+      cities: toStringArray(body.location || body.city || body.cities),
+      priority: "normal",
+      requested_count: requestedCount,
+      notes: [
+        {
+          by_user_id: req.user._id,
+          type: "company",
+          note: `Campus target: ${candidateTarget.join(", ")}`,
+        },
+      ],
+    });
 
-    const hasFullJobPayload = [
-      "job_name",
-      "description",
-      "work_mode_id",
-      "job_type_id",
-      "job_time_id",
-      "job_salary_id",
-      "salary",
-    ].every((field) => typeof payload[field] !== "undefined" && payload[field] !== "");
-
-    if (!hasFullJobPayload) {
-      const request = await JobZainTalentRequestModel.create({
-        company_id: company._id,
-        requested_by_user_id: req.user._id,
-        title: req.body?.title || req.body?.job_name || "Campus internship request",
-        description: req.body?.description || req.body?.details || "Campus opportunity request from the university portal.",
-        required_skills: Array.isArray(req.body?.required_skills) ? req.body.required_skills : [],
-        preferred_skills: Array.isArray(req.body?.preferred_skills) ? req.body.preferred_skills : [],
-        countries: req.body?.country ? [req.body.country] : [],
-        cities: req.body?.location ? [req.body.location] : req.body?.city ? [req.body.city] : [],
-        priority: "normal",
-        requested_count: Number(req.body?.requested_count || 5),
-        notes: [
-          {
-            by_user_id: req.user._id,
-            type: "company",
-            note: `Campus target: ${candidateTarget.join(", ")}`,
-          },
-        ],
-      });
-
-      return ReturnAppData.createData({
-        res,
-        status: 202,
-        data: request,
-        message: "campus_opportunity_request_created",
-      });
-    }
-
-    const job = await jobsModel.create(payload);
-    return ReturnAppData.createData({ res, data: job, message: "campus_opportunity_created" });
+    return ReturnAppData.createData({
+      res,
+      status: 202,
+      data: request,
+      message: "campus_opportunity_request_created",
+    });
   } catch (error) {
     next(error);
   }
@@ -527,16 +516,43 @@ const companyOpportunities = async (req, res, next) => {
     const company = await getCompanyForRequest(req, "_id");
     if (!company) return ReturnAppData.getError({ res, status: 403, message: "company_not_found" });
 
-    const jobs = await jobsModel
-      .find({
+    const limit = normalizeLimit(req.query.limit);
+    const [jobs, requests] = await Promise.all([
+      jobsModel
+        .find({
+          company_id: company._id,
+          $or: [{ is_for_students: true }, { is_for_fresh_graduates: true }, { candidate_target: { $in: ["students", "fresh_graduates"] } }],
+        })
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .lean(),
+      JobZainTalentRequestModel.find({
         company_id: company._id,
-        $or: [{ is_for_students: true }, { is_for_fresh_graduates: true }, { candidate_target: { $in: ["students", "fresh_graduates"] } }],
+        "notes.note": /^Campus target:/,
       })
-      .sort({ createdAt: -1 })
-      .limit(normalizeLimit(req.query.limit))
-      .lean();
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .lean(),
+    ]);
 
-    return ReturnAppData.getData({ res, data: jobs, message: "campus_company_opportunities" });
+    const submittedRequests = requests.map((request) => ({
+      ...request,
+      _id: request._id,
+      job_name: request.title,
+      candidate_target: request.notes?.[0]?.note?.includes("fresh_graduates") ? ["fresh_graduates"] : ["students"],
+      is_for_students: !request.notes?.[0]?.note?.includes("fresh_graduates"),
+      is_for_fresh_graduates: request.notes?.[0]?.note?.includes("fresh_graduates"),
+      publish_status: request.status,
+      work_mode: "Campus request",
+      city: request.cities?.[0] || "Campus",
+      source: "company_campus_opportunity_request",
+    }));
+
+    const opportunities = [...submittedRequests, ...jobs]
+      .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+      .slice(0, limit);
+
+    return ReturnAppData.getData({ res, data: opportunities, message: "campus_company_opportunities" });
   } catch (error) {
     next(error);
   }
