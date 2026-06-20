@@ -89,21 +89,21 @@ const universityLogin = async (req, res, next) => {
       });
     }
 
-    const university = domain
+    const university = email
       ? await UniversityModel.findOne({
-          $or: [{ email_domain: domain }, { career_center_email: email }],
+          career_center_email: email,
           status: { $ne: "suspended" },
         }).lean()
       : null;
 
-    if (!university && !isAcademicDomain(domain)) {
+    if (!university) {
       return ReturnAppData.createError({
         res,
         status: 403,
         message:
           lan === "ar"
-            ? "دخول الجامعة يتطلب بريد مركز مهني مسجل أو نطاقاً جامعياً مثل .edu أو .ac."
-            : "University login requires a registered career-center email or an academic domain such as .edu or .ac.",
+            ? "دخول الجامعة يتطلب بريد مركز مهني مسجل."
+            : "University login requires a registered career-center email.",
       });
     }
 
