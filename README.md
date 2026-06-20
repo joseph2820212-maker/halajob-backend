@@ -60,7 +60,7 @@ Frontend environment variables:
 
 ```text
 VITE_API_URL=https://jobzain.com
-VITE_ENABLE_UNIVERSITY_PREVIEW=true
+VITE_ENABLE_UNIVERSITY_PREVIEW=false
 ```
 
 ## Checks
