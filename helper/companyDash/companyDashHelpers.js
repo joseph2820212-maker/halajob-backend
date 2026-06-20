@@ -13,11 +13,22 @@ export const isValidObjectId = (value) =>
   mongoose.Types.ObjectId.isValid(String(value || ""));
 
 export const toObjectIdArray = (value) => {
-  const arr = Array.isArray(value)
-    ? value
-    : value === undefined || value === null
-      ? []
-      : [value];
+  let arr = [];
+
+  if (Array.isArray(value)) {
+    arr = value;
+  } else if (value === undefined || value === null || value === "") {
+    arr = [];
+  } else if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      arr = Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      arr = value.split(/[\s,;|]+/);
+    }
+  } else {
+    arr = [value];
+  }
 
   return [...new Set(arr.map((x) => String(x || "").trim()).filter(isValidObjectId))];
 };
