@@ -9,6 +9,12 @@ import {
   UserSavedJobModel,
 } from "../../../models/index.js";
 
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
+
 /* أسماء المجموعات المساعدة للعدّ */
 const REV_COLL = UserReviewJobModel.collection.name;
 const SAVE_COLL = UserSavedJobModel.collection.name;
@@ -38,8 +44,8 @@ async function ensureCompany(req, res) {
  const getCreatedJobs = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
-    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit ?? "10", 10)));
+    const page = parseIntBounded(req.query.page, 0, 0, 100000);
+    const limit = parseIntBounded(req.query.limit, 10, 1, 50);
     const q = (req.query.q ?? "").trim();
 
     const company = await ensureCompany(req, res);
@@ -141,8 +147,8 @@ const getJobById = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const id = req.params.id;
-    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit ?? "5", 10)));
+    const page = parseIntBounded(req.query.page, 0, 0, 100000);
+    const limit = parseIntBounded(req.query.limit, 5, 1, 50);
 
     if (!mongoose.isValidObjectId(id)) {
       return ReturnAppData.getError({ res, status: 400, message: lan === "ar" ? "معرّف غير صالح" : "Invalid id" });
@@ -249,8 +255,8 @@ const getJobById = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const id = req.params.id;
-    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit ?? "5", 10)));
+    const page = parseIntBounded(req.query.page, 0, 0, 100000);
+    const limit = parseIntBounded(req.query.limit, 5, 1, 50);
 
     if (!mongoose.isValidObjectId(id)) {
       return ReturnAppData.getError({ res, status: 400, message: lan === "ar" ? "معرّف غير صالح" : "Invalid id" });

@@ -7,6 +7,12 @@ const COMP_COLL = CompanyModel.collection.name;
 
 const toObjectId = (v) => new mongoose.Types.ObjectId(String(v));
 
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
+
 /** مُساعد: تنفيذ تجميعة مع تقسيم صفحات وإخراج total وhasMore */
 async function runPagedAggregate(model, { match, lookups = [], project = {}, page, limit, sort = { createdAt: -1, _id: -1 } }) {
   const pipeline = [
@@ -41,8 +47,8 @@ const getSavedJob = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const user = req.user;
-    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit ?? "10", 10)));
+    const page = parseIntBounded(req.query.page, 0, 0, 100000);
+    const limit = parseIntBounded(req.query.limit, 10, 1, 50);
 
     if (!user?._id) {
       return ReturnAppData.createError({ res, status: 401, message: lan === "ar" ? "غير مصرح" : "Unauthorized" });
@@ -99,8 +105,8 @@ const getAppliedJobs = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const user = req.user;
-    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit ?? "10", 10)));
+    const page = parseIntBounded(req.query.page, 0, 0, 100000);
+    const limit = parseIntBounded(req.query.limit, 10, 1, 50);
 
     if (!user?._id) {
       return ReturnAppData.createError({ res, status: 401, message: lan === "ar" ? "غير مصرح" : "Unauthorized" });
@@ -164,8 +170,8 @@ const getInterviewedJobs = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const user = req.user;
-    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit ?? "10", 10)));
+    const page = parseIntBounded(req.query.page, 0, 0, 100000);
+    const limit = parseIntBounded(req.query.limit, 10, 1, 50);
 
     if (!user?._id) {
       return ReturnAppData.createError({ res, status: 401, message: lan === "ar" ? "غير مصرح" : "Unauthorized" });

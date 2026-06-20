@@ -7,6 +7,12 @@ import {
   UserApplyingJobModel,
 } from "../../../models/index.js";
 
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
+
 /* helper: تحقق شركة المالك */
 async function ensureCompany(req, res) {
   const lan = (req.get("lan") || "en").toLowerCase();
@@ -33,8 +39,8 @@ export const getJobApplicants = async (req, res, next) => {
   try {
     const lan = (req.get("lan") || "en").toLowerCase();
     const id = req.params.id;
-    const page = Math.max(0, parseInt(req.query.page ?? "0", 10));
-    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit ?? "5", 10)));
+    const page = parseIntBounded(req.query.page, 0, 0, 100000);
+    const limit = parseIntBounded(req.query.limit, 5, 1, 50);
 
     if (!mongoose.isValidObjectId(id)) {
       return ReturnAppData.createError({ res, status: 400, message: lan === "ar" ? "معرّف غير صالح" : "Invalid id" });
