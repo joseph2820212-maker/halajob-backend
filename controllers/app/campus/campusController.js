@@ -43,6 +43,31 @@ const toStringArray = (value) => {
   return [];
 };
 
+const cleanText = (value) => String(value || "").trim();
+
+const normalizeUniversityCreatePayload = (body = {}) => {
+  const name = cleanText(body.name || body.name_en);
+  const emailDomain = cleanText(body.email_domain).toLowerCase().replace(/^@+/, "");
+  const careerCenterEmail = cleanText(body.career_center_email).toLowerCase() || (emailDomain ? `careers@${emailDomain}` : "");
+  const status = ["active", "pending", "suspended"].includes(cleanText(body.status).toLowerCase())
+    ? cleanText(body.status).toLowerCase()
+    : "pending";
+  const studentsCount = Number(body.students_count || 0);
+
+  return {
+    name,
+    name_en: cleanText(body.name_en || name),
+    logo: cleanText(body.logo),
+    city: cleanText(body.city),
+    country: cleanText(body.country),
+    email_domain: emailDomain,
+    career_center_email: careerCenterEmail,
+    status,
+    verified: status === "active",
+    students_count: Number.isFinite(studentsCount) && studentsCount >= 0 ? Math.floor(studentsCount) : 0,
+  };
+};
+
 const getEmployee = async (req) =>
   EmployeeModel.findOne({ user_id: req.user._id })
     .populate({ path: "user_id", select: "first_name mid_name last_name email image" })
@@ -645,7 +670,12 @@ const listUniversities = async (req, res, next) => {
 
 const createUniversity = async (req, res, next) => {
   try {
-    const university = await UniversityModel.create(req.body || {});
+    const payload = normalizeUniversityCreatePayload(req.body || {});
+    if (!payload.name || !payload.email_domain || !payload.career_center_email) {
+      return ReturnAppData.createError({ res, status: 422, message: "university_name_and_email_domain_required" });
+    }
+
+    const university = await UniversityModel.create(payload);
     return ReturnAppData.createData({ res, data: university, message: "university_created" });
   } catch (error) {
     next(error);
