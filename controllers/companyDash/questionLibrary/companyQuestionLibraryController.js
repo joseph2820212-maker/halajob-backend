@@ -36,6 +36,31 @@ const normalizePayload = (body = {}) => ({
   is_active: body.is_active === undefined ? true : toBool(body.is_active),
 });
 
+const normalizePatchPayload = (body = {}) => {
+  const payload = {};
+
+  if (body.title !== undefined || body.question !== undefined) {
+    payload.title = cleanText(body.title || body.question);
+    payload.question = cleanText(body.question || body.title);
+  }
+  if (body.type !== undefined) payload.type = cleanText(body.type || "text");
+  if (body.options !== undefined) payload.options = normalizeOptions(body.options);
+  if (body.is_required !== undefined || body.required !== undefined) payload.is_required = toBool(body.is_required ?? body.required);
+  if (body.is_knockout !== undefined || body.knockout !== undefined) payload.is_knockout = toBool(body.is_knockout ?? body.knockout);
+  if (body.weight !== undefined) payload.weight = Math.min(Math.max(Number(body.weight ?? 1), 0), 100);
+  if (body.expected_answer !== undefined || body.knockout_expected_answer !== undefined || body.correct_answer !== undefined) {
+    payload.expected_answer = parseMaybeJson(body.expected_answer ?? body.knockout_expected_answer ?? body.correct_answer ?? null);
+  }
+  if (body.knockout_action !== undefined) {
+    payload.knockout_action = ["mark_not_match", "needs_manual_review", "reject"].includes(body.knockout_action) ? body.knockout_action : "mark_not_match";
+  }
+  if (body.category !== undefined) payload.category = cleanText(body.category || "general");
+  if (body.tags !== undefined) payload.tags = toArray(body.tags).map(cleanText).filter(Boolean);
+  if (body.is_active !== undefined) payload.is_active = toBool(body.is_active);
+
+  return payload;
+};
+
 export const listQuestions = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
@@ -72,7 +97,8 @@ export const updateQuestion = async (req, res, next) => {
     if (!isValidObjectId(req.params.questionId)) return fail(res, "invalid_question_id", 400);
     const oldQuestion = await CompanyQuestionLibraryModel.findOne({ _id: req.params.questionId, company_id: companyData.company._id }).lean();
     if (!oldQuestion) return fail(res, "question_not_found", 404);
-    const payload = normalizePayload(req.body);
+    const payload = normalizePatchPayload(req.body);
+    if ((req.body.title !== undefined || req.body.question !== undefined) && !payload.question) return fail(res, "question_required", 422);
     const question = await CompanyQuestionLibraryModel.findOneAndUpdate({ _id: req.params.questionId, company_id: companyData.company._id }, { $set: payload }, { new: true, runValidators: true });
     await writeAuditLog({ req, companyId: companyData.company._id, actorUserId: companyData.userId, actorType: "company_owner", action: "question_library_updated", entityType: "question_library", entityId: question._id, oldValue: oldQuestion, newValue: payload });
     return success(res, question, "question_library_updated");
