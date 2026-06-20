@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { randomBytes } from "crypto";
 import { CvTemplateModel, EmployeeCvModel } from "../../../models/index.js";
 import { buildCvTemplateData } from "../../../services/cv/cvData.service.js";
 import { generatePdfFromHtml, renderCvHtml } from "../../../services/cv/cvPdf.service.js";
@@ -93,8 +94,9 @@ export const createMyCvDownloadUrl = async (req, res, next) => {
     await ensureOutputDir();
     const html = renderCvHtml({ template: context.template, data: context.data });
     const pdf = await generatePdfFromHtml(html);
-    const fileName = `${context.employee._id}-${Date.now()}.pdf`;
+    const fileName = `generated-${randomBytes(12).toString("hex")}.pdf`;
     const filePath = path.join(CV_OUTPUT_ROOT, fileName);
+    const publicPath = path.posix.join("cv", "generated", fileName);
     await fs.promises.writeFile(filePath, pdf);
 
     const cv = await EmployeeCvModel.create({
@@ -106,7 +108,7 @@ export const createMyCvDownloadUrl = async (req, res, next) => {
       colors: context.colors,
       font: context.font,
       sections: req.body?.sections || {},
-      pdf_file: filePath.replace(/\\/g, "/"),
+      pdf_file: publicPath,
       is_default: Boolean(req.body?.is_default),
     });
 

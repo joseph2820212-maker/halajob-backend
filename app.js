@@ -6,6 +6,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import hpp from "hpp";
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -191,6 +192,7 @@ app.use(
 /* ----------------------------- Static Uploads ----------------------------- */
 
 const uploadsPath = path.join(process.cwd(), "uploads");
+const generatedCvPath = path.resolve(process.cwd(), "cv", "generated");
 
 app.use(
   "/uploads",
@@ -219,6 +221,39 @@ app.use(
     },
   })
 );
+
+app.get("/cv/generated/:fileName", async (req, res, next) => {
+  try {
+    const fileName = String(req.params.fileName || "");
+    const extension = path.extname(fileName).toLowerCase();
+
+    if (path.basename(fileName) !== fileName || extension !== ".pdf") {
+      throw new ApiError(400, "invalid_cv_file", "CV");
+    }
+
+    const filePath = path.resolve(generatedCvPath, fileName);
+    if (!filePath.startsWith(generatedCvPath + path.sep)) {
+      throw new ApiError(400, "invalid_cv_file", "CV");
+    }
+
+    await fs.promises.access(filePath, fs.constants.R_OK);
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    res.setHeader("Content-Type", "application/pdf");
+
+    if (!isProduction) {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+    }
+
+    return res.download(filePath, "cv.pdf");
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      return next(new ApiError(404, "cv_not_found", "CV"));
+    }
+
+    return next(error);
+  }
+});
 
 /* ----------------------------- Routes Limits ----------------------------- */
 
