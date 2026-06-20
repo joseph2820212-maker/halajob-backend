@@ -53,6 +53,8 @@ const titleFromDomain = (domain = "") =>
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ") || "University";
 
+const escapeRegExp = (value = "") => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const getUniversityForRequest = async (req) => {
   const email = String(req.user?.email || "").trim().toLowerCase();
   const domain = getEmailDomain(email);
@@ -561,28 +563,46 @@ const partners = async (req, res, next) => {
 
 const addPartner = async (req, res, next) => {
   try {
-    const { university_id: universityId, company_id: submittedCompanyId, note = "" } = req.body || {};
+    const {
+      university_id: submittedUniversityId,
+      university_ref: universityRef,
+      company_id: submittedCompanyId,
+      note = "",
+    } = req.body || {};
+    const ref = String(universityRef || submittedUniversityId || "").trim();
+    const refLower = ref.toLowerCase();
+    const university = isValidObjectId(ref)
+      ? await UniversityModel.findById(ref).select("_id").lean()
+      : await UniversityModel.findOne({
+          status: { $ne: "suspended" },
+          $or: [
+            { email_domain: refLower },
+            { career_center_email: refLower },
+            { name: new RegExp(`^${escapeRegExp(ref)}$`, "i") },
+            { name_en: new RegExp(`^${escapeRegExp(ref)}$`, "i") },
+          ],
+        }).select("_id").lean();
     let companyId = submittedCompanyId;
     if (!companyId && req.user?._id) {
       const company = await CompanyModel.findOne(buildCompanyOwnerQuery(req.user._id)).select("_id").lean();
       companyId = company?._id;
     }
 
-    if (!isValidObjectId(universityId) || !isValidObjectId(companyId)) {
+    if (!university?._id || !isValidObjectId(companyId)) {
       return ReturnAppData.createError({ res, status: 400, message: "invalid_university_or_company_id" });
     }
 
-    const university = await UniversityModel.findOneAndUpdate(
-      { _id: universityId, "partners.company_id": { $ne: companyId } },
+    const updatedUniversity = await UniversityModel.findOneAndUpdate(
+      { _id: university._id, "partners.company_id": { $ne: companyId } },
       { $push: { partners: { company_id: companyId, status: "pending", note } } },
       { new: true }
     ).lean();
 
-    if (!university) {
+    if (!updatedUniversity) {
       return ReturnAppData.createError({ res, status: 409, message: "partner_already_exists_or_university_missing" });
     }
 
-    return ReturnAppData.createData({ res, data: university, message: "campus_partner_added" });
+    return ReturnAppData.createData({ res, data: updatedUniversity, message: "campus_partner_added" });
   } catch (error) {
     next(error);
   }
