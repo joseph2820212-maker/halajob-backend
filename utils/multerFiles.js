@@ -1,6 +1,7 @@
 import multer from 'multer';
 import path from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import { randomBytes } from 'crypto';
 
 const UPLOADS_ROOT = path.resolve('uploads');
 const DOCS_DIR = 'files';
@@ -19,7 +20,7 @@ const sanitizeFileName = (originalName = '') => {
   return `${base.replace(/[^a-zA-Z0-9_-]/g, '_').replace(/\s+/g, '_').toLowerCase()}${ext}`;
 };
 
-const rand = () => Math.random().toString(36).slice(2, 8);
+const rand = () => randomBytes(8).toString('hex');
 
 const hasAllowedMime = (file, ext) => {
   const allowed = ALLOWED_FILES[ext];

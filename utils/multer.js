@@ -1,6 +1,7 @@
 import multer from 'multer';
 import path from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import { randomBytes } from 'crypto';
 
 const UPLOADS_ROOT = path.resolve('uploads');
 
@@ -25,6 +26,8 @@ const sanitizeFileName = (originalName = '') => {
     .toLowerCase()}${extension}`;
 };
 
+const rand = () => randomBytes(8).toString('hex');
+
 const hasAllowedMime = (file, ext) => {
   const allowed = ALLOWED_FILES[ext];
   if (!allowed) return false;
@@ -38,7 +41,7 @@ const upload = multer({
       if (!existsSync(UPLOADS_ROOT)) mkdirSync(UPLOADS_ROOT, { recursive: true });
       cb(null, UPLOADS_ROOT);
     },
-    filename: (req, file, cb) => cb(null, `${Date.now()}-${sanitizeFileName(file.originalname || 'file')}`),
+    filename: (req, file, cb) => cb(null, `${Date.now()}-${rand()}-${sanitizeFileName(file.originalname || 'file')}`),
   }),
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname || '').toLowerCase();
