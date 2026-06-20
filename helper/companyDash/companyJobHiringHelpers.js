@@ -481,9 +481,15 @@ export const populateApplicationQuery = (query) =>
       select: "first_name mid_name last_name email image phone_code phone_national",
     });
 
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
+
 export const paginateApplications = async (req, filter, sort) => {
-  const page = Math.max(Number(req.query.page) || 1, 1);
-  const limit = Math.min(Math.max(Number(req.query.limit || req.query.paginate) || 10, 1), 100);
+  const page = parseIntBounded(req.query.page, 1, 1, 100000);
+  const limit = parseIntBounded(req.query.limit || req.query.paginate, 10, 1, 100);
   const skip = (page - 1) * limit;
 
   const query = populateApplicationQuery(UserApplyingJobModel.find(filter)).sort(sort).skip(skip).limit(limit).lean();

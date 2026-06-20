@@ -140,9 +140,15 @@ export const calculateProfileCompletion = (employee = {}) => {
   return Math.round((done / checks.length) * 100);
 };
 
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
+
 export const paginate = async (Model, filter = {}, req, options = {}) => {
-  const page = Math.max(Number(req.query.page) || 1, 1);
-  const limit = Math.min(Math.max(Number(req.query.limit || req.query.paginate) || 10, 1), 100);
+  const page = parseIntBounded(req.query.page, 1, 1, 100000);
+  const limit = parseIntBounded(req.query.limit || req.query.paginate, 10, 1, 100);
   const skip = (page - 1) * limit;
   const sort = options.sort || parseSort(req.query.sort) || { createdAt: -1, _id: -1 };
 
