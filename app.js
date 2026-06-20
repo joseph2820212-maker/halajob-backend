@@ -199,9 +199,19 @@ app.use(
     index: false,
     dotfiles: "deny",
 
-    setHeaders: (res) => {
+    setHeaders: (res, filePath) => {
+      const extension = path.extname(filePath).toLowerCase();
+
       res.setHeader("X-Content-Type-Options", "nosniff");
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+
+      if (extension === ".svg" || extension === ".html") {
+        res.setHeader("Content-Security-Policy", "default-src 'none'; img-src data:; style-src 'unsafe-inline'");
+      }
+
+      if (extension === ".html") {
+        res.setHeader("Content-Disposition", "attachment");
+      }
 
       if (!isProduction) {
         res.setHeader("Access-Control-Allow-Origin", "*");

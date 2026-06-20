@@ -14,7 +14,6 @@ const ALLOWED_FILES = {
   '.xlsx': ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
   '.csv': ['text/csv', 'application/csv', 'application/vnd.ms-excel'],
   '.ttf': ['font/ttf', 'application/x-font-ttf'],
-  '.html': ['text/html'],
 };
 
 const sanitizeFileName = (originalName = '') => {
