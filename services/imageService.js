@@ -2,6 +2,8 @@ import sharp from "sharp";
 import fs from "fs";
 import path from "path";
 
+const UPLOADS_ROOT = path.resolve(process.cwd(), "uploads");
+
 const ensureDir = (dir) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 };
@@ -22,8 +24,11 @@ export const deleteImage = async (dbPath) => {
   if (!dbPath || typeof dbPath !== "string") return;
 
   try {
-    const cleanPath = dbPath.replace(/^\/+/, "");
-    const fullPath = path.join("uploads", cleanPath);
+    const cleanPath = dbPath.split("?")[0].split("#")[0].replace(/\\/g, "/").replace(/^\/+/, "");
+    const relativePath = cleanPath.replace(/^uploads\//, "");
+    const fullPath = path.resolve(UPLOADS_ROOT, relativePath);
+
+    if (fullPath === UPLOADS_ROOT || !fullPath.startsWith(UPLOADS_ROOT + path.sep)) return;
     await safeUnlink(fullPath);
   } catch (err) {
     console.error("Error deleting image:", err);

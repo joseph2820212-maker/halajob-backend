@@ -1,30 +1,14 @@
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
-import fs from 'fs';
-import path from "path";
-import { fileURLToPath } from "url";
 import { UserModel, RefreshTokenModel } from "../../../models/index.js";
 import bcryptjs from "bcryptjs";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { deleteImage } from "../../../services/imageService.js";
 
 // Helper to join base URL safely with a relative path
 function buildPublicUrl(base, rel) {
   if (!base) return rel;
   const cleaned = rel?.replace(/^\/+/, "") || "";
   return base.endsWith("/") ? base + cleaned : `${base}/${cleaned}`;
-}
-
-// Ensure we only ever delete inside the uploads dir
-function safeUploadsPath(relative) {
-  const uploadsDir = path.resolve(__dirname, "../../../../uploads");
-  const filename = path.basename(relative || ""); // strip any path traversal
-  return {
-    uploadsDir,
-    abs: path.join(uploadsDir, filename),
-    filename,
-  };
 }
 
 export const updateImage = async (req, res, next) => {
@@ -52,10 +36,7 @@ export const updateImage = async (req, res, next) => {
 
     // Delete old image safely if present
     if (user.image) {
-      const { abs, uploadsDir } = safeUploadsPath(user.image);
-      if (abs.startsWith(uploadsDir) && fs.existsSync(abs)) {
-        fs.unlinkSync(abs);
-      }
+      await deleteImage(user.image);
     }
 
     // Save only the filename (recommended). Multer should have stored it under /uploads/<filename>
