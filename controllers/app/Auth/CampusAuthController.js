@@ -76,14 +76,36 @@ const campusRegister = async (req, res, next) => {
 };
 
 const universityLogin = async (req, res, next) => {
+  const lan = getLang(req);
   try {
-    const domain = getDomain(req.body?.email);
+    const email = String(req.body?.email || "").trim().toLowerCase();
+    const domain = getDomain(email);
+
+    if (!emailRe.test(email)) {
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message: lan === "ar" ? "البريد الجامعي غير صحيح." : "University email is invalid.",
+      });
+    }
+
     const university = domain
       ? await UniversityModel.findOne({
-          $or: [{ email_domain: domain }, { career_center_email: String(req.body?.email || "").toLowerCase() }],
+          $or: [{ email_domain: domain }, { career_center_email: email }],
           status: { $ne: "suspended" },
         }).lean()
       : null;
+
+    if (!university && !isAcademicDomain(domain)) {
+      return ReturnAppData.createError({
+        res,
+        status: 403,
+        message:
+          lan === "ar"
+            ? "دخول الجامعة يتطلب بريد مركز مهني مسجل أو نطاقاً جامعياً مثل .edu أو .ac."
+            : "University login requires a registered career-center email or an academic domain such as .edu or .ac.",
+      });
+    }
 
     req.campusUniversity = university || null;
     return Login.login(req, res, next);
