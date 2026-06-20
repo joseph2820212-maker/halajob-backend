@@ -9,7 +9,6 @@ const ALLOWED_FILES = {
   '.jpg': ['image/jpeg'],
   '.jpeg': ['image/jpeg'],
   '.png': ['image/png'],
-  '.svg': ['image/svg+xml'],
   '.webp': ['image/webp'],
   '.xlsx': ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
   '.csv': ['text/csv', 'application/csv', 'application/vnd.ms-excel'],

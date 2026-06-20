@@ -46,7 +46,7 @@ export const processUploadImage = async (file, options = {}) => {
   const {
     targetDir = "images",
     webpQuality = 80,
-    keepOriginalFor = new Set([".svg", ".webp"]),
+    keepOriginalFor = new Set([".webp"]),
   } = options;
 
   const ext = path.extname(file.originalname).toLowerCase();

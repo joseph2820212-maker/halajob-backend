@@ -39,6 +39,11 @@ const sendDashboardFile = ({ allowDocuments = false } = {}) => (req, res) => {
     return res.status(403).json({ status: false, message: 'file_access_forbidden' });
   }
 
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  if (extension === '.svg') {
+    res.setHeader('Content-Security-Policy', "default-src 'none'; img-src data:; style-src 'unsafe-inline'");
+  }
+
   const baseDirectory = isDocument ? path.join(FILES_DIRECTORY, 'files') : FILES_DIRECTORY;
   const filePath = path.resolve(baseDirectory, fileName);
 
