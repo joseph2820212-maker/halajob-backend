@@ -561,7 +561,13 @@ const partners = async (req, res, next) => {
 
 const addPartner = async (req, res, next) => {
   try {
-    const { university_id: universityId, company_id: companyId, note = "" } = req.body || {};
+    const { university_id: universityId, company_id: submittedCompanyId, note = "" } = req.body || {};
+    let companyId = submittedCompanyId;
+    if (!companyId && req.user?._id) {
+      const company = await CompanyModel.findOne(buildCompanyOwnerQuery(req.user._id)).select("_id").lean();
+      companyId = company?._id;
+    }
+
     if (!isValidObjectId(universityId) || !isValidObjectId(companyId)) {
       return ReturnAppData.createError({ res, status: 400, message: "invalid_university_or_company_id" });
     }
