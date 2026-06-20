@@ -1,6 +1,7 @@
 // controllers/Permission.controller.js
 
 import ReturnDashData from "../../helper/ReturnDashData/index.js";
+import { sanitizeDashUpdate } from "../../helper/dash/sanitizeDashUpdate.js";
 import { PermissionModel } from "../../models/index.js";
 
 /**
@@ -37,7 +38,12 @@ import { PermissionModel } from "../../models/index.js";
   try {
     const { id } = req.params;
 
-    const doc = await PermissionModel.findByIdAndUpdate(id, req.body, {
+    const updatePayload = sanitizeDashUpdate(req.body);
+    if (!Object.keys(updatePayload).length) {
+      return ReturnDashData.updateError({ res, status: 400, message: "no_update_fields" });
+    }
+
+    const doc = await PermissionModel.findByIdAndUpdate(id, updatePayload, {
       new: true,
       runValidators: true,
     });

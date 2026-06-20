@@ -1,6 +1,7 @@
 // controllers/role.controller.js
 
 import ReturnDashData from "../../helper/ReturnDashData/index.js";
+import { sanitizeDashUpdate } from "../../helper/dash/sanitizeDashUpdate.js";
 import { FontModel } from "../../models/index.js";
 
 /**
@@ -50,7 +51,12 @@ import { FontModel } from "../../models/index.js";
     }
       // ضمان استخدام الخط المائل للأمام
 
-    const doc = await FontModel.findByIdAndUpdate(id, req.body, {
+    const updatePayload = sanitizeDashUpdate(payload);
+    if (!Object.keys(updatePayload).length) {
+      return ReturnDashData.updateError({ res, status: 400, message: "no_update_fields" });
+    }
+
+    const doc = await FontModel.findByIdAndUpdate(id, updatePayload, {
       new: true,
       runValidators: true,
     });
