@@ -37,6 +37,16 @@ const getEmployee = async (req) =>
     .populate({ path: "user_id", select: "first_name mid_name last_name email image" })
     .lean();
 
+const getCompanyForRequest = async (req, select = "") => {
+  if (req.company?._id) {
+    const query = CompanyModel.findById(req.company._id);
+    return (select ? query.select(select) : query).lean();
+  }
+
+  const query = CompanyModel.findOne(buildCompanyOwnerQuery(req.user._id));
+  return (select ? query.select(select) : query).lean();
+};
+
 const getEmailDomain = (email = "") => String(email).trim().toLowerCase().split("@")[1] || "";
 
 const isAcademicDomain = (domain = "") =>
@@ -184,7 +194,7 @@ const opportunities = async (req, res, next) => {
 
 const createCompanyOpportunity = async (req, res, next) => {
   try {
-    const company = await CompanyModel.findOne(buildCompanyOwnerQuery(req.user._id)).select("_id owner_user_id").lean();
+    const company = await getCompanyForRequest(req, "_id owner_user_id");
     if (!company) return ReturnAppData.createError({ res, status: 403, message: "company_not_found" });
     const target = String(req.body?.target || req.body?.candidate_target || "students").toLowerCase();
     const candidateTarget = target === "fresh_graduates" ? ["fresh_graduates"] : ["students"];
@@ -359,7 +369,7 @@ const registerEvent = async (req, res, next) => {
 
 const universityOverview = async (req, res, next) => {
   try {
-    const company = await CompanyModel.findOne(buildCompanyOwnerQuery(req.user._id)).lean();
+    const company = await getCompanyForRequest(req);
     const [students, internships, universities] = await Promise.all([
       EmployeeModel.countDocuments({ is_student: true }),
       jobsModel.countDocuments({ $or: [{ is_for_students: true }, { is_for_fresh_graduates: true }] }),
@@ -514,7 +524,7 @@ const createUniversityOpportunityRequest = async (req, res, next) => {
 
 const companyOpportunities = async (req, res, next) => {
   try {
-    const company = await CompanyModel.findOne(buildCompanyOwnerQuery(req.user._id)).select("_id").lean();
+    const company = await getCompanyForRequest(req, "_id");
     if (!company) return ReturnAppData.getError({ res, status: 403, message: "company_not_found" });
 
     const jobs = await jobsModel
@@ -584,7 +594,7 @@ const addPartner = async (req, res, next) => {
         }).select("_id").lean();
     let companyId = submittedCompanyId;
     if (!companyId && req.user?._id) {
-      const company = await CompanyModel.findOne(buildCompanyOwnerQuery(req.user._id)).select("_id").lean();
+      const company = await getCompanyForRequest(req, "_id");
       companyId = company?._id;
     }
 
