@@ -21,12 +21,14 @@ const publicCompanyFilter = {
   accepted: true,
 };
 
+const escapeRegex = (value = "") => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const buildCompanyFilter = (query = {}) => {
   const { search, country, city, type, industry_id, is_verified } = query;
   const filter = { ...publicCompanyFilter };
 
   if (search) {
-    const regex = new RegExp(String(search).trim(), "i");
+    const regex = new RegExp(escapeRegex(String(search).trim()), "i");
     filter.$or = [
       { company_name: regex },
       { description: regex },
@@ -37,7 +39,7 @@ const buildCompanyFilter = (query = {}) => {
   }
 
   if (country) filter.company_country = country;
-  if (city) filter.company_city = new RegExp(String(city).trim(), "i");
+  if (city) filter.company_city = new RegExp(escapeRegex(String(city).trim()), "i");
   if (type) filter.company_type = type;
   if (industry_id && isValidObjectId(industry_id)) filter.industry_id = industry_id;
   if (is_verified !== undefined) filter.is_verified = String(is_verified) === "true";

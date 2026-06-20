@@ -70,10 +70,12 @@ const parseArrayQuery = (value) => {
     .filter(Boolean);
 };
 
+const escapeRegex = (value = "") => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const buildSearchFilter = (search) => {
   const value = String(search || "").trim();
   if (!value) return null;
-  const regex = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+  const regex = new RegExp(escapeRegex(value), "i");
 
   return {
     $or: [
@@ -118,7 +120,7 @@ const applyCommonJobFilters = (filter, query) => {
   const countries = parseArrayQuery(country || query.countries);
   if (countries.length) filter.countries = { $in: countries };
 
-  if (city) filter.city = new RegExp(String(city).trim(), "i");
+  if (city) filter.city = new RegExp(escapeRegex(String(city).trim()), "i");
 
   if (job_type_id && isValidObjectId(job_type_id)) filter.job_type_id = job_type_id;
   if (work_mode_id && isValidObjectId(work_mode_id)) filter.work_mode_id = work_mode_id;
