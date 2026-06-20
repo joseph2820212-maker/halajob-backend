@@ -4,12 +4,18 @@ import {
    revokeTokenById, updateTokenById
 } from '../../../services/fcmTokens.js';
 
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
+
 export default {
   async listTokens(req, res, next) {
     try {
       const userId = req.user._id;
       const onlyValid = req.query.onlyValid !== 'false';
-      const limit = Math.min(parseInt(req.query.limit || '50', 10), 100);
+      const limit = parseIntBounded(req.query.limit, 50, 1, 100);
       const cursor = req.query.cursor || null; // ISO date أو _id
 
       const { items, nextCursor } = await getUserTokens(userId, { onlyValid, limit, cursor });

@@ -77,6 +77,12 @@ const failSubscription = (res, check) => fail(res, check.message || "subscriptio
   requested: check.requested,
 });
 
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
+
 // This project is deployed on environments that may use a standalone MongoDB server.
 // MongoDB transactions require a replica set, so the hiring flow uses safe sequential
 // writes instead of session.withTransaction to avoid 500 errors in production.
@@ -919,7 +925,7 @@ export const bulkApplicationCvs = async (req, res, next) => {
     const filter = await buildBulkApplicationsFilter(req, res, companyData);
     if (!filter) return;
 
-    const limit = Math.min(Math.max(Number(req.body?.limit || req.query.limit || 500), 1), 1000);
+    const limit = parseIntBounded(req.body?.limit || req.query.limit, 500, 1, 1000);
     const applications = await populateApplicationQuery(
       UserApplyingJobModel.find(filter).sort(buildApplicationsSort({ ...req.query, ...req.body })).limit(limit)
     ).lean();
@@ -975,7 +981,7 @@ export const bulkExportApplications = async (req, res, next) => {
     const filter = await buildBulkApplicationsFilter(req, res, companyData);
     if (!filter) return;
 
-    const limit = Math.min(Math.max(Number(req.body?.limit || req.query.limit || 500), 1), 1000);
+    const limit = parseIntBounded(req.body?.limit || req.query.limit, 500, 1, 1000);
     const applications = await populateApplicationQuery(
       UserApplyingJobModel.find(filter).sort(buildApplicationsSort({ ...req.query, ...req.body })).limit(limit)
     ).lean();
@@ -1034,7 +1040,7 @@ export const getAtsPipeline = async (req, res, next) => {
     }
 
     const statuses = ["new", "reviewing", "initial_match", "not_match", "contacted", "interview_scheduled", "interview_completed", "offer", "accepted", "hired", "rejected", "archived", "withdrawn", "offer_declined"];
-    const limit = Math.min(Math.max(Number(req.query.limit) || 500, 1), 1000);
+    const limit = parseIntBounded(req.query.limit, 500, 1, 1000);
     const applications = await populateApplicationQuery(
       UserApplyingJobModel.find(filter).sort({ stage_order: 1, ats_score: -1, createdAt: -1 }).limit(limit)
     ).lean();

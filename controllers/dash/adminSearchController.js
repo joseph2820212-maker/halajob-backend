@@ -12,6 +12,11 @@ import {
 const clean = (value = "") => String(value || "").trim();
 const escapeRegex = (value = "") => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(String(id || ""));
+const parseIntBounded = (value, fallback, min, max) => {
+  const n = Number.parseInt(String(value ?? ""), 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(max, Math.max(min, n));
+};
 
 const normalize = (value = "") =>
   String(value || "")
@@ -27,7 +32,7 @@ const normalize = (value = "") =>
 
 const tokensOf = (value = "") => [...new Set(normalize(value).split(/\s+/).filter((x) => x.length >= 2))];
 
-const limitOf = (req) => Math.min(Math.max(Number(req.query.limit || 8), 1), 30);
+const limitOf = (req) => parseIntBounded(req.query.limit, 8, 1, 30);
 
 const execute = async (key, promise) => {
   try {
