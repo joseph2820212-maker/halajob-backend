@@ -427,6 +427,38 @@ const sanitizeUpdatePayload = (payload = {}) => {
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(String(id || ''));
 
+const parseObjectIds = (value) => {
+  const values = Array.isArray(value) ? value : String(value || '').split(/[\s,;]+/);
+  return values
+    .flatMap((entry) => (Array.isArray(entry) ? entry : String(entry || '').split(/[\s,;]+/)))
+    .map((id) => String(id).trim())
+    .filter(isValidObjectId);
+};
+
+const stripControlFields = (payload = {}) => {
+  ['_id', 'id', 'ids', 'resource', 'force'].forEach((key) => {
+    delete payload[key];
+  });
+  return payload;
+};
+
+const isSortableSchemaPath = (field, config) => field === '_id' || Boolean(config.model.schema.path(field));
+
+const buildSort = (requestedSort, config) => {
+  const fallback = config.defaultSort || '-createdAt';
+  if (!requestedSort) return fallback;
+  if (typeof requestedSort !== 'string') return fallback;
+
+  const tokens = requestedSort
+    .split(/[\s,]+/)
+    .map((token) => token.trim())
+    .filter(Boolean)
+    .filter((token) => /^-?[A-Za-z0-9_.]+$/.test(token))
+    .filter((token) => isSortableSchemaPath(token.replace(/^-/, ''), config));
+
+  return tokens.length ? tokens.join(' ') : fallback;
+};
+
 const addSchemaQueryFilters = (filter, query, config) => {
   const reserved = new Set([
     'page',
@@ -561,7 +593,7 @@ const list = (resourceName) => async (req, res) => {
     const page = toInt(req.query.page, 1);
     const limit = toInt(req.query.limit, 10, { min: 1, max: 200 });
     const skip = (page - 1) * limit;
-    const sort = req.query.sort || config.defaultSort || '-createdAt';
+    const sort = buildSort(req.query.sort, config);
     const filter = await buildFilter(req, config);
 
     const findQuery = selectHiddenFields(applyPopulate(config.model.find(filter), config), config)
@@ -639,9 +671,7 @@ const update = (resourceName) => async (req, res) => {
     const id = req.params.id || req.body?.id || req.query.id;
     if (!isValidObjectId(id)) return ReturnDashData.updateError({ res, status: 400, message: 'invalid_id' });
 
-    const payload = await normalizePayload(req, config);
-    delete payload._id;
-    delete payload.id;
+    const payload = stripControlFields(await normalizePayload(req, config));
 
     if (config.model === CompanyModel && (payload.accepted === true || payload.accepted === 'true' || payload.accepted === 1 || payload.accepted === '1')) {
       payload.accepted = true;
@@ -655,7 +685,12 @@ const update = (resourceName) => async (req, res) => {
       if (!payload.publish_status) payload.publish_status = 'published';
     }
 
-    const doc = await config.model.findByIdAndUpdate(id, sanitizeUpdatePayload(payload), { new: true, runValidators: true });
+    const updatePayload = sanitizeUpdatePayload(payload);
+    if (!Object.keys(updatePayload).length) {
+      return ReturnDashData.updateError({ res, status: 400, message: 'no_update_fields' });
+    }
+
+    const doc = await config.model.findByIdAndUpdate(id, updatePayload, { new: true, runValidators: true });
     if (!doc) return ReturnDashData.updateError({ res, status: 404, message: `${config.key}_not_found` });
 
     if (config.model === CompanyModel && doc.accepted === true && doc.status === true) {
@@ -723,16 +758,17 @@ const bulkUpdate = (resourceName) => async (req, res) => {
     const config = getResourceConfig(resourceName || req.params.resource);
     if (!config) return ReturnDashData.getError({ res, status: 404, message: 'resource_not_found' });
 
-    const ids = (req.body?.ids || [])
-      .map((id) => String(id).trim())
-      .filter(isValidObjectId);
+    const ids = parseObjectIds(req.body?.ids);
 
     if (!ids.length) return ReturnDashData.updateError({ res, status: 400, message: 'ids_required' });
 
-    const payload = await normalizePayload(req, config);
-    delete payload.ids;
+    const payload = stripControlFields(await normalizePayload(req, config));
+    const updatePayload = sanitizeUpdatePayload(payload);
+    if (!Object.keys(updatePayload).length) {
+      return ReturnDashData.updateError({ res, status: 400, message: 'no_update_fields' });
+    }
 
-    const result = await config.model.updateMany({ _id: { $in: ids } }, { $set: sanitizeUpdatePayload(payload) }, { runValidators: true });
+    const result = await config.model.updateMany({ _id: { $in: ids } }, { $set: updatePayload }, { runValidators: true });
 
     return ReturnDashData.updateData({
       res,
