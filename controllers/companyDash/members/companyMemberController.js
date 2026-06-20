@@ -4,6 +4,8 @@ import { writeAuditLog } from "../../../services/auditLog.service.js";
 
 const cleanText = (value = "") => String(value ?? "").trim();
 const toArray = (value) => Array.isArray(value) ? value : value ? String(value).split(/[,;\n]+/).map((x) => x.trim()).filter(Boolean) : [];
+const MEMBER_ROLES = new Set(["admin", "hr_manager", "recruiter", "viewer"]);
+const MEMBER_STATUSES = new Set(["active", "invited", "suspended", "removed"]);
 const DEFAULT_PERMISSIONS_BY_ROLE = {
   owner: ["*"],
   admin: ["company.profile.manage", "jobs.manage", "ats.view", "ats.status.change", "ats.notes.add", "ats.messages.send", "ats.interviews.schedule", "ats.reject", "ats.hire", "audit.view", "company.members.manage", "question_library.manage", "message_templates.manage", "support.manage"],
@@ -36,7 +38,7 @@ export const upsertMember = async (req, res, next) => {
     if (!isValidObjectId(userId)) return fail(res, "invalid_user_id", 400);
     const user = await UserModel.findById(userId).select("_id email").lean();
     if (!user) return fail(res, "user_not_found", 404);
-    const memberRole = ["admin", "hr_manager", "recruiter", "viewer"].includes(req.body.member_role) ? req.body.member_role : "recruiter";
+    const memberRole = MEMBER_ROLES.has(req.body.member_role) ? req.body.member_role : "recruiter";
     const permissions = toArray(req.body.permissions);
     const payload = {
       company_id: companyData.company._id,
@@ -44,7 +46,7 @@ export const upsertMember = async (req, res, next) => {
       role_id: isValidObjectId(req.body.role_id) ? req.body.role_id : null,
       member_role: memberRole,
       permissions: permissions.length ? permissions : DEFAULT_PERMISSIONS_BY_ROLE[memberRole],
-      status: ["active", "invited", "suspended", "removed"].includes(req.body.status) ? req.body.status : "active",
+      status: MEMBER_STATUSES.has(req.body.status) ? req.body.status : "active",
       invited_by: companyData.userId,
       invited_at: new Date(),
     };
@@ -64,9 +66,15 @@ export const updateMember = async (req, res, next) => {
     if (!companyData) return;
     if (!isValidObjectId(req.params.memberId)) return fail(res, "invalid_member_id", 400);
     const patch = {};
-    if (req.body.member_role) patch.member_role = req.body.member_role;
+    if (req.body.member_role) {
+      if (!MEMBER_ROLES.has(req.body.member_role)) return fail(res, "invalid_member_role", 422);
+      patch.member_role = req.body.member_role;
+    }
     if (req.body.permissions !== undefined) patch.permissions = toArray(req.body.permissions);
-    if (req.body.status) patch.status = req.body.status;
+    if (req.body.status) {
+      if (!MEMBER_STATUSES.has(req.body.status)) return fail(res, "invalid_member_status", 422);
+      patch.status = req.body.status;
+    }
     if (req.body.role_id !== undefined) patch.role_id = isValidObjectId(req.body.role_id) ? req.body.role_id : null;
     const member = await CompanyMemberModel.findOneAndUpdate({ _id: req.params.memberId, company_id: companyData.company._id }, { $set: patch }, { new: true, runValidators: true });
     if (!member) return fail(res, "company_member_not_found", 404);

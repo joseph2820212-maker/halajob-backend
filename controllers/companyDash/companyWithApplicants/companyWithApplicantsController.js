@@ -39,6 +39,45 @@ const interviewPopulate = [
 
 const escapeRegex = (value = "") => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
+const APPLICATION_STATUSES = new Set([
+  "waiting",
+  "screening",
+  "shortlisted",
+  "interview",
+  "offer",
+  "accepted",
+  "hired",
+  "rejected",
+  "withdrawn",
+  "auto_cancel",
+  "new",
+  "reviewing",
+  "initial_match",
+  "not_match",
+  "contacted",
+  "interview_scheduled",
+  "interview_completed",
+  "archived",
+  "offer_declined",
+]);
+const INTERVIEW_STATUSES = new Set(["scheduled", "rescheduled", "completed", "cancelled", "no_show", "accepted", "rejected"]);
+const INTERVIEW_TYPES = new Set(["online", "in_office", "phone", "on_app"]);
+const INTERVIEW_PATCH_FIELDS = new Set([
+  "type",
+  "status",
+  "start_at",
+  "end_at",
+  "timezone",
+  "meet_link",
+  "office_address",
+  "company_note",
+  "candidate_note",
+  "result_note",
+  "rating",
+  "cancelled_reason",
+  "scorecard",
+]);
+
 const toNumber = (value) => {
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
@@ -190,6 +229,7 @@ export const changeApplicationStatus = async (req, res, next) => {
 
     const newStatus = String(req.body.status || "").trim();
     if (!newStatus) return fail(res, "application_status_required", 422);
+    if (!APPLICATION_STATUSES.has(newStatus)) return fail(res, "invalid_application_status", 422);
 
     const application = await UserApplyingJobModel.findOne({ _id: applicationId, company_id: companyData.company._id });
     if (!application) return fail(res, "application_not_found", 404);
@@ -358,14 +398,18 @@ export const scheduleInterview = async (req, res, next) => {
 
     const application = await UserApplyingJobModel.findOne({ _id: application_id, company_id: companyData.company._id, job_id });
     if (!application) return fail(res, "application_not_found", 404);
+    const type = req.body.type || "online";
+    const status = req.body.status || "scheduled";
+    if (!INTERVIEW_TYPES.has(type)) return fail(res, "invalid_interview_type", 422);
+    if (!INTERVIEW_STATUSES.has(status)) return fail(res, "invalid_interview_status", 422);
 
     const interview = await InterviewModel.create({
       application_id,
       job_id,
       company_id: companyData.company._id,
       employee_user_id,
-      type: req.body.type || "online",
-      status: req.body.status || "scheduled",
+      type,
+      status,
       start_at,
       end_at,
       timezone: req.body.timezone || companyData.company.timezone || "UTC",
@@ -439,9 +483,19 @@ export const updateInterview = async (req, res, next) => {
     const { interviewId } = req.params;
     if (!isValidObjectId(interviewId)) return fail(res, "invalid_interview_id", 400);
 
+    const patch = Object.entries(req.body || {}).reduce((acc, [key, value]) => {
+      if (INTERVIEW_PATCH_FIELDS.has(key)) acc[key] = value;
+      return acc;
+    }, {});
+    if (patch.type && !INTERVIEW_TYPES.has(patch.type)) return fail(res, "invalid_interview_type", 422);
+    if (patch.status && !INTERVIEW_STATUSES.has(patch.status)) return fail(res, "invalid_interview_status", 422);
+    if (!Object.keys(patch).length) return fail(res, "no_update_fields", 400);
+    const update = { $set: patch };
+    if (patch.start_at || patch.end_at) update.$inc = { reschedule_count: 1 };
+
     const interview = await InterviewModel.findOneAndUpdate(
       { _id: interviewId, company_id: companyData.company._id },
-      { $set: req.body, $inc: req.body.start_at || req.body.end_at ? { reschedule_count: 1 } : {} },
+      update,
       { new: true, runValidators: true }
     ).populate(interviewPopulate);
 
