@@ -464,6 +464,12 @@ async function ensureEmployeeProfile({
       ...(profileSet.student_profile || {}),
       ...studentProfile,
     };
+
+    const universityName = safeString(studentProfile.university);
+    const universityId = objectIdOrNull(studentProfile.university_id);
+
+    if (universityName) profileSet.university = universityName;
+    if (universityId) profileSet.university_id = universityId;
   }
 
   return EmployeeModel.findOneAndUpdate(

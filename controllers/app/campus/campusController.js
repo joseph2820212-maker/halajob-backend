@@ -147,6 +147,27 @@ const getCareerCenterUniversityForRequest = async (req) => {
   }).lean();
 };
 
+const buildUniversityStudentQuery = (university) => {
+  if (!university?._id) return { _id: null };
+
+  const exactNames = [university.name, university.name_en]
+    .map((value) => cleanText(value))
+    .filter(Boolean);
+
+  const clauses = [
+    { university_id: university._id },
+    { "student_profile.university_id": university._id },
+  ];
+
+  for (const name of exactNames) {
+    const matcher = new RegExp(`^${escapeRegExp(name)}$`, "i");
+    clauses.push({ university: matcher });
+    clauses.push({ "student_profile.university": matcher });
+  }
+
+  return { $or: clauses };
+};
+
 const campusJobQuery = (target = "students") => {
   const normalizedTarget = allowedTargets.has(target) ? target : "students";
   if (normalizedTarget === "all") {
@@ -296,6 +317,7 @@ const profile = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
   try {
     const body = req.body || {};
+    const linkedUniversity = await ensureUniversityForRequest(req);
     const allowed = [
       "university",
       "specialty",
@@ -322,6 +344,17 @@ const updateProfile = async (req, res, next) => {
     if (body.expected_graduation_year) set.graduation_year = Number(body.expected_graduation_year);
     if (body.profile_headline) set.profile_headline = String(body.profile_headline).trim();
     if (body.about_me) set.about_me = String(body.about_me).trim();
+
+    const normalizedUniversityName = cleanText(body.university) || cleanText(linkedUniversity?.name);
+    if (normalizedUniversityName) {
+      set.university = normalizedUniversityName;
+      set["student_profile.university"] = normalizedUniversityName;
+    }
+
+    if (linkedUniversity?._id) {
+      set.university_id = linkedUniversity._id;
+      set["student_profile.university_id"] = linkedUniversity._id;
+    }
 
     const employee = await EmployeeModel.findOneAndUpdate(
       { user_id: req.user._id },
@@ -424,8 +457,9 @@ const userUniversityOverview = async (req, res, next) => {
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
 
     const partnerCompanyIds = (university.partners || []).map((partner) => partner.company_id).filter(Boolean);
+    const universityStudentQuery = buildUniversityStudentQuery(university);
     const [studentsCount, opportunitiesCount, requestsCount, placements] = await Promise.all([
-      EmployeeModel.countDocuments({ $or: [{ university_id: university._id }, { university: university.name }] }),
+      EmployeeModel.countDocuments(universityStudentQuery),
       jobsModel.countDocuments({
         $or: [{ is_for_students: true }, { is_for_fresh_graduates: true }, { candidate_target: { $in: ["students", "fresh_graduates"] } }],
         ...(partnerCompanyIds.length ? { company_id: { $in: partnerCompanyIds } } : {}),
@@ -500,7 +534,7 @@ const userUniversityStudents = async (req, res, next) => {
   try {
     const university = await getCareerCenterUniversityForRequest(req);
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
-    const studentsList = await EmployeeModel.find({ $or: [{ university_id: university._id }, { university: university.name }] })
+    const studentsList = await EmployeeModel.find(buildUniversityStudentQuery(university))
       .select("profile_headline current_job_title candidate_stage student_profile graduation_year profile_completion user_id")
       .populate({ path: "user_id", select: "first_name mid_name last_name email image" })
       .sort({ updatedAt: -1 })
