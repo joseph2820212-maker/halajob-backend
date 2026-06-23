@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import "../config/loadEnv.js";
 import mongoose from "mongoose";
 import { jobsModel, EmployeeModel, CompanyModel } from "../models/index.js";
 import {
@@ -7,8 +7,6 @@ import {
   rebuildEmployeeProjection,
   rebuildMatchForJob,
 } from "../services/search/rebuildSearchData.js";
-
-dotenv.config();
 
 const connectionUrl = process.env.CONNECTION_URL;
 

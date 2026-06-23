@@ -1,7 +1,6 @@
 "use strict";
 
-import dotenv from "dotenv";
-dotenv.config();
+import "./config/loadEnv.js";
 
 import mongoose from "mongoose";
 import logger from "./config/logger.js";

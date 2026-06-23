@@ -11,6 +11,8 @@ npm ci
 npm run dev
 ```
 
+For a seeded local setup with working admin, company, and job seeker logins, see [docs/local-auth-qa.md](docs/local-auth-qa.md).
+
 Production backend environment variables:
 
 ```text
