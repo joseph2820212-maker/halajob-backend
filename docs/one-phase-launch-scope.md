@@ -4,6 +4,8 @@ Source handouts:
 
 - `C:\Users\Admin\Downloads\hala_job_codex_one_phase_ai_campus_global_handout.docx`
 - `C:\Users\Admin\Downloads\HALAJOB_CODEX_IMPLEMENTATION.md`
+- Deferred onboarding handout, do not implement until requested:
+  `C:\Users\Admin\Downloads\Hala Job Onboarding Handout (download).html`
 
 This file tracks the launch architecture requested in the handout so the scope
 is visible in the repo and can be implemented/tested in order.
@@ -19,6 +21,14 @@ is visible in the repo and can be implemented/tested in order.
 6. Trust and anti-scam review layer.
 7. Application status history, push notifications, analytics, and release
    signing/package strategy.
+
+## Deferred Design Handouts
+
+The onboarding handout is intentionally logged for later and is not part of the
+current implementation pass. When onboarding is explicitly requested, use
+`C:\Users\Admin\Downloads\Hala Job Onboarding Handout (download).html` as the
+visual/content reference, then implement it against the existing Flutter app
+architecture with real navigation, loading/error states, and localization.
 
 ## Current Evidence From The Handout
 
