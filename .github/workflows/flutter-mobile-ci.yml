@@ -115,6 +115,7 @@ jobs:
             'mobile\scripts\assert-mobile-playstore-release.ps1',
             'mobile\scripts\assert-mobile-device-qa-log.ps1',
             'mobile\scripts\assert-mobile-backend-reachability.ps1',
+            'mobile\scripts\assert-mobile-live-api-routes.ps1',
             'mobile\scripts\assert-mobile-screen-inventory.ps1',
             'mobile\scripts\setup-android-signing.ps1',
             'mobile\scripts\setup-android-sdk.ps1'
@@ -197,6 +198,32 @@ jobs:
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Diagnostics: ``$env:HALA_CI_SHOW_DIAGNOSTICS``"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ""
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "Use ``remote-backend`` for production campus accounts. Use ``local-device`` only for campus screen/device QA while the campus backend is not deployed."
+
+          $routeReportPath = 'mobile\dist\android\mobile-live-api-routes-report.json'
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ""
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "### Live API Route Deployment"
+
+          if (Test-Path -LiteralPath $routeReportPath) {
+            $routeReport = Get-Content -Raw -LiteralPath $routeReportPath | ConvertFrom-Json
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Status: ``$($routeReport.status)``"
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Checked backend: ``$($routeReport.baseUrl)``"
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Routes passed: ``$($routeReport.passed) / $($routeReport.total)``"
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Routes failed: ``$($routeReport.failed)``"
+
+            if ($routeReport.failed -gt 0) {
+              Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ""
+              Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "> Production campus mode is not launch-ready until the failed live routes are deployed."
+              Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ""
+              Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "| Method | Path | Status |"
+              Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "| --- | --- | --- |"
+              foreach ($failedRoute in @($routeReport.failedResults | Select-Object -First 10)) {
+                Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "| $($failedRoute.method) | ``$($failedRoute.path)`` | ``$($failedRoute.statusCode)`` |"
+              }
+            }
+          } else {
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Status: ``not generated``"
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- The tester ZIP may still exist, but no live API deployment report was found for this run."
+          }
 
       - name: Upload latest tester APK
         if: github.event_name != 'pull_request'
