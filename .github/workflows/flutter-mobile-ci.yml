@@ -35,6 +35,13 @@ jobs:
       - name: Verify backend mobile route contract
         run: npm run test:mobile-routes
 
+      - name: Guard approved mobile palette
+        run: |
+          if git grep -n -E 'green|Green|10C26A|0xFF10C26A|0xff10c26a|Colors\.green|#10C26A|#10c26a' -- mobile/lib mobile/test mobile/docs mobile/README.md ':!mobile/docs/brand'; then
+            echo "Old green mobile palette value found. Use the approved navy/cream/orange system."
+            exit 1
+          fi
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -77,6 +84,32 @@ jobs:
           flutter-version: 3.35.3
           channel: stable
           cache: true
+
+      - name: Validate mobile PowerShell release scripts
+        shell: pwsh
+        run: |
+          $files = @(
+            'mobile\scripts\build-android.ps1',
+            'mobile\scripts\mobile-release-preflight.ps1',
+            'mobile\scripts\prepare-mobile-tester-drop.ps1',
+            'mobile\scripts\package-mobile-tester-handoff.ps1',
+            'mobile\scripts\assert-mobile-tester-handoff.ps1',
+            'mobile\scripts\assert-mobile-playstore-release.ps1',
+            'mobile\scripts\setup-android-signing.ps1',
+            'mobile\scripts\setup-android-sdk.ps1'
+          )
+
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $file), [ref]$tokens, [ref]$errors) | Out-Null
+            if ($errors.Count -gt 0) {
+              Write-Error "PowerShell parse failed: $file"
+              $errors | Format-List *
+              exit 1
+            }
+            Write-Host "OK $file"
+          }
 
       - name: Resolve Android build inputs
         shell: pwsh
