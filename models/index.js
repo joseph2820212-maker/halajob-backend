@@ -66,6 +66,7 @@ import UniversityModel from './UniversityModel.js';
 import UniversityOpportunityRequestModel from './UniversityOpportunityRequestModel.js';
 import AccountContextModel from './AccountContextModel.js';
 import UniversityMembershipModel from './UniversityMembershipModel.js';
+import CareerPassportModel from './CareerPassportModel.js';
 
 // cv
 
@@ -134,6 +135,7 @@ export {
   UniversityOpportunityRequestModel,
   AccountContextModel,
   UniversityMembershipModel,
+  CareerPassportModel,
   //cv
   CvTemplateModel,
   EmployeeCvModel

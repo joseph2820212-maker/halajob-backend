@@ -1,0 +1,405 @@
+import crypto from "crypto";
+import {
+  CareerPassportModel,
+  EmployeeModel,
+  UserApplyingJobModel,
+  UserSavedJobModel,
+} from "../models/index.js";
+import { resolveAppAccount } from "./appAccount.service.js";
+import { writeAuditLog } from "./auditLog.service.js";
+
+const clampScore = (value) => Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
+const idString = (value) => (value?._id || value || "").toString();
+const text = (value) => String(value || "").trim();
+const hasText = (value) => text(value).length > 0;
+const list = (value) => (Array.isArray(value) ? value : []);
+const uniqueStrings = (items = []) => [...new Set(items.map(text).filter(Boolean))];
+
+const dateValue = (value) => {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+};
+
+const skillTitle = (item = {}) => text(item.title || item.name || item.skill_name || item.skill_id?.title_en || item.skill_id?.name);
+const languageName = (item = {}) => text(item.name || item.title || item.language_id?.title_en || item.language_id?.name || item.language_id);
+
+const percentFromBooleans = (checks = []) => {
+  if (!checks.length) return 0;
+  return clampScore((checks.filter(Boolean).length / checks.length) * 100);
+};
+
+const component = ({ key, label, weight, score, explanation }) => ({
+  key,
+  label,
+  weight,
+  score: clampScore(score),
+  explanation,
+});
+
+async function resolveEmployee(user) {
+  const account = await resolveAppAccount(user, { createMissingEmployee: true });
+  if (account.accountType !== "employee" || !account.employee?._id) {
+    const error = new Error("CAREER_PASSPORT_EMPLOYEE_REQUIRED");
+    error.statusCode = 403;
+    throw error;
+  }
+
+  return EmployeeModel.findById(account.employee._id);
+}
+
+async function getActivityStats({ userId, employeeId }) {
+  const appliedCount = await UserApplyingJobModel.countDocuments({
+    $or: [{ user_id: userId }, { employee_id: employeeId }],
+  });
+  const interviewCount = await UserApplyingJobModel.countDocuments({
+    $or: [{ user_id: userId }, { employee_id: employeeId }],
+    status: { $in: ["interview", "interview_scheduled", "interview_completed", "offer", "accepted", "hired"] },
+  });
+  const hiredCount = await UserApplyingJobModel.countDocuments({
+    $or: [{ user_id: userId }, { employee_id: employeeId }],
+    status: { $in: ["accepted", "hired"] },
+  });
+  const savedCount = await UserSavedJobModel.countDocuments({ user_id: userId });
+
+  return { appliedCount, interviewCount, hiredCount, savedCount };
+}
+
+function buildSnapshot({ user, employee, passport, stats }) {
+  const technicalSkills = list(employee.student_profile?.technical_skills).map(skillTitle);
+  const softSkills = list(employee.student_profile?.soft_skills).map(skillTitle);
+  const skills = uniqueStrings([...list(employee.skills).map(skillTitle), ...technicalSkills, ...softSkills]);
+  const languages = uniqueStrings(list(employee.languages).map(languageName));
+  const education = list(employee.education).map((item) => ({
+    id: idString(item),
+    level: text(item.level || item.education_level_id?.title_en || item.education_level_id?.name),
+    study: text(item.study),
+    institution: text(item.institution),
+    start_date: dateValue(item.start_date),
+    end_date: dateValue(item.end_date),
+    is_until_now: item.is_until_now === true,
+  }));
+  const experience = list(employee.experience).map((item) => ({
+    id: idString(item),
+    company_name: text(item.company_name),
+    position: text(item.position),
+    details: text(item.details),
+    start_date: dateValue(item.start_date),
+    end_date: dateValue(item.end_date),
+    is_until_now: item.is_until_now === true,
+  }));
+  const projects = list(employee.student_profile?.projects).map((item) => ({
+    id: idString(item),
+    name: text(item.name),
+    description: text(item.description),
+    type: text(item.type),
+    technologies: uniqueStrings(item.technologies),
+    url: text(item.url),
+  }));
+  const cvs = list(employee.cvs).map((item) => ({
+    id: idString(item),
+    title: text(item.title || item.fileName || "CV"),
+    file_name: text(item.fileName),
+    url: text(item.url),
+    status: text(item.status || "inactive"),
+    template_key: text(item.template_key),
+    created_from_builder: item.created_from_builder === true,
+  }));
+  const links = list(employee.links).map((item) => ({
+    id: idString(item),
+    title: text(item.title),
+    url: text(item.url),
+  }));
+
+  return {
+    identity: {
+      user_id: idString(user),
+      employee_id: idString(employee),
+      name: [user.first_name, user.mid_name, user.last_name].map(text).filter(Boolean).join(" "),
+      headline: text(employee.profile_headline || employee.current_job_title),
+      current_job_title: text(employee.current_job_title),
+      location_country: text(employee.current_country),
+      location_city: text(employee.current_city),
+      preferred_work_mode: text(employee.work_location),
+      candidate_stage: text(employee.candidate_stage),
+      is_student: employee.is_student === true,
+      profile_photo: text(user.image),
+      badges: {
+        student_verified: employee.student_profile?.student_email_verified === true,
+        education_added: education.length > 0,
+        cv_added: cvs.length > 0,
+      },
+    },
+    education: {
+      university: text(employee.student_profile?.university),
+      major: text(employee.student_profile?.specialty),
+      graduation_year: employee.graduation_year || employee.student_profile?.expected_graduation_year || null,
+      verification_status: employee.student_profile?.student_email_verified ? "verified" : "unverified",
+      records: education,
+      certificates: list(employee.licenses).map((item) => ({
+        id: idString(item),
+        name: text(item.name),
+        end_in: dateValue(item.end_in),
+        is_for_ever: item.is_for_ever === true,
+      })),
+    },
+    experience_projects: { experience, projects, links },
+    skills: {
+      hard_skills: skills,
+      soft_skills: uniqueStrings(softSkills),
+      languages,
+      missing_skills: list(passport?.score?.next_actions).filter((item) => /skill/i.test(item)),
+    },
+    cv_assets: {
+      uploaded_count: cvs.filter((item) => item.url).length,
+      generated_count: cvs.filter((item) => item.created_from_builder).length,
+      active_cv: cvs.find((item) => item.status === "active") || null,
+      cvs,
+    },
+    readiness: {
+      employability_score: passport?.score || null,
+      profile_completion: employee.profile_completion || 0,
+      interview_count: stats.interviewCount,
+      application_count: stats.appliedCount,
+      saved_jobs_count: stats.savedCount,
+      hired_count: stats.hiredCount,
+    },
+    privacy: {
+      visibility: passport?.visibility || "private",
+      share_enabled: passport?.share?.enabled === true,
+      share_token: passport?.share?.enabled ? passport.share.token : "",
+      share_expires_at: dateValue(passport?.share?.expires_at),
+    },
+  };
+}
+
+function calculateScore({ employee, snapshot, stats }) {
+  const activeCv = snapshot.cv_assets.active_cv;
+  const profileCompleteness = employee.profile_completion
+    ? clampScore(employee.profile_completion)
+    : percentFromBooleans([
+        hasText(snapshot.identity.name),
+        hasText(snapshot.identity.headline),
+        hasText(employee.about_me),
+        hasText(snapshot.identity.location_country),
+        hasText(snapshot.identity.preferred_work_mode),
+        snapshot.education.records.length > 0 || hasText(snapshot.education.university),
+        snapshot.experience_projects.experience.length > 0 || snapshot.experience_projects.projects.length > 0,
+        snapshot.skills.hard_skills.length > 0,
+        snapshot.skills.languages.length > 0,
+        snapshot.cv_assets.uploaded_count > 0,
+      ]);
+
+  const cvQuality = percentFromBooleans([
+    Boolean(activeCv),
+    snapshot.cv_assets.uploaded_count > 0,
+    snapshot.cv_assets.generated_count > 0,
+    hasText(employee.about_me),
+    snapshot.experience_projects.experience.length > 0,
+    snapshot.education.records.length > 0,
+    snapshot.skills.hard_skills.length >= 5,
+    snapshot.skills.languages.length > 0,
+  ]);
+
+  const skillsMatch = clampScore(Math.min(100, snapshot.skills.hard_skills.length * 12 + snapshot.skills.languages.length * 8));
+  const jobReadiness = percentFromBooleans([
+    employee.is_free_for_work === true,
+    hasText(employee.work_location),
+    list(employee.job_names).length > 0 || hasText(employee.profile_headline),
+    list(employee.job_types).length > 0,
+    list(employee.preferred_work_modes).length > 0 || hasText(employee.work_location),
+    list(employee.preferred_countries).length > 0 || hasText(employee.current_country),
+    employee.expected_salary?.min || employee.expected_salary?.max,
+    stats.savedCount > 0 || stats.appliedCount > 0,
+  ]);
+  const interviewReadiness = clampScore(Math.min(100, stats.interviewCount * 30 + stats.hiredCount * 40 + (hasText(employee.about_me) ? 20 : 0)));
+  const educationVerification = percentFromBooleans([
+    snapshot.education.records.length > 0 || hasText(snapshot.education.university),
+    employee.student_profile?.student_email_verified === true || !employee.is_student,
+  ]);
+  const applicationActivity = clampScore(Math.min(100, stats.savedCount * 10 + stats.appliedCount * 20));
+  const trustActivity = percentFromBooleans([employee.status !== false, employee.accepted === true || employee.profile_visibility !== "private"]);
+
+  const components = [
+    component({ key: "profile_completeness", label: "Profile completeness", weight: 15, score: profileCompleteness, explanation: "Core identity, contact, career, education, skill, and CV fields." }),
+    component({ key: "cv_quality", label: "CV quality", weight: 20, score: cvQuality, explanation: "CV presence plus profile sections needed for an employer-ready CV." }),
+    component({ key: "skills_match", label: "Skills match", weight: 20, score: skillsMatch, explanation: "Current skills and languages available for matching." }),
+    component({ key: "job_readiness", label: "Job readiness", weight: 15, score: jobReadiness, explanation: "Availability, work preferences, salary, and application readiness." }),
+    component({ key: "interview_readiness", label: "Interview readiness", weight: 10, score: interviewReadiness, explanation: "Interview activity plus profile narrative readiness." }),
+    component({ key: "education_verification", label: "Education verification", weight: 10, score: educationVerification, explanation: "Education record and verified student evidence where relevant." }),
+    component({ key: "application_activity", label: "Application activity", weight: 5, score: applicationActivity, explanation: "Healthy saved/applied job activity." }),
+    component({ key: "trust_activity", label: "Trust/activity", weight: 5, score: trustActivity, explanation: "Active account and profile trust readiness." }),
+  ];
+
+  const total = clampScore(components.reduce((sum, item) => sum + item.score * (item.weight / 100), 0));
+  const nextActions = [];
+  if (!activeCv) nextActions.push("Upload or generate an active CV.");
+  if (!hasText(employee.about_me)) nextActions.push("Add an about-me summary.");
+  if (snapshot.skills.hard_skills.length < 5) nextActions.push("Add more role-relevant skills.");
+  if (!hasText(snapshot.identity.preferred_work_mode)) nextActions.push("Choose a preferred work mode.");
+  if (employee.is_student && !employee.student_profile?.student_email_verified) nextActions.push("Verify your student email or university evidence.");
+
+  const strengths = [];
+  if (profileCompleteness >= 75) strengths.push("Profile is mostly complete.");
+  if (skillsMatch >= 70) strengths.push("Skills are strong enough for matching.");
+  if (cvQuality >= 70) strengths.push("CV assets are ready for employers.");
+  if (stats.appliedCount > 0) strengths.push("Application activity is already started.");
+
+  return {
+    total,
+    source: "rule_based_v1",
+    generated_by_ai: false,
+    explanation: `Rule-based employability score generated from profile, CV, skills, education, verification, and activity evidence. Current score: ${total}/100.`,
+    components,
+    strengths,
+    next_actions: nextActions,
+    updated_at: new Date(),
+  };
+}
+
+async function upsertPassport({ user, employee, activeContextId = null, refreshScore = false }) {
+  let passport = await CareerPassportModel.findOne({ user_id: user._id });
+  if (!passport) {
+    passport = new CareerPassportModel({
+      user_id: user._id,
+      employee_id: employee._id,
+      active_context_id: activeContextId,
+      visibility: "private",
+    });
+  }
+
+  const stats = await getActivityStats({ userId: user._id, employeeId: employee._id });
+  let snapshot = buildSnapshot({ user, employee, passport, stats });
+  if (refreshScore || !passport.score?.updated_at) {
+    passport.score = calculateScore({ employee, snapshot, stats });
+  }
+
+  passport.employee_id = employee._id;
+  passport.active_context_id = activeContextId || passport.active_context_id || null;
+  passport.snapshot = buildSnapshot({ user, employee, passport, stats });
+  await passport.save();
+
+  snapshot = buildSnapshot({ user, employee, passport, stats });
+  return { passport, snapshot };
+}
+
+export async function getCareerPassport({ user, req }) {
+  const employee = await resolveEmployee(user);
+  return upsertPassport({
+    user,
+    employee,
+    activeContextId: req?.activeContext?.id || null,
+    refreshScore: false,
+  });
+}
+
+export async function refreshCareerPassportScore({ user, req }) {
+  const employee = await resolveEmployee(user);
+  const result = await upsertPassport({
+    user,
+    employee,
+    activeContextId: req?.activeContext?.id || null,
+    refreshScore: true,
+  });
+
+  await writeAuditLog({
+    req,
+    actorId: user._id,
+    actorType: "employee",
+    action: "career_passport_score_refreshed",
+    targetType: "career_passport",
+    targetId: result.passport._id,
+    metadata: {
+      score: result.passport.score?.total,
+      score_source: result.passport.score?.source,
+      generated_by_ai: false,
+    },
+  });
+
+  return result;
+}
+
+export async function updateCareerPassport({ user, body = {}, req }) {
+  const employee = await resolveEmployee(user);
+  const set = {};
+  const allowedVisibility = new Set(["private", "companies_only", "public"]);
+  const allowedWorkMode = new Set(["remote", "hybrid", "onsite", "field", "unknown", ""]);
+
+  if (body.headline !== undefined) set.profile_headline = text(body.headline).slice(0, 160);
+  if (body.current_job_title !== undefined) set.current_job_title = text(body.current_job_title).slice(0, 160);
+  if (body.about_me !== undefined) set.about_me = text(body.about_me).slice(0, 2000);
+  if (body.preferred_work_mode !== undefined && allowedWorkMode.has(text(body.preferred_work_mode))) {
+    set.work_location = text(body.preferred_work_mode) || "unknown";
+  }
+  if (body.visibility !== undefined && allowedVisibility.has(text(body.visibility))) {
+    set.profile_visibility = text(body.visibility);
+  }
+
+  if (Object.keys(set).length) {
+    await EmployeeModel.updateOne({ _id: employee._id }, { $set: set });
+  }
+
+  const refreshedEmployee = await EmployeeModel.findById(employee._id);
+  const result = await upsertPassport({
+    user,
+    employee: refreshedEmployee,
+    activeContextId: req?.activeContext?.id || null,
+    refreshScore: true,
+  });
+
+  if (body.visibility !== undefined && allowedVisibility.has(text(body.visibility))) {
+    result.passport.visibility = text(body.visibility);
+    await result.passport.save();
+    result.snapshot.privacy.visibility = result.passport.visibility;
+  }
+
+  await writeAuditLog({
+    req,
+    actorId: user._id,
+    actorType: "employee",
+    action: "career_passport_updated",
+    targetType: "career_passport",
+    targetId: result.passport._id,
+    metadata: { fields: Object.keys(set), visibility: result.passport.visibility },
+  });
+
+  return result;
+}
+
+export async function updateCareerPassportShare({ user, body = {}, req }) {
+  const employee = await resolveEmployee(user);
+  const result = await upsertPassport({
+    user,
+    employee,
+    activeContextId: req?.activeContext?.id || null,
+    refreshScore: false,
+  });
+
+  const enabled = body.enabled !== false && body.action !== "revoke";
+  if (!enabled) {
+    result.passport.share.enabled = false;
+    result.passport.share.revoked_at = new Date();
+  } else {
+    result.passport.share.enabled = true;
+    result.passport.share.token = result.passport.share.token || crypto.randomBytes(24).toString("hex");
+    result.passport.share.created_at = result.passport.share.created_at || new Date();
+    result.passport.share.revoked_at = null;
+    result.passport.share.expires_at = body.expires_at ? new Date(body.expires_at) : null;
+  }
+
+  await result.passport.save();
+  const stats = await getActivityStats({ userId: user._id, employeeId: employee._id });
+  result.snapshot = buildSnapshot({ user, employee, passport: result.passport, stats });
+
+  await writeAuditLog({
+    req,
+    actorId: user._id,
+    actorType: "employee",
+    action: enabled ? "career_passport_share_enabled" : "career_passport_share_revoked",
+    targetType: "career_passport",
+    targetId: result.passport._id,
+    metadata: { enabled },
+  });
+
+  return result;
+}

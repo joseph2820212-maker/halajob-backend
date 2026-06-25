@@ -18,9 +18,11 @@ import pageRote from './pageRote.js';
 import NotificationRote from './NotificationRote.js';
 import CampusRote from './CampusRote.js';
 import MeRote from './MeRote.js';
+import CareerPassportRote from './CareerPassportRote.js';
 
 const router = express.Router();
 router.use('/me', MeRote);
+router.use('/career-passport', CareerPassportRote);
 router.use('/auth', AuthRote);
 router.use('/company', CompanyRote);
 router.use('/helper', HelperRote);

@@ -20,6 +20,11 @@ const requiredEndpoints = [
   ["POST", "/user/v1/me/active-context"],
   ["GET", "/user/v1/me/permissions"],
 
+  ["GET", "/user/v1/career-passport"],
+  ["PUT", "/user/v1/career-passport"],
+  ["POST", "/user/v1/career-passport/share"],
+  ["POST", "/ai/v1/career-passport/score"],
+
   ["GET", "/user/v1/helper/languages"],
   ["GET", "/user/v1/helper/work-mode"],
   ["GET", "/user/v1/helper/job-types"],

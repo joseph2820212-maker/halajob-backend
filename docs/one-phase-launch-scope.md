@@ -23,7 +23,7 @@ is visible in the repo and can be implemented/tested in order.
 | --- | --- | --- |
 | Account switcher | Backend account-context model/API and mobile switcher are now implemented. | Finish production data QA, ensure every protected backend surface respects active context, and add database migration/seed notes before launch. |
 | AI career copilot / scoring | Not implemented as proven launch product. | Add server-only AI endpoints before Flutter UI calls any AI feature. |
-| Career Passport | Missing. | Add private-by-default passport API and score model before employer/university views. |
+| Career Passport | Backend passport API and rule-based score snapshot foundation are now implemented. | Add mobile Passport screens, employer/university views, AI-backed scoring, and share-link QA. |
 | Campus verification | Campus student screens/routes exist, but verification workflow is not complete. | Add university list, verification start/confirm/upload, and admin review queue. |
 | University dashboard | Basic campus/university route pieces exist, not full dashboard/permission model. | Add university admin context and dashboard metrics. |
 | Global country/currency | Partial country/city helpers exist. Currency/work-mode launch rules need enforcement. | Limit salary currencies to USD/EUR/GBP and add country/work-mode contracts across records. |
@@ -166,6 +166,19 @@ Required APIs/screens:
 - `PassportImproveScreen`
 - `EmployerPassportView`
 - `UniversityStudentPassportView`
+
+Current implementation note:
+
+- `GET /user/v1/career-passport`, `PUT /user/v1/career-passport`,
+  `POST /user/v1/career-passport/share`, and
+  `POST /ai/v1/career-passport/score` are mounted.
+- Score refresh is backend-owned but currently `rule_based_v1`, not provider AI.
+  This avoids fake AI while preserving the endpoint contract for the later AI
+  provider layer.
+- The passport is derived from real employee/user profile data and stores
+  privacy/share/score snapshots in `career_passports`.
+- Mobile `CareerPassportScreen`, employer-safe view, university-safe view, and
+  AI usage/cost controls remain open work.
 
 Acceptance checks:
 
