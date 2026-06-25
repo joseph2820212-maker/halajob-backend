@@ -32,6 +32,24 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install backend dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Backend syntax check
+        run: npm run check:syntax
+
+      - name: Backend relative import check
+        run: npm run check:imports
+
+      - name: Backend app import smoke check
+        run: npm run smoke:import
+
       - name: Verify backend mobile route contract
         run: npm run test:mobile-routes
 
