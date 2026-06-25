@@ -55,7 +55,7 @@ jobs:
 
       - name: Guard approved mobile palette
         run: |
-          if git grep -n -E 'green|Green|10C26A|0xFF10C26A|0xff10c26a|Colors\.green|#10C26A|#10c26a' -- mobile/lib mobile/test mobile/docs mobile/README.md ':!mobile/docs/brand'; then
+          if git grep -n -E 'green|Green|emerald|Emerald|mint|Mint|lime|Lime|teal|Teal|10C26A|0xFF10C26A|0xff10c26a|#10C26A|#10c26a|4C6A4F|0xFF4C6A4F|0xff4c6a4f|#4C6A4F|#4c6a4f|Colors\.green' -- mobile/lib mobile/test mobile/docs mobile/README.md mobile/mockups ':!mobile/docs/brand'; then
             echo "Old green mobile palette value found. Use the approved navy/cream/orange system."
             exit 1
           fi
