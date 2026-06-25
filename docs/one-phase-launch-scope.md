@@ -29,6 +29,8 @@ current implementation pass. When onboarding is explicitly requested, use
 `C:\Users\Admin\Downloads\Hala Job Onboarding Handout (download).html` as the
 visual/content reference, then implement it against the existing Flutter app
 architecture with real navigation, loading/error states, and localization.
+Until then, do not copy this handout into the app, do not create onboarding
+screens from it, and do not let it change the current release behavior.
 
 ## Current Evidence From The Handout
 
@@ -38,7 +40,7 @@ architecture with real navigation, loading/error states, and localization.
 | AI career copilot / scoring | Not implemented as proven launch product. | Add server-only AI endpoints before Flutter UI calls any AI feature. |
 | Career Passport | Backend passport API, rule-based score snapshot foundation, and mobile seeker/campus Passport sheet are now implemented. | Add edit flows, employer/university views, AI-backed scoring, and share-link QA. |
 | Campus verification | Backend model/API foundation and Flutter campus verification sheet now support university list, status, email code verification, document upload, resubmit, and university admin approve/reject/request-info. | Complete live email/device QA against production credentials and approve/reject flows. |
-| University dashboard | University admin backend routes now honor active context for overview, students, verification queue/actions, partners, opportunity requests, employability analytics, and outcomes reports under `/university/v1`. | Add full Flutter university dashboard UI and richer report exports. |
+| University dashboard | University admin backend routes now honor active context for overview, students, verification queue/actions, partners, opportunity requests, employability analytics, and outcomes reports under `/university/v1`; Flutter now opens a university admin dashboard from the active `university_admin` context with metrics, verification actions, readiness, students, partners, and account switching. | Add deeper sub-screens, richer report exports, live university admin device QA, and release analytics. |
 | Global country/currency | Partial country/city helpers exist. Currency/work-mode launch rules need enforcement. | Limit salary currencies to USD/EUR/GBP and add country/work-mode contracts across records. |
 | Translation | Not implemented as approved AI translation workflow. | Add backend translation endpoints and approval storage. |
 | Trust/anti-scam | Some report/review features exist, no full trust score/admin queue. | Add trust scoring/report/review routes and admin actions. |
