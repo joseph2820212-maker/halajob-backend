@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
+import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import {
   CampusEventRegistrationModel,
   CompanyModel,
@@ -10,10 +12,13 @@ import {
   UserSavedJobModel,
   InterviewModel,
   JobZainTalentRequestModel,
+  StudentVerificationModel,
+  UniversityMembershipModel,
   UniversityOpportunityRequestModel,
   jobsModel,
 } from "../../../models/index.js";
 import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
+import { writeAuditLog } from "../../../services/auditLog.service.js";
 
 const { isValidObjectId } = mongoose;
 
@@ -44,6 +49,61 @@ const toStringArray = (value) => {
 };
 
 const cleanText = (value) => String(value || "").trim();
+const normalizeEmail = (value) => cleanText(value).toLowerCase();
+const idOf = (value) => value?._id || value || null;
+
+const hashVerificationCode = ({ code, userId }) =>
+  crypto
+    .createHash("sha256")
+    .update(`${code}:${userId}:${process.env.JWT_SECRET || "halajob-campus"}`)
+    .digest("hex");
+
+const createVerificationCode = () => String(crypto.randomInt(100000, 1000000));
+
+const normalizeVerificationMethod = (value) => {
+  const method = cleanText(value).toLowerCase();
+  if (["email", "document", "invite_code", "manual"].includes(method)) return method;
+  return "email";
+};
+
+const normalizeGraduationYear = (value) => {
+  const year = Number(value);
+  if (!Number.isFinite(year)) return null;
+  const rounded = Math.floor(year);
+  return rounded >= 1900 && rounded <= 2200 ? rounded : null;
+};
+
+const ACADEMIC_YEAR_VALUES = new Set([
+  "first",
+  "second",
+  "third",
+  "fourth",
+  "fifth",
+  "sixth",
+  "diploma",
+  "postgraduate",
+  "internship",
+  "graduated",
+]);
+
+const normalizeAcademicYear = (value) => {
+  const academicYear = cleanText(value).toLowerCase();
+  return ACADEMIC_YEAR_VALUES.has(academicYear) ? academicYear : "";
+};
+
+const publicUniversity = (university = {}) => ({
+  id: String(university._id || ""),
+  _id: university._id,
+  name: university.name || "",
+  name_en: university.name_en || university.name || "",
+  logo: university.logo || "",
+  city: university.city || "",
+  country: university.country || "",
+  email_domain: university.email_domain || "",
+  verified: university.verified === true,
+  status: university.status || "pending",
+  campuses: university.campuses || [],
+});
 
 const normalizeUniversityCreatePayload = (body = {}) => {
   const name = cleanText(body.name || body.name_en);
@@ -145,6 +205,165 @@ const getCareerCenterUniversityForRequest = async (req) => {
     career_center_email: email,
     status: { $ne: "suspended" },
   }).lean();
+};
+
+const getUniversityByRef = async (refInput) => {
+  const ref = cleanText(refInput);
+  if (!ref) return null;
+  const refLower = ref.toLowerCase().replace(/^@+/, "");
+  if (isValidObjectId(ref)) {
+    return UniversityModel.findOne({ _id: ref, status: { $ne: "suspended" } }).lean();
+  }
+
+  return UniversityModel.findOne({
+    status: { $ne: "suspended" },
+    $or: [
+      { email_domain: refLower },
+      { career_center_email: refLower },
+      { name: new RegExp(`^${escapeRegExp(ref)}$`, "i") },
+      { name_en: new RegExp(`^${escapeRegExp(ref)}$`, "i") },
+    ],
+  }).lean();
+};
+
+const getUniversityForVerificationBody = async (body = {}) => {
+  const ref =
+    body.university_id ||
+    body.university_ref ||
+    body.university ||
+    body.email_domain ||
+    body.domain;
+  return getUniversityByRef(ref);
+};
+
+const getUniversityAdminScope = async (req) => {
+  const activeContext = req.activeContext || {};
+
+  if (activeContext.context_type === "super_admin" && activeContext.status === "active") {
+    const requestedUniversity = await getUniversityByRef(req.query?.university_id || req.body?.university_id);
+    return { superAdmin: true, university: requestedUniversity || null };
+  }
+
+  if (
+    activeContext.context_type === "university_admin" &&
+    activeContext.status === "active" &&
+    isValidObjectId(activeContext.entity_id)
+  ) {
+    const university = await UniversityModel.findOne({
+      _id: activeContext.entity_id,
+      status: { $ne: "suspended" },
+    }).lean();
+    if (!university) return null;
+
+    const membership = await UniversityMembershipModel.exists({
+      user_id: req.user._id,
+      university_id: university._id,
+      status: "active",
+    });
+    const isCareerCenter = normalizeEmail(university.career_center_email) === normalizeEmail(req.user?.email);
+    if (membership || isCareerCenter) {
+      return { superAdmin: false, university };
+    }
+  }
+
+  const careerCenterUniversity = await getCareerCenterUniversityForRequest(req);
+  if (careerCenterUniversity) return { superAdmin: false, university: careerCenterUniversity };
+  return null;
+};
+
+const serializeVerification = (verification = {}) => {
+  const university =
+    verification.university_id && typeof verification.university_id === "object"
+      ? verification.university_id
+      : null;
+
+  return {
+    id: String(verification._id || ""),
+    _id: verification._id,
+    method: verification.method || "email",
+    status: verification.status || "pending",
+    university_id: idOf(verification.university_id),
+    university: university ? publicUniversity(university) : null,
+    student_email: verification.student_email || "",
+    student_id_number: verification.student_id_number || "",
+    campus: verification.campus || "",
+    faculty_major: verification.faculty_major || "",
+    degree_level: verification.degree_level || "",
+    graduation_year: verification.graduation_year || null,
+    invite_code: verification.invite_code || "",
+    document_url: verification.document_url || "",
+    email_confirmed_at: verification.email_confirmed_at || null,
+    reviewed_by: verification.reviewed_by || null,
+    reviewed_at: verification.reviewed_at || null,
+    rejection_reason: verification.rejection_reason || "",
+    requested_information: verification.requested_information || "",
+    created_at: verification.createdAt || verification.created_at || null,
+    updated_at: verification.updatedAt || verification.updated_at || null,
+  };
+};
+
+const applyVerifiedStudentToEmployee = async ({ verification, university }) => {
+  const set = {
+    is_student: true,
+    candidate_stage: "student",
+    university: university.name || verification.submitted_payload?.university || "",
+    university_id: university._id,
+    "student_profile.university": university.name || "",
+    "student_profile.university_id": university._id,
+    "student_profile.student_email": verification.student_email || "",
+    "student_profile.student_email_verified": true,
+    "search_filters.career.is_student": true,
+  };
+
+  if (verification.faculty_major) set["student_profile.specialty"] = verification.faculty_major;
+  if (verification.submitted_payload?.academic_year) {
+    const academicYear = normalizeAcademicYear(verification.submitted_payload.academic_year);
+    if (academicYear) set["student_profile.academic_year"] = academicYear;
+  }
+  if (verification.graduation_year) {
+    set.graduation_year = verification.graduation_year;
+    set["student_profile.expected_graduation_year"] = verification.graduation_year;
+  }
+
+  return EmployeeModel.findOneAndUpdate(
+    { user_id: verification.user_id },
+    { $set: set },
+    { new: true, runValidators: true }
+  ).lean();
+};
+
+const updateStudentProfileFromVerification = async ({ req, university, body = {}, studentEmail = "" }) => {
+  const employee = await EmployeeModel.findOne({ user_id: req.user._id }).lean();
+  if (!employee) return null;
+
+  const set = {
+    is_student: true,
+    candidate_stage: "student",
+    university: university.name || "",
+    university_id: university._id,
+    "student_profile.university": university.name || "",
+    "student_profile.university_id": university._id,
+    "student_profile.student_email": studentEmail || employee.student_profile?.student_email || "",
+    "search_filters.career.is_student": true,
+  };
+  const major = cleanText(body.faculty_major || body.major || body.specialty);
+  const campus = cleanText(body.campus);
+  const academicYear = normalizeAcademicYear(body.academic_year);
+  const graduationYear = normalizeGraduationYear(body.graduation_year || body.expected_graduation_year);
+
+  if (major) set["student_profile.specialty"] = major;
+  if (campus) set["student_profile.sub_specialty"] = campus;
+  if (academicYear) set["student_profile.academic_year"] = academicYear;
+  if (graduationYear) {
+    set.graduation_year = graduationYear;
+    set["student_profile.expected_graduation_year"] = graduationYear;
+  }
+
+  return EmployeeModel.findOneAndUpdate(
+    { user_id: req.user._id },
+    { $set: set },
+    { new: true, runValidators: true }
+  ).lean();
 };
 
 const buildUniversityStudentQuery = (university) => {
@@ -424,6 +643,397 @@ const registerEvent = async (req, res, next) => {
   }
 };
 
+const studentVerificationStatus = async (req, res, next) => {
+  try {
+    const verification = await StudentVerificationModel.findOne({ user_id: req.user._id })
+      .populate({ path: "university_id", select: "name name_en logo city country email_domain verified status campuses" })
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .lean();
+
+    if (!verification) {
+      return ReturnAppData.getData({
+        res,
+        data: {
+          status: "not_started",
+          verification: null,
+        },
+        message: "student_verification_not_started",
+      });
+    }
+
+    return ReturnAppData.getData({
+      res,
+      data: {
+        status: verification.status,
+        verification: serializeVerification(verification),
+      },
+      message: "student_verification_status",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const startStudentVerification = async (req, res, next) => {
+  try {
+    const body = req.body || {};
+    const employee = await EmployeeModel.findOne({ user_id: req.user._id }).select("_id").lean();
+    if (!employee) {
+      return ReturnAppData.createError({ res, status: 404, message: "campus_profile_not_found" });
+    }
+
+    const university = await getUniversityForVerificationBody(body);
+    if (!university) {
+      return ReturnAppData.createError({ res, status: 422, message: "university_required" });
+    }
+
+    const existingVerified = await StudentVerificationModel.findOne({
+      user_id: req.user._id,
+      university_id: university._id,
+      status: "verified",
+    }).lean();
+    if (existingVerified) {
+      return ReturnAppData.createData({
+        res,
+        status: 200,
+        data: {
+          status: "verified",
+          verification: serializeVerification({ ...existingVerified, university_id: university }),
+        },
+        message: "student_already_verified",
+      });
+    }
+
+    const method = normalizeVerificationMethod(body.method || body.verification_method);
+    const studentEmail = normalizeEmail(body.student_email || req.user?.email);
+    const emailDomain = getEmailDomain(studentEmail);
+    const universityDomain = normalizeEmail(university.email_domain);
+
+    if (method === "email" && (!studentEmail || !universityDomain || emailDomain !== universityDomain)) {
+      return ReturnAppData.createError({
+        res,
+        status: 422,
+        message: "student_email_must_match_university_domain",
+      });
+    }
+
+    const now = new Date();
+    let emailCodeHash = "";
+    let emailCodeExpiresAt = null;
+    let emailSent = false;
+    if (method === "email") {
+      const code = createVerificationCode();
+      emailCodeHash = hashVerificationCode({ code, userId: req.user._id });
+      emailCodeExpiresAt = new Date(now.getTime() + 15 * 60 * 1000);
+      const sent = await sendRecoveryEmail({
+        to: studentEmail,
+        passcode: code,
+        lang: req.get("lan") || "en",
+        type: "passcode",
+      });
+      emailSent = Boolean(sent);
+    }
+
+    const payload = {
+      user_id: req.user._id,
+      employee_id: employee._id,
+      university_id: university._id,
+      method,
+      status: "pending",
+      student_email: studentEmail,
+      student_id_number: cleanText(body.student_id_number || body.student_number),
+      campus: cleanText(body.campus),
+      faculty_major: cleanText(body.faculty_major || body.major || body.specialty),
+      degree_level: cleanText(body.degree_level || body.degree),
+      graduation_year: normalizeGraduationYear(body.graduation_year || body.expected_graduation_year),
+      invite_code: cleanText(body.invite_code || body.code),
+      submitted_payload: {
+        university: university.name || "",
+        university_id: university._id,
+        source: cleanText(body.source || "mobile"),
+        academic_year: cleanText(body.academic_year),
+        degree_level: cleanText(body.degree_level || body.degree),
+      },
+      email_code_hash: emailCodeHash,
+      email_code_expires_at: emailCodeExpiresAt,
+      email_confirmed_at: null,
+      reviewed_by: null,
+      reviewed_at: null,
+      rejection_reason: "",
+      requested_information: "",
+    };
+
+    await updateStudentProfileFromVerification({ req, university, body, studentEmail });
+
+    const existingPending = await StudentVerificationModel.findOne({
+      user_id: req.user._id,
+      university_id: university._id,
+      status: { $ne: "verified" },
+    }).sort({ updatedAt: -1 });
+
+    const verification = existingPending
+      ? await StudentVerificationModel.findByIdAndUpdate(
+          existingPending._id,
+          { $set: payload },
+          { new: true, runValidators: true }
+        ).lean()
+      : await StudentVerificationModel.create(payload);
+    const verificationObject = verification.toObject ? verification.toObject() : verification;
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: "employee",
+      action: "campus_verification_started",
+      entityType: "other",
+      entityId: verificationObject._id,
+      newValue: {
+        method,
+        status: verificationObject.status,
+        university_id: university._id,
+      },
+    });
+
+    return ReturnAppData.createData({
+      res,
+      status: 202,
+      data: {
+        status: verificationObject.status,
+        email_sent: emailSent,
+        verification: serializeVerification({ ...verificationObject, university_id: university }),
+      },
+      message: "student_verification_started",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const confirmStudentVerificationEmail = async (req, res, next) => {
+  try {
+    const body = req.body || {};
+    const code = cleanText(body.code || body.passcode || body.otp);
+    if (!code) return ReturnAppData.createError({ res, status: 422, message: "verification_code_required" });
+
+    const verificationId = cleanText(body.verification_id || body.id);
+    const query = verificationId && isValidObjectId(verificationId)
+      ? { _id: verificationId, user_id: req.user._id }
+      : { user_id: req.user._id, method: "email", status: "pending" };
+
+    const verification = await StudentVerificationModel.findOne(query)
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .populate({ path: "university_id", select: "name name_en logo city country email_domain verified status campuses" });
+
+    if (!verification) {
+      return ReturnAppData.createError({ res, status: 404, message: "student_verification_not_found" });
+    }
+
+    if (verification.status !== "pending") {
+      return ReturnAppData.createError({ res, status: 409, message: "student_verification_not_pending" });
+    }
+
+    if (verification.email_code_expires_at && verification.email_code_expires_at.getTime() < Date.now()) {
+      verification.status = "expired";
+      await verification.save();
+      return ReturnAppData.createError({ res, status: 410, message: "student_verification_code_expired" });
+    }
+
+    const expectedHash = hashVerificationCode({ code, userId: req.user._id });
+    if (!verification.email_code_hash || verification.email_code_hash !== expectedHash) {
+      return ReturnAppData.createError({ res, status: 422, message: "invalid_verification_code" });
+    }
+
+    verification.status = "verified";
+    verification.email_confirmed_at = new Date();
+    verification.reviewed_at = new Date();
+    verification.rejection_reason = "";
+    verification.requested_information = "";
+    await verification.save();
+
+    await applyVerifiedStudentToEmployee({
+      verification: verification.toObject(),
+      university: verification.university_id,
+    });
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: "employee",
+      action: "campus_verification_email_confirmed",
+      entityType: "other",
+      entityId: verification._id,
+      newValue: {
+        status: "verified",
+        university_id: verification.university_id?._id || verification.university_id,
+      },
+    });
+
+    return ReturnAppData.updateData({
+      res,
+      data: {
+        status: "verified",
+        verification: serializeVerification(verification.toObject()),
+      },
+      message: "student_verification_verified",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const uploadStudentVerificationDocument = async (req, res, next) => {
+  try {
+    const body = req.body || {};
+    const employee = await EmployeeModel.findOne({ user_id: req.user._id }).select("_id").lean();
+    if (!employee) {
+      return ReturnAppData.createError({ res, status: 404, message: "campus_profile_not_found" });
+    }
+
+    const verificationId = cleanText(body.verification_id || body.id);
+    let verification = verificationId && isValidObjectId(verificationId)
+      ? await StudentVerificationModel.findOne({ _id: verificationId, user_id: req.user._id })
+      : null;
+
+    const university = verification
+      ? await UniversityModel.findById(verification.university_id).lean()
+      : await getUniversityForVerificationBody(body);
+
+    if (!university) {
+      return ReturnAppData.createError({ res, status: 422, message: "university_required" });
+    }
+
+    const documentUrl = req.file?.filename
+      ? `/uploads/${req.file.filename}`
+      : cleanText(body.document_url);
+    if (!documentUrl) {
+      return ReturnAppData.createError({ res, status: 422, message: "student_document_required" });
+    }
+
+    const payload = {
+      user_id: req.user._id,
+      employee_id: employee._id,
+      university_id: university._id,
+      method: "document",
+      status: "pending",
+      student_email: normalizeEmail(body.student_email || verification?.student_email || req.user?.email),
+      student_id_number: cleanText(body.student_id_number || verification?.student_id_number),
+      campus: cleanText(body.campus || verification?.campus),
+      faculty_major: cleanText(body.faculty_major || body.major || body.specialty || verification?.faculty_major),
+      degree_level: cleanText(body.degree_level || body.degree || verification?.degree_level),
+      graduation_year:
+        normalizeGraduationYear(body.graduation_year || body.expected_graduation_year) ||
+        verification?.graduation_year ||
+        null,
+      document_url: documentUrl,
+      submitted_payload: {
+        university: university.name || "",
+        university_id: university._id,
+        source: cleanText(body.source || "mobile"),
+        academic_year: cleanText(body.academic_year || verification?.submitted_payload?.academic_year),
+        degree_level: cleanText(body.degree_level || body.degree || verification?.degree_level),
+      },
+      email_code_hash: "",
+      email_code_expires_at: null,
+      reviewed_by: null,
+      reviewed_at: null,
+      rejection_reason: "",
+      requested_information: "",
+    };
+
+    await updateStudentProfileFromVerification({
+      req,
+      university,
+      body: payload,
+      studentEmail: payload.student_email,
+    });
+
+    verification = verification
+      ? await StudentVerificationModel.findByIdAndUpdate(
+          verification._id,
+          { $set: payload },
+          { new: true, runValidators: true }
+        ).lean()
+      : await StudentVerificationModel.create(payload);
+    const verificationObject = verification.toObject ? verification.toObject() : verification;
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: "employee",
+      action: "campus_verification_document_uploaded",
+      entityType: "other",
+      entityId: verificationObject._id,
+      newValue: {
+        status: verificationObject.status,
+        university_id: university._id,
+        has_document: Boolean(documentUrl),
+      },
+    });
+
+    return ReturnAppData.createData({
+      res,
+      status: 202,
+      data: {
+        status: verificationObject.status,
+        verification: serializeVerification({ ...verificationObject, university_id: university }),
+      },
+      message: "student_verification_document_uploaded",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resubmitStudentVerification = async (req, res, next) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return ReturnAppData.createError({ res, status: 400, message: "invalid_student_verification_id" });
+    }
+
+    const verification = await StudentVerificationModel.findOne({
+      _id: req.params.id,
+      user_id: req.user._id,
+    });
+    if (!verification) {
+      return ReturnAppData.createError({ res, status: 404, message: "student_verification_not_found" });
+    }
+    if (!["rejected", "needs_more_information", "expired", "pending"].includes(verification.status)) {
+      return ReturnAppData.createError({ res, status: 409, message: "student_verification_cannot_be_resubmitted" });
+    }
+
+    verification.status = "pending";
+    verification.rejection_reason = "";
+    verification.requested_information = "";
+    verification.submitted_payload = {
+      ...(verification.submitted_payload || {}),
+      resubmitted_at: new Date(),
+      note: cleanText(req.body?.note),
+    };
+    await verification.save();
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: "employee",
+      action: "campus_verification_resubmitted",
+      entityType: "other",
+      entityId: verification._id,
+      newValue: { status: "pending" },
+    });
+
+    return ReturnAppData.updateData({
+      res,
+      data: {
+        status: verification.status,
+        verification: serializeVerification(verification.toObject()),
+      },
+      message: "student_verification_resubmitted",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const universityOverview = async (req, res, next) => {
   try {
     const company = await getCompanyForRequest(req);
@@ -453,12 +1063,13 @@ const universityOverview = async (req, res, next) => {
 
 const userUniversityOverview = async (req, res, next) => {
   try {
-    const university = await getCareerCenterUniversityForRequest(req);
+    const scope = await getUniversityAdminScope(req);
+    const university = scope?.university;
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
 
     const partnerCompanyIds = (university.partners || []).map((partner) => partner.company_id).filter(Boolean);
     const universityStudentQuery = buildUniversityStudentQuery(university);
-    const [studentsCount, opportunitiesCount, requestsCount, placements] = await Promise.all([
+    const [studentsCount, opportunitiesCount, requestsCount, placements, verificationStats] = await Promise.all([
       EmployeeModel.countDocuments(universityStudentQuery),
       jobsModel.countDocuments({
         $or: [{ is_for_students: true }, { is_for_fresh_graduates: true }, { candidate_target: { $in: ["students", "fresh_graduates"] } }],
@@ -466,7 +1077,12 @@ const userUniversityOverview = async (req, res, next) => {
       }),
       UniversityOpportunityRequestModel.countDocuments({ university_id: university._id, status: { $nin: ["closed", "cancelled"] } }),
       UserApplyingJobModel.countDocuments({ status: { $in: ["accepted", "hired"] }, ...(partnerCompanyIds.length ? { company_id: { $in: partnerCompanyIds } } : {}) }),
+      StudentVerificationModel.aggregate([
+        { $match: { university_id: university._id } },
+        { $group: { _id: "$status", count: { $sum: 1 } } },
+      ]),
     ]);
+    const verificationCounts = Object.fromEntries((verificationStats || []).map((item) => [item._id, item.count]));
 
     return ReturnAppData.getData({
       res,
@@ -474,6 +1090,10 @@ const userUniversityOverview = async (req, res, next) => {
         university,
         stats: {
           registered_students: studentsCount || university.students_count || 0,
+          verified_students: verificationCounts.verified || 0,
+          pending_verifications: verificationCounts.pending || 0,
+          rejected_verifications: verificationCounts.rejected || 0,
+          needs_more_information: verificationCounts.needs_more_information || 0,
           internships_posted: opportunitiesCount,
           active_requests: requestsCount,
           placements,
@@ -486,9 +1106,195 @@ const userUniversityOverview = async (req, res, next) => {
   }
 };
 
+const adminVerificationsQuery = async (req) => {
+  const scope = await getUniversityAdminScope(req);
+  if (!scope) return null;
+
+  const query = {};
+  if (!scope.superAdmin) {
+    query.university_id = scope.university._id;
+  } else if (scope.university?._id) {
+    query.university_id = scope.university._id;
+  }
+
+  const status = cleanText(req.query?.status || req.body?.status).toLowerCase();
+  if (status && status !== "all") query.status = status;
+
+  return { scope, query };
+};
+
+const adminListVerifications = async (req, res, next) => {
+  try {
+    const scoped = await adminVerificationsQuery(req);
+    if (!scoped) {
+      return ReturnAppData.getError({ res, status: 403, message: "university_admin_context_required" });
+    }
+
+    const limit = normalizeLimit(req.query.limit, 25, 100);
+    const verifications = await StudentVerificationModel.find(scoped.query)
+      .populate({ path: "university_id", select: "name name_en logo city country email_domain verified status campuses" })
+      .populate({ path: "user_id", select: "first_name mid_name last_name email image" })
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(limit)
+      .lean();
+
+    return ReturnAppData.getData({
+      res,
+      data: verifications.map(serializeVerification),
+      message: "student_verification_queue",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const findAdminVerification = async (req) => {
+  if (!isValidObjectId(req.params.id)) return { scoped: await adminVerificationsQuery(req), verification: null };
+  const scoped = await adminVerificationsQuery(req);
+  if (!scoped) return { scoped: null, verification: null };
+  const query = {
+    _id: req.params.id,
+    ...scoped.query,
+  };
+  delete query.status;
+  const verification = await StudentVerificationModel.findOne(query).populate({
+    path: "university_id",
+    select: "name name_en logo city country email_domain verified status campuses",
+  });
+  return { scoped, verification };
+};
+
+const adminApproveVerification = async (req, res, next) => {
+  try {
+    const { scoped, verification } = await findAdminVerification(req);
+    if (!scoped) {
+      return ReturnAppData.updateError({ res, status: 403, message: "university_admin_context_required" });
+    }
+    if (!verification) {
+      return ReturnAppData.updateError({ res, status: 404, message: "student_verification_not_found" });
+    }
+
+    verification.status = "verified";
+    verification.reviewed_by = req.user._id;
+    verification.reviewed_at = new Date();
+    verification.rejection_reason = "";
+    verification.requested_information = "";
+    await verification.save();
+
+    await applyVerifiedStudentToEmployee({
+      verification: verification.toObject(),
+      university: verification.university_id,
+    });
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: scoped.superAdmin ? "admin" : "university_admin",
+      action: "campus_verification_approved",
+      entityType: "other",
+      entityId: verification._id,
+      newValue: {
+        status: "verified",
+        university_id: verification.university_id?._id || verification.university_id,
+      },
+    });
+
+    return ReturnAppData.updateData({
+      res,
+      data: serializeVerification(verification.toObject()),
+      message: "student_verification_approved",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const adminRejectVerification = async (req, res, next) => {
+  try {
+    const { scoped, verification } = await findAdminVerification(req);
+    if (!scoped) {
+      return ReturnAppData.updateError({ res, status: 403, message: "university_admin_context_required" });
+    }
+    if (!verification) {
+      return ReturnAppData.updateError({ res, status: 404, message: "student_verification_not_found" });
+    }
+
+    const reason = cleanText(req.body?.reason || req.body?.rejection_reason || "Verification evidence was not accepted.");
+    verification.status = "rejected";
+    verification.reviewed_by = req.user._id;
+    verification.reviewed_at = new Date();
+    verification.rejection_reason = reason;
+    verification.requested_information = "";
+    await verification.save();
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: scoped.superAdmin ? "admin" : "university_admin",
+      action: "campus_verification_rejected",
+      entityType: "other",
+      entityId: verification._id,
+      newValue: {
+        status: "rejected",
+        reason,
+      },
+    });
+
+    return ReturnAppData.updateData({
+      res,
+      data: serializeVerification(verification.toObject()),
+      message: "student_verification_rejected",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const adminRequestVerificationInfo = async (req, res, next) => {
+  try {
+    const { scoped, verification } = await findAdminVerification(req);
+    if (!scoped) {
+      return ReturnAppData.updateError({ res, status: 403, message: "university_admin_context_required" });
+    }
+    if (!verification) {
+      return ReturnAppData.updateError({ res, status: 404, message: "student_verification_not_found" });
+    }
+
+    const requestedInformation = cleanText(req.body?.reason || req.body?.requested_information || "More information is required.");
+    verification.status = "needs_more_information";
+    verification.reviewed_by = req.user._id;
+    verification.reviewed_at = new Date();
+    verification.requested_information = requestedInformation;
+    verification.rejection_reason = "";
+    await verification.save();
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: scoped.superAdmin ? "admin" : "university_admin",
+      action: "campus_verification_more_information_requested",
+      entityType: "other",
+      entityId: verification._id,
+      newValue: {
+        status: "needs_more_information",
+        requested_information: requestedInformation,
+      },
+    });
+
+    return ReturnAppData.updateData({
+      res,
+      data: serializeVerification(verification.toObject()),
+      message: "student_verification_more_information_requested",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const userUniversityOpportunities = async (req, res, next) => {
   try {
-    const university = await getCareerCenterUniversityForRequest(req);
+    const scope = await getUniversityAdminScope(req);
+    const university = scope?.university;
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
     const partnerCompanyIds = (university.partners || []).map((partner) => partner.company_id).filter(Boolean);
     const limit = normalizeLimit(req.query.limit);
@@ -532,7 +1338,8 @@ const userUniversityOpportunities = async (req, res, next) => {
 
 const userUniversityStudents = async (req, res, next) => {
   try {
-    const university = await getCareerCenterUniversityForRequest(req);
+    const scope = await getUniversityAdminScope(req);
+    const university = scope?.university;
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
     const studentsList = await EmployeeModel.find(buildUniversityStudentQuery(university))
       .select("profile_headline current_job_title candidate_stage student_profile graduation_year profile_completion user_id")
@@ -548,7 +1355,8 @@ const userUniversityStudents = async (req, res, next) => {
 
 const userUniversityPartners = async (req, res, next) => {
   try {
-    const university = await UniversityModel.findOne({ _id: (await getCareerCenterUniversityForRequest(req))?._id })
+    const scope = await getUniversityAdminScope(req);
+    const university = await UniversityModel.findOne({ _id: scope?.university?._id })
       .populate({ path: "partners.company_id", select: "company_name logo company_country company_city is_verified" })
       .lean();
     if (!university) return ReturnAppData.getError({ res, status: 404, message: "campus_university_not_found" });
@@ -560,7 +1368,8 @@ const userUniversityPartners = async (req, res, next) => {
 
 const createUniversityOpportunityRequest = async (req, res, next) => {
   try {
-    const university = await getCareerCenterUniversityForRequest(req);
+    const scope = await getUniversityAdminScope(req);
+    const university = scope?.university;
     if (!university) return ReturnAppData.createError({ res, status: 404, message: "campus_university_not_found" });
     const title = String(req.body?.title || req.body?.job_name || "Campus internship request").trim();
     if (!title) return ReturnAppData.createError({ res, status: 422, message: "title_required" });
@@ -706,7 +1515,42 @@ const listUniversities = async (req, res, next) => {
       .limit(normalizeLimit(req.query.limit, 50, 100))
       .lean();
 
-    return ReturnAppData.getData({ res, data: universities, message: "universities" });
+    return ReturnAppData.getData({ res, data: universities.map(publicUniversity), message: "universities" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const listUniversityCampuses = async (req, res, next) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return ReturnAppData.getError({ res, status: 400, message: "invalid_university_id" });
+    }
+
+    const university = await UniversityModel.findOne({
+      _id: req.params.id,
+      status: { $ne: "suspended" },
+    }).lean();
+    if (!university) {
+      return ReturnAppData.getError({ res, status: 404, message: "university_not_found" });
+    }
+
+    const campuses = Array.isArray(university.campuses) && university.campuses.length
+      ? university.campuses
+      : [
+          {
+            id: String(university._id),
+            name: university.name || university.name_en || "Main campus",
+            city: university.city || "",
+            status: "active",
+          },
+        ];
+
+    return ReturnAppData.getData({
+      res,
+      data: campuses,
+      message: "university_campuses",
+    });
   } catch (error) {
     next(error);
   }
@@ -759,6 +1603,15 @@ export default {
   updateProfile,
   resources,
   registerEvent,
+  studentVerificationStatus,
+  startStudentVerification,
+  confirmStudentVerificationEmail,
+  uploadStudentVerificationDocument,
+  resubmitStudentVerification,
+  adminListVerifications,
+  adminApproveVerification,
+  adminRejectVerification,
+  adminRequestVerificationInfo,
   universityOverview,
   userUniversityOverview,
   userUniversityOpportunities,
@@ -771,6 +1624,7 @@ export default {
   partners,
   addPartner,
   listUniversities,
+  listUniversityCampuses,
   createUniversity,
   updateUniversityStatus,
 };

@@ -15,6 +15,7 @@ import userRoutes from "./routesUser/index.js";
 import employeeRoutes from "./routesEmployee/index.js";
 import companyRoutes from "./routesCompany/index.js";
 import aiRoutes from "./routesAi/index.js";
+import campusRoutes from "./routesCampus/index.js";
 import routesHealth from "./routesHealth/index.js";
 import error from "./middlewares/error.js";
 import ApiError from "./utils/apiError.js";
@@ -75,6 +76,8 @@ const corsOptions = {
     "Accept",
     "lan",
     "x-language",
+    "X-Active-Context-Id",
+    "active_context_id",
   ],
 
   exposedHeaders: [
@@ -286,6 +289,7 @@ app.use("/dash/v1", routes);
 app.use("/employee/v1", employeeRoutes);
 app.use("/company/v1", companyRoutes);
 app.use("/ai/v1", aiRoutes);
+app.use("/campus/v1", campusRoutes);
 app.use("/health", routesHealth);
 app.use("/user/v1", userRoutes);
 

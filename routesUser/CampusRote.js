@@ -10,6 +10,19 @@ const router = express.Router();
 const upload = multer;
 const campusMobileGuard = [authUser, requireAppAccount("employee"), campusMobileController.requireCampusStudent];
 
+router.get("/universities", campusController.listUniversities);
+router.get("/universities/:id/campuses", campusController.listUniversityCampuses);
+router.get("/student-verifications/me", authUser, campusController.studentVerificationStatus);
+router.post("/student-verifications", authUser, upload.none(), campusController.startStudentVerification);
+router.post("/student-verifications/:id/resubmit", authUser, upload.none(), campusController.resubmitStudentVerification);
+router.post("/verification/start", authUser, upload.none(), campusController.startStudentVerification);
+router.post("/verification/confirm-email", authUser, upload.none(), campusController.confirmStudentVerificationEmail);
+router.post("/verification/upload-document", authUser, upload.single("document"), campusController.uploadStudentVerificationDocument);
+router.get("/admin/verifications", authUser, campusController.adminListVerifications);
+router.post("/admin/verifications/:id/approve", authUser, upload.none(), campusController.adminApproveVerification);
+router.post("/admin/verifications/:id/reject", authUser, upload.none(), campusController.adminRejectVerification);
+router.post("/admin/verifications/:id/request-info", authUser, upload.none(), campusController.adminRequestVerificationInfo);
+
 router.get("/dashboard", campusMobileGuard, campusMobileController.dashboard);
 router.get("/dashboard/overview", campusMobileGuard, campusMobileController.dashboard);
 router.get("/content", campusMobileGuard, campusMobileController.content);

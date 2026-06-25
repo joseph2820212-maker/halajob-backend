@@ -19,6 +19,7 @@ const sources = {
   fcm: readSource("routesUser/FcmRote.js"),
   helper: readSource("routesUser/HelperRote.js"),
   campus: readSource("routesUser/CampusRote.js"),
+  campusPublic: readSource("routesCampus/index.js"),
   employeeDash: readSource("routesEmployee/employeeDashRoutes.js"),
   employeeCv: readSource("routesEmployee/cvRoute.js"),
 };
@@ -65,7 +66,7 @@ function assertSourceIncludes({ fileName, source, required }) {
 assertMounts({
   fileName: "app.js",
   mounts: declaredMounts(sources.app, "app"),
-  required: ["/user/v1", "/employee/v1"],
+  required: ["/user/v1", "/employee/v1", "/campus/v1"],
 });
 
 assertMounts({
@@ -189,6 +190,18 @@ assertRoutes({
     "GET /events",
     "GET /resources",
     "GET /overview",
+    "GET /universities",
+    "GET /universities/:id/campuses",
+    "GET /student-verifications/me",
+    "POST /student-verifications",
+    "POST /student-verifications/:id/resubmit",
+    "POST /verification/start",
+    "POST /verification/confirm-email",
+    "POST /verification/upload-document",
+    "GET /admin/verifications",
+    "POST /admin/verifications/:id/approve",
+    "POST /admin/verifications/:id/reject",
+    "POST /admin/verifications/:id/request-info",
     "POST /events/:eventId/register",
     "PATCH /events/:eventId/cancel",
     "POST /events/:eventId/cancel",
@@ -205,6 +218,25 @@ assertRoutes({
     "POST /applications/:id/messages",
     "PATCH /applications/:id/cancel",
     "POST /applications/:id/cancel",
+  ],
+});
+
+assertRoutes({
+  fileName: "routesCampus/index.js",
+  routes: declaredRoutes(sources.campusPublic),
+  required: [
+    "GET /universities",
+    "GET /universities/:id/campuses",
+    "GET /student-verifications/me",
+    "POST /student-verifications",
+    "POST /student-verifications/:id/resubmit",
+    "POST /verification/start",
+    "POST /verification/confirm-email",
+    "POST /verification/upload-document",
+    "GET /admin/verifications",
+    "POST /admin/verifications/:id/approve",
+    "POST /admin/verifications/:id/reject",
+    "POST /admin/verifications/:id/request-info",
   ],
 });
 

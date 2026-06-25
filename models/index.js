@@ -64,6 +64,7 @@ import CompanySupportTicketModel from './CompanySupportTicketModel.js';
 import CampusEventRegistrationModel from './CampusEventRegistrationModel.js';
 import UniversityModel from './UniversityModel.js';
 import UniversityOpportunityRequestModel from './UniversityOpportunityRequestModel.js';
+import StudentVerificationModel from './StudentVerificationModel.js';
 import AccountContextModel from './AccountContextModel.js';
 import UniversityMembershipModel from './UniversityMembershipModel.js';
 import CareerPassportModel from './CareerPassportModel.js';
@@ -133,6 +134,7 @@ export {
   CampusEventRegistrationModel,
   UniversityModel,
   UniversityOpportunityRequestModel,
+  StudentVerificationModel,
   AccountContextModel,
   UniversityMembershipModel,
   CareerPassportModel,

@@ -1,6 +1,9 @@
 # HalaJob One-Phase Launch Scope
 
-Source handout: `C:\Users\Admin\Downloads\hala_job_codex_one_phase_ai_campus_global_handout.docx`
+Source handouts:
+
+- `C:\Users\Admin\Downloads\hala_job_codex_one_phase_ai_campus_global_handout.docx`
+- `C:\Users\Admin\Downloads\HALAJOB_CODEX_IMPLEMENTATION.md`
 
 This file tracks the launch architecture requested in the handout so the scope
 is visible in the repo and can be implemented/tested in order.
@@ -24,8 +27,8 @@ is visible in the repo and can be implemented/tested in order.
 | Account switcher | Backend account-context model/API and mobile switcher are now implemented. | Finish production data QA, ensure every protected backend surface respects active context, and add database migration/seed notes before launch. |
 | AI career copilot / scoring | Not implemented as proven launch product. | Add server-only AI endpoints before Flutter UI calls any AI feature. |
 | Career Passport | Backend passport API, rule-based score snapshot foundation, and mobile seeker/campus Passport sheet are now implemented. | Add edit flows, employer/university views, AI-backed scoring, and share-link QA. |
-| Campus verification | Campus student screens/routes exist, but verification workflow is not complete. | Add university list, verification start/confirm/upload, and admin review queue. |
-| University dashboard | Basic campus/university route pieces exist, not full dashboard/permission model. | Add university admin context and dashboard metrics. |
+| Campus verification | Backend model/API foundation now exists for university list, campus list, student verification status/start/email-confirm/document-upload/resubmit, and university admin approve/reject/request-info. | Add Flutter verification screens, document picker flow, status UI, and live email/device QA. |
+| University dashboard | Basic campus/university routes exist and now honor university admin active context for overview/students/partners/opportunity requests. | Add full Flutter university dashboard and richer analytics/reports. |
 | Global country/currency | Partial country/city helpers exist. Currency/work-mode launch rules need enforcement. | Limit salary currencies to USD/EUR/GBP and add country/work-mode contracts across records. |
 | Translation | Not implemented as approved AI translation workflow. | Add backend translation endpoints and approval storage. |
 | Trust/anti-scam | Some report/review features exist, no full trust score/admin queue. | Add trust scoring/report/review routes and admin actions. |
@@ -206,12 +209,35 @@ Verification methods:
 Required verification APIs:
 
 - `GET /campus/v1/universities`
+- `GET /campus/v1/universities/:id/campuses`
 - `POST /campus/v1/verification/start`
 - `POST /campus/v1/verification/confirm-email`
 - `POST /campus/v1/verification/upload-document`
+- `GET /campus/v1/student-verifications/me`
+- `POST /campus/v1/student-verifications`
+- `POST /campus/v1/student-verifications/{id}/resubmit`
 - `GET /campus/v1/admin/verifications?status=pending`
 - `POST /campus/v1/admin/verifications/{id}/approve`
 - `POST /campus/v1/admin/verifications/{id}/reject`
+- `POST /campus/v1/admin/verifications/{id}/request-info`
+
+Current implementation note:
+
+- `student_verifications` now stores verification method, status, university,
+  student evidence, email-code hash/expiry, document URL, review state, and
+  rejection/request-info reasons.
+- `GET /campus/v1/universities` and `GET /campus/v1/universities/:id/campuses`
+  are mounted for campus selection.
+- `POST /campus/v1/verification/start`, `POST /campus/v1/verification/confirm-email`,
+  `POST /campus/v1/verification/upload-document`, `GET /campus/v1/student-verifications/me`,
+  `POST /campus/v1/student-verifications`, and
+  `POST /campus/v1/student-verifications/{id}/resubmit` are mounted.
+- University admin queue/actions are mounted at `/campus/v1/admin/verifications`
+  and mirrored under `/user/v1/campus/...` for mobile compatibility.
+- Approval updates the employee student profile with verified university
+  evidence, so the Career Passport verified-student badge can be based on real
+  backend state.
+- Flutter verification screens and device/file-picker QA remain open work.
 
 University dashboard screens:
 

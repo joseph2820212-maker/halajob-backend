@@ -16,6 +16,20 @@ const UniversityPartnerSchema = new Schema(
   { _id: true, timestamps: true }
 );
 
+const UniversityCampusSchema = new Schema(
+  {
+    name: { type: String, trim: true, default: "" },
+    city: { type: String, trim: true, default: "" },
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+      index: true,
+    },
+  },
+  { _id: true, timestamps: true }
+);
+
 const UniversitySchema = new Schema(
   {
     name: { type: String, required: true, trim: true, index: true },
@@ -41,6 +55,7 @@ const UniversitySchema = new Schema(
     },
     verified: { type: Boolean, default: false, index: true },
     students_count: { type: Number, default: 0, min: 0 },
+    campuses: { type: [UniversityCampusSchema], default: [] },
     partners: { type: [UniversityPartnerSchema], default: [] },
     status: {
       type: String,
