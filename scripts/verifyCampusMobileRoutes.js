@@ -16,6 +16,7 @@ const sources = {
   applyingJob: readSource("routesUser/ApplyingJobRote.js"),
   jobInformation: readSource("routesUser/JobInformationRote.js"),
   notification: readSource("routesUser/NotificationRote.js"),
+  fcm: readSource("routesUser/FcmRote.js"),
   helper: readSource("routesUser/HelperRote.js"),
   campus: readSource("routesUser/CampusRote.js"),
   employeeDash: readSource("routesEmployee/employeeDashRoutes.js"),
@@ -74,6 +75,7 @@ assertMounts({
     "/applying-job",
     "/app/dashboard",
     "/notifications",
+    "/fcm",
     "/campus",
   ],
 });
@@ -149,6 +151,17 @@ assertRoutes({
     "PATCH /:id/read",
     "DELETE /:id",
     "POST /:id/delete",
+  ],
+});
+
+assertRoutes({
+  fileName: "routesUser/FcmRote.js",
+  routes: declaredRoutes(sources.fcm),
+  required: [
+    "GET /tokens",
+    "POST /tokens",
+    "POST /update-tokens/:id",
+    "POST /delete-tokens/:id",
   ],
 });
 
