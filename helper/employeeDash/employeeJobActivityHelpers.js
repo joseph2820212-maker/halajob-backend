@@ -121,9 +121,39 @@ export const normalizeJobLite = (job) => {
   };
 };
 
+const actorLabel = (actor) => {
+  if (!actor) return "";
+  if (typeof actor === "object") {
+    const parts = [actor.first_name, actor.mid_name, actor.last_name]
+      .map(cleanText)
+      .filter(Boolean);
+    return parts.join(" ") || cleanText(actor.full_name || actor.name || actor.email);
+  }
+  return cleanText(actor);
+};
+
+export const normalizeApplicationMessageForEmployee = (entry = {}) => {
+  const createdAt = entry.created_at || entry.createdAt || entry.updatedAt || null;
+  const sender = actorLabel(entry.created_by || entry.createdBy || entry.sender || entry.user);
+  return {
+    _id: entry._id || createdAt || "",
+    id: entry._id || createdAt || "",
+    channel: entry.channel || "app",
+    message: entry.message || "",
+    created_by: entry.created_by || entry.createdBy || null,
+    sender,
+    sender_name: sender,
+    created_at: createdAt,
+    createdAt,
+  };
+};
+
 export const normalizeApplicationForEmployee = (application) => {
   if (!application) return null;
   const job = normalizeJobLite(application.job_id);
+  const communicationLog = Array.isArray(application.communication_log)
+    ? application.communication_log.map(normalizeApplicationMessageForEmployee)
+    : [];
   return {
     _id: application._id,
     status: application.status || "waiting",
@@ -138,8 +168,9 @@ export const normalizeApplicationForEmployee = (application) => {
     phone_national: application.phone_national || "",
     cv: application.cv || "",
     cover_letter: application.cover_letter || "",
-    communication_log: Array.isArray(application.communication_log) ? application.communication_log : [],
     answers: application.answers || [],
+    communication_log: communicationLog,
+    messages: communicationLog,
     user_job_rating: application.user_job_rating || 0,
     cv_download: Boolean(application.cv_download),
     filter: {
@@ -315,6 +346,7 @@ export const applicationPopulateForEmployee = [
     { path: "languages.language_id" },
   ] },
   { path: "company_id", select: "company_name logo image cover_image company_country company_city company_type industry_name is_verified rating_avg rating_count" },
+  { path: "communication_log.created_by", select: "first_name mid_name last_name email image" },
 ];
 
 export const interviewPopulateForEmployee = [

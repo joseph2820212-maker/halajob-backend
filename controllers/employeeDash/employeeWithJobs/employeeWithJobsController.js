@@ -458,7 +458,16 @@ export const applyToJob = async (req, res, next) => {
 };
 
 
-const createEmployeeStatusHistory = async ({ application, oldStatus, newStatus, employeeData, note = "" }) => {
+const createEmployeeStatusHistory = async ({
+  application,
+  oldStatus,
+  newStatus,
+  employeeData,
+  note = "",
+  action = "status_changed",
+  visibleToCandidate = false,
+  metadata = {},
+}) => {
   try {
     await ApplicationStatusHistoryModel.create({
       application_id: application._id,
@@ -469,7 +478,10 @@ const createEmployeeStatusHistory = async ({ application, oldStatus, newStatus, 
       new_status: newStatus,
       changed_by: employeeData.userId,
       actor_type: "employee",
+      action,
       note,
+      visible_to_candidate: visibleToCandidate,
+      metadata,
     });
   } catch {
     // history must not break the main employee action
@@ -662,11 +674,14 @@ export const addApplicationMessage = async (req, res, next) => {
     const application = await findOwnedApplication(employeeData, req.params.applicationId);
     if (!application) return fail(res, "application_not_found", 404);
 
-    const message = cleanText(req.body.message || req.body.note);
+    const message = cleanText(req.body.message || req.body.note || req.body.body);
     if (!message) return fail(res, "message_required", 422);
+    const channel = cleanText(req.body.channel || "app") || "app";
+
+    application.communication_log = application.communication_log || [];
 
     application.communication_log.push({
-      channel: "internal",
+      channel,
       message,
       created_by: employeeData.userId,
       created_at: new Date(),
@@ -681,13 +696,16 @@ export const addApplicationMessage = async (req, res, next) => {
       newStatus: application.status,
       employeeData,
       note: "candidate_message_added",
+      action: "candidate_message_sent",
+      visibleToCandidate: true,
+      metadata: { channel },
     });
 
     const populated = await UserApplyingJobModel.findById(application._id)
       .populate(applicationPopulateForEmployee)
       .lean();
 
-    return success(res, normalizeApplicationForEmployee(populated), "application_message_added");
+    return success(res, normalizeApplicationForEmployee(populated), "application_message_sent");
   } catch (error) {
     next(error);
   }

@@ -1,0 +1,284 @@
+{
+  "headline": "Student opportunities built for your campus journey.",
+  "intro": "Track internships, applications, events, and career resources in one focused student mobile experience.",
+  "quickActions": [
+    {
+      "id": "browse_internships",
+      "label": "Browse internships",
+      "caption": "Jump into the student opportunity feed.",
+      "icon": "work_outline_rounded"
+    },
+    {
+      "id": "continue_application",
+      "label": "Continue application",
+      "caption": "Open the latest student application status.",
+      "icon": "assignment_late_rounded"
+    },
+    {
+      "id": "campus_resources",
+      "label": "Career resources",
+      "caption": "Open guides and prep content for students.",
+      "icon": "auto_stories_rounded"
+    },
+    {
+      "id": "campus_events",
+      "label": "Campus events",
+      "caption": "Move to workshops, talks, and office hours.",
+      "icon": "event_available_rounded"
+    }
+  ],
+  "metrics": [
+    { "label": "Open opportunities", "value": "12", "tone": "navy" },
+    { "label": "Applications", "value": "3", "tone": "orange" },
+    { "label": "Campus events", "value": "2", "tone": "orangeSoft" },
+    { "label": "Profile strength", "value": "76%", "tone": "navySoft" }
+  ],
+  "opportunities": [
+    {
+      "id": "student-marketing-intern",
+      "title": "Student Marketing Intern",
+      "company": "Nexa Retail",
+      "summary": "Hybrid internship with weekly mentoring and campus-friendly scheduling.",
+      "meta": "Riyadh | Hybrid | Internship",
+      "tag": "Internship",
+      "tone": "orange",
+      "salary": "Monthly stipend | Travel covered for events",
+      "deadline": "Apply within 3 days",
+      "description": "Work with the retail growth team on student campaigns, event planning, and social content built for campus audiences.",
+      "skills": ["Communication", "Content planning", "Presentation"],
+      "highlights": [
+        "Weekly mentoring with the marketing lead.",
+        "Flexible hours around lecture schedules.",
+        "Hands-on campaign work rather than observation only."
+      ]
+    },
+    {
+      "id": "junior-data-placement",
+      "title": "Junior Data Analyst Placement",
+      "company": "Green Health Group",
+      "summary": "Placement role focused on dashboards, reporting, and SQL fundamentals.",
+      "meta": "On site | Graduate track",
+      "tag": "Placement",
+      "tone": "blue",
+      "salary": "Placement salary | Growth plan included",
+      "deadline": "Apply this week",
+      "description": "Join an operations analytics team to support dashboards, reporting packs, and structured data review tasks.",
+      "skills": ["Excel", "SQL basics", "Analytical thinking"],
+      "highlights": [
+        "Clear progression path into a graduate analyst seat.",
+        "Supportive training structure for first placements.",
+        "Strong reporting and dashboard exposure."
+      ],
+      "initiallyApplied": true
+    },
+    {
+      "id": "campus-ambassador",
+      "title": "Campus Ambassador",
+      "company": "Hala Job",
+      "summary": "Represent the platform at student events and help peers discover openings.",
+      "meta": "Flexible | Part-time",
+      "tag": "Campus",
+      "tone": "purple",
+      "salary": "Part-time stipend | Performance bonus",
+      "deadline": "Rolling applications",
+      "description": "Act as the student-facing bridge between campus communities and the Hala Job platform with event and peer outreach work.",
+      "skills": ["Student outreach", "Event support", "Organization"],
+      "highlights": [
+        "Build communication experience while still studying.",
+        "Coordinate student-first activations and sessions.",
+        "Flexible commitment that can fit alongside coursework."
+      ]
+    }
+  ],
+  "applications": [
+    {
+      "id": "app-student-marketing",
+      "opportunityId": "student-marketing-intern",
+      "title": "Student Marketing Intern",
+      "company": "Nexa Retail",
+      "subtitle": "Nexa Retail has reviewed your profile and shortlisted you.",
+      "status": "Shortlisted",
+      "meta": "Updated 2 hours ago",
+      "tone": "navy",
+      "nextStep": "Prepare examples of student community work before the intro call.",
+      "timeline": [
+        {
+          "label": "Application submitted",
+          "detail": "Your student profile and details were received successfully.",
+          "tone": "blue"
+        },
+        {
+          "label": "Shortlisted",
+          "detail": "The hiring team wants to move you into a first conversation.",
+          "tone": "navy"
+        }
+      ]
+    },
+    {
+      "id": "app-junior-data",
+      "opportunityId": "junior-data-placement",
+      "title": "Junior Data Analyst Placement",
+      "company": "Green Health Group",
+      "subtitle": "Assessment task waiting for submission before Friday.",
+      "status": "Action needed",
+      "meta": "Due in 2 days",
+      "tone": "orange",
+      "nextStep": "Submit the assessment pack before Friday evening.",
+      "timeline": [
+        {
+          "label": "Application submitted",
+          "detail": "The role application has already been received.",
+          "tone": "blue"
+        },
+        {
+          "label": "Assessment issued",
+          "detail": "A short data task is now waiting for submission.",
+          "tone": "orange"
+        }
+      ]
+    },
+    {
+      "id": "app-campus-ambassador",
+      "opportunityId": "campus-ambassador",
+      "title": "Campus Ambassador",
+      "company": "Hala Job",
+      "subtitle": "Application received and queued for review.",
+      "status": "Submitted",
+      "meta": "Sent yesterday",
+      "tone": "blue",
+      "nextStep": "Keep your student profile and preferred campus activities updated.",
+      "timeline": [
+        {
+          "label": "Application submitted",
+          "detail": "The student ambassador application is in the review queue.",
+          "tone": "blue"
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "title": "CV lab for students",
+      "category": "Career toolkit",
+      "summary": "A guided checklist for turning coursework and campus work into a strong internship CV.",
+      "meta": "Guide | 12 min",
+      "icon": "description_rounded",
+      "tone": "orange",
+      "bullets": [
+        "Translate academic projects into employer-facing outcomes.",
+        "Choose stronger verbs and concise results language.",
+        "Know what to include before your first internship."
+      ]
+    },
+    {
+      "title": "Interview practice pack",
+      "category": "Interview prep",
+      "summary": "Student-friendly prompts for behavior questions, confidence, and motivation.",
+      "meta": "Practice set | 8 min",
+      "icon": "record_voice_over_rounded",
+      "tone": "navy",
+      "bullets": [
+        "Common internship interview prompts and how to frame answers.",
+        "Ways to discuss classroom experience without underselling it.",
+        "A quick structure for confident answers under pressure."
+      ]
+    },
+    {
+      "title": "Career fair playbook",
+      "category": "Networking",
+      "summary": "A short prep guide for getting the most out of campus hiring events.",
+      "meta": "Checklist | 6 min",
+      "icon": "groups_rounded",
+      "tone": "purple",
+      "bullets": [
+        "Questions to ask recruiters at booths and after talks.",
+        "How to follow up after a campus hiring event.",
+        "What to carry and what to show on your phone."
+      ]
+    }
+  ],
+  "events": [
+    {
+      "title": "CV Office Hours",
+      "host": "Hala Job Campus Team",
+      "summary": "Drop in with your current CV and get focused feedback before application deadlines.",
+      "meta": "Wed | 2:00 PM | Student Hub",
+      "tag": "Workshop",
+      "tone": "orange",
+      "bullets": [
+        "Bring your latest CV or draft.",
+        "Expect fast feedback on structure, language, and strengths.",
+        "Ideal before internship and placement applications."
+      ]
+    },
+    {
+      "title": "Hiring Partners Meet-Up",
+      "host": "Career Center",
+      "summary": "A smaller employer session for students interested in analytics, operations, and marketing.",
+      "meta": "Thu | 11:30 AM | Main Hall",
+      "tag": "Networking",
+      "tone": "navy",
+      "bullets": [
+        "Meet recruiters and hiring managers from active campus partner companies.",
+        "Prepare one short intro and two role-specific questions.",
+        "Use this event to shortlist the next roles to apply for."
+      ]
+    }
+  ],
+  "profileCheckpoints": [
+    {
+      "label": "University",
+      "value": "King Saud University",
+      "summary": "Your university details support student-specific opportunity targeting.",
+      "actionLabel": "Review details",
+      "badge": "Done",
+      "tone": "navy",
+      "nextSteps": [
+        "Keep the official university name consistent with your student email.",
+        "Update this if you transfer campuses or departments.",
+        "Use the same details across applications for cleaner verification."
+      ]
+    },
+    {
+      "label": "Specialty",
+      "value": "Business Analytics",
+      "summary": "Your field of study helps the app surface better-fit internships.",
+      "actionLabel": "Refine specialty",
+      "badge": "Strong",
+      "tone": "blue",
+      "nextSteps": [
+        "Add the exact concentration or track if relevant.",
+        "Mirror strong course themes in your CV and headline.",
+        "Use this to filter the most relevant placement roles."
+      ]
+    },
+    {
+      "label": "Graduation year",
+      "value": "2027",
+      "summary": "Expected graduation helps classify internships versus graduate-track roles.",
+      "actionLabel": "Check timeline",
+      "badge": "Active",
+      "tone": "orange",
+      "nextSteps": [
+        "Make sure the year matches your latest academic plan.",
+        "Use accurate timing for summer internships and placements.",
+        "Revisit this after any change in study schedule."
+      ]
+    },
+    {
+      "label": "CV status",
+      "value": "Uploaded and visible",
+      "summary": "A visible campus CV improves application readiness on mobile.",
+      "actionLabel": "Review CV plan",
+      "badge": "Ready",
+      "tone": "purple",
+      "nextSteps": [
+        "Keep one clean student CV focused on internships and placements.",
+        "Update recent projects, society work, and practical tools.",
+        "Check that the file opens correctly before heavy application weeks."
+      ]
+    }
+  ],
+  "completionLabel": "A stronger campus profile will unlock better student opportunity matching.",
+  "completionValue": "76%"
+}
