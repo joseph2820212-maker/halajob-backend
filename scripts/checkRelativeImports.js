@@ -2,7 +2,24 @@ import fs from "fs";
 import path from "path";
 
 const root = process.cwd();
-const ignoredDirs = new Set([".git", "node_modules", "uploads", "cv", "backups", "logs"]);
+const ignoredDirs = new Set([
+  ".android-sdk",
+  ".dart_tool",
+  ".flutter-user",
+  ".git",
+  ".pub",
+  ".pub-cache",
+  "android",
+  "backups",
+  "build",
+  "coverage",
+  "cv",
+  "dist",
+  "ios",
+  "logs",
+  "node_modules",
+  "uploads",
+]);
 const importPattern =
   /(?:import|export)\s+(?:[^'"()]+?\s+from\s+)?["'](\.{1,2}\/[^"']+)["']|import\s*\(\s*["'](\.{1,2}\/[^"']+)["']\s*\)|require\s*\(\s*["'](\.{1,2}\/[^"']+)["']\s*\)/g;
 

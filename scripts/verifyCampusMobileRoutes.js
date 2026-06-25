@@ -96,6 +96,7 @@ assertRoutes({
     "POST /forgot-password",
     "POST /passcode-forgot-password",
     "POST /resetPassword",
+    "POST /update-profile",
   ],
 });
 
@@ -138,7 +139,17 @@ assertRoutes({
 assertRoutes({
   fileName: "routesUser/NotificationRote.js",
   routes: declaredRoutes(sources.notification),
-  required: ["GET /", "GET /unread-count", "POST /read-all", "POST /:id/read", "DELETE /:id"],
+  required: [
+    "GET /",
+    "GET /get",
+    "GET /unread-count",
+    "POST /read-all",
+    "PATCH /read-all",
+    "POST /:id/read",
+    "PATCH /:id/read",
+    "DELETE /:id",
+    "POST /:id/delete",
+  ],
 });
 
 assertRoutes({
@@ -181,9 +192,14 @@ assertRoutes({
   routes: declaredRoutes(sources.employeeDash),
   required: [
     "GET /jobs",
+    "GET /jobs/recommended",
+    "GET /jobs/saved",
+    "GET /jobs/:jobId",
     "POST /jobs/:jobId/apply",
     "POST /jobs/:jobId/save",
     "DELETE /jobs/:jobId/save",
+    "POST /jobs/:jobId/rate",
+    "POST /jobs/:jobId/review",
     "GET /applications",
     "GET /applications/interviews",
     "PATCH /applications/interviews/:interviewId/respond",
@@ -192,13 +208,27 @@ assertRoutes({
     "GET /applications/:applicationId",
     "POST /applications/:applicationId/messages",
     "PATCH /applications/:applicationId/cancel",
+    "GET /companies",
+    "GET /companies/activity",
+    "GET /companies/applied",
+    "GET /companies/saved-jobs",
+    "GET /companies/viewed",
+    "GET /companies/:companyId",
+    "POST /companies/:companyId/review",
   ],
 });
 
 assertRoutes({
   fileName: "routesEmployee/cvRoute.js",
   routes: declaredRoutes(sources.employeeCv),
-  required: ["POST /upload", "PUT /upload/:cvId", "GET /uploaded", "DELETE /uploaded/:cvId"],
+  required: [
+    "POST /upload",
+    "PUT /upload/:cvId",
+    "GET /uploaded",
+    "DELETE /uploaded/:cvId",
+    "GET /generate/templates",
+    "POST /generate/download-url",
+  ],
 });
 
 console.log("Mobile route contract verified.");

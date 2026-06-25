@@ -3,7 +3,24 @@ import fs from "fs";
 import path from "path";
 
 const root = process.cwd();
-const ignoredDirs = new Set([".git", "node_modules", "uploads", "cv", "backups", "logs", "dist"]);
+const ignoredDirs = new Set([
+  ".android-sdk",
+  ".dart_tool",
+  ".flutter-user",
+  ".git",
+  ".pub",
+  ".pub-cache",
+  "android",
+  "backups",
+  "build",
+  "coverage",
+  "cv",
+  "dist",
+  "ios",
+  "logs",
+  "node_modules",
+  "uploads",
+]);
 
 const walk = (dir, files = []) => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
