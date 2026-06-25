@@ -259,6 +259,33 @@ const content = async (req, res, next) => {
   }
 };
 
+const events = async (req, res, next) => {
+  try {
+    const registrations = await CampusEventRegistrationModel.find({
+      user_id: req.user._id,
+      status: "registered",
+    })
+      .select("event_id title organizer kind date_label mode status updatedAt")
+      .lean();
+    const registeredEventIds = registrations
+      .map((registration) => cleanText(registration.event_id))
+      .filter(Boolean);
+
+    return ReturnAppData.getData({
+      res,
+      data: {
+        events: readCampusContent().events || [],
+        event_registrations: registrations,
+        registered_event_ids: registeredEventIds,
+        meta: { source: "backend", version: "campus-events-v1" },
+      },
+      message: "campus_events",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const cancelEventRegistration = async (req, res, next) => {
   try {
     const eventId = cleanText(req.params.eventId || req.body?.event_id);
@@ -647,6 +674,7 @@ export default {
   requireCampusOpportunity,
   dashboard,
   content,
+  events,
   cancelEventRegistration,
   opportunities,
   opportunityDetails,

@@ -17,7 +17,7 @@
     "smoke:import": "node scripts/smokeImport.js",
     "smoke:http": "node scripts/smokeHttp.js",
     "smoke:cors": "node scripts/smokeCors.js",
-    "test:mobile-routes": "node scripts/verifyCampusMobileRoutes.js",
+    "test:mobile-routes": "node scripts/verifyCampusMobileRoutes.js && node scripts/verifyMobileRouteMounts.js",
     "check:syntax": "node scripts/checkSyntax.js",
     "check:imports": "node scripts/checkRelativeImports.js"
   },

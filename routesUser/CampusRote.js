@@ -13,6 +13,7 @@ const campusMobileGuard = [authUser, requireAppAccount("employee"), campusMobile
 router.get("/dashboard", campusMobileGuard, campusMobileController.dashboard);
 router.get("/dashboard/overview", campusMobileGuard, campusMobileController.dashboard);
 router.get("/content", campusMobileGuard, campusMobileController.content);
+router.get("/events", campusMobileGuard, campusMobileController.events);
 
 router.get("/opportunities", campusMobileGuard, campusMobileController.opportunities);
 router.get("/opportunities/:id/readiness", campusMobileGuard, campusMobileController.requireCampusOpportunity, ApplyingJobController.getApplyReadiness);
