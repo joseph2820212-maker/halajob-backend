@@ -1106,6 +1106,157 @@ const userUniversityOverview = async (req, res, next) => {
   }
 };
 
+const clampScore = (value) => {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return 0;
+  return Math.max(0, Math.min(100, Math.round(number)));
+};
+
+const readinessScoreForStudent = (student = {}) =>
+  clampScore(student.student_profile?.readiness_score || student.profile_completion || 0);
+
+const countBy = (items, readKey) =>
+  items.reduce((totals, item) => {
+    const key = cleanText(readKey(item)) || "unknown";
+    totals[key] = (totals[key] || 0) + 1;
+    return totals;
+  }, {});
+
+const topEntries = (counts, limit = 10) =>
+  Object.entries(counts)
+    .map(([label, count]) => ({ label, count }))
+    .filter((item) => item.label && item.label !== "unknown")
+    .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
+    .slice(0, limit);
+
+const skillTitle = (skill = {}) => cleanText(skill.title || skill.name || skill.label);
+
+const skillCountsFromStudents = (students = []) => {
+  const counts = {};
+  for (const student of students) {
+    const skills = [
+      ...(student.skills || []),
+      ...(student.student_profile?.technical_skills || []),
+      ...(student.student_profile?.soft_skills || []),
+    ];
+    for (const skill of skills) {
+      const title = skillTitle(skill);
+      if (title) counts[title] = (counts[title] || 0) + 1;
+    }
+  }
+  return counts;
+};
+
+const buildUniversityDashboardReport = async (req) => {
+  const scope = await getUniversityAdminScope(req);
+  const university = scope?.university;
+  if (!university) return null;
+
+  const studentQuery = buildUniversityStudentQuery(university);
+  const students = await EmployeeModel.find(studentQuery)
+    .select("profile_headline current_job_title candidate_stage student_profile graduation_year profile_completion user_id cvs skills")
+    .lean();
+  const studentUserIds = students.map((student) => idOf(student.user_id)).filter(Boolean);
+  const applicationMatch = studentUserIds.length ? { user_id: { $in: studentUserIds } } : { _id: null };
+
+  const [verificationStats, applicationStats, missingSkills, interviewCount, topCompanyRows] = await Promise.all([
+    StudentVerificationModel.aggregate([
+      { $match: { university_id: university._id } },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]),
+    UserApplyingJobModel.aggregate([
+      { $match: applicationMatch },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]),
+    UserApplyingJobModel.aggregate([
+      { $match: { ...applicationMatch, "filter_result.missing_skills": { $exists: true, $ne: [] } } },
+      { $unwind: "$filter_result.missing_skills" },
+      { $group: { _id: "$filter_result.missing_skills", count: { $sum: 1 } } },
+      { $sort: { count: -1, _id: 1 } },
+      { $limit: 10 },
+    ]),
+    InterviewModel.countDocuments({
+      ...(studentUserIds.length ? { employee_user_id: { $in: studentUserIds } } : { _id: null }),
+      status: { $in: ["scheduled", "rescheduled", "accepted", "completed"] },
+    }),
+    UserApplyingJobModel.aggregate([
+      { $match: applicationMatch },
+      { $group: { _id: "$company_id", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 10 },
+      { $lookup: { from: "companies", localField: "_id", foreignField: "_id", as: "company" } },
+      { $unwind: { path: "$company", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          company_id: "$_id",
+          company_name: { $ifNull: ["$company.company_name", "Company"] },
+          count: 1,
+        },
+      },
+    ]),
+  ]);
+
+  const verificationByStatus = Object.fromEntries((verificationStats || []).map((item) => [item._id || "unknown", item.count]));
+  const applicationsByStatus = Object.fromEntries((applicationStats || []).map((item) => [item._id || "unknown", item.count]));
+  const readinessScores = students.map(readinessScoreForStudent);
+  const averageReadiness = readinessScores.length
+    ? Math.round(readinessScores.reduce((sum, score) => sum + score, 0) / readinessScores.length)
+    : 0;
+  const readinessBands = {
+    under_50: readinessScores.filter((score) => score < 50).length,
+    between_50_79: readinessScores.filter((score) => score >= 50 && score < 80).length,
+    over_80: readinessScores.filter((score) => score >= 80).length,
+  };
+  const cvUploadedCount = students.filter((student) => Array.isArray(student.cvs) && student.cvs.length > 0).length;
+  const majorCounts = countBy(students, (student) => student.student_profile?.specialty || student.current_job_title || student.candidate_stage);
+  const recordedSkillCounts = skillCountsFromStudents(students);
+  const applicationTotal = Object.values(applicationsByStatus).reduce((sum, count) => sum + count, 0);
+
+  return {
+    university: publicUniversity(university),
+    metrics: {
+      registered_students: students.length || university.students_count || 0,
+      verified_students: verificationByStatus.verified || 0,
+      pending_verifications: verificationByStatus.pending || 0,
+      rejected_verifications: verificationByStatus.rejected || 0,
+      needs_more_information: verificationByStatus.needs_more_information || 0,
+      average_employability_score: averageReadiness,
+      cv_completion_rate: students.length ? Math.round((cvUploadedCount / students.length) * 100) : 0,
+      internship_applications: applicationTotal,
+      hired_students: (applicationsByStatus.hired || 0) + (applicationsByStatus.accepted || 0),
+      interview_scheduled_count:
+        interviewCount +
+        (applicationsByStatus.interview || 0) +
+        (applicationsByStatus.interview_scheduled || 0),
+    },
+    readiness: {
+      average_score: averageReadiness,
+      bands: readinessBands,
+    },
+    cv: {
+      uploaded_count: cvUploadedCount,
+      missing_cv_count: Math.max(0, students.length - cvUploadedCount),
+      completion_rate: students.length ? Math.round((cvUploadedCount / students.length) * 100) : 0,
+    },
+    applications: {
+      total: applicationTotal,
+      by_status: applicationsByStatus,
+      shortlisted: applicationsByStatus.shortlisted || 0,
+      interviews: interviewCount,
+      offers: applicationsByStatus.offer || 0,
+      hired: (applicationsByStatus.hired || 0) + (applicationsByStatus.accepted || 0),
+    },
+    skills: {
+      top_missing_skills: (missingSkills || []).map((item) => ({ label: item._id, count: item.count })),
+      top_recorded_skills: topEntries(recordedSkillCounts),
+    },
+    majors: topEntries(majorCounts),
+    companies: topCompanyRows,
+    generated_at: new Date().toISOString(),
+  };
+};
+
 const adminVerificationsQuery = async (req) => {
   const scope = await getUniversityAdminScope(req);
   if (!scope) return null;
@@ -1366,6 +1517,86 @@ const userUniversityPartners = async (req, res, next) => {
   }
 };
 
+const userUniversityEmployabilityAnalytics = async (req, res, next) => {
+  try {
+    const report = await buildUniversityDashboardReport(req);
+    if (!report) {
+      return ReturnAppData.getError({ res, status: 403, message: "university_admin_context_required" });
+    }
+
+    return ReturnAppData.getData({
+      res,
+      data: {
+        university: report.university,
+        metrics: report.metrics,
+        readiness: report.readiness,
+        cv: report.cv,
+        skills: report.skills,
+        majors: report.majors,
+        generated_at: report.generated_at,
+      },
+      message: "university_employability_analytics",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const csvCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+const userUniversityOutcomeReport = async (req, res, next) => {
+  try {
+    const report = await buildUniversityDashboardReport(req);
+    if (!report) {
+      return ReturnAppData.getError({ res, status: 403, message: "university_admin_context_required" });
+    }
+
+    const rows = [
+      ["metric", "value"],
+      ["registered_students", report.metrics.registered_students],
+      ["verified_students", report.metrics.verified_students],
+      ["pending_verifications", report.metrics.pending_verifications],
+      ["average_employability_score", report.metrics.average_employability_score],
+      ["cv_completion_rate", report.metrics.cv_completion_rate],
+      ["internship_applications", report.metrics.internship_applications],
+      ["interview_scheduled_count", report.metrics.interview_scheduled_count],
+      ["hired_students", report.metrics.hired_students],
+    ];
+
+    if (cleanText(req.query?.format).toLowerCase() === "csv") {
+      const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n");
+      res.setHeader("Content-Type", "text/csv; charset=utf-8");
+      res.setHeader("Content-Disposition", 'attachment; filename="university-outcomes.csv"');
+      return res.status(200).send(csv);
+    }
+
+    return ReturnAppData.getData({
+      res,
+      data: {
+        university: report.university,
+        summary: report.metrics,
+        applications: report.applications,
+        verification: {
+          verified: report.metrics.verified_students,
+          pending: report.metrics.pending_verifications,
+          rejected: report.metrics.rejected_verifications,
+          needs_more_information: report.metrics.needs_more_information,
+        },
+        readiness: report.readiness,
+        cv: report.cv,
+        skills: report.skills,
+        majors: report.majors,
+        companies: report.companies,
+        export_formats: ["json", "csv"],
+        generated_at: report.generated_at,
+      },
+      message: "university_outcomes_report",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const createUniversityOpportunityRequest = async (req, res, next) => {
   try {
     const scope = await getUniversityAdminScope(req);
@@ -1617,6 +1848,8 @@ export default {
   userUniversityOpportunities,
   userUniversityStudents,
   userUniversityPartners,
+  userUniversityEmployabilityAnalytics,
+  userUniversityOutcomeReport,
   createUniversityOpportunityRequest,
   companyOpportunities,
   createCompanyOpportunity,

@@ -16,6 +16,7 @@ import employeeRoutes from "./routesEmployee/index.js";
 import companyRoutes from "./routesCompany/index.js";
 import aiRoutes from "./routesAi/index.js";
 import campusRoutes from "./routesCampus/index.js";
+import universityRoutes from "./routesUniversity/index.js";
 import routesHealth from "./routesHealth/index.js";
 import error from "./middlewares/error.js";
 import ApiError from "./utils/apiError.js";
@@ -290,6 +291,7 @@ app.use("/employee/v1", employeeRoutes);
 app.use("/company/v1", companyRoutes);
 app.use("/ai/v1", aiRoutes);
 app.use("/campus/v1", campusRoutes);
+app.use("/university/v1", universityRoutes);
 app.use("/health", routesHealth);
 app.use("/user/v1", userRoutes);
 

@@ -20,6 +20,7 @@ const sources = {
   helper: readSource("routesUser/HelperRote.js"),
   campus: readSource("routesUser/CampusRote.js"),
   campusPublic: readSource("routesCampus/index.js"),
+  university: readSource("routesUniversity/index.js"),
   employeeDash: readSource("routesEmployee/employeeDashRoutes.js"),
   employeeCv: readSource("routesEmployee/cvRoute.js"),
 };
@@ -66,7 +67,7 @@ function assertSourceIncludes({ fileName, source, required }) {
 assertMounts({
   fileName: "app.js",
   mounts: declaredMounts(sources.app, "app"),
-  required: ["/user/v1", "/employee/v1", "/campus/v1"],
+  required: ["/user/v1", "/employee/v1", "/campus/v1", "/university/v1"],
 });
 
 assertMounts({
@@ -237,6 +238,27 @@ assertRoutes({
     "POST /admin/verifications/:id/approve",
     "POST /admin/verifications/:id/reject",
     "POST /admin/verifications/:id/request-info",
+  ],
+});
+
+assertRoutes({
+  fileName: "routesUniversity/index.js",
+  routes: declaredRoutes(sources.university),
+  required: [
+    "GET /dashboard",
+    "GET /dashboard/overview",
+    "GET /overview",
+    "GET /students",
+    "GET /verifications",
+    "POST /verifications/:id/approve",
+    "POST /verifications/:id/reject",
+    "POST /verifications/:id/request-info",
+    "GET /analytics/employability",
+    "GET /reports/outcomes",
+    "GET /partners",
+    "GET /employer-partners",
+    "GET /opportunities",
+    "POST /opportunities",
   ],
 });
 

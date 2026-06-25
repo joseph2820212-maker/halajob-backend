@@ -37,8 +37,8 @@ architecture with real navigation, loading/error states, and localization.
 | Account switcher | Backend account-context model/API and mobile switcher are now implemented. | Finish production data QA, ensure every protected backend surface respects active context, and add database migration/seed notes before launch. |
 | AI career copilot / scoring | Not implemented as proven launch product. | Add server-only AI endpoints before Flutter UI calls any AI feature. |
 | Career Passport | Backend passport API, rule-based score snapshot foundation, and mobile seeker/campus Passport sheet are now implemented. | Add edit flows, employer/university views, AI-backed scoring, and share-link QA. |
-| Campus verification | Backend model/API foundation now exists for university list, campus list, student verification status/start/email-confirm/document-upload/resubmit, and university admin approve/reject/request-info. | Add Flutter verification screens, document picker flow, status UI, and live email/device QA. |
-| University dashboard | Basic campus/university routes exist and now honor university admin active context for overview/students/partners/opportunity requests. | Add full Flutter university dashboard and richer analytics/reports. |
+| Campus verification | Backend model/API foundation and Flutter campus verification sheet now support university list, status, email code verification, document upload, resubmit, and university admin approve/reject/request-info. | Complete live email/device QA against production credentials and approve/reject flows. |
+| University dashboard | University admin backend routes now honor active context for overview, students, verification queue/actions, partners, opportunity requests, employability analytics, and outcomes reports under `/university/v1`. | Add full Flutter university dashboard UI and richer report exports. |
 | Global country/currency | Partial country/city helpers exist. Currency/work-mode launch rules need enforcement. | Limit salary currencies to USD/EUR/GBP and add country/work-mode contracts across records. |
 | Translation | Not implemented as approved AI translation workflow. | Add backend translation endpoints and approval storage. |
 | Trust/anti-scam | Some report/review features exist, no full trust score/admin queue. | Add trust scoring/report/review routes and admin actions. |
@@ -247,7 +247,10 @@ Current implementation note:
 - Approval updates the employee student profile with verified university
   evidence, so the Career Passport verified-student badge can be based on real
   backend state.
-- Flutter verification screens and device/file-picker QA remain open work.
+- Flutter now exposes campus verification from the campus dashboard More actions,
+  including email-code verification, status/rejection display, document upload,
+  and resubmit. Live email delivery, real Android file-picker QA, and
+  university admin approve/reject device QA remain open work.
 
 University dashboard screens:
 
