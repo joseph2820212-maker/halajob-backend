@@ -16,6 +16,7 @@ import {
   generateAuthTokens,
   rotateRefreshToken,
 } from "../../../services/tokenService.js";
+import { syncAccountContextsForUser } from "../../../services/accountContext.service.js";
 
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
 const normEmail = (e) => (e || "").trim().toLowerCase();
@@ -55,6 +56,7 @@ async function buildAuthPayload(user, device) {
   const userDto = buildUserDto(user);
   const employee = account.accountType === "employee" ? serializeEmployee(account.employee) : null;
   const company = account.accountType === "company" ? serializeCompany(account.company) : null;
+  const accountContexts = await syncAccountContextsForUser(user);
 
   return {
     user: userDto,
@@ -64,6 +66,9 @@ async function buildAuthPayload(user, device) {
     employee,
     company,
     available_accounts: account.availableAccounts,
+    contexts: accountContexts.contexts,
+    active_context: accountContexts.activeContext,
+    permissions: accountContexts.activeContext?.permissions || [],
     tokens,
   };
 }

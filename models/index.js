@@ -64,6 +64,8 @@ import CompanySupportTicketModel from './CompanySupportTicketModel.js';
 import CampusEventRegistrationModel from './CampusEventRegistrationModel.js';
 import UniversityModel from './UniversityModel.js';
 import UniversityOpportunityRequestModel from './UniversityOpportunityRequestModel.js';
+import AccountContextModel from './AccountContextModel.js';
+import UniversityMembershipModel from './UniversityMembershipModel.js';
 
 // cv
 
@@ -130,6 +132,8 @@ export {
   CampusEventRegistrationModel,
   UniversityModel,
   UniversityOpportunityRequestModel,
+  AccountContextModel,
+  UniversityMembershipModel,
   //cv
   CvTemplateModel,
   EmployeeCvModel

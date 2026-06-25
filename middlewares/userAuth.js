@@ -3,6 +3,7 @@ import { UserModel, RefreshTokenModel } from '../models/index.js';
 import httpStatus from 'http-status';
 import { tokenTypes } from '../config/tokens.js';
 import { verify } from '../utils/jwtHelpers.js';
+import { resolveActiveContextForUser } from '../services/accountContext.service.js';
 
 const authUser = async (req, res, next) => {
   try {
@@ -48,6 +49,10 @@ const authUser = async (req, res, next) => {
 
     // Attach the payload to the request object
     req.user = user;
+    req.activeContext = await resolveActiveContextForUser(
+      user,
+      req.get('X-Active-Context-Id') || req.get('active_context_id')
+    );
    
     req.authHeader = accessToken;
     // Proceed to the next middleware or route handler

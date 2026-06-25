@@ -16,6 +16,10 @@ const requiredEndpoints = [
   ["POST", "/user/v1/auth/resetPassword"],
   ["POST", "/user/v1/auth/update-profile"],
 
+  ["GET", "/user/v1/me/contexts"],
+  ["POST", "/user/v1/me/active-context"],
+  ["GET", "/user/v1/me/permissions"],
+
   ["GET", "/user/v1/helper/languages"],
   ["GET", "/user/v1/helper/work-mode"],
   ["GET", "/user/v1/helper/job-types"],

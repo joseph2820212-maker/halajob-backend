@@ -49,6 +49,19 @@ const userSchema = new mongoose.Schema(
       enum: ["ar", "en"],
     },
 
+    default_context_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "account_contexts",
+      default: null,
+      index: true,
+    },
+
+    last_login_at: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+
     gender: {
       type: String,
       required: true,

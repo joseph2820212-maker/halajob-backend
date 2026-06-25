@@ -2,6 +2,10 @@ import ReturnAppData from "../helper/ReturnAppData/index.js";
 import { accountMessage, resolveAppAccount } from "../services/appAccount.service.js";
 
 const lang = (req) => String(req.get("lan") || "en").toLowerCase();
+const contextTypesForAccount = {
+  employee: ["job_seeker", "student"],
+  company: ["company_member", "company_admin"],
+};
 
 export const attachAppAccount = async (req, res, next) => {
   try {
@@ -23,6 +27,65 @@ export const requireAppAccount = (requiredType, options = {}) => async (req, res
       }));
 
     req.appAccount = account;
+
+    const activeContext = req.activeContext;
+    const allowedContextTypes = contextTypesForAccount[requiredType] || [];
+    if (activeContext?.context_type && allowedContextTypes.length) {
+      if (!allowedContextTypes.includes(activeContext.context_type)) {
+        return ReturnAppData.getError({
+          res,
+          status: 403,
+          message: accountMessage(lan, requiredType, account.companyState),
+          other: {
+            data: {
+              expected_account_type: requiredType,
+              active_context_type: activeContext.context_type,
+              active_context_id: activeContext.id,
+            },
+          },
+        });
+      }
+
+      if (activeContext.status === "suspended" || activeContext.status === "removed") {
+        return ReturnAppData.getError({
+          res,
+          status: 403,
+          message: "active_context_not_available",
+          other: {
+            data: {
+              active_context_type: activeContext.context_type,
+              active_context_id: activeContext.id,
+              active_context_status: activeContext.status,
+            },
+          },
+        });
+      }
+
+      if (requiredType === "company" && options.mustBeApproved !== false && activeContext.status !== "active") {
+        return ReturnAppData.getError({
+          res,
+          status: 403,
+          message: accountMessage(lan, "company", account.companyState),
+          other: {
+            data: {
+              expected_account_type: "company",
+              active_context_type: activeContext.context_type,
+              active_context_id: activeContext.id,
+              active_context_status: activeContext.status,
+            },
+          },
+        });
+      }
+
+      req.appAccount = {
+        ...account,
+        accountType: requiredType,
+        activeContext,
+        isEmployee: requiredType === "employee",
+        isCompany: requiredType === "company",
+      };
+      return next();
+    }
 
     if (account.accountType !== requiredType) {
       return ReturnAppData.getError({

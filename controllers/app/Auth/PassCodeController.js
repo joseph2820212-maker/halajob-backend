@@ -8,6 +8,7 @@ import {
 } from "../../../services/appAccount.service.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
+import { syncAccountContextsForUser } from "../../../services/accountContext.service.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
@@ -70,6 +71,7 @@ async function buildAuthPayload(user, device) {
   const userDto = buildUserDto(user);
   const employee = account.accountType === "employee" ? serializeEmployee(account.employee) : null;
   const company = account.accountType === "company" ? serializeCompany(account.company) : null;
+  const accountContexts = await syncAccountContextsForUser(user);
 
   return {
     user: userDto,
@@ -79,6 +81,9 @@ async function buildAuthPayload(user, device) {
     employee,
     company,
     available_accounts: account.availableAccounts,
+    contexts: accountContexts.contexts,
+    active_context: accountContexts.activeContext,
+    permissions: accountContexts.activeContext?.permissions || [],
     tokens,
   };
 }
@@ -148,6 +153,7 @@ export const passcodeVerify = async (req, res, next) => {
       user.another_device_expires_at = undefined;
       user.pending_device = undefined;
       user.markModified?.("device");
+      user.last_login_at = new Date();
       await user.save();
 
       return ReturnAppData.createData({
@@ -180,6 +186,7 @@ export const passcodeVerify = async (req, res, next) => {
       }
 
       user.markModified?.("device");
+      user.last_login_at = new Date();
       await user.save();
 
       return ReturnAppData.createData({
