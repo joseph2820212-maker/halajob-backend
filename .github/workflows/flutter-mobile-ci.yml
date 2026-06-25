@@ -113,6 +113,7 @@ jobs:
             'mobile\scripts\package-mobile-tester-handoff.ps1',
             'mobile\scripts\assert-mobile-tester-handoff.ps1',
             'mobile\scripts\assert-mobile-playstore-release.ps1',
+            'mobile\scripts\assert-mobile-device-qa-log.ps1',
             'mobile\scripts\setup-android-signing.ps1',
             'mobile\scripts\setup-android-sdk.ps1'
           )
