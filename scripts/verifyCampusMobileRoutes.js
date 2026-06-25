@@ -57,6 +57,11 @@ function assertMounts({ fileName, mounts, required }) {
   assert.deepEqual(missing, [], `${fileName} is missing mobile route mounts`);
 }
 
+function assertSourceIncludes({ fileName, source, required }) {
+  const missing = required.filter((snippet) => !source.includes(snippet));
+  assert.deepEqual(missing, [], `${fileName} is missing required mobile route source`);
+}
+
 assertMounts({
   fileName: "app.js",
   mounts: declaredMounts(sources.app, "app"),
@@ -197,6 +202,20 @@ assertRoutes({
     "POST /applications/:id/messages",
     "PATCH /applications/:id/cancel",
     "POST /applications/:id/cancel",
+  ],
+});
+
+assertSourceIncludes({
+  fileName: "routesUser/CampusRote.js",
+  source: sources.campus,
+  required: [
+    'router.get("/profile", campusMobileGuard',
+    'router.post("/profile", campusMobileGuard',
+    'router.put("/profile", campusMobileGuard',
+    'router.patch("/profile", campusMobileGuard',
+    'router.post("/events/:eventId/register", campusMobileGuard',
+    'router.patch("/events/:eventId/cancel", campusMobileGuard',
+    'router.post("/events/:eventId/cancel", campusMobileGuard',
   ],
 });
 

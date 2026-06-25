@@ -31,11 +31,11 @@ router.post("/applications/:id/cancel", campusMobileGuard, upload.none(), campus
 
 router.get("/resources", campusController.resources);
 router.get("/overview", authUser, campusController.overview);
-router.get("/profile", authUser, campusController.profile);
+router.get("/profile", campusMobileGuard, campusController.profile);
 router.post("/profile", campusMobileGuard, upload.none(), campusController.updateProfile);
-router.put("/profile", authUser, upload.none(), campusController.updateProfile);
-router.patch("/profile", authUser, upload.none(), campusController.updateProfile);
-router.post("/events/:eventId/register", authUser, upload.none(), campusController.registerEvent);
+router.put("/profile", campusMobileGuard, upload.none(), campusController.updateProfile);
+router.patch("/profile", campusMobileGuard, upload.none(), campusController.updateProfile);
+router.post("/events/:eventId/register", campusMobileGuard, upload.none(), campusController.registerEvent);
 router.patch("/events/:eventId/cancel", campusMobileGuard, upload.none(), campusMobileController.cancelEventRegistration);
 router.post("/events/:eventId/cancel", campusMobileGuard, upload.none(), campusMobileController.cancelEventRegistration);
 router.get("/university/overview", authUser, campusController.userUniversityOverview);
