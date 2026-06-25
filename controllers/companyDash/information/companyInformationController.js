@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import fs from "fs/promises";
+import { existsSync } from "fs";
+import path from "path";
 import {
   getCompanyOrFail,
   getCompanyPlain,
@@ -58,6 +61,61 @@ const OBJECT_FIELDS = new Set(["location_visibility", "privacy_settings"]);
 const OBJECT_ID_SINGLE_FIELDS = new Set(["industry_id", "country_id", "city_id"]);
 const NUMBER_FIELDS = new Set(["created_year", "company_size"]);
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const UPLOADS_ROOT = path.resolve(process.cwd(), "uploads");
+const DOCS_DIR = "files";
+const MAX_COMPANY_FILES = 10;
+const COMPANY_FILE_EXTENSIONS = new Set([".pdf", ".doc", ".docx", ".png", ".jpg", ".jpeg", ".webp"]);
+const COMPANY_DOCUMENT_EXTENSIONS = new Set([".pdf", ".doc", ".docx"]);
+
+const normalizeCompanyFileName = (value = "") => {
+  const raw = String(value || "").trim();
+  const safe = path.basename(raw);
+  if (!raw || raw !== safe || raw.includes("/") || raw.includes("\\") || raw.includes("..")) return "";
+  return safe;
+};
+
+const getCompanyFileDirForFilename = (filename = "") => {
+  const ext = path.extname(filename).toLowerCase();
+  return COMPANY_DOCUMENT_EXTENSIONS.has(ext) ? DOCS_DIR : "";
+};
+
+const buildCompanyFilePath = (filename = "") => {
+  const safe = normalizeCompanyFileName(filename);
+  const dir = getCompanyFileDirForFilename(safe);
+  return path.join(UPLOADS_ROOT, dir, safe);
+};
+
+const buildCompanyFileUrl = (filename = "") => {
+  const safe = normalizeCompanyFileName(filename);
+  if (!safe) return "";
+  const dir = getCompanyFileDirForFilename(safe);
+  const relativePath = dir ? `${dir}/${safe}` : safe;
+  const base = (process.env.FILE_BASE_URL || process.env.PUBLIC_BASE_URL || "").replace(/\/+$/, "");
+  return base ? `${base}/${relativePath}` : relativePath;
+};
+
+const serializeCompanyFiles = (company = {}) => {
+  const files = Array.isArray(company.files) ? company.files : [];
+  return {
+    files_count: files.length,
+    files: files
+      .map((filename) => normalizeCompanyFileName(filename))
+      .filter(Boolean)
+      .map((filename) => ({
+        filename,
+        file_name: filename,
+        url: buildCompanyFileUrl(filename),
+        download_path: `/company/v1/global/profile/files/${encodeURIComponent(filename)}/download`,
+      })),
+  };
+};
+
+const deleteCompanyUploadedFile = async (filename = "") => {
+  const safe = normalizeCompanyFileName(filename);
+  if (!safe) return;
+  const filePath = buildCompanyFilePath(safe);
+  if (existsSync(filePath)) await fs.unlink(filePath).catch(() => {});
+};
 
 const parseBool = (value) => {
   if (value === true || value === "true" || value === "1" || value === 1) return true;
@@ -685,6 +743,109 @@ export const updateCompanyMedia = async (req, res, next) => {
   }
 };
 
+export const listCompanyFiles = async (req, res, next) => {
+  try {
+    const company = await getCompanyPlain(req, res);
+    if (!company) return;
+
+    return success(res, serializeCompanyFiles(company), "company_files_loaded");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const uploadCompanyFile = async (req, res, next) => {
+  try {
+    const company = await getCompanyPlain(req, res);
+    if (!company) {
+      if (req.file?.filename) await deleteCompanyUploadedFile(req.file.filename);
+      return;
+    }
+
+    const filename = normalizeCompanyFileName(req.file?.filename);
+    if (!filename) return fail(res, "company_file_missing", 400);
+
+    const ext = path.extname(filename).toLowerCase();
+    if (!COMPANY_FILE_EXTENSIONS.has(ext)) {
+      await deleteCompanyUploadedFile(filename);
+      return fail(res, "unsupported_company_file_type", 400);
+    }
+
+    const files = Array.isArray(company.files) ? company.files : [];
+    if (files.length >= MAX_COMPANY_FILES) {
+      await deleteCompanyUploadedFile(filename);
+      return fail(res, "company_file_limit_reached", 400);
+    }
+
+    company.files = [...files, filename];
+    company.markModified("files");
+
+    await applyCompletionAndSearchFilters(company, ["files"]);
+    await applyCompanyProjection(company);
+    await company.save();
+    await rebuildCompanyJobsProjection(company._id);
+
+    return success(res, serializeCompanyFiles(company), "company_file_uploaded", 201);
+  } catch (error) {
+    if (req.file?.filename) await deleteCompanyUploadedFile(req.file.filename);
+    next(error);
+  }
+};
+
+export const deleteCompanyFile = async (req, res, next) => {
+  try {
+    const filename = normalizeCompanyFileName(req.params?.filename);
+    if (!filename) return fail(res, "company_file_missing", 400);
+
+    const company = await getCompanyPlain(req, res);
+    if (!company) return;
+
+    const files = Array.isArray(company.files) ? company.files : [];
+    if (!files.includes(filename)) {
+      return fail(res, "company_file_not_found", 404);
+    }
+
+    await deleteCompanyUploadedFile(filename);
+    company.files = files.filter((item) => item !== filename);
+    company.markModified("files");
+
+    await applyCompletionAndSearchFilters(company, ["files"]);
+    await applyCompanyProjection(company);
+    await company.save();
+    await rebuildCompanyJobsProjection(company._id);
+
+    return success(res, serializeCompanyFiles(company), "company_file_deleted");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const downloadCompanyFile = async (req, res, next) => {
+  try {
+    const filename = normalizeCompanyFileName(req.params?.filename);
+    if (!filename) return fail(res, "company_file_missing", 400);
+
+    const company = await getCompanyPlain(req, res);
+    if (!company) return;
+
+    const files = Array.isArray(company.files) ? company.files : [];
+    if (!files.includes(filename)) {
+      return fail(res, "company_file_not_found", 404);
+    }
+
+    const filePath = buildCompanyFilePath(filename);
+    if (!existsSync(filePath)) {
+      return fail(res, "company_file_not_found_on_server", 404);
+    }
+
+    return res.download(filePath, filename, (error) => {
+      if (error) next(error);
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const replaceSection = async (req, res, next) => {
   try {
     const { section } = req.params;
@@ -968,6 +1129,10 @@ export default {
   updateCompanyContact,
   updateCompanyLocation,
   updateCompanyMedia,
+  listCompanyFiles,
+  uploadCompanyFile,
+  deleteCompanyFile,
+  downloadCompanyFile,
   replaceSection,
   addSectionItems,
   updateSectionItem,

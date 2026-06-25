@@ -13,6 +13,7 @@ import supportController from "../controllers/companyDash/support/companySupport
 import memberController from "../controllers/companyDash/members/companyMemberController.js";
 
 import multer from "../utils/multer.js";
+import companyFileUpload from "../utils/multerCompanyFiles.js";
 import { requireCompanyPermission } from "../helper/companyDash/companyDashHelpers.js";
 
 const upload = multer;
@@ -46,6 +47,10 @@ router.put(
   ]),
   infoController.updateCompanyMedia
 );
+router.get("/profile/files", infoController.listCompanyFiles);
+router.post("/profile/files", companyFileUpload.single("file"), infoController.uploadCompanyFile);
+router.delete("/profile/files/:filename", infoController.deleteCompanyFile);
+router.get("/profile/files/:filename/download", infoController.downloadCompanyFile);
 
 /* Dynamic company sections */
 router.get("/profile/:section", infoController.getMySection);

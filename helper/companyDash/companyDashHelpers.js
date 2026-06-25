@@ -324,7 +324,7 @@ export const applyCompanyAutoFields = async (company, touchedFields = []) => {
 
 export const calculateCompanyProfileCompletion = (company = {}) => {
   const checks = [
-    company.image,
+    company.logo || company.image,
     company.cover_image,
     company.company_name,
     company.slug,
