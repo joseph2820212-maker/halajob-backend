@@ -217,6 +217,8 @@ assertSourceIncludes({
     'router.put("/profile", campusMobileGuard',
     'router.patch("/profile", campusMobileGuard',
     'router.get("/events", campusMobileGuard',
+    'router.get("/resources", campusMobileGuard',
+    'router.get("/overview", campusMobileGuard',
     'router.post("/events/:eventId/register", campusMobileGuard',
     'router.patch("/events/:eventId/cancel", campusMobileGuard',
     'router.post("/events/:eventId/cancel", campusMobileGuard',

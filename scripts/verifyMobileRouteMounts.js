@@ -121,8 +121,10 @@ const requiredEndpoints = [
 const requiredCampusStudentPaths = [
   "/user/v1/campus/dashboard",
   "/user/v1/campus/dashboard/overview",
+  "/user/v1/campus/overview",
   "/user/v1/campus/content",
   "/user/v1/campus/events",
+  "/user/v1/campus/resources",
   "/user/v1/campus/profile",
   "/user/v1/campus/opportunities",
   "/user/v1/campus/opportunities/:id",

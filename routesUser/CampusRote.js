@@ -30,8 +30,8 @@ router.post("/applications/:id/messages", campusMobileGuard, upload.none(), camp
 router.patch("/applications/:id/cancel", campusMobileGuard, upload.none(), campusMobileController.cancelApplication);
 router.post("/applications/:id/cancel", campusMobileGuard, upload.none(), campusMobileController.cancelApplication);
 
-router.get("/resources", campusController.resources);
-router.get("/overview", authUser, campusController.overview);
+router.get("/resources", campusMobileGuard, campusController.resources);
+router.get("/overview", campusMobileGuard, campusController.overview);
 router.get("/profile", campusMobileGuard, campusController.profile);
 router.post("/profile", campusMobileGuard, upload.none(), campusController.updateProfile);
 router.put("/profile", campusMobileGuard, upload.none(), campusController.updateProfile);
