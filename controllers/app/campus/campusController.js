@@ -20,6 +20,7 @@ import {
 import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
+import { getCareerPassportSafeViewForEmployee } from "../../../services/careerPassport.service.js";
 import {
   campusEventRegisteredNotification,
   campusVerificationApprovedNotification,
@@ -1574,6 +1575,76 @@ const userUniversityStudents = async (req, res, next) => {
   }
 };
 
+const userUniversityStudentCareerPassport = async (req, res, next) => {
+  try {
+    const scope = await getUniversityAdminScope(req);
+    const university = scope?.university;
+    if (!university) {
+      return ReturnAppData.getError({
+        res,
+        status: 403,
+        message: "university_admin_context_required",
+      });
+    }
+
+    if (!isValidObjectId(req.params.studentId)) {
+      return ReturnAppData.getError({
+        res,
+        status: 400,
+        message: "invalid_student_id",
+      });
+    }
+
+    const student = await EmployeeModel.findOne({
+      _id: req.params.studentId,
+      $and: [
+        buildUniversityStudentQuery(university),
+        {
+          $or: [
+            { student_email_verified: true },
+            { "student_profile.student_email_verified": true },
+          ],
+        },
+      ],
+    })
+      .populate({ path: "user_id", select: "first_name mid_name last_name image" })
+      .lean();
+
+    if (!student) {
+      return ReturnAppData.getError({
+        res,
+        status: 404,
+        message: "verified_student_not_found",
+      });
+    }
+
+    const result = await getCareerPassportSafeViewForEmployee({
+      employee: student,
+      viewerType: "university",
+    });
+
+    return ReturnAppData.getData({
+      res,
+      data: {
+        student: {
+          id: String(student._id || ""),
+          name: result.snapshot.identity.name,
+          university: result.snapshot.education.university,
+          major: result.snapshot.education.major,
+          verification_status: result.snapshot.education.verification_status,
+        },
+        passport: result.snapshot,
+        score: result.score,
+        visibility: result.visibility,
+        viewer_type: result.viewerType,
+      },
+      message: "university_student_career_passport",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const userUniversityPartners = async (req, res, next) => {
   try {
     const scope = await getUniversityAdminScope(req);
@@ -1917,6 +1988,7 @@ export default {
   userUniversityOverview,
   userUniversityOpportunities,
   userUniversityStudents,
+  userUniversityStudentCareerPassport,
   userUniversityPartners,
   userUniversityEmployabilityAnalytics,
   userUniversityOutcomeReport,

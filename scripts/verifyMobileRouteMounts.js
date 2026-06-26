@@ -59,6 +59,7 @@ const requiredEndpoints = [
   ["GET", "/university/v1/dashboard/overview"],
   ["GET", "/university/v1/overview"],
   ["GET", "/university/v1/students"],
+  ["GET", "/university/v1/students/:studentId/career-passport"],
   ["GET", "/university/v1/verifications"],
   ["POST", "/university/v1/verifications/:id/approve"],
   ["POST", "/university/v1/verifications/:id/reject"],

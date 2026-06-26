@@ -2,6 +2,7 @@ import crypto from "crypto";
 import {
   CareerPassportModel,
   EmployeeModel,
+  UserModel,
   UserApplyingJobModel,
   UserSavedJobModel,
 } from "../models/index.js";
@@ -490,6 +491,61 @@ export async function getSharedCareerPassport({ token, viewerType = "public" }) 
       enabled: true,
       expires_at: safeDate(passport.share?.expires_at),
     },
+    viewerType,
+  };
+}
+
+async function resolveUserForEmployee(employee = {}) {
+  const embeddedUser = employee.user_id && typeof employee.user_id === "object"
+    ? employee.user_id
+    : null;
+  if (embeddedUser?._id) return embeddedUser;
+
+  const userId = idString(employee.user_id);
+  if (!userId) return null;
+  return UserModel.findById(userId).lean();
+}
+
+export async function getCareerPassportSafeViewForEmployee({
+  employee,
+  viewerType = "university",
+}) {
+  const user = await resolveUserForEmployee(employee);
+  if (!user?._id || !employee?._id) {
+    const error = new Error("career_passport_student_not_found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const [passport, stats] = await Promise.all([
+    CareerPassportModel.findOne({ user_id: user._id }).lean(),
+    getActivityStats({ userId: user._id, employeeId: employee._id }),
+  ]);
+
+  const passportForSnapshot = passport || {
+    visibility: "private",
+    share: { enabled: false },
+    score: null,
+  };
+  let snapshot = buildSnapshot({ user, employee, passport: passportForSnapshot, stats });
+  const score = passport?.score?.updated_at
+    ? passport.score
+    : calculateScore({ employee, snapshot, stats });
+
+  snapshot = buildSnapshot({
+    user,
+    employee,
+    passport: { ...passportForSnapshot, score },
+    stats,
+  });
+
+  return {
+    employee,
+    user,
+    passport,
+    snapshot: sanitizeCareerPassportSnapshotForShare(snapshot, { viewerType }),
+    score: sanitizeCareerPassportScore(score),
+    visibility: passport?.visibility || "private",
     viewerType,
   };
 }

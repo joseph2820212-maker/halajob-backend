@@ -270,6 +270,7 @@ assertRoutes({
     "GET /dashboard/overview",
     "GET /overview",
     "GET /students",
+    "GET /students/:studentId/career-passport",
     "GET /verifications",
     "POST /verifications/:id/approve",
     "POST /verifications/:id/reject",

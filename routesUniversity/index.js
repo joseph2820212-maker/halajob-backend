@@ -11,6 +11,7 @@ router.get("/dashboard/overview", authUser, campusController.userUniversityOverv
 router.get("/overview", authUser, campusController.userUniversityOverview);
 
 router.get("/students", authUser, campusController.userUniversityStudents);
+router.get("/students/:studentId/career-passport", authUser, campusController.userUniversityStudentCareerPassport);
 
 router.get("/verifications", authUser, campusController.adminListVerifications);
 router.post("/verifications/:id/approve", authUser, upload.none(), campusController.adminApproveVerification);
