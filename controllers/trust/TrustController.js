@@ -9,6 +9,7 @@ import {
   recomputeAndSaveJobTrust,
 } from "../../services/trust/jobTrust.service.js";
 import { writeAuditLog } from "../../services/auditLog.service.js";
+import { recordAnalyticsEvent } from "../../services/analytics/analyticsEvent.service.js";
 
 const toObjectId = (value) => {
   const id = String(value || "").trim();
@@ -117,6 +118,15 @@ export const reportJob = async (req, res, next) => {
       jobId,
       newValue: { reason, report_id: report._id, trust },
     });
+    await recordAnalyticsEvent({
+      req,
+      event: "job_reported",
+      entityType: "job",
+      entityId: jobId,
+      jobId,
+      companyId: job.company_id,
+      metadata: { reason, report_id: report._id },
+    }).catch(() => null);
 
     return ReturnAppData.createData({
       res,

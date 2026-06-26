@@ -45,7 +45,7 @@ screens from it, and do not let it change the current release behavior.
 | Translation | Not implemented as approved AI translation workflow. | Add backend translation endpoints and approval storage. |
 | Trust/anti-scam | Backend trust score, seeker report/score routes, admin review queue/actions, job trust fields, and route verifier are now implemented. | Add live moderation QA, surface trust warnings in more mobile screens, and finish company-level trust review. |
 | Push notifications | Versioned `/notifications/v1` list/read/device-token routes now wrap the existing notification and FCM-token foundation. Real Android push delivery still needs release credentials/device QA. | Finish FCM permission prompts, production Firebase credential QA, and event-driven notification coverage. |
-| Analytics | Not implemented as a complete event layer. | Add analytics event collection for activation, AI, jobs, company, campus, and global actions. |
+| Analytics | Backend `/analytics/v1/events` foundation now records the approved activation, AI, jobs, company, campus, and global events against the signed-in user/context. | Wire more product actions to emit events automatically and add admin/cohort reporting screens. |
 | Release signing | Tester APK is local/debug signed. | Decide package strategy, production signing, and versionCode path before public distribution. |
 
 ## Account Context Contract
