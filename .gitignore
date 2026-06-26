@@ -37,6 +37,15 @@ yarn-error.log*
 notification/*firebase-adminsdk*.json
 notification/serviceAccount*.json
 !notification/serviceAccount.example.json
+**/google-services.json
+**/GoogleService-Info.plist
+**/key.properties
+**/*.jks
+**/*.keystore
+**/*.p8
+**/*.p12
+**/*.pem
+**/*.mobileprovision
 
 # OS/editor
 .DS_Store
