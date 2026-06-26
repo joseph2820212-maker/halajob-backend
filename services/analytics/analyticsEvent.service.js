@@ -7,6 +7,7 @@ export const ANALYTICS_EVENT_GROUPS = Object.freeze({
     "login_completed",
     "account_context_switched",
     "profile_completed",
+    "notification_opened",
   ],
   ai: [
     "ai_copilot_used",
