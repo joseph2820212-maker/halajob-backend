@@ -189,6 +189,30 @@ const requiredEndpoints = [
   ["PATCH", "/employee/v1/global/profile/:section/:itemId"],
   ["DELETE", "/employee/v1/global/profile/:section/:itemId"],
 
+  ["POST", "/employee/v1/jobs/:jobId/apply"],
+  ["POST", "/employee/v1/jobs/:jobId/save"],
+  ["DELETE", "/employee/v1/jobs/:jobId/save"],
+  ["POST", "/employee/v1/jobs/:jobId/rate"],
+  ["POST", "/employee/v1/jobs/:jobId/review"],
+  ["GET", "/employee/v1/applications"],
+  ["GET", "/employee/v1/applications/interviews"],
+  ["PATCH", "/employee/v1/applications/interviews/:interviewId/respond"],
+  ["POST", "/employee/v1/applications/interviews/:interviewId/respond"],
+  ["GET", "/employee/v1/applications/offers"],
+  ["PATCH", "/employee/v1/applications/offers/:invitationId/respond"],
+  ["POST", "/employee/v1/applications/offers/:invitationId/respond"],
+  ["GET", "/employee/v1/applications/:applicationId"],
+  ["POST", "/employee/v1/applications/:applicationId/messages"],
+  ["PATCH", "/employee/v1/applications/:applicationId/cancel"],
+  ["POST", "/employee/v1/applications/:applicationId/cancel"],
+  ["GET", "/employee/v1/companies"],
+  ["GET", "/employee/v1/companies/activity"],
+  ["GET", "/employee/v1/companies/applied"],
+  ["GET", "/employee/v1/companies/saved-jobs"],
+  ["GET", "/employee/v1/companies/viewed"],
+  ["GET", "/employee/v1/companies/:companyId"],
+  ["POST", "/employee/v1/companies/:companyId/review"],
+
   ["GET", "/employee/v1/cv/uploaded"],
   ["POST", "/employee/v1/cv/upload"],
   ["PUT", "/employee/v1/cv/upload/:cvId"],
@@ -360,6 +384,28 @@ const requiredUniversityAdminPaths = [
   "/user/v1/campus/university/partners",
 ];
 
+const requiredLegacyEmployeeMobilePaths = [
+  "/employee/v1/jobs/:jobId/apply",
+  "/employee/v1/jobs/:jobId/save",
+  "/employee/v1/jobs/:jobId/rate",
+  "/employee/v1/jobs/:jobId/review",
+  "/employee/v1/applications",
+  "/employee/v1/applications/interviews",
+  "/employee/v1/applications/interviews/:interviewId/respond",
+  "/employee/v1/applications/offers",
+  "/employee/v1/applications/offers/:invitationId/respond",
+  "/employee/v1/applications/:applicationId",
+  "/employee/v1/applications/:applicationId/messages",
+  "/employee/v1/applications/:applicationId/cancel",
+  "/employee/v1/companies",
+  "/employee/v1/companies/activity",
+  "/employee/v1/companies/applied",
+  "/employee/v1/companies/saved-jobs",
+  "/employee/v1/companies/viewed",
+  "/employee/v1/companies/:companyId",
+  "/employee/v1/companies/:companyId/review",
+];
+
 function hasEndpoint(method, path) {
   return endpointByPath.get(path)?.methods.includes(method) === true;
 }
@@ -386,6 +432,17 @@ assert.deepEqual(
   missingUniversityAdminGuards,
   [],
   "University admin mobile endpoints must require an active university_admin or super_admin context"
+);
+
+const missingLegacyEmployeeGuards = requiredLegacyEmployeeMobilePaths.filter((path) => {
+  const middlewares = endpointByPath.get(path)?.middlewares || [];
+  return !middlewares.includes("authUser");
+});
+
+assert.deepEqual(
+  missingLegacyEmployeeGuards,
+  [],
+  "Legacy employee mobile compatibility endpoints must require a signed-in user"
 );
 
 const sharedCareerPassportEndpoint = endpointByPath.get("/user/v1/career-passport/share/:token");
