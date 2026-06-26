@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
+import bcryptjs from "bcryptjs";
 import {
   getCompanyOrFail,
   getCompanyPlain,
@@ -17,7 +18,7 @@ import {
   companyPopulate
 } from "../../../helper/companyDash/companyDashHelpers.js";
 
-import { CountryModel, IndustryModel, LanguageModel, UserModel } from "../../../models/index.js";
+import { CountryModel, IndustryModel, LanguageModel, RefreshTokenModel, UserModel } from "../../../models/index.js";
 import normalizeArabicKeyword from "../../../helper/normalizeArabicKeyword.js";
 import { deleteImage, processUploadImage } from "../../../services/imageService.js";
 import { applyCompanyProjection, rebuildCompanyJobsProjection } from "../../../services/search/rebuildSearchData.js";
@@ -67,6 +68,8 @@ const DOCS_DIR = "files";
 const MAX_COMPANY_FILES = 10;
 const COMPANY_FILE_EXTENSIONS = new Set([".pdf", ".doc", ".docx", ".png", ".jpg", ".jpeg", ".webp"]);
 const COMPANY_DOCUMENT_EXTENSIONS = new Set([".pdf", ".doc", ".docx"]);
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const STRONG_PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
 const normalizeCompanyFileName = (value = "") => {
   const raw = String(value || "").trim();
@@ -1059,9 +1062,31 @@ export const updateMyCompanyUserProfile = async (req, res, next) => {
     const user = await UserModel.findById(company.owner_user_id);
     if (!user) return fail(res, "company_owner_user_not_found", 404);
 
-    ["first_name", "mid_name", "last_name", "email", "gender"].forEach((field) => {
+    let revokeAllSessions = false;
+
+    ["first_name", "mid_name", "last_name", "gender"].forEach((field) => {
       if (req.body[field] !== undefined) user[field] = req.body[field];
     });
+
+    if (req.body.email !== undefined) {
+      const nextEmail = String(req.body.email || "").trim().toLowerCase();
+      if (nextEmail && !EMAIL_REGEX.test(nextEmail)) {
+        return fail(res, "invalid_email", 400);
+      }
+      if (nextEmail && nextEmail !== user.email) {
+        user.email = nextEmail;
+        revokeAllSessions = true;
+      }
+    }
+
+    if (req.body.password !== undefined && String(req.body.password || "").trim()) {
+      const nextPassword = String(req.body.password);
+      if (!STRONG_PASSWORD_REGEX.test(nextPassword)) {
+        return fail(res, "weak_password", 400);
+      }
+      user.password = await bcryptjs.hash(nextPassword, 10);
+      revokeAllSessions = true;
+    }
 
     if (req.body.phone !== undefined || req.body.phone_number !== undefined) {
       const national = String(req.body.phone ?? req.body.phone_number ?? "").replace(/[^0-9]/g, "");
@@ -1084,6 +1109,10 @@ export const updateMyCompanyUserProfile = async (req, res, next) => {
 
     await user.save();
 
+    if (revokeAllSessions) {
+      await RefreshTokenModel.deleteMany({ userRef: user._id });
+    }
+
     return success(res, {
       id: user._id,
       first_name: user.first_name,
@@ -1095,6 +1124,7 @@ export const updateMyCompanyUserProfile = async (req, res, next) => {
       gender: user.gender,
       image: user.image,
       status: user.status,
+      require_relogin: revokeAllSessions,
     }, "company_user_profile_updated");
   } catch (error) {
     if (error.code === 11000) return fail(res, "user_unique_field_already_exists", 409, error.keyValue);
