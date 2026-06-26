@@ -20,6 +20,7 @@
     "smoke:cors": "node scripts/smokeCors.js",
     "check:secrets": "node scripts/verifyNoSecrets.js && node scripts/verifyNoTrackedRuntimeFiles.js",
     "check:runtime-files": "node scripts/verifyNoTrackedRuntimeFiles.js",
+    "docs:api-artifacts": "node scripts/generateApiArtifacts.js",
     "docs:route-report": "node scripts/generateRouteVerificationReport.js",
     "security:audit-users": "node scripts/securityAuditPrivilegedUsers.js",
     "test:security-http": "node scripts/verifySecurityHttpContracts.js",

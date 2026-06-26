@@ -1,0 +1,23 @@
+{
+  "name": "HalaJob Dev",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "https://jobzain.com",
+      "enabled": true
+    },
+    {
+      "key": "token",
+      "value": "",
+      "enabled": true
+    },
+    {
+      "key": "lang",
+      "value": "en",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-06-26T23:57:03.648Z",
+  "_postman_exported_using": "HalaJob generator"
+}
