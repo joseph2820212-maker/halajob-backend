@@ -25,6 +25,9 @@ const requiredEndpoints = [
   ["POST", "/user/v1/career-passport/share"],
   ["POST", "/ai/v1/career-passport/score"],
 
+  ["POST", "/trust/v1/jobs/:jobId/score"],
+  ["POST", "/trust/v1/jobs/:jobId/report"],
+
   ["GET", "/user/v1/global/countries"],
   ["GET", "/user/v1/global/cities"],
   ["GET", "/user/v1/global/currencies"],

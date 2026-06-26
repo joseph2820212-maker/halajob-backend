@@ -43,7 +43,7 @@ screens from it, and do not let it change the current release behavior.
 | University dashboard | University admin backend routes now honor active context for overview, students, verification queue/actions, partners, opportunity requests, employability analytics, and outcomes reports under `/university/v1`; Flutter now opens a university admin dashboard from the active `university_admin` context with metrics, verification actions, readiness, students, partners, and account switching. | Add deeper sub-screens, richer report exports, live university admin device QA, and release analytics. |
 | Global country/currency | Country/city helpers plus `/user/v1/global/*` mobile routes are now mounted. Launch salary currencies are constrained to USD/EUR/GBP in company jobs, seeker profile salary, job search filters, mobile job posting, and the backend launch-contract verifier. Work modes are constrained to onsite/remote/hybrid with city required for onsite/hybrid job posts. | Finish production data migration/QA, confirm all old records map to the launch contract, and add richer global admin controls. |
 | Translation | Not implemented as approved AI translation workflow. | Add backend translation endpoints and approval storage. |
-| Trust/anti-scam | Some report/review features exist, no full trust score/admin queue. | Add trust scoring/report/review routes and admin actions. |
+| Trust/anti-scam | Backend trust score, seeker report/score routes, admin review queue/actions, job trust fields, and route verifier are now implemented. | Add live moderation QA, surface trust warnings in more mobile screens, and finish company-level trust review. |
 | Push notifications | Backend FCM token routes exist; real Android push delivery still needs release credentials/device QA. | Finish FCM permission, device token lifecycle, and event-driven notifications. |
 | Analytics | Not implemented as a complete event layer. | Add analytics event collection for activation, AI, jobs, company, campus, and global actions. |
 | Release signing | Tester APK is local/debug signed. | Decide package strategy, production signing, and versionCode path before public distribution. |
@@ -370,6 +370,8 @@ Trust APIs:
 - `GET /admin/v1/trust/review-queue`
 - `POST /admin/v1/trust/jobs/{jobId}/mark-safe`
 - `POST /admin/v1/trust/jobs/{jobId}/suspend`
+- `POST /admin/v1/trust/jobs/{jobId}/request-documents`
+- Dashboard aliases also exist under `/dash/v1/trust/*` for the existing admin portal.
 
 Application statuses:
 

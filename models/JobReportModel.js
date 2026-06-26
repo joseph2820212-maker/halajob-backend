@@ -5,7 +5,7 @@ const JobReportSchema = new Schema(
     user_id: { type: Schema.Types.ObjectId, ref: "users", required: true, index: true },
     job_id: { type: Schema.Types.ObjectId, ref: "jobs", required: true, index: true },
     company_id: { type: Schema.Types.ObjectId, ref: "companies", default: null, index: true },
-    reason: { type: String, enum: ["fake_job", "spam", "scam", "wrong_information", "discrimination", "expired", "other"], required: true },
+    reason: { type: String, enum: ["fake_job", "spam", "scam", "wrong_information", "discrimination", "abuse", "expired", "other"], required: true },
     message: { type: String, default: "", trim: true },
     status: { type: String, enum: ["pending", "reviewing", "resolved", "rejected"], default: "pending", index: true },
     reviewed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },

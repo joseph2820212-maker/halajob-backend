@@ -148,6 +148,32 @@ const AtsSettingsSchema = new Schema(
   { _id: false }
 );
 
+const JobTrustSchema = new Schema(
+  {
+    score: { type: Number, min: 0, max: 100, default: 50, index: true },
+    risk_level: {
+      type: String,
+      enum: ["low", "medium", "high", "critical"],
+      default: "medium",
+      index: true,
+    },
+    flags: { type: [String], default: [] },
+    report_count: { type: Number, min: 0, default: 0, index: true },
+    duplicate_count: { type: Number, min: 0, default: 0 },
+    review_status: {
+      type: String,
+      enum: ["unreviewed", "safe", "needs_documents", "suspended"],
+      default: "unreviewed",
+      index: true,
+    },
+    admin_note: { type: String, trim: true, default: "" },
+    reviewed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    reviewed_at: { type: Date, default: null },
+    last_scored_at: { type: Date, default: null },
+  },
+  { _id: false }
+);
+
 const JobsSchema = new Schema(
   {
     search_projection: {
@@ -277,6 +303,7 @@ const JobsSchema = new Schema(
     reviewed_at: { type: Date, default: null },
     reviewed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
     rejection_reason: { type: String, trim: true, default: "" },
+    trust: { type: JobTrustSchema, default: () => ({}) },
 
     job_lifecycle: { type: JobLifecycleSchema, default: () => ({}) },
 
@@ -606,6 +633,8 @@ JobsSchema.index({ "search_projection.requirements.salary_max_usd": 1 });
 JobsSchema.index({ "search_projection.ranking.total_score": -1 });
 JobsSchema.index({ "search_projection.matching.tokens": 1 });
 JobsSchema.index({ "search_projection.matching.text": "text" });
+JobsSchema.index({ "trust.risk_level": 1, "trust.report_count": -1, updatedAt: -1 });
+JobsSchema.index({ "trust.review_status": 1, updatedAt: -1 });
 
 const jobsModel = mongoose.model("jobs", JobsSchema);
 export default jobsModel;

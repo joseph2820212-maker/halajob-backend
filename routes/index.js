@@ -10,6 +10,7 @@ import dashboardController from '../controllers/dash/adminDashboardController.js
 import adminModerationController from '../controllers/dash/adminModerationController.js';
 import adminSearchController from '../controllers/dash/adminSearchController.js';
 import resourceController from '../controllers/dash/adminResourceController.js';
+import TrustAdminController from '../controllers/trust/TrustAdminController.js';
 import campusController from '../controllers/app/campus/campusController.js';
 import cvRoute from './cvRoute.js';
 import { createDashResourceRouter } from './dashResourceRouteFactory.js';
@@ -95,6 +96,14 @@ router.post('/jobs/:id/approve', upload.none(), adminModerationController.approv
 router.post('/jobs/:id/reject', upload.none(), adminModerationController.rejectJob);
 router.patch('/jobs/:id/approve', upload.none(), adminModerationController.approveJob);
 router.patch('/jobs/:id/reject', upload.none(), adminModerationController.rejectJob);
+
+router.get('/trust/review-queue', TrustAdminController.reviewQueue);
+router.post('/trust/jobs/:jobId/mark-safe', upload.none(), TrustAdminController.markJobSafe);
+router.patch('/trust/jobs/:jobId/mark-safe', upload.none(), TrustAdminController.markJobSafe);
+router.post('/trust/jobs/:jobId/suspend', upload.none(), TrustAdminController.suspendJob);
+router.patch('/trust/jobs/:jobId/suspend', upload.none(), TrustAdminController.suspendJob);
+router.post('/trust/jobs/:jobId/request-documents', upload.none(), TrustAdminController.requestDocuments);
+router.patch('/trust/jobs/:jobId/request-documents', upload.none(), TrustAdminController.requestDocuments);
 
 router.get('/operations/talent-requests', adminModerationController.listTalentRequests);
 router.get('/talent-requests', adminModerationController.listTalentRequests);
