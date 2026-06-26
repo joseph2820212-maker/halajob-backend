@@ -12,6 +12,8 @@ const trustSource = readSource("routesTrust/index.js");
 const trustAdminSource = readSource("routesTrust/admin.js");
 const trustAdminControllerSource = readSource("controllers/trust/TrustAdminController.js");
 const dashSource = readSource("routes/index.js");
+const webAdminSource = readSource("web/src/admin/screens.tsx");
+const webApiSource = readSource("web/src/shared/api.ts");
 
 const requiredEndpoints = [
   ["POST", "/trust/v1/jobs/:jobId/score"],
@@ -104,5 +106,29 @@ assert.deepEqual(
   [],
   "TrustAdminController.js is missing admin trust analytics hooks"
 );
+
+const requiredWebTrustReview = [
+  "trustReviewQueue",
+  "trustMarkSafe",
+  "trustSuspend",
+  "trustRequestDocuments",
+  '"/dash/v1/trust/review-queue"',
+  '`/dash/v1/trust/jobs/${id}/mark-safe`',
+  '`/dash/v1/trust/jobs/${id}/suspend`',
+  '`/dash/v1/trust/jobs/${id}/request-documents`',
+].filter((snippet) => !webApiSource.includes(snippet));
+
+assert.deepEqual(requiredWebTrustReview, [], "web/src/shared/api.ts is missing admin trust review calls");
+
+const requiredWebTrustScreen = [
+  "adminService.trustReviewQueue",
+  '"trust"',
+  '"Trust review"',
+  '"Mark safe"',
+  '"Suspend job"',
+  '"Request documents"',
+].filter((snippet) => !webAdminSource.includes(snippet));
+
+assert.deepEqual(requiredWebTrustScreen, [], "web/src/admin/screens.tsx is missing admin trust review UI");
 
 console.log(`Trust route mounts verified (${requiredEndpoints.length} method/path checks).`);
