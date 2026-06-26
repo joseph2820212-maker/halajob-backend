@@ -155,6 +155,8 @@ const requiredHooks = [
       '"company_job_generate": "ai_job_draft_generated"',
       '"company_shortlist": "ai_shortlist_generated"',
       '"company_message_generate": "ai_hiring_message_generated"',
+      '"translate_job": "ai_job_translation_generated"',
+      '"translate_cv": "ai_cv_translation_generated"',
       "wasCompletedOutput",
     ],
   },

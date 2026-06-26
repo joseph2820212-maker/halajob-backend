@@ -19,6 +19,8 @@ export const ANALYTICS_EVENT_GROUPS = Object.freeze({
     "ai_shortlist_generated",
     "ai_job_draft_generated",
     "ai_hiring_message_generated",
+    "ai_job_translation_generated",
+    "ai_cv_translation_generated",
   ],
   jobs: [
     "job_viewed",
