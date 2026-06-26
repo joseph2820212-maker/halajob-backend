@@ -17,6 +17,10 @@ const readSource = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.u
 const campusNotificationSource = readSource("notification/CampusNotifications.js");
 const campusControllerSource = readSource("controllers/app/campus/campusController.js");
 const auditModelSource = readSource("models/AuditLogModel.js");
+const campusEventModelSource = readSource("models/CampusEventRegistrationModel.js");
+const campusEventJobSource = readSource("jobs/campusEvent.jobs.js");
+const schedulerSource = readSource("jobs/scheduler.js");
+const packageSource = readSource("package.json");
 
 const requiredEvents = [
   "application_status_shortlisted",
@@ -93,6 +97,38 @@ assert.deepEqual(
 assert.ok(
   auditModelSource.includes('"university_admin"') || auditModelSource.includes("'university_admin'"),
   "AuditLogModel must allow university_admin actors"
+);
+
+assert.deepEqual(
+  ["start_at", "reminder_sent_at"].filter((snippet) => !campusEventModelSource.includes(snippet)),
+  [],
+  "CampusEventRegistrationModel must support scheduled reminder timestamps"
+);
+
+assert.deepEqual(
+  [
+    "sendCampusEventReminders",
+    "CampusEventRegistrationModel.find",
+    "campusEventReminderNotification",
+    "reminder_sent_at",
+  ].filter((snippet) => !campusEventJobSource.includes(snippet)),
+  [],
+  "campusEvent.jobs.js must send one-time campus event reminders"
+);
+
+assert.deepEqual(
+  [
+    "send-campus-event-reminders",
+    "CAMPUS_EVENT_REMINDERS_CRON",
+    "sendCampusEventReminders",
+  ].filter((snippet) => !schedulerSource.includes(snippet)),
+  [],
+  "scheduler.js must register campus event reminders"
+);
+
+assert.ok(
+  packageSource.includes('"scheduled:campus-event-reminders"'),
+  "package.json must expose a manual campus event reminder command"
 );
 
 console.log(`Notification event contract verified (${requiredEvents.length} launch events).`);

@@ -13,6 +13,7 @@
     "scheduled:run": "node scripts/runScheduledJob.js",
     "scheduled:close-expired-jobs": "node scripts/runScheduledJob.js close-expired-jobs",
     "scheduled:job-reminders": "node scripts/runScheduledJob.js send-job-deadline-reminders",
+    "scheduled:campus-event-reminders": "node scripts/runScheduledJob.js send-campus-event-reminders",
     "scheduled:sync-company-jobs": "node scripts/runScheduledJob.js sync-company-active-job-counts",
     "smoke:import": "node scripts/smokeImport.js",
     "smoke:http": "node scripts/smokeHttp.js",

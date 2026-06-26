@@ -6,6 +6,7 @@ import {
   sendJobDeadlineReminders,
   syncCompanyActiveJobCounts,
 } from "./jobLifecycle.jobs.js";
+import { sendCampusEventReminders } from "./campusEvent.jobs.js";
 
 const enabled = () => String(process.env.SCHEDULED_JOBS_ENABLED ?? "true").toLowerCase() !== "false";
 const timezone = () => process.env.SCHEDULED_JOBS_TIMEZONE || "UTC";
@@ -36,6 +37,13 @@ const definitions = [
     defaultCron: "10 * * * *",
     lockTtlMs: 50 * 60 * 1000,
     handler: syncCompanyActiveJobCounts,
+  },
+  {
+    key: "send-campus-event-reminders",
+    envKey: "CAMPUS_EVENT_REMINDERS_CRON",
+    defaultCron: "15 * * * *",
+    lockTtlMs: 50 * 60 * 1000,
+    handler: sendCampusEventReminders,
   },
 ];
 

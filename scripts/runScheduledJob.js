@@ -14,7 +14,7 @@ if (!CONNECTION_URL) {
 
 if (!jobKey) {
   console.error("Usage: npm run scheduled:run -- <job-key>");
-  console.error("Available keys: close-expired-jobs, send-job-deadline-reminders, sync-company-active-job-counts");
+  console.error("Available keys: close-expired-jobs, send-job-deadline-reminders, sync-company-active-job-counts, send-campus-event-reminders");
   process.exit(1);
 }
 

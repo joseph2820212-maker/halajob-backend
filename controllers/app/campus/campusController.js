@@ -58,6 +58,12 @@ const cleanText = (value) => String(value || "").trim();
 const normalizeEmail = (value) => cleanText(value).toLowerCase();
 const idOf = (value) => value?._id || value || null;
 
+const parseDateOrNull = (value) => {
+  if (!value) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
 const hashVerificationCode = ({ code, userId }) =>
   crypto
     .createHash("sha256")
@@ -625,6 +631,7 @@ const registerEvent = async (req, res, next) => {
 
     const employee = await EmployeeModel.findOne({ user_id: req.user._id }).select("_id").lean();
     const body = req.body || {};
+    const startAt = parseDateOrNull(body.start_at || body.starts_at || body.event_start_at || body.eventStartAt);
     const payload = {
       user_id: req.user._id,
       employee_id: employee?._id || null,
@@ -633,13 +640,25 @@ const registerEvent = async (req, res, next) => {
       organizer: String(body.organizer || "").trim(),
       kind: String(body.kind || "").trim(),
       date_label: String(body.date_label || body.date || "").trim(),
+      start_at: startAt,
       mode: String(body.mode || "").trim(),
       status: "registered",
     };
 
     const registration = await CampusEventRegistrationModel.findOneAndUpdate(
       { user_id: req.user._id, event_id: eventId },
-      { $setOnInsert: payload, $set: { status: "registered" } },
+      {
+        $setOnInsert: { ...payload, reminder_sent_at: null },
+        $set: {
+          title: payload.title,
+          organizer: payload.organizer,
+          kind: payload.kind,
+          date_label: payload.date_label,
+          start_at: payload.start_at,
+          mode: payload.mode,
+          status: "registered",
+        },
+      },
       { new: true, upsert: true, runValidators: true }
     ).lean();
 

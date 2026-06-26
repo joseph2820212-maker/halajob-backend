@@ -40,6 +40,16 @@ const CampusEventRegistrationSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    start_at: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+    reminder_sent_at: {
+      type: Date,
+      default: null,
+      index: true,
+    },
     mode: {
       type: String,
       trim: true,
@@ -60,5 +70,6 @@ const CampusEventRegistrationSchema = new mongoose.Schema(
 
 CampusEventRegistrationSchema.index({ user_id: 1, event_id: 1 }, { unique: true });
 CampusEventRegistrationSchema.index({ event_id: 1, status: 1 });
+CampusEventRegistrationSchema.index({ status: 1, start_at: 1, reminder_sent_at: 1 });
 
 export default mongoose.model("campus_event_registrations", CampusEventRegistrationSchema);

@@ -59,6 +59,7 @@ export const campusEventRegisteredNotification = (registration = {}) =>
       title: clean(registration.title),
       organizer: clean(registration.organizer),
       date_label: clean(registration.date_label),
+      start_at: registration.start_at ? new Date(registration.start_at).toISOString() : "",
       mode: clean(registration.mode),
       status: clean(registration.status || "registered"),
     },
@@ -80,6 +81,7 @@ export const campusEventReminderNotification = (registration = {}) =>
       registration_id: idOf(registration._id || registration.id),
       title: clean(registration.title),
       date_label: clean(registration.date_label),
+      start_at: registration.start_at ? new Date(registration.start_at).toISOString() : "",
       mode: clean(registration.mode),
     },
     dedupeKey: registration.event_id
