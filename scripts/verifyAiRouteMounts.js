@@ -6,6 +6,7 @@ import app from "../app.js";
 const endpoints = listEndpoints(app);
 const endpointByPath = new Map(endpoints.map((endpoint) => [endpoint.path, endpoint]));
 const routeSource = fs.readFileSync(new URL("../routesAi/index.js", import.meta.url), "utf8");
+const dashboardRouteSource = fs.readFileSync(new URL("../routes/index.js", import.meta.url), "utf8");
 
 const requiredEndpoints = [
   ["POST", "/ai/v1/career-passport/score", "/career-passport/score", "employee"],
@@ -46,4 +47,36 @@ const missingGuards = requiredEndpoints
 
 assert.deepEqual(missingGuards, [], "AI endpoints must require auth and account guards");
 
-console.log(`AI route mounts verified (${requiredEndpoints.length} method/path checks).`);
+const requiredAdminEndpoints = [
+  ["GET", "/dash/v1/ai/features", "router.get('/ai/features'"],
+  ["GET", "/dash/v1/ai/limits", "router.get('/ai/limits'"],
+  ["POST", "/dash/v1/ai/limits", "router.post('/ai/limits'"],
+  ["PATCH", "/dash/v1/ai/limits/:id", "router.patch('/ai/limits/:id'"],
+  ["DELETE", "/dash/v1/ai/limits/:id", "router.delete('/ai/limits/:id'"],
+  ["GET", "/dash/v1/ai/requests", "router.get('/ai/requests'"],
+  ["GET", "/dash/v1/ai/requests/:id", "router.get('/ai/requests/:id'"],
+  ["GET", "/dash/v1/ai/summary", "router.get('/ai/summary'"],
+  ["GET", "/dash/v1/ai/usage/summary", "router.get('/ai/usage/summary'"],
+];
+
+const missingAdminEndpoints = requiredAdminEndpoints
+  .filter(([method, path]) => !endpointByPath.get(path)?.methods.includes(method))
+  .map(([method, path]) => `${method} ${path}`);
+
+assert.deepEqual(missingAdminEndpoints, [], "Express app is missing dashboard AI admin endpoints");
+
+const adminGuardIndex = dashboardRouteSource.indexOf("router.use(isAdmin)");
+assert.ok(adminGuardIndex >= 0, "Dashboard routes must mount the isAdmin guard");
+
+const unguardedAdminRoutes = requiredAdminEndpoints
+  .filter(([, , routeNeedle]) => {
+    const routeIndex = dashboardRouteSource.indexOf(routeNeedle);
+    return routeIndex < 0 || routeIndex < adminGuardIndex;
+  })
+  .map(([, path]) => path);
+
+assert.deepEqual(unguardedAdminRoutes, [], "Dashboard AI admin endpoints must be declared after isAdmin");
+
+console.log(
+  `AI route mounts verified (${requiredEndpoints.length} product checks, ${requiredAdminEndpoints.length} admin checks).`
+);

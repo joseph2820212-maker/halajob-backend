@@ -11,6 +11,7 @@ import adminModerationController from '../controllers/dash/adminModerationContro
 import adminSearchController from '../controllers/dash/adminSearchController.js';
 import resourceController from '../controllers/dash/adminResourceController.js';
 import TrustAdminController from '../controllers/trust/TrustAdminController.js';
+import AiAdminController from '../controllers/ai/AiAdminController.js';
 import campusController from '../controllers/app/campus/campusController.js';
 import cvRoute from './cvRoute.js';
 import { createDashResourceRouter } from './dashResourceRouteFactory.js';
@@ -81,6 +82,16 @@ router.get('/activity', dashboardController.tracking);
 router.get('/search/global', adminSearchController.globalSearch);
 router.get('/global-search', adminSearchController.globalSearch);
 
+/* ----------------------------- AI administration ----------------------------- */
+router.get('/ai/features', AiAdminController.listFeatures);
+router.get('/ai/limits', AiAdminController.listLimits);
+router.post('/ai/limits', upload.none(), AiAdminController.upsertLimit);
+router.patch('/ai/limits/:id', upload.none(), AiAdminController.updateLimit);
+router.delete('/ai/limits/:id', AiAdminController.deactivateLimit);
+router.get('/ai/requests', AiAdminController.listRequests);
+router.get('/ai/requests/:id', AiAdminController.getRequest);
+router.get('/ai/summary', AiAdminController.summary);
+router.get('/ai/usage/summary', AiAdminController.summary);
 
 /* ----------------------------- Moderation / operations queues ----------------------------- */
 router.get('/moderation/company-requests', adminModerationController.listCompanyRequests);
