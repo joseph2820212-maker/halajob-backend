@@ -9,5 +9,7 @@ router.use(authUser);
 router.post("/events", AnalyticsController.track);
 router.post("/track", AnalyticsController.track);
 router.get("/events", AnalyticsController.listMine);
+router.get("/admin/summary", AnalyticsController.adminSummary);
+router.get("/admin/cohorts", AnalyticsController.adminCohorts);
 
 export default router;

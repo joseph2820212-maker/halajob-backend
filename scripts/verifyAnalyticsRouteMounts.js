@@ -20,6 +20,8 @@ const requiredEndpoints = [
   ["POST", "/analytics/v1/events"],
   ["POST", "/analytics/v1/track"],
   ["GET", "/analytics/v1/events"],
+  ["GET", "/analytics/v1/admin/summary"],
+  ["GET", "/analytics/v1/admin/cohorts"],
 ];
 
 const missingEndpoints = requiredEndpoints
@@ -39,9 +41,25 @@ assert.deepEqual(
     'router.post("/events"',
     'router.post("/track"',
     'router.get("/events"',
+    'router.get("/admin/summary"',
+    'router.get("/admin/cohorts"',
   ].filter((snippet) => !routeSource.includes(snippet)),
   [],
   "routesAnalytics/index.js is missing auth or event routes"
+);
+
+const analyticsControllerSource = readSource("controllers/analytics/AnalyticsController.js");
+assert.deepEqual(
+  [
+    "requireAnalyticsReportContext",
+    'context_type === "super_admin"',
+    'context_type === "university_admin"',
+    "adminSummary",
+    "adminCohorts",
+    "analytics_admin_context_required",
+  ].filter((snippet) => !analyticsControllerSource.includes(snippet)),
+  [],
+  "AnalyticsController.js is missing guarded admin analytics reports"
 );
 
 assert.equal(analyticsGroupForEvent("job_reported"), "jobs");
