@@ -1,86 +1,212 @@
 # UI Card And Navigation Audit
 
-Date: 2026-06-26
+Date: 2026-06-27
 Branch: `flutter-seeker-campus`
-APK gate: do not ship a tester APK unless this file, Flutter checks, commit, metadata, and APK hash all point to the same commit.
+Latest source commit audited: `acc1236ddd6e13ea8a6e5a9183a5ca8f7d3a873b`
+Fresh APK ZIP handed off: `C:\Users\Admin\Downloads\HalaJob-1.0.2+18-UI-Lock-APK.zip`
+APK version: `1.0.2+18`
+APK SHA-256: `a322c205148b239e339fdb9f111ed0161521b9de6662f851001d2791f5babeda`
+Base URL: `https://jobzain.com`
+Campus auth mode: `local-device`
 
-## Summary
+## Status
 
-The current Flutter app source no longer uses `showModalBottomSheet`, `showBottomSheet`, `LaunchMode.inAppBrowserView`, or `WebView` for app navigation. The previous internal `*Sheet` class names were renamed to `*Screen` so static APK scans do not confuse native route children with bottom sheets. Real Hala Job functions now use Flutter-native routes with visible back navigation; only small platform dialogs/menus remain where appropriate.
+This audit records the current source and fresh APK metadata evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. Gate 6 visual proof is still pending until screenshots or screen recordings are captured from the same fresh APK or from the owner's real-device test.
 
-Bottom sheets intentionally kept: none in `mobile/lib`.
-Dialog/menu exceptions intentionally kept: delete/status confirmations, account menu, date picker, and language/account selectors where they are short native controls.
-External browser rule: external URLs use the Android platform browser intent through `mobile/lib/src/core/network/external_link.dart` and `MainActivity.kt`; the Flutter app no longer depends on `url_launcher`.
+## Gate Evidence
 
-## Page And Action Audit
+### Gate 1: Build And APK Truth
 
-| Role | Page | Card/Button/Action | Current behaviour | Required behaviour | Native screen / bottom sheet / external browser | Empty state | Error state | File(s) changed | Test proof |
-| ---- | ---- | ------------------ | ----------------- | ------------------ | ----------------------------------------------- | ----------- | ----------- | --------------- | ---------- |
-| Auth | Launch sign-in | Language switch card | Uses `HalaSegmentedControl`; selected language stays readable and can be re-tapped. | English/Arabic must never become invisible. | Native auth screen | N/A | Status/error card | `auth_screen.dart` | `widget_test.dart`: language visibility + Arabic RTL |
-| Auth | Launch sign-in | Job seeker sign-in card | Expands inline with email/phone, password, save password, forgot password, create account. | Light cream card, visible text, no guest button. | Native auth screen | N/A | Status/error card | `auth_screen.dart` | `widget_test.dart`: auth entry screen |
-| Auth | Launch sign-in | Campus sign-in card | Expands inline; remote campus auth by default; local tester card appears only in local-campus builds. | Campus QA must be possible without university email in local tester APK. | Native auth screen | N/A | Status/error card | `auth_screen.dart` | `widget_test.dart`: campus local tester opens dashboard |
-| Auth | Launch sign-in | Company sign-in card | Expands inline; company registration hidden because backend manages approved company access. | Company login must be clear and not show unsupported registration. | Native auth screen | N/A | Status/error card | `auth_screen.dart` | `widget_test.dart`: company auth/dashboard |
-| Auth | Register | Name, email, DOB, password fields | Required fields only; campus/company extra profile fields are moved after registration. | Launch-ready short register form. | Native auth screen | N/A | Validation card/message | `auth_screen.dart` | `widget_test.dart`: campus register flow |
-| Auth | Forgot password | Recovery code and reset password | Inline recovery flow after user action. | Clean recovery card, not a trapped popup. | Native auth screen | N/A | Recovery status card | `auth_screen.dart` | `widget_test.dart`: recovery coverage |
-| Seeker | Home | Welcome/profile score card | Uses shared cream card/dashboard hero. | Same light cream card system. | Native tab | Useful dashboard content | Remote sync notice | `dashboard_screen.dart` | `widget_test.dart`: seeker dashboard routes |
-| Seeker | Home | Quick action cards | `HalaActionTile`/module pattern routes to profile, CV, companies, applications, AI, settings. | Every major action opens a normal screen. | Native tab or pushed native screen | Clear fallback where data missing | Notice/error card | `dashboard_screen.dart` | `assert-mobile-screen-inventory.ps1` |
-| Seeker | Jobs/search | Search bar/filter chips/job cards | Search is inline; filters open `_OpportunityFiltersPage` through `MaterialPageRoute`. | Filters may be short controls; job detail must be native. | Native screen | Clear no-results message | Notice/error card | `dashboard_screen.dart` | `rg showModalBottomSheet mobile/lib` no matches |
-| Seeker | Jobs/search | Job card/detail action | Opens `_OpportunityDetailScreen` with back navigation. | Native job detail, never webview. | Native screen | Clear empty job state | Clear apply/load errors | `dashboard_screen.dart` | `widget_test.dart`: job detail/back flows |
-| Seeker | Job detail | Save/apply/report/rate/review | Native detail screen; feedback forms use native workflow pages. | App-style flow with clear errors. | Native screen; external browser only for external apply URL | Application/cv guidance | Clear failed-action message | `dashboard_screen.dart` | `external_link_test.dart`; widget action tests |
-| Seeker | Companies | Company directory card | Opens `_SeekerCompanyDirectoryScreen`; company detail opens in-app. | Companies view is reference organized card style. | Native screen | Directory loading/empty notice | Directory notice card | `dashboard_screen.dart` | `widget_test.dart`: company directory flow |
-| Seeker | Applications | Application card/detail | Opens `_ApplicationDetailScreen`. | Native application detail with status/messages. | Native screen | Useful "No applications yet" state | Clear failed-action message | `dashboard_screen.dart` | `widget_test.dart`: application detail |
-| Seeker | CV manager | Upload/activate/delete CV | Opens `_SeekerCvManagerScreen`; file actions handled in-app/platform file picker. | Native CV manager. | Native screen | CV empty state | Save/upload/delete notice | `dashboard_screen.dart` | `widget_test.dart`: CV manager flow |
-| Seeker | Career Passport | Score/share/edit cards | Opens `_CareerPassportScreen`; edit components renamed to native screen classes. | Native passport screen with editable/reviewable output. | Native screen | Passport missing sections shown in cards | AI/backend fallback notice | `dashboard_screen.dart` | `widget_test.dart`: passport share/edit |
-| Seeker | AI career tools | Career Copilot/Profile Score/CV Rewrite/Interview/Translate | Opens `_AiCareerToolsScreen`. | AI tools must be native and show fallback if provider unavailable. | Native screen | Backend/provider unavailable notice | Error result card with retry | `dashboard_screen.dart` | `widget_test.dart`: AI safe states |
-| Campus | Home | Campus hero/profile/readiness cards | Uses same dashboard/card shell with campus role. | Same light cream card system. | Native tab | Campus fallback data message | Remote sync notice | `dashboard_screen.dart` | `widget_test.dart`: campus tester opens dashboard |
-| Campus | Verification | Verification card/actions | Opens `_CampusVerificationScreen`. | Campus must be testable in QA build and not block whole app. | Native screen | Tester/local mode explanation | Clear verification errors | `dashboard_screen.dart` | `widget_test.dart`; campus auth tests |
-| Campus | Opportunities | Opportunity cards/detail | Campus opportunities reuse native opportunity detail. | Native detail, same job card style. | Native screen | Clear no campus opportunities state | Load notice card | `dashboard_screen.dart` | `assert-mobile-screen-inventory.ps1` |
-| Campus | Events/resources | Event/resource cards/detail | Opens `_EventDetailScreen` and `_ResourceDetailScreen`. | Native details; external content opens outside app if URL. | Native screen / external browser for external URL | Clear no resources/events state | External-link failure notice | `dashboard_screen.dart`, `external_link.dart` | `external_link_test.dart` |
-| Campus | Profile/settings | Profile and language cards | Profile/settings actions open native workflow screens; language is segmented. | No hidden icons or invisible text. | Native screen | Profile checkpoint empty guidance | Backend/account error card | `dashboard_screen.dart` | `widget_test.dart`: settings/profile |
-| Company | Header | Notification icon + one account/menu icon | Header has company context, notifications, and one account menu; no row of white icon spots. | Simplified company header. | Native dashboard header + popup menu | N/A | Menu actions route to native screens | `company_dashboard_screen.dart` | `widget_test.dart`: company header menu |
-| Company | Home | Summary/stats/jobs/applicants/cards | Dashboard home uses shared cards and bottom nav. | Clean light cream company cards. | Native tab | Company empty dashboard snapshot | Load notice card | `company_dashboard_screen.dart` | `widget_test.dart`: company dashboard |
-| Company | Jobs | Jobs card/create/edit/detail | Opens `_CompanyJobScreen`, `_CompanyJobFormScreen`, `_CompanyBulkJobsScreen`. | Every major job function opens a normal screen. | Native screen | Clear no jobs message | Action notice card | `company_dashboard_screen.dart` | `widget_test.dart`: company job screens |
-| Company | Applicants | Applicant card/detail | Opens `_CompanyApplicationScreen`. | Native applicant detail with status, CV, interview, messages. | Native screen | Clear no applicants message | Action notice card | `company_dashboard_screen.dart` | `widget_test.dart`: applicant/interview flows |
-| Company | Interviews | Schedule/update/cancel cards | Interview controls live inside applicant native screen. | No full-page bottom sheet. | Native screen + confirmation dialog | No interviews message | Action notice card | `company_dashboard_screen.dart` | `widget_test.dart`: interview flow |
-| Company | Files | Company files/upload/open | Opens `_CompanyFilesScreen`. | Native files screen. | Native screen + platform file picker/open | Clear no files message | Upload/open notice card | `company_dashboard_screen.dart` | `widget_test.dart`: company files |
-| Company | Profile/settings | Profile readiness/media/fields | Opens `_CompanyProfileSettingsScreen`; account owner opens `_CompanyAccountProfileScreen`. | Native settings/profile screens with visible language controls. | Native screen | Missing items guidance | Save/upload notice card | `company_dashboard_screen.dart` | `widget_test.dart`: profile/settings |
-| Company | Team | Invite/update/remove member | Opens `_CompanyTeamScreen`. | Native team management screen. | Native screen + confirmation dialog | Clear no team data message | Action notice card | `company_dashboard_screen.dart` | `widget_test.dart`: team permissions |
-| Company | TES questions | Create/update/disable questions | Opens `_CompanyQuestionsScreen`. | Native TES Talent Evaluation screen. | Native screen | Clear no questions message | Action notice card | `company_dashboard_screen.dart` | `widget_test.dart`: TES questions |
-| Company | Templates | Message template cards/actions | Opens `_CompanyTemplatesScreen`. | Native templates screen. | Native screen | Clear no templates message | Action notice card | `company_dashboard_screen.dart` | `widget_test.dart`: templates |
-| Company | Talent/search/help | Search, smart match, help request | Opens `_CompanyTalentSearchScreen` and `_CompanyTalentHelpScreen`. | Native talent screens. | Native screen | Clear no talent/tester data message | Action notice card | `company_dashboard_screen.dart` | `widget_test.dart`: talent screens |
-| Company | AI hiring | Job draft/message/shortlist | Opens `_CompanyAiToolsScreen`. | Native AI screen with provider fallback. | Native screen | AI provider unavailable notice | AI result/error card | `company_dashboard_screen.dart` | `widget_test.dart`: company AI |
-| Company | Billing/support/audit/campus recruiting | Module cards/actions | Opens `_CompanySubscriptionBillingScreen`, `_CompanySupportScreen`, `_CompanyAuditLogsScreen`, `_CompanyCampusRecruitingScreen`. | Native module screens. | Native screen | Clear backend/test data empty state | Action notice card | `company_dashboard_screen.dart` | `widget_test.dart`: module flows |
-| University | Dashboard | Metrics/students/partners/opportunities/outcomes | Native university dashboard with header actions. | Same card system and clear role mode. | Native dashboard | Section empty cards | Load notice card | `university_dashboard_screen.dart` | `university_dashboard_screen_test.dart` |
-| University | Account/details | Account details/switch/sign out | Opens `_UniversityAccountDetailsScreen` and `_UniversityAccountSwitcherScreen`. | Native account screens. | Native screen | Linked account explanation | Save/upload notice card | `university_dashboard_screen.dart` | `university_dashboard_screen_test.dart` |
-| University | Verification | Approve/reject/request info | Actions available from dashboard queue/student detail. | Clear admin flow. | Native screen + short dialog for reason | No pending verification message | Action error/notice | `university_dashboard_screen.dart` | `university_dashboard_screen_test.dart` |
-| University | Student passport | Student passport card | Opens `_StudentPassportScreen`. | Native student passport detail. | Native screen | Missing passport sections | Load notice | `university_dashboard_screen.dart` | `university_dashboard_screen_test.dart` |
-| University | Partners/opportunities/outcomes | Details/export/request forms | Opens `_PartnerDetailsScreen`, `_OpportunityDetailsScreen`, `_OutcomesDetailsScreen`, `_OpportunityRequestScreen`. | Native admin detail/report screens. | Native screen | Clear no data message | Save/export notice | `university_dashboard_screen.dart` | `university_dashboard_screen_test.dart` |
+- `.github/workflows/flutter-mobile-ci.yml` now pins Flutter `3.44.4`.
+- The workflow artifact names distinguish fresh APK and metadata artifacts.
+- `mobile/scripts/export-latest-apk-zip.ps1` warns that it packages an existing APK and validates APK metadata against `mobile/pubspec.yaml`.
+- `mobile/scripts/prepare-mobile-tester-drop.ps1` requires a rebuild before packaging unless `-PackageExistingApkOnly` is explicitly passed.
+- Settings/diagnostics can show build label, build mode, base URL, campus auth mode, and commit when supplied through dart defines.
 
-## Bottom Sheet Conversion Proof
+Acceptance checks:
 
-Converted/renamed native workflow children:
+```powershell
+rg -n "flutter-version: 3\.35\.3" .github mobile/scripts
+```
 
-- Seeker/campus: notifications, settings, AI translation review, Career Passport edit, CV/application/profile editors, job rating/review/report, campus profile editor.
-- Company: account switcher, notifications, job detail, job form, bulk jobs, applicant detail, records, talent, support, team, TES questions, templates, AI tools, profile settings, account profile, files, billing, campus recruiting, audit logs, translation review.
-- University: account switcher and account details.
+Result: no matches.
 
-Static checks:
+```powershell
+rg -n "flutter-version: 3\.44\.4" .github/workflows/flutter-mobile-ci.yml
+```
+
+Result:
+
+```text
+66:          flutter-version: 3.44.4
+117:          flutter-version: 3.44.4
+```
+
+Fresh APK metadata:
+
+| Field | Value |
+|---|---|
+| Branch | `flutter-seeker-campus` |
+| Commit | `acc1236ddd6e13ea8a6e5a9183a5ca8f7d3a873b` |
+| Version name | `1.0.2` |
+| Version code | `18` |
+| Base URL | `https://jobzain.com` |
+| Campus auth mode | `local-device` |
+| Signing mode | `debug-local` |
+| APK SHA-256 | `a322c205148b239e339fdb9f111ed0161521b9de6662f851001d2791f5babeda` |
+
+### Gate 2: Visual System Source Lock
+
+- `mobile/lib/src/theme/app_theme.dart` uses the launch palette: lighter cream background, navy text, orange accents.
+- `HalaNativeHeader` uses a light cream/surface header with navy title text and a bottom border.
+- `HalaHeaderIconButton` uses surface background, border, navy icon, and orange notification dot.
+- Company header source keeps company context, notifications, and one account/menu button rather than a row of icon spots.
+
+Acceptance checks:
+
+```powershell
+rg -n "0xFFF3E6D3|0xFFE5D0B1" mobile/lib/src mobile/scripts
+```
+
+Result: no matches.
+
+```powershell
+rg -n "halaCream = Color\(0xFFF8F0E2\)|halaCreamDeep = Color\(0xFFEBDAC2\)" mobile/lib/src/theme/app_theme.dart mobile/scripts/assert-mobile-screen-inventory.ps1
+```
+
+Result:
+
+```text
+mobile/lib/src/theme/app_theme.dart:3:const halaCream = Color(0xFFF8F0E2);
+mobile/lib/src/theme/app_theme.dart:5:const halaCreamDeep = Color(0xFFEBDAC2);
+mobile/scripts/assert-mobile-screen-inventory.ps1:343:    'const halaCream = Color(0xFFF8F0E2);',
+mobile/scripts/assert-mobile-screen-inventory.ps1:344:    'const halaCreamDeep = Color(0xFFEBDAC2);',
+```
+
+### Gate 3: Navigation Source Lock
+
+Required rule: internal HalaJob actions use native Flutter screens with back navigation; external websites/documents open outside the app.
+
+Acceptance checks:
 
 ```powershell
 rg -n "showModalBottomSheet|showBottomSheet|LaunchMode\.inAppBrowserView|inAppBrowserView|WebView" mobile/lib mobile/test mobile/scripts
 ```
 
-Expected result: no matches except spreadsheet MIME types when searching lowercase `sheet`.
+Result: matches only the guard list inside `mobile/scripts/assert-mobile-screen-inventory.ps1`.
 
-## APK Release Gate
+```powershell
+rg -n "class _.*Sheet" mobile/lib/src
+```
 
-Before sending an APK:
+Result: no matches.
 
-1. Increase `mobile/pubspec.yaml` build number. This pass uses `1.0.2+18`.
-2. Run:
-   - `powershell -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1`
-   - `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat analyze`
-   - `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat test --reporter compact`
-3. Commit and push the exact source used for the APK.
-4. Build the APK from that pushed commit.
-5. Export the APK ZIP and record version, branch, commit, and SHA-256.
+```powershell
+rg -n "Navigator\.push|MaterialPageRoute" mobile/lib/src/features/company mobile/lib/src/features/dashboard mobile/lib/src/features/university
+```
+
+Result: major seeker, campus, company, and university workflows show native `MaterialPageRoute` navigation.
+
+### Gate 5: Empty And Error State Source Lock
+
+The exact broad plan command is intentionally noisy because it matches Dart identifiers such as `isEmpty` and approved class names such as `HalaEmptyStateCard`.
+
+```powershell
+rg -n "No resources|No records|Something went wrong|Empty" mobile/lib/src
+```
+
+Justification for matches:
+
+- `isEmpty`, `isNotEmpty`, `supportedBaseUrlOrEmpty`, and similar matches are code identifiers/control flow, not visible UI copy.
+- `HalaEmptyStateCard` is the approved empty-state component.
+- Exact visible banned copy checks found no matches for `No resources`, `No records`, `Something went wrong`, or quoted `Empty`.
+
+Exact visible-copy check:
+
+```powershell
+Get-ChildItem -Recurse .\mobile\lib\src -Filter *.dart |
+  Select-String -SimpleMatch 'No resources','No records','Something went wrong','"Empty"',"'Empty'"
+```
+
+Result: no matches.
+
+## Page And Action Checklist
+
+| Role | Page | Card / action | Required visual style | Required tap behaviour | Empty state | Error state | Screenshot proof |
+|---|---|---|---|---|---|---|---|
+| Auth | Sign-in role selection | Hala logo, language switch, job seeker, campus, company cards | Light cream cards, navy text, orange selected accents, readable English/Arabic | Expands inline on the native auth screen | N/A | Clean status/error notice | Pending Gate 6 |
+| Auth | Job seeker sign in | Email/phone, password, save password, forgot password, create account | Cream form fields with visible dark text | Native auth/passcode flow | N/A | Validation/status notice | Pending Gate 6 |
+| Auth | Campus sign in | Campus login and local-device tester mode | Cream card; QA mode visible in local-campus APK | Native campus auth flow; local-device mode can enter without university email | N/A | Validation/status notice | Pending Gate 6 |
+| Auth | Register | Name, email, date of birth, password | Short launch form, no heavy profile fields | Native registration/passcode flow | N/A | Field validation/status notice | Pending Gate 6 |
+| Seeker | Home | Welcome/profile score, search, quick actions, recommendations | Shared cream card system | Native tabs or `MaterialPageRoute` screens | Approved empty cards/notices where data missing | `HalaStateNotice` style load errors | Pending Gate 6 |
+| Seeker | Jobs | Search bar, filters, job cards, chips | Cream cards, navy labels, orange active states | Filters/detail/apply use native screens; external apply URL opens outside app | Clear no-jobs/no-results wording | Clear load/action notice | Pending Gate 6 |
+| Seeker | Job detail/apply | Detail, CV selection, cover letter/AI helper, application status | Native detail page with card sections | Internal actions stay native; external company URL outside app | Guidance card when CV/data missing | Failed apply/save/report notice | Pending Gate 6 |
+| Seeker | Companies | Search, company cards, details, openings, trust markers | Reference organized cream-card style | Company directory/detail native screens | Directory empty/loading notice | Directory error notice | Pending Gate 6 |
+| Seeker | Applications | Application list, status chips, detail, messages, interviews | Cream cards and readable status chips | Application detail native screen | "No applications yet" style guidance | Failed action/load notice | Pending Gate 6 |
+| Seeker | Career Passport | Score, completeness, missing skills, share/edit | Cream cards and orange highlights | Passport and editors are native screens | Missing-section cards | AI/backend fallback notice | Pending Gate 6 |
+| Seeker | AI tools | CV rewrite, interview, match, cover letter | Native card sections | AI tools open native screens | Provider unavailable fallback card | AI result/error notice | Pending Gate 6 |
+| Campus | Entry/home | Local campus QA access, home, readiness cards | Same cream dashboard system | Campus home uses native dashboard/screen routes | Campus tester/demo data guidance | Remote sync/load notice | Pending Gate 6 |
+| Campus | Opportunities/events/resources | Opportunity cards, event detail, resource detail | Cream cards with clear metadata chips | Internal details native; external URLs outside app | No campus content/resources guidance | Backend route/load notice | Pending Gate 6 |
+| Campus | Verification/profile | Verification, Student Passport, profile checkpoints | Cream cards, readable status | Native screens/editors | Missing profile/verification guidance | Clear save/verification errors | Pending Gate 6 |
+| Company | Dashboard header | Company name/logo/status, notification, one account menu | Light header, no white icon spots, no dark chip row | Menu opens account/profile/settings/refresh/sign out actions | N/A | Menu actions route to native screens | Pending Gate 6 |
+| Company | Dashboard cards | Summary, stats, jobs, applicants, modules | Shared cream cards and consistent spacing | Bottom nav/native module routes | Company snapshot empty guidance | Load notice | Pending Gate 6 |
+| Company | Jobs | Jobs list, create/edit job, bulk jobs | Cream cards/forms | Native `_CompanyJobScreen` and `_CompanyJobFormScreen` routes | No jobs guidance | Action notice | Pending Gate 6 |
+| Company | Applicants/interviews | Applicant detail, status, CV, messages, interview actions | Native cards and readable chips | Native applicant screen plus allowed confirmations | No applicants/interviews guidance | Action notice | Pending Gate 6 |
+| Company | Files/team/templates/questions | Files, team, message templates, TES questions | Native cream module screens | Native screens; file picker/platform open where needed | Clear no-data guidance per module | Upload/save/action notice | Pending Gate 6 |
+| Company | AI/talent/support/billing/settings | AI hiring, talent search, support, billing, profile settings | Cream cards, orange CTA accents | Native module screens | Backend/provider/tester-data fallback | Action/error notice | Pending Gate 6 |
+| University | Dashboard | Metrics, verification, students, partners, opportunities | Cream admin dashboard cards | Native university dashboard/routes | Section empty cards | Load/action notice | Pending Gate 6 |
+| University | Verification/student passport | Approve/reject/request info, student detail | Native cards and readable statuses | Native screens; short dialogs only for reason/confirmation | No pending requests guidance | Action error/notice | Pending Gate 6 |
+| University | Reports/settings | Analytics, outcomes, account settings | Cream report cards | Native routes | No report data guidance | Save/export/load notice | Pending Gate 6 |
+| Shared | Settings/profile/notifications | Account switcher, language, notifications, security/sign-out | Light cards, readable bilingual controls | Native screens; sign-out confirmation allowed | Clear no notifications/data guidance | Clear action notice | Pending Gate 6 |
+
+## Gate 6 Screenshot Proof Checklist
+
+Required proof from the same fresh APK is still pending for:
+
+1. Sign-in screen.
+2. Language switch in English.
+3. Language switch in Arabic.
+4. Job seeker home.
+5. Job list.
+6. Job detail.
+7. Apply flow.
+8. Companies view.
+9. Company detail.
+10. Applications.
+11. Career Passport / AI tools.
+12. Campus entry.
+13. Campus home.
+14. Campus resource detail.
+15. Company dashboard.
+16. Company jobs.
+17. Create/edit job.
+18. Applicants.
+19. Application detail.
+20. Company settings/header/menu.
+21. University/admin dashboard if available.
+
+Emulator attempt on 2026-06-27:
+
+- `emulator` package installed into the repo-local Android SDK.
+- `adb devices` showed no attached Android device.
+- `sdkmanager` system image installs for Android 36 and Android 35 both stalled at the `.installer` stage and did not produce a valid AVD system image.
+- Partial system image folders were removed after verifying their paths were inside `mobile\.android-sdk`.
+- Result: Gate 6 remains pending until a usable emulator is available or the owner provides real-device screenshots/screen recording from the handed-off APK.
+
+## Tests And Guards
+
+Current source checks run against commit `acc1236ddd6e13ea8a6e5a9183a5ca8f7d3a873b`:
+
+- `powershell -ExecutionPolicy Bypass -File .\mobile\scripts\assert-mobile-screen-inventory.ps1`
+- `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat analyze`
+- `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat test --reporter compact`
+
+Last recorded result before this audit update:
+
+- Mobile screen inventory assertion passed.
+- Flutter analyze: no issues found.
+- Flutter tests: 412 tests passed.
+
+## Remaining UI Lock Blocker
+
+Gate 6 is not complete until visual proof is captured from the fresh APK or the owner confirms the same APK on a real Android phone. The project must not be described as launch-ready from source checks alone.
