@@ -63,6 +63,9 @@ assert.deepEqual(
 );
 
 assert.equal(analyticsGroupForEvent("job_reported"), "jobs");
+assert.equal(analyticsGroupForEvent("job_trust_marked_safe"), "jobs");
+assert.equal(analyticsGroupForEvent("job_trust_suspended"), "jobs");
+assert.equal(analyticsGroupForEvent("job_trust_documents_requested"), "jobs");
 assert.equal(analyticsGroupForEvent("notification_opened"), "activation");
 assert.equal(analyticsGroupForEvent("career_passport_updated"), "activation");
 assert.equal(analyticsGroupForEvent("career_passport_share_enabled"), "activation");

@@ -10,6 +10,7 @@ const readSource = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.u
 const appSource = readSource("app.js");
 const trustSource = readSource("routesTrust/index.js");
 const trustAdminSource = readSource("routesTrust/admin.js");
+const trustAdminControllerSource = readSource("controllers/trust/TrustAdminController.js");
 const dashSource = readSource("routes/index.js");
 
 const requiredEndpoints = [
@@ -88,6 +89,20 @@ assert.deepEqual(
   requiredDashRoutes.filter((snippet) => !dashSource.includes(snippet)),
   [],
   "routes/index.js is missing dashboard trust aliases"
+);
+
+const requiredAdminAnalytics = [
+  "recordAnalyticsEvent",
+  'event: "job_trust_marked_safe"',
+  'event: "job_trust_suspended"',
+  'event: "job_trust_documents_requested"',
+  'source: "trust_admin_review"',
+];
+
+assert.deepEqual(
+  requiredAdminAnalytics.filter((snippet) => !trustAdminControllerSource.includes(snippet)),
+  [],
+  "TrustAdminController.js is missing admin trust analytics hooks"
 );
 
 console.log(`Trust route mounts verified (${requiredEndpoints.length} method/path checks).`);

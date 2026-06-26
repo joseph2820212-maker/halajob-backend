@@ -173,6 +173,16 @@ const requiredHooks = [
       "generated_by_ai",
     ],
   },
+  {
+    file: "controllers/trust/TrustAdminController.js",
+    snippets: [
+      "recordTrustAdminAnalytics",
+      'event: "job_trust_marked_safe"',
+      'event: "job_trust_suspended"',
+      'event: "job_trust_documents_requested"',
+      'source: "trust_admin_review"',
+    ],
+  },
 ];
 
 const failures = [];

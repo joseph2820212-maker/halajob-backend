@@ -7,6 +7,7 @@ import {
 import { rebuildJobIntegration } from "../../services/search/rebuildSearchData.js";
 import { recomputeAndSaveJobTrust } from "../../services/trust/jobTrust.service.js";
 import { writeAuditLog } from "../../services/auditLog.service.js";
+import { recordAnalyticsEvent } from "../../services/analytics/analyticsEvent.service.js";
 
 const toObjectId = (value) => {
   const id = String(value || "").trim();
@@ -15,6 +16,24 @@ const toObjectId = (value) => {
 
 const clean = (value = "") => String(value || "").trim();
 const adminId = (req) => req.admin?._id || req.user?._id || null;
+const recordTrustAdminAnalytics = ({ req, event, job, jobId, note = "", metadata = {} }) =>
+  recordAnalyticsEvent({
+    req,
+    event,
+    userId: adminId(req),
+    companyId: job?.company_id,
+    activeContext: req.activeContext,
+    entityType: "job",
+    entityId: jobId || job?._id,
+    jobId: jobId || job?._id,
+    metadata: {
+      source: "trust_admin_review",
+      note: clean(note),
+      review_status: clean(job?.trust?.review_status),
+      risk_level: clean(job?.trust?.risk_level),
+      ...metadata,
+    },
+  }).catch(() => null);
 const toInt = (value, fallback = 1, min = 1, max = 200) => {
   const n = Number.parseInt(value, 10);
   if (!Number.isFinite(n)) return fallback;
@@ -149,6 +168,14 @@ export const markJobSafe = async (req, res) => {
     if (!job) return ReturnDashData.updateError({ res, status: 404, message: "job_not_found" });
     await rebuildJobIntegration(jobId, { rebuildMatches: true });
     await writeAuditLog({ req, companyId: job.company_id, actorUserId: adminId(req), actorType: "admin", action: "trust_job_marked_safe", entityType: "job", entityId: jobId, jobId, note });
+    await recordTrustAdminAnalytics({
+      req,
+      event: "job_trust_marked_safe",
+      job,
+      jobId,
+      note,
+      metadata: { action: "mark_safe", score: job.trust?.score || Math.max(score?.score || 0, 85) },
+    });
     return ReturnDashData.updateData({ res, data: job, message: "job_marked_safe" });
   } catch (error) {
     return ReturnDashData.updateError({ res, status: 500, message: error.message || "trust_mark_safe_failed" });
@@ -190,6 +217,14 @@ export const suspendJob = async (req, res) => {
     if (!job) return ReturnDashData.updateError({ res, status: 404, message: "job_not_found" });
     await rebuildJobIntegration(jobId, { rebuildMatches: false });
     await writeAuditLog({ req, companyId: job.company_id, actorUserId: adminId(req), actorType: "admin", action: "trust_job_suspended", entityType: "job", entityId: jobId, jobId, note: reason });
+    await recordTrustAdminAnalytics({
+      req,
+      event: "job_trust_suspended",
+      job,
+      jobId,
+      note: reason,
+      metadata: { action: "suspend", score: job.trust?.score || 0 },
+    });
     return ReturnDashData.updateData({ res, data: job, message: "job_suspended" });
   } catch (error) {
     return ReturnDashData.updateError({ res, status: 500, message: error.message || "trust_suspend_failed" });
@@ -226,6 +261,14 @@ export const requestDocuments = async (req, res) => {
 
     if (!job) return ReturnDashData.updateError({ res, status: 404, message: "job_not_found" });
     await writeAuditLog({ req, companyId: job.company_id, actorUserId: adminId(req), actorType: "admin", action: "trust_job_documents_requested", entityType: "job", entityId: jobId, jobId, note });
+    await recordTrustAdminAnalytics({
+      req,
+      event: "job_trust_documents_requested",
+      job,
+      jobId,
+      note,
+      metadata: { action: "request_documents", score: job.trust?.score || score?.score || 50 },
+    });
     return ReturnDashData.updateData({ res, data: job, message: "job_documents_requested" });
   } catch (error) {
     return ReturnDashData.updateError({ res, status: 500, message: error.message || "trust_request_documents_failed" });
