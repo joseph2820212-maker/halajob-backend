@@ -37,7 +37,7 @@ screens from it, and do not let it change the current release behavior.
 | Area | Current status | Required next move |
 | --- | --- | --- |
 | Account switcher | Backend account-context model/API and mobile switcher are now implemented. | Finish production data QA, ensure every protected backend surface respects active context, and add database migration/seed notes before launch. |
-| AI career copilot / scoring | Backend-only `/ai/v1` safety foundation is now mounted for the approved endpoint contract. Requests are authenticated, account-guarded, hashed, logged to `ai_requests`, checked against `ai_usage_limits`, and blocked with clear fallback responses until provider AI is explicitly enabled and implemented. Flutter now exposes backend-only AI career tools for Career Copilot, Profile Score, CV Rewrite, and Interview Practice from the seeker/campus More tab with visible AI-suggestion safety labels and safe provider-disabled states. | Add real provider adapter, prompt/output schemas, admin enable controls, production prompt/output QA, and job-specific Flutter AI flows for match explanation and cover letters. |
+| AI career copilot / scoring | Backend-only `/ai/v1` safety foundation is now mounted for the approved endpoint contract. Requests are authenticated, account-guarded, hashed, logged to `ai_requests`, checked against `ai_usage_limits`, and blocked with clear fallback responses until provider AI is explicitly enabled and implemented. Flutter now exposes backend-only AI career tools for Career Copilot, Profile Score, CV Rewrite, and Interview Practice from the seeker/campus More tab, plus job match explanation and cover-letter suggestions from job detail, with visible AI-suggestion safety labels and safe provider-disabled states. | Add real provider adapter, prompt/output schemas, admin enable controls, production prompt/output QA, and company-side Flutter AI tools for job drafts, shortlist explanation, and hiring messages. |
 | Career Passport | Backend passport API, rule-based score snapshot foundation, and mobile seeker/campus Passport sheet are now implemented. | Add edit flows, employer/university views, AI-backed scoring, and share-link QA. |
 | Campus verification | Backend model/API foundation and Flutter campus verification sheet now support university list, status, email code verification, document upload, resubmit, and university admin approve/reject/request-info. | Complete live email/device QA against production credentials and approve/reject flows. |
 | University dashboard | University admin backend routes now honor active context for overview, students, verification queue/actions, partners, opportunity requests, employability analytics, and outcomes reports under `/university/v1`; Flutter now opens a university admin dashboard from the active `university_admin` context with metrics, verification actions, readiness, students, partners, and account switching. | Add deeper sub-screens, richer report exports, live university admin device QA, and release analytics. |
@@ -157,9 +157,11 @@ Current implementation note:
 - Provider generation remains intentionally disabled/not implemented; endpoints
   return a clear blocked fallback instead of fake AI output.
 - Flutter seeker/campus More now includes an AI career tools sheet for
-  `career_copilot`, `profile_score`, `cv_rewrite`, and `interview_practice`.
-  It calls only the backend AI routes, visibly labels results as AI suggestions,
-  and surfaces blocked/provider-disabled responses as safe product states.
+  `career_copilot`, `profile_score`, `cv_rewrite`, and `interview_practice`;
+  job detail also exposes `job_match_explanation` and `job_cover_letter`.
+  Both surfaces call only the backend AI routes, visibly label results as AI
+  suggestions, and surface blocked/provider-disabled responses as safe product
+  states.
 
 ## Career Passport And Employability Score
 
