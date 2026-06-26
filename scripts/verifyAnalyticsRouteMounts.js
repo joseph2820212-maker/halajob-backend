@@ -15,6 +15,8 @@ const readSource = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.u
 const appSource = readSource("app.js");
 const routeSource = readSource("routesAnalytics/index.js");
 const trustSource = readSource("controllers/trust/TrustController.js");
+const webAdminSource = readSource("web/src/admin/screens.tsx");
+const webApiSource = readSource("web/src/shared/api.ts");
 
 const requiredEndpoints = [
   ["POST", "/analytics/v1/events"],
@@ -115,6 +117,32 @@ assert.throws(
 assert.ok(
   trustSource.includes('event: "job_reported"') && trustSource.includes("recordAnalyticsEvent"),
   "trust report controller must record job_reported analytics"
+);
+
+assert.deepEqual(
+  [
+    "analyticsSummary",
+    "analyticsCohorts",
+    '"/analytics/v1/admin/summary"',
+    '"/analytics/v1/admin/cohorts"',
+  ].filter((snippet) => !webApiSource.includes(snippet)),
+  [],
+  "web/src/shared/api.ts is missing admin analytics report calls"
+);
+
+assert.deepEqual(
+  [
+    "AdminAnalyticsPanel",
+    '"analytics"',
+    '"Analytics reports"',
+    "adminService.analyticsSummary",
+    "adminService.analyticsCohorts",
+    '"Events by group"',
+    '"Top events"',
+    '"Context events"',
+  ].filter((snippet) => !webAdminSource.includes(snippet)),
+  [],
+  "web/src/admin/screens.tsx is missing admin analytics report UI"
 );
 
 console.log(`Analytics route mounts verified (${requiredEndpoints.length} method/path checks).`);
