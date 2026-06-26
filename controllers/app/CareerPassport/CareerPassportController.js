@@ -89,6 +89,18 @@ const update = async (req, res, next) => {
 const refreshScore = async (req, res, next) => {
   try {
     const result = await refreshCareerPassportScore({ user: req.user, req });
+    const generatedByAi = result.passport?.score?.generated_by_ai === true;
+    const aiStatus = result.aiStatus || {
+      generated_by_ai: generatedByAi,
+      source: result.passport?.score?.source || "rule_based_v1",
+      status: generatedByAi ? "completed" : "fallback",
+      reason: generatedByAi ? "provider_result" : "rule_based_fallback",
+      request_id: null,
+      cached: false,
+      message: generatedByAi
+        ? "AI-assisted score explanation applied. Review suggestions before acting."
+        : "Rule-based score returned because AI explanation is unavailable or disabled.",
+    };
     recordAnalyticsEvent({
       req,
       event: "ai_score_generated",
@@ -99,7 +111,9 @@ const refreshScore = async (req, res, next) => {
       metadata: {
         source: "career_passport_score",
         score_source: result.passport?.score?.source || "rule_based_v1",
-        generated_by_ai: result.passport?.score?.generated_by_ai === true,
+        generated_by_ai: generatedByAi,
+        ai_status: aiStatus.status,
+        ai_reason: aiStatus.reason,
         score: result.passport?.score?.total ?? null,
       },
     }).catch(() => null);
@@ -109,11 +123,7 @@ const refreshScore = async (req, res, next) => {
         passport_id: result.passport._id,
         passport: result.snapshot,
         score: result.passport.score,
-        ai_status: {
-          generated_by_ai: false,
-          source: "rule_based_v1",
-          message: "Backend rule-based score refreshed. Provider AI is not enabled for this module yet.",
-        },
+        ai_status: aiStatus,
       },
       message: "career_passport_score_refreshed",
     });

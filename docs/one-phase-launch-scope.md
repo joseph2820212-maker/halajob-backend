@@ -38,7 +38,7 @@ screens from it, and do not let it change the current release behavior.
 | --- | --- | --- |
 | Account switcher | Backend account-context model/API and mobile switcher are now implemented. | Finish production data QA, ensure every protected backend surface respects active context, and add database migration/seed notes before launch. |
 | AI career copilot / scoring | Backend-only `/ai/v1` safety foundation is now mounted for the approved endpoint contract. Requests are authenticated, account-guarded, hashed, logged to `ai_requests`, checked against `ai_usage_limits`, and blocked with clear fallback responses until provider AI is explicitly enabled. The backend now has a provider adapter path for local mock verification and OpenAI-compatible chat-completions providers, with JSON output normalization, completed/failed request records, token/cost estimates from configured pricing, safety payloads, and dashboard admin APIs to inspect requests and manage feature limits. Flutter now exposes backend-only AI career tools for Career Copilot, Profile Score, CV Rewrite, and Interview Practice from the seeker/campus More tab, job match explanation and cover-letter suggestions from seeker/campus job detail, and company job draft, shortlist explanation, and hiring-message suggestions from company More/job detail, all with visible AI-suggestion safety labels and safe provider-disabled states. | Add admin UI screens, production provider credentials/pricing, production prompt/output QA, usage-limit signoff, and live account/device AI acceptance. |
-| Career Passport | Backend passport API, rule-based score snapshot foundation, and mobile seeker/campus Passport sheet are now implemented. | Add edit flows, employer/university views, AI-backed scoring, and share-link QA. |
+| Career Passport | Backend passport API, rule-based score snapshot foundation, optional backend AI-assisted score explanation, mobile seeker/campus Passport sheet, public share viewer, QR share, university-safe view, and backend-supported mobile edit flow are now implemented. | Add fuller section-by-section edit flows and live share-link/device QR QA. |
 | Campus verification | Backend model/API foundation and Flutter campus verification sheet now support university list, status, email code verification, document upload, resubmit, and university admin approve/reject/request-info. | Complete live email/device QA against production credentials and approve/reject flows. |
 | University dashboard | University admin backend routes now honor active context for overview, students, verification queue/actions, partners, opportunity requests, employability analytics, and outcomes reports under `/university/v1`; Flutter now opens a university admin dashboard from the active `university_admin` context with metrics, verification actions, readiness, students, partners, and account switching. | Add deeper sub-screens, richer report exports, live university admin device QA, and release analytics. |
 | Global country/currency | Country/city helpers plus `/user/v1/global/*` mobile routes are now mounted. Launch salary currencies are constrained to USD/EUR/GBP in company jobs, seeker profile salary, job search filters, mobile job posting, and the backend launch-contract verifier. Work modes are constrained to onsite/remote/hybrid with city required for onsite/hybrid job posts. | Finish production data migration/QA, confirm all old records map to the launch contract, and add richer global admin controls. |
@@ -219,16 +219,18 @@ Current implementation note:
 - `GET /user/v1/career-passport`, `PUT /user/v1/career-passport`,
   `POST /user/v1/career-passport/share`, and
   `POST /ai/v1/career-passport/score` are mounted.
-- Score refresh is backend-owned but currently `rule_based_v1`, not provider AI.
-  This avoids fake AI while preserving the endpoint contract for a later
-  dedicated provider-backed passport scoring model.
+- Score refresh is backend-owned. The total remains rule-based for safe,
+  deterministic testing, and the backend layers in an AI-assisted explanation
+  from the protected `profile_score` AI adapter when mock/real AI is enabled.
+  If AI is disabled or unavailable, the route returns the rule-based
+  explanation with a clear fallback status.
 - The passport is derived from real employee/user profile data and stores
   privacy/share/score snapshots in `career_passports`.
 - Mobile now exposes Career Passport from the seeker/campus dashboard More
   actions, loads the backend passport, refreshes the score through the backend
   AI route contract, and toggles share/revoke from the app.
-- Dedicated edit flows, employer-safe view, university-safe view, and
-  provider-backed passport scoring QA remain open work.
+- Fuller section-by-section edit flows and live share-link/device QR QA remain
+  open work.
 
 Acceptance checks:
 

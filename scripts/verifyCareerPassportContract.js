@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  mergeCareerPassportScoreWithAiOutput,
   sanitizeCareerPassportScore,
   sanitizeCareerPassportSnapshotForShare,
 } from "../services/careerPassport.service.js";
@@ -127,5 +128,40 @@ const score = sanitizeCareerPassportScore({
 assert.equal(score.total, 100);
 assert.equal(score.generated_by_ai, true);
 assert.deepEqual(score.next_actions, ["One", "Two"]);
+
+const aiMergedScore = mergeCareerPassportScoreWithAiOutput({
+  now: new Date("2026-06-26T00:00:00.000Z"),
+  score: {
+    total: 82,
+    source: "rule_based_v1",
+    generated_by_ai: false,
+    explanation: "Rule based.",
+    strengths: ["Profile is mostly complete."],
+    next_actions: ["Upload or generate an active CV."],
+  },
+  output: {
+    score: 79,
+    strengths: ["Clear target role"],
+    missing_fields: ["Add portfolio link"],
+    weak_sections: ["Interview readiness"],
+    recommended_edits: ["Add quantified project evidence"],
+  },
+});
+
+assert.equal(aiMergedScore.total, 82);
+assert.equal(aiMergedScore.source, "ai_assisted_v1");
+assert.equal(aiMergedScore.generated_by_ai, true);
+assert.ok(aiMergedScore.explanation.includes("AI-assisted explanation"));
+assert.ok(aiMergedScore.explanation.includes("79/100"));
+assert.deepEqual(aiMergedScore.strengths, [
+  "Profile is mostly complete.",
+  "Clear target role",
+]);
+assert.deepEqual(aiMergedScore.next_actions, [
+  "Upload or generate an active CV.",
+  "Add portfolio link",
+  "Interview readiness",
+  "Add quantified project evidence",
+]);
 
 console.log("Career Passport sharing contract verified.");

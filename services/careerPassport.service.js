@@ -8,6 +8,7 @@ import {
 } from "../models/index.js";
 import { resolveAppAccount } from "./appAccount.service.js";
 import { writeAuditLog } from "./auditLog.service.js";
+import { handleSafeAiRequest } from "./ai/aiSafety.service.js";
 
 const clampScore = (value) => Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
 const idString = (value) => (value?._id || value || "").toString();
@@ -179,6 +180,28 @@ const safeDate = (value) => dateValue(value);
 const safeText = (value, limit = 500) => text(value).slice(0, limit);
 
 const safeStrings = (items = [], limit = 20) => uniqueStrings(list(items)).slice(0, limit);
+
+const aiStringList = (value, limit = 8) => {
+  const items = Array.isArray(value) ? value : value ? [value] : [];
+  return uniqueStrings(
+    items.map((item) => {
+      if (typeof item === "string") return item;
+      if (!item || typeof item !== "object") return "";
+      return (
+        item.title ||
+        item.label ||
+        item.name ||
+        item.reason ||
+        item.explanation ||
+        item.text ||
+        ""
+      );
+    })
+  )
+    .map((item) => safeText(item, 220))
+    .filter(Boolean)
+    .slice(0, limit);
+};
 
 const nonNegativeInt = (value) => Math.max(0, Math.round(Number(value) || 0));
 
@@ -390,6 +413,189 @@ function calculateScore({ employee, snapshot, stats }) {
   };
 }
 
+export function mergeCareerPassportScoreWithAiOutput({
+  score = {},
+  output = {},
+  now = new Date(),
+} = {}) {
+  const sourceScore =
+    score && typeof score.toObject === "function" ? score.toObject() : score || {};
+  const aiStrengths = aiStringList(output.strengths, 6);
+  const weakSections = aiStringList(output.weak_sections, 6);
+  const missingFields = aiStringList(output.missing_fields, 6);
+  const recommendedEdits = aiStringList(output.recommended_edits, 8);
+  const providerScore = Number(output.score);
+  const providerSignal = Number.isFinite(providerScore)
+    ? `AI profile-score signal: ${clampScore(providerScore)}/100.`
+    : "";
+  const explanationParts = [
+    "AI-assisted explanation layered over the rule-based Career Passport score.",
+    providerSignal,
+    aiStrengths.length ? `Strengths: ${aiStrengths.join("; ")}.` : "",
+    weakSections.length ? `Weak sections: ${weakSections.join("; ")}.` : "",
+    recommendedEdits.length ? `Recommended edits: ${recommendedEdits.join("; ")}.` : "",
+  ].filter(Boolean);
+
+  return {
+    ...sourceScore,
+    total: clampScore(sourceScore.total ?? sourceScore.score),
+    source: "ai_assisted_v1",
+    generated_by_ai: true,
+    explanation: safeText(
+      explanationParts.join(" ") || sourceScore.explanation,
+      1200
+    ),
+    strengths: safeStrings([...(sourceScore.strengths || []), ...aiStrengths], 12),
+    next_actions: safeStrings(
+      [
+        ...(sourceScore.next_actions || sourceScore.nextActions || []),
+        ...missingFields,
+        ...weakSections,
+        ...recommendedEdits,
+      ],
+      12
+    ),
+    updated_at: now,
+  };
+}
+
+const buildCareerPassportAiRequest = ({ req, snapshot = {}, score = {} }) => ({
+  user: req?.user,
+  activeContext: req?.activeContext,
+  appAccount: req?.appAccount,
+  params: {
+    ...(req?.params || {}),
+    source: "career_passport_score",
+  },
+  query: req?.query || {},
+  body: {
+    source: "career_passport_score",
+    career_passport: {
+      identity: {
+        headline: safeText(snapshot.identity?.headline, 160),
+        current_job_title: safeText(snapshot.identity?.current_job_title, 160),
+        preferred_work_mode: safeText(snapshot.identity?.preferred_work_mode, 80),
+        candidate_stage: safeText(snapshot.identity?.candidate_stage, 80),
+        is_student: snapshot.identity?.is_student === true,
+        student_verified: snapshot.identity?.badges?.student_verified === true,
+      },
+      education: {
+        university: safeText(snapshot.education?.university, 160),
+        major: safeText(snapshot.education?.major, 160),
+        verification_status: safeText(snapshot.education?.verification_status, 80),
+        records_count: list(snapshot.education?.records).length,
+      },
+      skills: {
+        hard_skills: safeStrings(snapshot.skills?.hard_skills, 20),
+        soft_skills: safeStrings(snapshot.skills?.soft_skills, 20),
+        languages: safeStrings(snapshot.skills?.languages, 12),
+      },
+      cv_assets: {
+        uploaded_count: nonNegativeInt(snapshot.cv_assets?.uploaded_count),
+        generated_count: nonNegativeInt(snapshot.cv_assets?.generated_count),
+        has_active_cv: Boolean(snapshot.cv_assets?.active_cv),
+      },
+      readiness: {
+        profile_completion: clampScore(snapshot.readiness?.profile_completion),
+        interview_count: nonNegativeInt(snapshot.readiness?.interview_count),
+        application_count: nonNegativeInt(snapshot.readiness?.application_count),
+        saved_jobs_count: nonNegativeInt(snapshot.readiness?.saved_jobs_count),
+      },
+      score: {
+        total: clampScore(score.total ?? score.score),
+        source: safeText(score.source || "rule_based_v1", 80),
+        components: list(score.components).map((item) => ({
+          key: safeText(item.key, 80),
+          label: safeText(item.label, 120),
+          score: clampScore(item.score),
+          weight: Number(item.weight || 0),
+        })),
+        strengths: safeStrings(score.strengths, 12),
+        next_actions: safeStrings(score.next_actions || score.nextActions, 12),
+      },
+    },
+  },
+  headers: req?.headers || {},
+  ip: req?.ip || "",
+});
+
+const buildCareerPassportAiStatus = ({
+  score = {},
+  aiStatus = {},
+  message = "",
+} = {}) => ({
+  generated_by_ai: score.generated_by_ai === true,
+  source: score.source || "rule_based_v1",
+  request_id: aiStatus.request_id || null,
+  status: aiStatus.status || (score.generated_by_ai ? "completed" : "fallback"),
+  reason: aiStatus.reason || (score.generated_by_ai ? "provider_result" : "rule_based_fallback"),
+  cached: aiStatus.cached === true,
+  message:
+    message ||
+    (score.generated_by_ai
+      ? "AI-assisted score explanation applied. Review suggestions before acting."
+      : "Rule-based score returned because AI explanation is unavailable or disabled."),
+});
+
+async function applyAiScoreExplanation({ req, result }) {
+  const score = result.passport.score || {};
+
+  try {
+    const aiResult = await handleSafeAiRequest({
+      req: buildCareerPassportAiRequest({
+        req,
+        snapshot: result.snapshot,
+        score,
+      }),
+      feature: "profile_score",
+    });
+    const aiStatus = aiResult?.payload?.ai_status || {};
+    const output = aiResult?.payload?.output || {};
+    const canUseAiOutput =
+      aiResult?.success === true &&
+      ["completed", "cached"].includes(aiStatus.status) &&
+      output &&
+      typeof output === "object" &&
+      !Array.isArray(output);
+
+    if (!canUseAiOutput) {
+      result.aiStatus = buildCareerPassportAiStatus({
+        score,
+        aiStatus,
+      });
+      return result;
+    }
+
+    const aiScore = mergeCareerPassportScoreWithAiOutput({
+      score,
+      output,
+    });
+    result.passport.score = aiScore;
+    result.snapshot = {
+      ...result.snapshot,
+      readiness: {
+        ...(result.snapshot?.readiness || {}),
+        employability_score: aiScore,
+      },
+    };
+    result.passport.snapshot = result.snapshot;
+    result.passport.markModified("score");
+    result.passport.markModified("snapshot");
+    await result.passport.save();
+    result.aiStatus = buildCareerPassportAiStatus({
+      score: aiScore,
+      aiStatus,
+    });
+    return result;
+  } catch (error) {
+    result.aiStatus = buildCareerPassportAiStatus({
+      score,
+      message: "Rule-based score returned because the AI explanation check failed safely.",
+    });
+    return result;
+  }
+}
+
 async function upsertPassport({ user, employee, activeContextId = null, refreshScore = false }) {
   let passport = await CareerPassportModel.findOne({ user_id: user._id });
   if (!passport) {
@@ -552,12 +758,17 @@ export async function getCareerPassportSafeViewForEmployee({
 
 export async function refreshCareerPassportScore({ user, req }) {
   const employee = await resolveEmployee(user);
-  const result = await upsertPassport({
-    user,
-    employee,
-    activeContextId: req?.activeContext?.id || null,
-    refreshScore: true,
+  const result = await applyAiScoreExplanation({
+    req,
+    result: await upsertPassport({
+      user,
+      employee,
+      activeContextId: req?.activeContext?.id || null,
+      refreshScore: true,
+    }),
   });
+
+  const generatedByAi = result.passport.score?.generated_by_ai === true;
 
   await writeAuditLog({
     req,
@@ -569,7 +780,9 @@ export async function refreshCareerPassportScore({ user, req }) {
     metadata: {
       score: result.passport.score?.total,
       score_source: result.passport.score?.source,
-      generated_by_ai: false,
+      generated_by_ai: generatedByAi,
+      ai_status: result.aiStatus?.status || "",
+      ai_reason: result.aiStatus?.reason || "",
     },
   });
 
