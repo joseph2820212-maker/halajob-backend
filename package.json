@@ -20,6 +20,7 @@
     "smoke:cors": "node scripts/smokeCors.js",
     "check:secrets": "node scripts/verifyNoSecrets.js",
     "test:security-http": "node scripts/verifySecurityHttpContracts.js",
+    "test:integration:auth-context": "node scripts/verifyAuthContextIntegration.js",
     "test:ai-safety": "node scripts/verifyAiSafetyContract.js && node scripts/verifyAiRouteMounts.js",
     "test:global-launch-contract": "node scripts/verifyGlobalLaunchContract.js",
     "test:trust-routes": "node scripts/verifyTrustRouteMounts.js",
@@ -94,6 +95,7 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
+    "mongodb-memory-server": "^10.3.0",
     "nodemon": "^3.1.14"
   },
   "overrides": {
