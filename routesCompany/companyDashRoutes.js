@@ -127,9 +127,9 @@ router.patch("/members/:memberId", requireCompanyPermission("company.members.man
 router.delete("/members/:memberId", requireCompanyPermission("company.members.manage"), upload.none(), memberController.removeMember);
 
 /* Analytics */
-router.get("/analytics", analyticsController.getCompanyAnalytics);
-router.get("/analytics/jobs", analyticsController.getJobsAnalytics);
-router.get("/analytics/applications", analyticsController.getApplicationsAnalytics);
-router.get("/analytics/profile", analyticsController.getProfileAnalytics);
+router.get("/analytics", requireCompanyPermission("analytics.view"), analyticsController.getCompanyAnalytics);
+router.get("/analytics/jobs", requireCompanyPermission("analytics.view"), analyticsController.getJobsAnalytics);
+router.get("/analytics/applications", requireCompanyPermission("analytics.view"), analyticsController.getApplicationsAnalytics);
+router.get("/analytics/profile", requireCompanyPermission("analytics.view"), analyticsController.getProfileAnalytics);
 
 export default router;

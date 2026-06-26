@@ -156,6 +156,10 @@ assertSourceIncludes({
     'router.post("/message-templates", requireCompanyPermission("message_templates.manage")',
     'router.patch("/message-templates/:templateId", requireCompanyPermission("message_templates.manage")',
     'router.delete("/message-templates/:templateId", requireCompanyPermission("message_templates.manage")',
+    'router.get("/analytics", requireCompanyPermission("analytics.view")',
+    'router.get("/analytics/jobs", requireCompanyPermission("analytics.view")',
+    'router.get("/analytics/applications", requireCompanyPermission("analytics.view")',
+    'router.get("/analytics/profile", requireCompanyPermission("analytics.view")',
   ],
 });
 
@@ -164,8 +168,10 @@ assertSourceIncludes({
   source: sources.companyMembers,
   required: [
     'admin: ["company.profile.manage"',
+    '"analytics.view", "audit.view"',
     '"support.manage", "billing.manage"],',
     'hr_manager: ["jobs.manage"',
+    '"analytics.view", "company.members.manage"',
   ],
 });
 
