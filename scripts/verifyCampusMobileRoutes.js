@@ -29,6 +29,7 @@ const sources = {
   companyJobs: readSource("routesCompany/jobRoute.js"),
   companyCampus: readSource("routesCompany/campusRoute.js"),
   companyHelpers: readSource("helper/companyDash/companyDashHelpers.js"),
+  companyMembers: readSource("controllers/companyDash/members/companyMemberController.js"),
   employeeDash: readSource("routesEmployee/employeeDashRoutes.js"),
   employeeCv: readSource("routesEmployee/cvRoute.js"),
 };
@@ -119,7 +120,12 @@ assertSourceIncludes({
   fileName: "routesCompany/companyDashRoutes.js",
   source: sources.companyDash,
   required: [
-    'router.post("/subscription/request", upload.none(), companySubscriptionController.requestPlanChange)',
+    'router.get("/subscription/current", requireCompanyPermission("billing.manage")',
+    'router.get("/subscription", requireCompanyPermission("billing.manage")',
+    'router.get("/subscription/billing-summary", requireCompanyPermission("billing.manage")',
+    'router.get("/subscription/invoices", requireCompanyPermission("billing.manage")',
+    'router.get("/subscription/invoices/:invoiceId", requireCompanyPermission("billing.manage")',
+    'router.post("/subscription/request", requireCompanyPermission("billing.manage")',
     'router.get("/support-tickets", requireCompanyPermission("support.manage")',
     'router.post("/support-tickets", requireCompanyPermission("support.manage")',
     'router.post("/support-tickets/:ticketId/messages", requireCompanyPermission("support.manage")',
@@ -135,6 +141,16 @@ assertSourceIncludes({
     'router.post("/message-templates", requireCompanyPermission("message_templates.manage")',
     'router.patch("/message-templates/:templateId", requireCompanyPermission("message_templates.manage")',
     'router.delete("/message-templates/:templateId", requireCompanyPermission("message_templates.manage")',
+  ],
+});
+
+assertSourceIncludes({
+  fileName: "controllers/companyDash/members/companyMemberController.js",
+  source: sources.companyMembers,
+  required: [
+    'admin: ["company.profile.manage"',
+    '"support.manage", "billing.manage"],',
+    'hr_manager: ["jobs.manage"',
   ],
 });
 

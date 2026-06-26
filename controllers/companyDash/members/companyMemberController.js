@@ -8,8 +8,8 @@ const MEMBER_ROLES = new Set(["admin", "hr_manager", "recruiter", "viewer"]);
 const MEMBER_STATUSES = new Set(["active", "invited", "suspended", "removed"]);
 const DEFAULT_PERMISSIONS_BY_ROLE = {
   owner: ["*"],
-  admin: ["company.profile.manage", "jobs.manage", "ats.view", "ats.status.change", "ats.notes.add", "ats.messages.send", "ats.interviews.schedule", "ats.reject", "ats.hire", "audit.view", "company.members.manage", "question_library.manage", "message_templates.manage", "support.manage"],
-  hr_manager: ["jobs.manage", "ats.view", "ats.status.change", "ats.notes.add", "ats.messages.send", "ats.interviews.schedule", "ats.reject", "ats.hire", "company.members.manage", "question_library.manage", "message_templates.manage", "support.manage"],
+  admin: ["company.profile.manage", "jobs.manage", "ats.view", "ats.status.change", "ats.notes.add", "ats.messages.send", "ats.interviews.schedule", "ats.reject", "ats.hire", "audit.view", "company.members.manage", "question_library.manage", "message_templates.manage", "support.manage", "billing.manage"],
+  hr_manager: ["jobs.manage", "ats.view", "ats.status.change", "ats.notes.add", "ats.messages.send", "ats.interviews.schedule", "ats.reject", "ats.hire", "company.members.manage", "question_library.manage", "message_templates.manage", "support.manage", "billing.manage"],
   recruiter: ["ats.view", "ats.status.change", "ats.notes.add", "ats.messages.send", "ats.interviews.schedule"],
   viewer: ["ats.view"],
 };

@@ -26,12 +26,12 @@ router.get("/me/basic-profile", infoController.getMyBasicCompanyProfile);
 router.put("/me/basic-profile", upload.single("image"), infoController.updateMyCompanyUserProfile);
 router.put("/me/image", upload.single("image"), infoController.updateMyCompanyUserProfile);
 router.get("/profile/completion", infoController.getMyCompanyCompletion);
-router.get("/subscription/current", companySubscriptionController.getMySubscription);
-router.get("/subscription", companySubscriptionController.getMySubscription);
-router.get("/subscription/billing-summary", companySubscriptionController.getBillingSummary);
-router.get("/subscription/invoices", companySubscriptionController.getMyInvoices);
-router.get("/subscription/invoices/:invoiceId", companySubscriptionController.getMyInvoiceDetails);
-router.post("/subscription/request", upload.none(), companySubscriptionController.requestPlanChange);
+router.get("/subscription/current", requireCompanyPermission("billing.manage"), companySubscriptionController.getMySubscription);
+router.get("/subscription", requireCompanyPermission("billing.manage"), companySubscriptionController.getMySubscription);
+router.get("/subscription/billing-summary", requireCompanyPermission("billing.manage"), companySubscriptionController.getBillingSummary);
+router.get("/subscription/invoices", requireCompanyPermission("billing.manage"), companySubscriptionController.getMyInvoices);
+router.get("/subscription/invoices/:invoiceId", requireCompanyPermission("billing.manage"), companySubscriptionController.getMyInvoiceDetails);
+router.post("/subscription/request", requireCompanyPermission("billing.manage"), upload.none(), companySubscriptionController.requestPlanChange);
 router.post("/profile/rebuild-search-filters", upload.none(), infoController.rebuildMyCompanySearchFilters);
 
 /* Company profile */
