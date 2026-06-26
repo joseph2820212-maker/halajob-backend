@@ -10,7 +10,7 @@ The current Flutter app source no longer uses `showModalBottomSheet`, `showBotto
 
 Bottom sheets intentionally kept: none in `mobile/lib`.
 Dialog/menu exceptions intentionally kept: delete/status confirmations, account menu, date picker, and language/account selectors where they are short native controls.
-External browser rule: external URLs use `LaunchMode.externalApplication` first through `mobile/lib/src/core/network/external_link.dart`.
+External browser rule: external URLs use the Android platform browser intent through `mobile/lib/src/core/network/external_link.dart` and `MainActivity.kt`; the Flutter app no longer depends on `url_launcher`.
 
 ## Page And Action Audit
 
@@ -76,7 +76,7 @@ Expected result: no matches except spreadsheet MIME types when searching lowerca
 
 Before sending an APK:
 
-1. Increase `mobile/pubspec.yaml` build number. This pass uses `1.0.2+17`.
+1. Increase `mobile/pubspec.yaml` build number. This pass uses `1.0.2+18`.
 2. Run:
    - `powershell -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1`
    - `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat analyze`
