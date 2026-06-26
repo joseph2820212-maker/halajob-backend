@@ -2,7 +2,7 @@
 
 Date: 2026-06-26
 Branch: `flutter-seeker-campus`
-Status: UI stabilization pass in progress after real-device APK UI/UX failure. Do not build or send another APK until the remaining audit rows are fixed and proof is added.
+Status: UI stabilization pass in progress after real-device APK UI/UX failure. Latest code pass removes account-switch bottom sheets, standardizes the main native headers, and tightens the global card/input/button style. Do not mark complete until real-device screenshots/click-through proof is added.
 
 ## Owner Decision
 
@@ -37,18 +37,17 @@ Existing shared widgets must be used or extended rather than inventing one-off s
 
 ## Current Static Scan Result
 
-Command: `rg -n "showModalBottomSheet|HalaWorkflowBody|Color\(0xFF10C26A\)|green|WebView|webview" mobile/lib/src mobile/test`
+Command: `rg -n "showModalBottomSheet|WebView|webview|InAppWebView|Color\(0xFF10C26A\)|green" mobile/lib/src mobile/test`
 
-Result after the current pass:
+Result after the 2026-06-26 native-shell stabilization pass:
 
-- Full-page bottom sheets converted from the seeker/campus/company flows listed below.
+- Account switchers are now native screens with back navigation for seeker/campus, company, and university/admin.
 - Remaining bottom sheets are limited to:
-  - dashboard account switcher: quick context selector, intentionally allowed for now
-  - company account switcher: quick context selector, intentionally allowed for now
-  - university account switcher: quick context selector, intentionally allowed for now
   - opportunity filters: short filter controls, intentionally allowed for now
 - No green token or WebView reference found in `mobile/lib/src` or `mobile/test`.
-- `git diff --check -- mobile UI_CARD_AND_NAVIGATION_AUDIT.md` passes; Flutter analyzer/device screenshots are still pending because Flutter is not available on this Codex shell PATH.
+- `git diff --check -- mobile/lib/src/theme/app_theme.dart mobile/lib/src/widgets/hala_cards.dart mobile/lib/src/features/auth/auth_screen.dart mobile/lib/src/features/dashboard/dashboard_screen.dart mobile/lib/src/features/company/company_dashboard_screen.dart mobile/lib/src/features/university/university_dashboard_screen.dart UI_CARD_AND_NAVIGATION_AUDIT.md` passes.
+- Lightweight bracket-balance scan passes for all edited Dart files.
+- Flutter analyzer/device screenshots are still pending because Flutter is not available on this Codex shell PATH.
 
 ## Current Fix Pass
 
@@ -79,6 +78,15 @@ Shared components added or expanded:
 - `HalaErrorStateCard`
 - `HalaWorkflowBody`
 
+Global style corrections in the latest pass:
+
+- `HalaHeaderIconButton` now uses darker navy header surfaces instead of pale/white icon spots.
+- Legacy `_HalaTitleHeader` detail screens now render through `HalaNativeHeader`, so AI tools, Career Passport, campus verification, company directory, CV manager, job detail, application detail, resources, and events share the same native header family.
+- Auth register, verification, recovery, diagnostics, and status surfaces now use the shared Hala card language instead of separate material card styles.
+- Company section wrappers now use `HalaCard`.
+- University/admin dashboard now uses the same navy header plus cream page-gradient shell as seeker and company.
+- Global text fields and primary/secondary buttons now use the same 8px radius rhythm as the card system.
+
 Test coverage added:
 
 - `mobile/test/hala_cards_test.dart` covers `HalaNativeHeader`, `HalaErrorStateCard`, and `HalaWorkflowBody`.
@@ -88,9 +96,9 @@ Test coverage added:
 | Role | Page | Card/Button/Action | Current behaviour | Required behaviour | Native screen / bottom sheet / external browser | Empty state | Error state | File(s) changed | Test proof |
 | ---- | ---- | ------------------ | ----------------- | ------------------ | ----------------------------------------------- | ----------- | ----------- | --------------- | ---------- |
 | Global | App shell | Page background | Uses cream theme but individual pages still create mixed custom containers and cards. | One light cream page background with consistent spacing on every screen. | Native screen | N/A | N/A | Pending | Pending |
-| Global | App shell | Universal header | Headers differed between auth, seeker, campus, company, and university. Company header had crowded icon area. | One native header pattern with title/subtitle, optional back arrow, notification icon, and one profile/settings/menu icon. | Native screen | N/A | N/A | `mobile/lib/src/widgets/hala_cards.dart`, `mobile/lib/src/features/dashboard/dashboard_screen.dart`, `mobile/lib/src/features/company/company_dashboard_screen.dart`, `mobile/lib/src/features/university/university_dashboard_screen.dart` | Code updated; Flutter analyzer/device screenshot pending because Flutter is not on this Codex shell PATH. |
+| Global | App shell | Universal header | Headers differed between auth, seeker, campus, company, university, and deeper detail screens. Company header had crowded icon area and pale icon spots. | One native header pattern with title/subtitle, optional back arrow, notification icon, and one profile/settings/menu icon. | Native screen | N/A | N/A | `mobile/lib/src/widgets/hala_cards.dart`, `mobile/lib/src/features/dashboard/dashboard_screen.dart`, `mobile/lib/src/features/company/company_dashboard_screen.dart`, `mobile/lib/src/features/university/university_dashboard_screen.dart` | `HalaHeaderIconButton` darkened; legacy `_HalaTitleHeader` now uses `HalaNativeHeader`; bracket-balance and `git diff --check` pass; Flutter analyzer/device screenshot pending because Flutter is not on this Codex shell PATH. |
 | Global | App shell | Back navigation | Most real pages use `MaterialPageRoute`; remaining bottom sheets are quick account selectors or filters only in static scan. | Every real app function opens as a normal screen with visible back navigation. | Native screen | N/A | N/A | `mobile/lib/src/features/dashboard/dashboard_screen.dart`, `mobile/lib/src/features/company/company_dashboard_screen.dart`, `mobile/lib/src/features/university/university_dashboard_screen.dart` | Static scan confirms only allowed sheet categories remain; Flutter analyzer/device screenshot pending because Flutter is not on this Codex shell PATH. |
-| Global | App shell | Bottom sheets | Remaining static scan shows account switchers and opportunity filters only. | Keep sheets only for short filters, short sort choices, quick menus, or simple confirmations. Convert full forms/pages to screens. | Native screen except allowed short controls | N/A | N/A | `mobile/lib/src/features/dashboard/dashboard_screen.dart`, `mobile/lib/src/features/company/company_dashboard_screen.dart`, `mobile/lib/src/features/university/university_dashboard_screen.dart` | `rg showModalBottomSheet` shows 4 remaining allowed calls; device click-through pending. |
+| Global | App shell | Bottom sheets | Remaining static scan shows opportunity filters only. Account switchers have been converted to native screens. | Keep sheets only for short filters, short sort choices, quick menus, or simple confirmations. Convert full forms/pages to screens. | Native screen except allowed short controls | N/A | N/A | `mobile/lib/src/features/dashboard/dashboard_screen.dart`, `mobile/lib/src/features/company/company_dashboard_screen.dart`, `mobile/lib/src/features/university/university_dashboard_screen.dart` | `rg showModalBottomSheet` shows 1 remaining allowed call for opportunity filters; bracket-balance and `git diff --check` pass; device click-through pending. |
 | Global | App shell | External links | External links exist in job/application details. No WebView package was found. | Internal actions stay native; external URLs launch external browser/app only. | External browser/app for external links | N/A | Clear launch failure card if external app cannot open | Pending | Pending |
 | Global | Empty states | Empty content | Several sections already use `HalaEmptyStateCard`, but some use vague short strings such as "No linked students loaded yet" or custom local empty widgets. | Every empty area uses `HalaEmptyStateCard` with icon, title, explanation, and action when useful. | Native screen | Required on every empty list/panel | N/A | Pending | Pending |
 | Global | Error states | API failure notice | Many failures use snackbar or small notice text. | Every failed API section shows `HalaErrorStateCard` with what failed, known reason, retry button, and no raw technical message. | Native screen | N/A | Required on every API section | `mobile/lib/src/widgets/hala_cards.dart`, `mobile/test/hala_cards_test.dart` | Shared `HalaErrorStateCard` added; screen-by-screen migration pending. |
@@ -99,12 +107,12 @@ Test coverage added:
 | Auth | Sign-in / register | Job seeker sign-in card | Existing `_AuthSignInCard` used a separate rounded-card style. | Light cream role card. Opens job seeker login form on same native auth screen or nested native screen. | Native screen | N/A | Clear auth error card | `mobile/lib/src/features/auth/auth_screen.dart` | Card radius aligned to shared 8px system; device screenshot pending. |
 | Auth | Sign-in / register | Campus sign-in card | Existing `_AuthSignInCard` plus tester/local mode used separate rounded-card styling. | Light cream role card. Campus QA must be testable without university email blocking tester builds. | Native screen | Explain live university email requirement only in production path | Clear campus auth error card | `mobile/lib/src/features/auth/auth_screen.dart` | Card radius aligned to shared 8px system; tester card remains available; device screenshot pending. |
 | Auth | Sign-in / register | Company sign-in card | Existing company role path in auth used separate rounded-card styling. | Light cream role card. Opens company login/register path clearly. | Native screen | N/A | Clear company auth error card | `mobile/lib/src/features/auth/auth_screen.dart` | Card radius aligned to shared 8px system; device screenshot pending. |
-| Auth | Sign-in / register | Register card | Existing register mode with more fields than final launch requirement. | Required fields only at registration: name, email, date of birth, password. Other fields move to profile completion. | Native screen | N/A | Field validation and submit error card | Pending | Pending |
+| Auth | Sign-in / register | Register card | Existing register mode uses name, email, date of birth, password. Card surface was separate from shared Hala card style. | Required fields only at registration: name, email, date of birth, password. Other fields move to profile completion. | Native screen | N/A | Field validation and submit error card | `mobile/lib/src/features/auth/auth_screen.dart` | Register card now uses `HalaCard`; bracket-balance and `git diff --check` pass; device screenshot pending. |
 | Auth | Sign-in / register | Role/account selector card | Existing role cards included a dark selected register state. | Consistent light cream cards; selected role visible in orange/navy. | Native screen | N/A | Clear role selection error | `mobile/lib/src/features/auth/auth_screen.dart` | Selected register role card changed to light cream/navy/orange; device screenshot pending. |
-| Auth | Sign-in / register | Forgot password card/action | Existing auth flow needs audit. | Clean light cream card/action below password. Opens native password recovery screen. | Native screen | N/A | Clear recovery error card | Pending | Pending |
+| Auth | Sign-in / register | Forgot password card/action | Existing recovery flow stayed inline but used a one-off custom rounded panel. | Clean light cream card/action below password. Opens native password recovery screen or compact inline recovery card if intentionally kept on auth. | Native screen / compact inline auth card | N/A | Clear recovery error card | `mobile/lib/src/features/auth/auth_screen.dart` | Recovery panel now uses shared Hala card styling; full native recovery route still pending design decision; bracket-balance and `git diff --check` pass. |
 | Auth | Sign-in / register | Save password option | Existing `_SavePasswordOption`. | Visible checkbox/toggle with navy text and orange selected state. | Native screen | N/A | N/A | Pending | Pending |
 | Auth | Sign-in / register | Loading state | Existing submit loading. | Button loading state plus no layout jump. | Native screen | N/A | N/A | Pending | Pending |
-| Auth | Sign-in / register | Status/error card | Existing `_StatusCard`. | Replace/standardize with `HalaErrorStateCard` or `HalaStateNotice` style, no vague errors. | Native screen | N/A | Required | Pending | Pending |
+| Auth | Sign-in / register | Status/error card | Existing `_StatusCard` used a plain material card. | Replace/standardize with `HalaErrorStateCard` or `HalaStateNotice` style, no vague errors. | Native screen | N/A | Required | `mobile/lib/src/features/auth/auth_screen.dart` | `_StatusCard` now uses `HalaCard` and emphasized border for error tone; wording audit still pending; bracket-balance and `git diff --check` pass. |
 | Job seeker | Home | Welcome/header card | Existing dashboard header/session card mix. | Universal native header plus light cream welcome card. | Native screen | N/A | Error card if dashboard data fails | `mobile/lib/src/features/dashboard/dashboard_screen.dart`, `mobile/lib/src/widgets/hala_cards.dart` | Header simplified to notification plus one account menu; device screenshot pending. |
 | Job seeker | Home | Search card | Existing search/feed controls. | Light cream search card; opens job search/listing screen. | Native screen | If no recent search, show helpful hint | Error card if search fails | Pending | Pending |
 | Job seeker | Home | Quick action cards | Existing `_QuickActionGrid` and module cards. | Use `HalaActionTile` or `HalaModuleCard` consistently. Every card opens a native screen. | Native screen | Disabled only with clear reason | Error card if action cannot load | Pending | Pending |
@@ -153,7 +161,7 @@ Test coverage added:
 | Campus/student | Campus home | Events card | Existing `_EventDetailScreen`. | Native list/detail with back navigation. | Native screen | "No campus events available yet." | Error card with retry | Pending | Pending |
 | Campus/student | Campus home | Resources card | Existing `_ResourceDetailScreen`. | Native resource list/detail screens. | Native screen | "No campus resources available yet." | Error card with retry | Pending | Pending |
 | Campus/student | Campus home | University/partner card | Existing partner/opportunity detail for university side; campus needs matching style. | Light cream card and native detail screen. | Native screen | "No university partners available yet." | Error card with retry | Pending | Pending |
-| Company | Dashboard | Header card | Existing `_CompanyHeader` plus multiple icons/menu. Owner reports white spots/icons. | Simplify: company name/logo/status, notification icon, one profile/settings/menu icon. No blank white circles. | Native screen | N/A | Error card if company profile fails | `mobile/lib/src/features/company/company_dashboard_screen.dart`, `mobile/lib/src/widgets/hala_cards.dart` | Old `IconButton` header controls removed; header now uses `HalaNativeHeader`, `HalaHeaderIconButton`, and one menu chip. Device screenshot pending. |
+| Company | Dashboard | Header card | Existing `_CompanyHeader` plus multiple icons/menu. Owner reports white spots/icons. | Simplify: company name/logo/status, notification icon, one profile/settings/menu icon. No blank white circles. | Native screen | N/A | Error card if company profile fails | `mobile/lib/src/features/company/company_dashboard_screen.dart`, `mobile/lib/src/widgets/hala_cards.dart` | Old `IconButton` header controls removed; header now uses `HalaNativeHeader`, `HalaHeaderIconButton`, and one dark navy menu chip. Device screenshot pending. |
 | Company | Dashboard | Company summary card | Existing `_CompanyHomePanel`. | Light cream summary card, navy text, orange highlights. | Native screen | Explain missing company data | Error card with retry | Pending | Pending |
 | Company | Dashboard | Stats cards | Existing metric tiles. | Uniform light cream stat cards. | Native screen | Show zero state with explanation | Error card with retry | Pending | Pending |
 | Company | Dashboard | Jobs card | Existing jobs panel. | Opens company jobs native screen/panel with back when full page. | Native screen | "No jobs posted yet." | Error card with retry | Pending | Pending |
@@ -173,7 +181,7 @@ Test coverage added:
 | Company | Support | Support card | Existing `_CompanySupportSheet`. | Convert to native support screen. | Native screen | "No support tickets yet." | Error card with retry | Pending | Pending |
 | Company | Settings/profile | Profile/settings action | Existing account/profile/settings sheets. | Native company settings screen. One header menu entry opens it. | Native screen | N/A | Error card for failed save | Pending | Pending |
 | Company | Notifications | Notification icon/action | Existing `_CompanyNotificationsSheet`. | If full notification history, convert to native screen. If quick preview, sheet allowed. | Native screen or short bottom sheet | "No company notifications yet." | Error card with retry | `mobile/lib/src/features/company/company_dashboard_screen.dart` | Converted to `_CompanyWorkflowPage` native route; screenshot/tap proof pending. |
-| University/admin | Dashboard | University dashboard card | Existing `UniversityDashboardScreen`. | Standard light cream page/card/header system. | Native screen | "No university dashboard data loaded yet." | Error card with retry | `mobile/lib/src/features/university/university_dashboard_screen.dart`, `mobile/lib/src/widgets/hala_cards.dart` | Header simplified to one account menu; device screenshot pending. |
+| University/admin | Dashboard | University dashboard card | Existing `UniversityDashboardScreen` used its own SafeArea/ListView shell and header inside the scroll content. | Standard light cream page/card/header system. | Native screen | "No university dashboard data loaded yet." | Error card with retry | `mobile/lib/src/features/university/university_dashboard_screen.dart`, `mobile/lib/src/widgets/hala_cards.dart` | University/admin now uses the same navy top header and cream page-gradient shell as seeker/company; device screenshot pending. |
 | University/admin | Dashboard | Student verification card | Existing verification queue. | Native verification detail screen. | Native screen | "No pending student verification requests." with explanation | Error card with retry | Pending | Pending |
 | University/admin | Dashboard | Analytics/outcomes card | Existing outcomes panel and details screen. | Native screen with consistent cards. | Native screen | "No outcomes report data available yet." | Error card with retry | Pending | Pending |
 | University/admin | Dashboard | Campus resources card | Existing university resource/opportunity areas. | Native resources screen/detail. | Native screen | "No campus resources available yet." | Error card with retry | Pending | Pending |
@@ -181,7 +189,7 @@ Test coverage added:
 | University/admin | Dashboard | Approvals card | Existing student verification/queue. | Native approvals screen. | Native screen | "No approvals waiting right now." | Error card with retry | Pending | Pending |
 | University/admin | Dashboard | Settings/account card | Existing account details/switcher sheets. | Convert account/settings details to native screen if full edit form. Account quick switcher may remain short sheet. | Native screen, short sheet allowed for quick switch | N/A | Error card for failed save | `mobile/lib/src/features/university/university_dashboard_screen.dart` | Account details converted to `_UniversityWorkflowPage`; account switcher intentionally remains quick sheet. Screenshot/tap proof pending. |
 | Settings | Profile | Profile card | Existing dashboard/company profile sheets. | Native profile screen with shared cards. | Native screen | N/A | Error card for failed save | Pending | Pending |
-| Settings | Account switcher | Account switcher card | Existing account switcher bottom sheets. | Short account switcher sheet allowed only if it is a quick selector. Full account management opens native screen. | Bottom sheet allowed for quick switch | "No other accounts available." | Error card with retry | Pending | Pending |
+| Settings | Account switcher | Account switcher card | Existing account switcher bottom sheets for seeker/campus, company, and university/admin. | Native account switch screen with back navigation. Full account management opens native screen. | Native screen | "No other accounts available." | Error card with retry | `mobile/lib/src/features/dashboard/dashboard_screen.dart`, `mobile/lib/src/features/company/company_dashboard_screen.dart`, `mobile/lib/src/features/university/university_dashboard_screen.dart` | Account switchers converted from bottom sheets to native workflow routes; `rg showModalBottomSheet` now shows only the short opportunity filter sheet; device click-through pending. |
 | Settings | Language | Language card | Existing auth/settings language controls. | Shared light cream language card with visible selected state. | Native screen | N/A | N/A | Pending | Pending |
 | Settings | Notifications | Notifications card | Existing notification settings/history mixed with sheets. | Native notifications/settings screen; quick preview sheet allowed. | Native screen | "No notifications yet." | Error card with retry | Pending | Pending |
 | Settings | Security/sign-out | Sign-out/destructive actions | Existing confirmation dialogs. | Confirmation dialog allowed only for sign-out/destructive actions. | Confirmation dialog allowed | N/A | Clear failure card if sign-out fails | Pending | Pending |
@@ -193,7 +201,7 @@ These are the current bottom sheet families found by `rg showModalBottomSheet mo
 
 | File | Current sheet/function family | Audit decision |
 | ---- | ----------------------------- | -------------- |
-| `mobile/lib/src/features/dashboard/dashboard_screen.dart` | Account switcher sheets | Allowed only if quick context selector; full account management must be native screen. |
+| `mobile/lib/src/features/dashboard/dashboard_screen.dart` | Account switcher sheets | Converted to native `_DashboardWorkflowPage`; proof pending. |
 | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | Notifications sheet | Converted to native `_DashboardWorkflowPage`; proof pending. |
 | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | Dashboard settings sheet | Converted to native `_DashboardWorkflowPage`; proof pending. |
 | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | AI translation/review sheet | Converted to native `_DashboardWorkflowPage` with `HalaWorkflowBody`; proof pending. |
@@ -203,12 +211,12 @@ These are the current bottom sheet families found by `rg showModalBottomSheet mo
 | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | CV/apply questions sheet | Converted to native `_DashboardWorkflowPage` with `HalaWorkflowBody`; proof pending. |
 | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | Availability/choice/salary/profile editor sheets | Converted to native `_DashboardWorkflowPage` with `HalaWorkflowBody`; proof pending. |
 | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | Job rating/text feedback sheets | Converted to native `_DashboardWorkflowPage` with `HalaWorkflowBody`; proof pending. |
-| `mobile/lib/src/features/company/company_dashboard_screen.dart` | Company account switcher sheet | Allowed only as quick account selector. |
+| `mobile/lib/src/features/company/company_dashboard_screen.dart` | Company account switcher sheet | Converted to native `_CompanyWorkflowPage`; proof pending. |
 | `mobile/lib/src/features/company/company_dashboard_screen.dart` | Company notifications sheet | Converted to native `_CompanyWorkflowPage`; proof pending. |
 | `mobile/lib/src/features/company/company_dashboard_screen.dart` | Company account/profile/settings, files, job form, job detail, applicants, support, team, questions, templates, talent, invitations, audit, campus recruiting, billing, AI tools | Static scan now shows no `showModalBottomSheet` calls for these workflows; they route through native company workflow pages. Many internal body widgets still need real-device card/spacing proof. |
 | `mobile/lib/src/features/company/company_dashboard_screen.dart` | Company job translation review | Converted to native `_CompanyWorkflowPage` with `HalaWorkflowBody`; proof pending. |
 | `mobile/lib/src/features/university/university_dashboard_screen.dart` | University account details sheet | Converted to native `_UniversityWorkflowPage`; proof pending. |
-| `mobile/lib/src/features/university/university_dashboard_screen.dart` | University account switcher sheet | Allowed only as quick account selector. |
+| `mobile/lib/src/features/university/university_dashboard_screen.dart` | University account switcher sheet | Converted to native `_UniversityWorkflowPage`; proof pending. |
 
 ## Required Proof Before Next APK
 
