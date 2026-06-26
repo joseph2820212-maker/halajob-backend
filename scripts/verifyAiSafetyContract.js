@@ -2,8 +2,13 @@ import assert from "node:assert/strict";
 import {
   AI_FEATURES,
   buildAiSafetyPayload,
+  buildAiProviderPrompt,
+  createMockAiOutput,
   hashAiInput,
   normalizeAiFeatureKey,
+  normalizeAiProviderName,
+  normalizeAiProviderOutput,
+  parseAiProviderJson,
 } from "../services/ai/aiSafety.service.js";
 
 const requiredFeatures = [
@@ -23,6 +28,8 @@ const requiredFeatures = [
 assert.deepEqual(Object.keys(AI_FEATURES).sort(), requiredFeatures.sort());
 assert.equal(normalizeAiFeatureKey("Cover Letter"), "cover_letter");
 assert.equal(normalizeAiFeatureKey("job-cover-letter"), "job_cover_letter");
+assert.equal(normalizeAiProviderName("OpenAI Compatible"), "openai_compatible");
+assert.equal(normalizeAiProviderName(" mock "), "mock");
 
 const hashA = hashAiInput({ b: 2, a: { y: 1, x: 0 } });
 const hashB = hashAiInput({ a: { x: 0, y: 1 }, b: 2 });
@@ -45,6 +52,38 @@ for (const [feature, config] of Object.entries(AI_FEATURES)) {
   assert.ok(config.required_account, `${feature} must declare its account guard`);
   assert.ok(Array.isArray(config.output_keys), `${feature} must declare output keys`);
   assert.ok(config.output_keys.length > 0, `${feature} output keys cannot be empty`);
+
+  const mockOutput = createMockAiOutput({
+    feature,
+    outputKeys: config.output_keys,
+    input: { body: { title: "Test title" } },
+  });
+  assert.deepEqual(
+    Object.keys(mockOutput).sort(),
+    [...config.output_keys].sort(),
+    `${feature} mock output must match the declared output keys`
+  );
+
+  const normalizedOutput = normalizeAiProviderOutput({
+    feature,
+    output: { [config.output_keys[0]]: "present", unexpected: true },
+  });
+  assert.deepEqual(
+    Object.keys(normalizedOutput).sort(),
+    [...config.output_keys].sort(),
+    `${feature} provider output must be normalized to declared keys`
+  );
 }
+
+const providerPrompt = buildAiProviderPrompt({
+  feature: "company_shortlist",
+  outputKeys: AI_FEATURES.company_shortlist.output_keys,
+});
+assert.ok(providerPrompt.includes("Return only a valid JSON object"));
+assert.ok(providerPrompt.includes("suggestion-only"));
+assert.ok(providerPrompt.includes("protected characteristics"));
+
+assert.deepEqual(parseAiProviderJson('{"score":72}'), { score: 72 });
+assert.deepEqual(parseAiProviderJson('```json\n{"score":72}\n```'), { score: 72 });
 
 console.log("AI safety contract verified.");
