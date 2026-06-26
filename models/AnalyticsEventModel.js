@@ -17,7 +17,7 @@ const AnalyticsEventSchema = new Schema(
     context_type: { type: String, trim: true, default: "", index: true },
     entity_type: {
       type: String,
-      enum: ["job", "application", "company", "campus", "university", "ai_request", "notification", "other"],
+      enum: ["job", "application", "company", "campus", "university", "ai_request", "notification", "cv", "career_passport", "translation", "other"],
       default: "other",
       index: true,
     },

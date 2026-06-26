@@ -28,6 +28,11 @@ const requiredEndpoints = [
   ["POST", "/analytics/v1/events"],
   ["POST", "/analytics/v1/track"],
 
+  ["POST", "/ai/v1/translate/job/:jobId"],
+  ["POST", "/ai/v1/translate/cv"],
+  ["PUT", "/jobs/v1/:jobId/translations/:lang"],
+  ["PUT", "/user/v1/cv/translations/:lang"],
+
   ["POST", "/trust/v1/jobs/:jobId/score"],
   ["POST", "/trust/v1/jobs/:jobId/report"],
 

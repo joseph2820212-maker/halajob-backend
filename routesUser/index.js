@@ -20,10 +20,12 @@ import CampusRote from './CampusRote.js';
 import MeRote from './MeRote.js';
 import CareerPassportRote from './CareerPassportRote.js';
 import GlobalRote from './GlobalRote.js';
+import CvTranslationRote from './CvTranslationRote.js';
 
 const router = express.Router();
 router.use('/me', MeRote);
 router.use('/career-passport', CareerPassportRote);
+router.use('/cv', CvTranslationRote);
 router.use('/global', GlobalRote);
 router.use('/auth', AuthRote);
 router.use('/company', CompanyRote);

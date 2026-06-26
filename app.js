@@ -14,6 +14,7 @@ import routes from "./routes/index.js";
 import userRoutes from "./routesUser/index.js";
 import employeeRoutes from "./routesEmployee/index.js";
 import companyRoutes from "./routesCompany/index.js";
+import jobsRoutes from "./routesJobs/index.js";
 import aiRoutes from "./routesAi/index.js";
 import analyticsRoutes from "./routesAnalytics/index.js";
 import trustRoutes from "./routesTrust/index.js";
@@ -293,6 +294,7 @@ app.use(
 app.use("/dash/v1", routes);
 app.use("/employee/v1", employeeRoutes);
 app.use("/company/v1", companyRoutes);
+app.use("/jobs/v1", jobsRoutes);
 app.use("/ai/v1", aiRoutes);
 app.use("/analytics/v1", analyticsRoutes);
 app.use("/trust/v1", trustRoutes);

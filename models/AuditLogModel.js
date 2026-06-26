@@ -10,7 +10,7 @@ const AuditLogSchema = new Schema(
     action: { type: String, required: true, trim: true, index: true },
     entity_type: {
       type: String,
-      enum: ["job", "application", "interview", "company", "company_member", "question_library", "message_template", "support_ticket", "subscription", "verification", "notification", "other"],
+      enum: ["job", "application", "interview", "company", "company_member", "question_library", "message_template", "support_ticket", "subscription", "verification", "notification", "translation", "other"],
       default: "other",
       index: true,
     },

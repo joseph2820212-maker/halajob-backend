@@ -22,6 +22,7 @@
     "test:trust-routes": "node scripts/verifyTrustRouteMounts.js",
     "test:notification-routes": "node scripts/verifyNotificationRouteMounts.js",
     "test:analytics-routes": "node scripts/verifyAnalyticsRouteMounts.js",
+    "test:translation-routes": "node scripts/verifyTranslationRouteMounts.js",
     "test:mobile-routes": "node scripts/verifyCampusMobileRoutes.js && node scripts/verifyMobileRouteMounts.js",
     "check:syntax": "node scripts/checkSyntax.js",
     "check:imports": "node scripts/checkRelativeImports.js"
