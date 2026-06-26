@@ -142,6 +142,28 @@ const requiredHooks = [
       'event: "currency_selected"',
     ],
   },
+  {
+    file: "controllers/ai/AiSafetyController.js",
+    snippets: [
+      "AI_ANALYTICS_EVENTS",
+      '"profile_score": "ai_score_generated"',
+      '"cv_rewrite": "ai_cv_rewritten"',
+      '"job_match_explanation": "ai_job_match_viewed"',
+      '"job_cover_letter": "ai_cover_letter_generated"',
+      '"interview_practice": "ai_interview_practiced"',
+      '"company_shortlist": "ai_shortlist_generated"',
+      "wasCompletedOutput",
+    ],
+  },
+  {
+    file: "controllers/app/CareerPassport/CareerPassportController.js",
+    snippets: [
+      "recordAnalyticsEvent",
+      'event: "ai_score_generated"',
+      'source: "career_passport_score"',
+      "generated_by_ai",
+    ],
+  },
 ];
 
 const failures = [];

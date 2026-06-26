@@ -5,6 +5,7 @@ import {
   updateCareerPassport,
   updateCareerPassportShare,
 } from "../../../services/careerPassport.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 const sendPassport = ({ res, result, message }) =>
   ReturnAppData.getData({
@@ -50,6 +51,20 @@ const update = async (req, res, next) => {
 const refreshScore = async (req, res, next) => {
   try {
     const result = await refreshCareerPassportScore({ user: req.user, req });
+    recordAnalyticsEvent({
+      req,
+      event: "ai_score_generated",
+      userId: req.user?._id,
+      activeContext: req.activeContext,
+      entityType: "career_passport",
+      entityId: result.passport?._id,
+      metadata: {
+        source: "career_passport_score",
+        score_source: result.passport?.score?.source || "rule_based_v1",
+        generated_by_ai: result.passport?.score?.generated_by_ai === true,
+        score: result.passport?.score?.total ?? null,
+      },
+    }).catch(() => null);
     return ReturnAppData.createData({
       res,
       data: {
