@@ -95,6 +95,7 @@ const requiredEndpoints = [
 
   ["GET", "/user/v1/notifications"],
   ["GET", "/user/v1/notifications/get"],
+  ["GET", "/user/v1/notifications/unread-count"],
   ["POST", "/user/v1/notifications/read-all"],
   ["PATCH", "/user/v1/notifications/read-all"],
   ["POST", "/user/v1/notifications/:id/read"],
