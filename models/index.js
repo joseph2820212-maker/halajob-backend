@@ -58,6 +58,8 @@ import CompanySubscriptionModel from './CompanySubscriptionModel.js';
 import CompanyInvoiceModel from './CompanyInvoiceModel.js';
 import ScheduledJobLockModel from './ScheduledJobLockModel.js';
 import AuditLogModel from './AuditLogModel.js';
+import AiRequestModel from './AiRequestModel.js';
+import AiUsageLimitModel from './AiUsageLimitModel.js';
 import CompanyQuestionLibraryModel from './CompanyQuestionLibraryModel.js';
 import CompanyMessageTemplateModel from './CompanyMessageTemplateModel.js';
 import CompanySupportTicketModel from './CompanySupportTicketModel.js';
@@ -128,6 +130,8 @@ export {
   CompanyInvoiceModel,
   ScheduledJobLockModel,
   AuditLogModel,
+  AiRequestModel,
+  AiUsageLimitModel,
   CompanyQuestionLibraryModel,
   CompanyMessageTemplateModel,
   CompanySupportTicketModel,

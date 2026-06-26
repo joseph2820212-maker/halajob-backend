@@ -37,7 +37,7 @@ screens from it, and do not let it change the current release behavior.
 | Area | Current status | Required next move |
 | --- | --- | --- |
 | Account switcher | Backend account-context model/API and mobile switcher are now implemented. | Finish production data QA, ensure every protected backend surface respects active context, and add database migration/seed notes before launch. |
-| AI career copilot / scoring | Not implemented as proven launch product. | Add server-only AI endpoints before Flutter UI calls any AI feature. |
+| AI career copilot / scoring | Backend-only `/ai/v1` safety foundation is now mounted for the approved endpoint contract. Requests are authenticated, account-guarded, hashed, logged to `ai_requests`, checked against `ai_usage_limits`, and blocked with clear fallback responses until provider AI is explicitly enabled and implemented. | Add real provider adapter, prompt/output schemas, admin enable controls, and Flutter suggestion-review UI only after live safety QA. |
 | Career Passport | Backend passport API, rule-based score snapshot foundation, and mobile seeker/campus Passport sheet are now implemented. | Add edit flows, employer/university views, AI-backed scoring, and share-link QA. |
 | Campus verification | Backend model/API foundation and Flutter campus verification sheet now support university list, status, email code verification, document upload, resubmit, and university admin approve/reject/request-info. | Complete live email/device QA against production credentials and approve/reject flows. |
 | University dashboard | University admin backend routes now honor active context for overview, students, verification queue/actions, partners, opportunity requests, employability analytics, and outcomes reports under `/university/v1`; Flutter now opens a university admin dashboard from the active `university_admin` context with metrics, verification actions, readiness, students, partners, and account switching. | Add deeper sub-screens, richer report exports, live university admin device QA, and release analytics. |
@@ -140,6 +140,22 @@ AI launch acceptance checks:
 - AI labels are visible in Flutter.
 - Usage limits and friendly fallback states are enforced by backend.
 - Candidate ranking explanations avoid protected or irrelevant attributes.
+
+Current implementation note:
+
+- `/ai/v1/career/copilot`, `/ai/v1/profile/score`, `/ai/v1/cv/rewrite`,
+  `/ai/v1/jobs/:jobId/match`, `/ai/v1/jobs/:jobId/cover-letter`,
+  `/ai/v1/interview/practice`, `/ai/v1/company/jobs/generate`,
+  `/ai/v1/company/jobs/:jobId/shortlist`,
+  `/ai/v1/company/messages/generate`, `/ai/v1/translate/job/:jobId`, and
+  `/ai/v1/translate/cv` are mounted behind auth and account-context guards.
+- `ai_requests` stores feature, input hash, output JSON placeholder,
+  provider/model, status, error, user/context, usage estimates, and safety
+  flags.
+- `ai_usage_limits` can enable/disable a feature and set daily/monthly limits
+  globally or by user/context/company/university scope.
+- Provider generation remains intentionally disabled/not implemented; endpoints
+  return a clear blocked fallback instead of fake AI output.
 
 ## Career Passport And Employability Score
 
