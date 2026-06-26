@@ -148,6 +148,48 @@ const AtsSettingsSchema = new Schema(
   { _id: false }
 );
 
+const JobTrustDocumentLinkSchema = new Schema(
+  {
+    url: { type: String, required: true, trim: true },
+    label: { type: String, trim: true, default: "" },
+    kind: { type: String, trim: true, default: "evidence" },
+  },
+  { _id: true }
+);
+
+const JobTrustDocumentRequestSchema = new Schema(
+  {
+    status: {
+      type: String,
+      enum: ["none", "requested", "submitted", "accepted", "rejected"],
+      default: "none",
+      index: true,
+    },
+    note: { type: String, trim: true, default: "" },
+    requested_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    requested_at: { type: Date, default: null },
+  },
+  { _id: false }
+);
+
+const JobTrustDocumentResponseSchema = new Schema(
+  {
+    status: {
+      type: String,
+      enum: ["none", "requested", "submitted", "accepted", "rejected"],
+      default: "none",
+      index: true,
+    },
+    note: { type: String, trim: true, default: "" },
+    links: { type: [JobTrustDocumentLinkSchema], default: [] },
+    submitted_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    submitted_at: { type: Date, default: null },
+    reviewed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    reviewed_at: { type: Date, default: null },
+  },
+  { _id: false }
+);
+
 const JobTrustSchema = new Schema(
   {
     score: { type: Number, min: 0, max: 100, default: 50, index: true },
@@ -167,6 +209,8 @@ const JobTrustSchema = new Schema(
       index: true,
     },
     admin_note: { type: String, trim: true, default: "" },
+    document_request: { type: JobTrustDocumentRequestSchema, default: () => ({}) },
+    document_response: { type: JobTrustDocumentResponseSchema, default: () => ({}) },
     reviewed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
     reviewed_at: { type: Date, default: null },
     last_scored_at: { type: Date, default: null },

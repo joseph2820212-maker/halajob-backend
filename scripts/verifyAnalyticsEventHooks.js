@@ -183,6 +183,15 @@ const requiredHooks = [
       'source: "trust_admin_review"',
     ],
   },
+  {
+    file: "controllers/trust/TrustController.js",
+    snippets: [
+      "recordAnalyticsEvent",
+      "submitJobDocuments",
+      'event: "job_trust_documents_submitted"',
+      'source: "company_trust_response"',
+    ],
+  },
 ];
 
 const failures = [];

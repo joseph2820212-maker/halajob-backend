@@ -33,6 +33,7 @@ export const ANALYTICS_EVENT_GROUPS = Object.freeze({
     "job_trust_marked_safe",
     "job_trust_suspended",
     "job_trust_documents_requested",
+    "job_trust_documents_submitted",
     "remote_filter_used",
     "hybrid_filter_used",
   ],

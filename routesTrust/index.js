@@ -23,4 +23,20 @@ router.post(
   TrustController.reportJob
 );
 
+router.post(
+  "/jobs/:jobId/documents",
+  authUser,
+  requireAppAccount("company"),
+  upload.none(),
+  TrustController.submitJobDocuments
+);
+
+router.patch(
+  "/jobs/:jobId/documents",
+  authUser,
+  requireAppAccount("company"),
+  upload.none(),
+  TrustController.submitJobDocuments
+);
+
 export default router;

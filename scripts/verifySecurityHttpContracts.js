@@ -22,6 +22,7 @@ const protectedChecks = [
   ["POST", "/analytics/v1/events", "analytics tracking"],
   ["POST", "/ai/v1/profile/score", "employee AI"],
   ["POST", "/trust/v1/jobs/job-1/report", "trust report"],
+  ["POST", "/trust/v1/jobs/job-1/documents", "trust company document response"],
   ["GET", "/campus/v1/student-verifications/me", "campus student verification"],
 ];
 

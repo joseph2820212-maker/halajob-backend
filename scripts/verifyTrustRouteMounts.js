@@ -10,6 +10,7 @@ const readSource = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.u
 const appSource = readSource("app.js");
 const trustSource = readSource("routesTrust/index.js");
 const trustAdminSource = readSource("routesTrust/admin.js");
+const trustControllerSource = readSource("controllers/trust/TrustController.js");
 const trustAdminControllerSource = readSource("controllers/trust/TrustAdminController.js");
 const dashSource = readSource("routes/index.js");
 const webAdminSource = readSource("web/src/admin/screens.tsx");
@@ -18,6 +19,8 @@ const webApiSource = readSource("web/src/shared/api.ts");
 const requiredEndpoints = [
   ["POST", "/trust/v1/jobs/:jobId/score"],
   ["POST", "/trust/v1/jobs/:jobId/report"],
+  ["POST", "/trust/v1/jobs/:jobId/documents"],
+  ["PATCH", "/trust/v1/jobs/:jobId/documents"],
   ["GET", "/admin/v1/trust/review-queue"],
   ["POST", "/admin/v1/trust/jobs/:jobId/mark-safe"],
   ["PATCH", "/admin/v1/trust/jobs/:jobId/mark-safe"],
@@ -54,8 +57,11 @@ assert.deepEqual(
 const requiredTrustGuards = [
   'authUser',
   'requireAppAccount("employee")',
+  'requireAppAccount("company")',
   'router.post(\n  "/jobs/:jobId/score"',
   'router.post(\n  "/jobs/:jobId/report"',
+  'router.post(\n  "/jobs/:jobId/documents"',
+  'router.patch(\n  "/jobs/:jobId/documents"',
 ];
 
 assert.deepEqual(
@@ -107,15 +113,30 @@ assert.deepEqual(
   "TrustAdminController.js is missing admin trust analytics hooks"
 );
 
+const requiredCompanyTrustAnalytics = [
+  "submitJobDocuments",
+  'event: "job_trust_documents_submitted"',
+  'source: "company_trust_response"',
+  "trust_job_documents_submitted",
+];
+
+assert.deepEqual(
+  requiredCompanyTrustAnalytics.filter((snippet) => !trustControllerSource.includes(snippet)),
+  [],
+  "TrustController.js is missing company trust document analytics/audit hooks"
+);
+
 const requiredWebTrustReview = [
   "trustReviewQueue",
   "trustMarkSafe",
   "trustSuspend",
   "trustRequestDocuments",
+  "submitTrustDocuments",
   '"/dash/v1/trust/review-queue"',
   '`/dash/v1/trust/jobs/${id}/mark-safe`',
   '`/dash/v1/trust/jobs/${id}/suspend`',
   '`/dash/v1/trust/jobs/${id}/request-documents`',
+  '`/trust/v1/jobs/${id}/documents`',
 ].filter((snippet) => !webApiSource.includes(snippet));
 
 assert.deepEqual(requiredWebTrustReview, [], "web/src/shared/api.ts is missing admin trust review calls");
