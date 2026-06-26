@@ -25,7 +25,7 @@ const routeActions = {
   campus: ["opportunities", "applications", "profile", "notifications", "resources", "University portal", "students", "partners", "post internship"],
   company: ["jobs", "applicants", "pipeline", "invitations", "talent", "reviews", "subscription", "analytics", "support", "members", "library", "profile", "campus"],
   seeker: ["applications", "interviews", "offers", "saved", "companies", "profile", "notifications", "cv builder"],
-  admin: ["companies", "jobs", "talent", "universities", "subscriptions"],
+  admin: ["companies", "jobs", "trust", "analytics", "talent", "universities", "subscriptions"],
 };
 
 log(`launch browser ${executablePath}`);
