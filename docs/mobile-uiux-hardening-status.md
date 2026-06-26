@@ -5,7 +5,8 @@ Branch: `flutter-seeker-campus`
 Last verified:
 
 - `flutter analyze`: no issues found
-- `flutter test --concurrency=1`: 407 tests passed
+- `flutter test --reporter compact`: 410 tests passed
+- `powershell -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1`: passed on 2026-06-26
 
 ## Completed for testing readiness
 
@@ -44,22 +45,24 @@ These items do not block code/test readiness, but should be reviewed on a real p
 
 - Do a physical-device click-through of every role using a fresh APK.
 - Confirm final colors, spacing, and card density against the owner-approved visual handout.
-- Decide whether small editor/filter sheets should remain sheets or become full screens after phone review.
+- Confirm compact native editors and short dialogs still feel comfortable after phone review.
 - Expand Arabic localization beyond top-level labels and important controls.
 - Run live backend QA with real seeker, campus, company, and university/admin accounts.
 - Run live AI-provider QA after production AI credentials and limits are configured.
 - Run production Firebase push-notification QA with a real Android device.
 - Build the release APK/AAB with the production keystore when launch signing is ready.
 
-## Remaining sheets intentionally allowed for now
+## Dialogs/menus intentionally allowed for now
 
-Bottom sheets still exist for small mobile tasks such as:
+`mobile/lib` no longer uses Flutter bottom sheets for app workflows. Small
+native platform controls still exist for tasks such as:
 
-- account switcher/account details
 - notifications
 - filters and sorting
 - short profile editors
 - ratings, report messages, and confirmation-style forms
 - translation review/edit forms
+- account menu and short confirmation dialogs
 
-These are acceptable mobile overlays unless phone testing shows they feel crowded.
+These remain acceptable only where they are short native screens, dialogs, or
+menus with a clear back/cancel path.
