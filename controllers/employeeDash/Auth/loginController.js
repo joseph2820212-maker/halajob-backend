@@ -2,6 +2,7 @@ import bcryptjs from "bcryptjs";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { EmployeeModel, RoleModel, UserModel } from "../../../models/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 const msg = (lan, ar, en) => (lan === "ar" ? ar : en);
 
@@ -208,6 +209,17 @@ const login = async (req, res, next) => {
   await user.save();
 
   const authPayload = await buildAuthPayload(user, authDevice);
+  recordAnalyticsEvent({
+   req,
+   event: "login_completed",
+   userId: user._id,
+   entityType: "other",
+   entityId: employee._id,
+   metadata: {
+    source: "employee_dashboard_login",
+    portal: "employee",
+   },
+  }).catch(() => null);
 
   return ReturnAppData.createData({
    res,

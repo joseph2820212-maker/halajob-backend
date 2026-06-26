@@ -17,6 +17,7 @@ import {
   isLaunchContractError,
   normalizeLaunchCurrencyCode,
 } from "../../../services/globalLaunchContract.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import mongoose from "mongoose";
 
 const ARRAY_FIELDS = new Set([
@@ -687,6 +688,63 @@ const rebuildEmployeeSearchFilters = async (employee) => {
 
 const shouldRebuildSearchFilters = (fields = []) => fields.some((field) => SEARCH_FILTER_RELATED_FIELDS.has(field));
 
+const employeeUserId = (employee = {}, req = null) =>
+  employee.user_id?._id || employee.user_id || req?.user?._id || null;
+
+const recordEmployeeAnalytics = ({ req, event, employee, metadata = {} }) => {
+  if (!employee?._id) return;
+  recordAnalyticsEvent({
+    req,
+    event,
+    userId: employeeUserId(employee, req),
+    entityType: "other",
+    entityId: employee._id,
+    metadata,
+  }).catch(() => null);
+};
+
+const recordProfileCompletedIfNeeded = ({ req, employee, previousCompletion = 0, fields = [] }) => {
+  if (Number(previousCompletion || 0) >= 100 || Number(employee.profile_completion || 0) < 100) return;
+  recordEmployeeAnalytics({
+    req,
+    event: "profile_completed",
+    employee,
+    metadata: {
+      previous_completion: Number(previousCompletion || 0),
+      completion: Number(employee.profile_completion || 0),
+      fields,
+    },
+  });
+};
+
+const recordGlobalPreferenceAnalytics = ({ req, employee, fields = [] }) => {
+  if (fields.includes("preferred_countries")) {
+    recordEmployeeAnalytics({
+      req,
+      event: "country_changed",
+      employee,
+      metadata: {
+        source: "employee_preferences",
+        preferred_countries: (employee.preferred_countries || []).map(String),
+      },
+    });
+  }
+
+  if (fields.includes("expected_salary") || fields.includes("min_salary")) {
+    const salary = employee.expected_salary?.toObject?.() || employee.expected_salary || {};
+    recordEmployeeAnalytics({
+      req,
+      event: "currency_selected",
+      employee,
+      metadata: {
+        source: "employee_salary",
+        currency_code: String(salary.currency_code || "").toUpperCase(),
+        currency_id: salary.currency_id || null,
+      },
+    });
+  }
+};
+
 const refreshEmployeeMatchingData = async (employee, { rebuildMatches = true } = {}) => {
   await applyEmployeeProjection(employee);
   await employee.save();
@@ -852,6 +910,7 @@ export const updateBasicEmployeeProfile = async (req, res, next) => {
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
 
+    const previousCompletion = Number(employee.profile_completion || 0);
     const touchedFields = [];
 
     for (const field of SINGLE_FIELDS) {
@@ -869,6 +928,8 @@ export const updateBasicEmployeeProfile = async (req, res, next) => {
 
     await refreshEmployeeMatchingData(employee, { rebuildMatches: shouldRebuildSearchFilters(touchedFields) });
     await populateEmployeeSingles(employee);
+    recordProfileCompletedIfNeeded({ req, employee, previousCompletion, fields: touchedFields });
+    recordGlobalPreferenceAnalytics({ req, employee, fields: touchedFields });
 
     return success(res, employee, "employee_profile_updated");
   } catch (error) {
@@ -882,10 +943,12 @@ export const updateAboutMe = async (req, res, next) => {
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
 
+    const previousCompletion = Number(employee.profile_completion || 0);
     employee.about_me = req.body.about_me ?? "";
     employee.profile_completion = calculateProfileCompletion(employee);
     await rebuildEmployeeSearchFilters(employee);
     await refreshEmployeeMatchingData(employee);
+    recordProfileCompletedIfNeeded({ req, employee, previousCompletion, fields: ["about_me"] });
 
     return success(res, employee, "about_me_updated");
   } catch (error) {
@@ -898,10 +961,12 @@ export const updateLatestWorkExperience = async (req, res, next) => {
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
 
+    const previousCompletion = Number(employee.profile_completion || 0);
     await applySingleField(employee, "latest_work_experience", req.body);
     employee.profile_completion = calculateProfileCompletion(employee);
     await rebuildEmployeeSearchFilters(employee);
     await refreshEmployeeMatchingData(employee);
+    recordProfileCompletedIfNeeded({ req, employee, previousCompletion, fields: ["latest_work_experience"] });
 
     return success(res, employee, "latest_work_experience_updated");
   } catch (error) {
@@ -914,6 +979,7 @@ export const updateWorkPreferences = async (req, res, next) => {
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
 
+    const previousCompletion = Number(employee.profile_completion || 0);
     const fields = [
       "work_location",
       "is_can_move",
@@ -955,6 +1021,8 @@ export const updateWorkPreferences = async (req, res, next) => {
       { path: "job_names", select: "sector_ar sector_en subSector_ar subSector_en title_ar title_en keywords" },
       { path: "job_types", select: "name title_ar title_en keyword" },
     ]);
+    recordProfileCompletedIfNeeded({ req, employee, previousCompletion, fields: touchedFields });
+    recordGlobalPreferenceAnalytics({ req, employee, fields: touchedFields });
 
     return success(res, employee, "work_preferences_updated");
   } catch (error) {
@@ -973,6 +1041,7 @@ export const replaceSection = async (req, res, next) => {
 
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
+    const previousCompletion = Number(employee.profile_completion || 0);
 
     if (ARRAY_FIELDS.has(section)) {
       employee[section] = await normalizeEmployeeArrayField(section, req.body);
@@ -993,6 +1062,8 @@ export const replaceSection = async (req, res, next) => {
     } else {
       await populateEmployeeSection(employee, section);
     }
+    recordProfileCompletedIfNeeded({ req, employee, previousCompletion, fields: [section] });
+    recordGlobalPreferenceAnalytics({ req, employee, fields: [section] });
 
     return success(res, employee, `${section}_replaced`);
   } catch (error) {
@@ -1009,6 +1080,7 @@ export const addSectionItems = async (req, res, next) => {
 
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
+    const previousCompletion = Number(employee.profile_completion || 0);
 
     const items = await normalizeEmployeeArrayField(section, req.body);
     if (!items.length) return fail(res, "no_items_provided", 400);
@@ -1039,6 +1111,8 @@ export const addSectionItems = async (req, res, next) => {
     const result = Array.isArray(employee[section])
       ? employee[section].map((item) => serializeSectionItem(item, req))
       : employee[section];
+    recordProfileCompletedIfNeeded({ req, employee, previousCompletion, fields: [section] });
+    recordGlobalPreferenceAnalytics({ req, employee, fields: [section] });
 
     return success(res, result, `${section}_items_added`, 201);
   } catch (error) {
@@ -1055,6 +1129,7 @@ export const updateSectionItem = async (req, res, next) => {
 
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
+    const previousCompletion = Number(employee.profile_completion || 0);
 
     if (
       section === "job_names" ||
@@ -1080,6 +1155,7 @@ export const updateSectionItem = async (req, res, next) => {
     await populateEmployeeSection(employee, section);
 
     const updatedItem = employee[section].id?.(itemId);
+    recordProfileCompletedIfNeeded({ req, employee, previousCompletion, fields: [section] });
     return success(res, serializeSectionItem(updatedItem, req), `${section}_item_updated`);
   } catch (error) {
     next(error);
@@ -1094,6 +1170,7 @@ export const deleteSectionItem = async (req, res, next) => {
 
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
+    const previousCompletion = Number(employee.profile_completion || 0);
 
    if (
       section === "job_names" ||
@@ -1118,6 +1195,8 @@ export const deleteSectionItem = async (req, res, next) => {
     }
 
     await refreshEmployeeMatchingData(employee, { rebuildMatches: SEARCH_FILTER_RELATED_FIELDS.has(section) });
+    recordProfileCompletedIfNeeded({ req, employee, previousCompletion, fields: [section] });
+    recordGlobalPreferenceAnalytics({ req, employee, fields: [section] });
 
     return success(res, employee, `${section}_item_deleted`);
   } catch (error) {
@@ -1139,6 +1218,7 @@ export const replaceMinSalary = async (req, res, next) => {
   try {
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
+    const previousCompletion = Number(employee.profile_completion || 0);
 
     await applySingleField(employee, "min_salary", req.body);
     employee.profile_completion = calculateProfileCompletion(employee);
@@ -1149,6 +1229,8 @@ export const replaceMinSalary = async (req, res, next) => {
       path: "expected_salary.currency_id",
       select: "code name_ar name_en symbol_ar symbol_en rate rate_base is_base",
     });
+    recordProfileCompletedIfNeeded({ req, employee, previousCompletion, fields: ["min_salary"] });
+    recordGlobalPreferenceAnalytics({ req, employee, fields: ["min_salary"] });
 
     return success(res, serializeSingleField("min_salary", employee.expected_salary, req), "expected_salary_replaced");
   } catch (error) {

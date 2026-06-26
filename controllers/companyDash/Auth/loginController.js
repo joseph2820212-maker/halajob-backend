@@ -2,6 +2,7 @@ import bcryptjs from "bcryptjs";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { CompanyModel, RoleModel, UserModel } from "../../../models/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 const msg = (lan, ar, en) => (lan === "ar" ? ar : en);
 const normEmail = (email) => String(email || "").trim().toLowerCase();
@@ -299,6 +300,18 @@ const login = async (req, res, next) => {
     await user.save();
 
     const authPayload = await buildAuthPayload(user, authDevice);
+    recordAnalyticsEvent({
+      req,
+      event: "login_completed",
+      userId: user._id,
+      companyId: company._id,
+      entityType: "company",
+      entityId: company._id,
+      metadata: {
+        source: "company_dashboard_login",
+        portal: "company",
+      },
+    }).catch(() => null);
 
     return ReturnAppData.createData({
       res,

@@ -9,6 +9,7 @@ import {
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
 import { syncAccountContextsForUser } from "../../../services/accountContext.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
@@ -155,11 +156,23 @@ export const passcodeVerify = async (req, res, next) => {
       user.markModified?.("device");
       user.last_login_at = new Date();
       await user.save();
+      const authPayload = await buildAuthPayload(user, dev);
+      recordAnalyticsEvent({
+        req,
+        event: "login_completed",
+        userId: user._id,
+        activeContext: authPayload.active_context,
+        entityType: "other",
+        metadata: {
+          source: "device_verification",
+          device_inserted: result.inserted,
+        },
+      }).catch(() => null);
 
       return ReturnAppData.createData({
         res,
         status: 200,
-        data: await buildAuthPayload(user, dev),
+        data: authPayload,
         message:
           lan === "ar"
             ? result.inserted
@@ -172,6 +185,7 @@ export const passcodeVerify = async (req, res, next) => {
     }
 
     if (passcodeValid) {
+      const wasSignupCompletion = user.status !== true || user.passcode_active !== true;
       user.passcode_active = true;
       user.status = true;
       user.passcode = undefined;
@@ -188,11 +202,32 @@ export const passcodeVerify = async (req, res, next) => {
       user.markModified?.("device");
       user.last_login_at = new Date();
       await user.save();
+      const authPayload = await buildAuthPayload(user, dev);
+      if (wasSignupCompletion) {
+        recordAnalyticsEvent({
+          req,
+          event: "signup_completed",
+          userId: user._id,
+          activeContext: authPayload.active_context,
+          entityType: "other",
+          metadata: { source: "passcode_activation" },
+        }).catch(() => null);
+      }
+      recordAnalyticsEvent({
+        req,
+        event: "login_completed",
+        userId: user._id,
+        activeContext: authPayload.active_context,
+        entityType: "other",
+        metadata: {
+          source: wasSignupCompletion ? "signup_passcode" : "login_passcode",
+        },
+      }).catch(() => null);
 
       return ReturnAppData.createData({
         res,
         status: 200,
-        data: await buildAuthPayload(user, dev),
+        data: authPayload,
         message: lan === "ar" ? "تم تسجيل الدخول" : "Logged in",
       });
     }

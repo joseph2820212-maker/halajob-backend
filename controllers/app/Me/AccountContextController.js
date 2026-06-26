@@ -4,6 +4,7 @@ import {
   setActiveAccountContext,
   syncAccountContextsForUser,
 } from "../../../services/accountContext.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 const getContextId = (body = {}) => body.context_id || body.contextId || body.active_context_id || body.activeContextId;
 
@@ -40,6 +41,18 @@ const setActiveContext = async (req, res, next) => {
       contextId,
       req,
     });
+    recordAnalyticsEvent({
+      req,
+      event: "account_context_switched",
+      userId: req.user._id,
+      activeContext: result.activeContext,
+      entityType: "other",
+      entityId: result.activeContext?._id || result.activeContext?.id || null,
+      metadata: {
+        context_type: result.activeContext?.context_type || "",
+        requested_context_id: String(contextId || ""),
+      },
+    }).catch(() => null);
 
     return ReturnAppData.updateData({
       res,

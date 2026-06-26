@@ -99,6 +99,49 @@ const requiredHooks = [
       'source: "legacy_send_interview"',
     ],
   },
+  {
+    file: "controllers/app/Auth/PassCodeController.js",
+    snippets: [
+      "recordAnalyticsEvent",
+      'event: "signup_completed"',
+      'event: "login_completed"',
+      "wasSignupCompletion",
+    ],
+  },
+  {
+    file: "controllers/companyDash/Auth/loginController.js",
+    snippets: [
+      "recordAnalyticsEvent",
+      'event: "login_completed"',
+      'source: "company_dashboard_login"',
+    ],
+  },
+  {
+    file: "controllers/employeeDash/Auth/loginController.js",
+    snippets: [
+      "recordAnalyticsEvent",
+      'event: "login_completed"',
+      'source: "employee_dashboard_login"',
+    ],
+  },
+  {
+    file: "controllers/app/Me/AccountContextController.js",
+    snippets: [
+      "recordAnalyticsEvent",
+      'event: "account_context_switched"',
+      "requested_context_id",
+    ],
+  },
+  {
+    file: "controllers/employeeDash/information/employeeInformationController.js",
+    snippets: [
+      "recordProfileCompletedIfNeeded",
+      "recordGlobalPreferenceAnalytics",
+      'event: "profile_completed"',
+      'event: "country_changed"',
+      'event: "currency_selected"',
+    ],
+  },
 ];
 
 const failures = [];
