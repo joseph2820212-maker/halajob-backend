@@ -227,8 +227,8 @@ Current implementation note:
 - Mobile now exposes Career Passport from the seeker/campus dashboard More
   actions, loads the backend passport, refreshes the score through the backend
   AI route contract, and toggles share/revoke from the app.
-- Dedicated edit flows, employer-safe view, university-safe view, and AI
-  usage/cost controls remain open work.
+- Dedicated edit flows, employer-safe view, university-safe view, and
+  provider-backed passport scoring QA remain open work.
 
 Acceptance checks:
 
