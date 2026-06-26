@@ -12,16 +12,22 @@ Branch: `flutter-seeker-campus`
 | User logout robustness | `/user/v1/auth/logout` no longer requires a valid access token and accepts `refreshToken`, `refresh_token`, or `x-refresh-token`. | `routesUser/AuthRote.js`, `controllers/app/Auth/LoginController.js` |
 | Admin logout robustness | `/dash/v1/auth/logout` now rejects missing refresh tokens instead of returning success while clearing nothing. | `controllers/dash/authController.js` |
 | Logout security contract | HTTP contract now proves user, company, and admin logout reject missing refresh tokens. | `npm run test:security-http` |
+| Explicit account-context safety | `X-Active-Context-Id` now fails closed when malformed, owned by another user, suspended, or removed instead of silently falling back to the default context. | `services/accountContext.service.js`, `npm run test:integration:auth-context` |
+| Approved company route guard | Company dashboard/helper/jobs/campus APIs now require both a company context and an approved company account. Pending company accounts are blocked from approved dashboard APIs. | `routesCompany/index.js`, `npm run test:integration:auth-context` |
+| Seeded auth/context integration coverage | Runtime MongoDB integration coverage now includes missing/malformed token, seeker, student/campus, approved company, pending company, university admin, dashboard admin, cross-role denial, cross-company context denial, suspended context denial, invalid context id, and refresh-token revocation. | `scripts/verifyAuthContextIntegration.js` |
 
 ## Checks Run
 
 ```bash
 npm run test:security-http
+npm run test:integration:auth-context
 npm run test:mobile-routes
 npm run check:syntax
+npm run check:imports
+npm run check:i18n
 npm --prefix web run build
 ```
 
 ## Remaining From Backend/API Audit
 
-The project still needs the larger runtime integration suite from the backend audit: seeded users, roles, companies, universities, students, cross-account negative cases, mutation side effects, upload/download security, and full web/mobile end-to-end API flow coverage.
+The project still needs the larger runtime integration suite from the backend audit: AI, trust, analytics, notifications, applications, CV, jobs, payments/subscriptions, mutation side effects, upload/download security, and full web/mobile end-to-end API flow coverage.

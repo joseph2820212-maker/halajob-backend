@@ -112,10 +112,12 @@ assertSourceIncludes({
   source: sources.companyIndex,
   required: [
     "requireCompanyContext",
-    'router.use("/global", authUser, requireCompanyContext, companyDashRoutes)',
-    'router.use("/helper", authUser, requireCompanyContext, informationHelperRoute)',
-    'router.use("/jobs", authUser, requireCompanyContext, jobRoute)',
-    'router.use("/campus", authUser, requireCompanyContext, campusRoute)',
+    "requireAppAccount",
+    'const approvedCompanyGuard = [authUser, requireCompanyContext, requireAppAccount("company")]',
+    'router.use("/global", approvedCompanyGuard, companyDashRoutes)',
+    'router.use("/helper", approvedCompanyGuard, informationHelperRoute)',
+    'router.use("/jobs", approvedCompanyGuard, jobRoute)',
+    'router.use("/campus", approvedCompanyGuard, campusRoute)',
   ],
 });
 

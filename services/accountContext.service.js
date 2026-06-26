@@ -11,6 +11,7 @@ import {
 } from "../models/index.js";
 import { getCompanyRequestState, getRoleAccountType } from "./appAccount.service.js";
 import { writeAuditLog } from "./auditLog.service.js";
+import ApiError from "../utils/apiError.js";
 
 const ACTIVE_STATUSES = new Set(["active", "pending"]);
 
@@ -46,6 +47,8 @@ const toObjectId = (value) => {
   if (value instanceof mongoose.Types.ObjectId) return value;
   return mongoose.Types.ObjectId.isValid(String(value)) ? new mongoose.Types.ObjectId(String(value)) : null;
 };
+
+const contextAccessError = (statusCode, message) => new ApiError(statusCode, message, "Account Context");
 
 const idOf = (value) => value?._id || value || null;
 
@@ -419,18 +422,31 @@ export async function setActiveAccountContext({ user, contextId, req = null }) {
 export async function resolveActiveContextForUser(userInput, requestedContextId = null) {
   const userId = toObjectId(userInput?._id || userInput?.id);
   if (!userId) return null;
+  const hasRequestedContext =
+    requestedContextId !== null &&
+    requestedContextId !== undefined &&
+    String(requestedContextId).trim() !== "";
   const requestedId = toObjectId(requestedContextId);
   const defaultId = toObjectId(userInput?.default_context_id);
 
-  let context = null;
-  if (requestedId) {
-    context = await AccountContextModel.findOne({
-      _id: requestedId,
-      user_id: userId,
-      status: { $in: ["active", "pending"] },
-    }).lean();
+  if (hasRequestedContext) {
+    if (!requestedId) {
+      throw contextAccessError(400, "invalid_active_context_id");
+    }
+
+    const requestedContext = await AccountContextModel.findById(requestedId).lean();
+    if (!requestedContext || String(requestedContext.user_id || "") !== String(userId)) {
+      throw contextAccessError(403, "active_context_forbidden");
+    }
+
+    if (!ACTIVE_STATUSES.has(requestedContext.status)) {
+      throw contextAccessError(403, "active_context_not_available");
+    }
+
+    return serializeAccountContext(requestedContext, requestedContext._id);
   }
 
+  let context = null;
   if (!context && defaultId) {
     context = await AccountContextModel.findOne({
       _id: defaultId,
