@@ -25,6 +25,9 @@ const sources = {
   university: readSource("routesUniversity/index.js"),
   campusController: readSource("controllers/app/campus/campusController.js"),
   companyIndex: readSource("routesCompany/index.js"),
+  companyDash: readSource("routesCompany/companyDashRoutes.js"),
+  companyJobs: readSource("routesCompany/jobRoute.js"),
+  companyCampus: readSource("routesCompany/campusRoute.js"),
   companyHelpers: readSource("helper/companyDash/companyDashHelpers.js"),
   employeeDash: readSource("routesEmployee/employeeDashRoutes.js"),
   employeeCv: readSource("routesEmployee/cvRoute.js"),
@@ -109,6 +112,61 @@ assertSourceIncludes({
     'router.use("/helper", authUser, requireCompanyContext, informationHelperRoute)',
     'router.use("/jobs", authUser, requireCompanyContext, jobRoute)',
     'router.use("/campus", authUser, requireCompanyContext, campusRoute)',
+  ],
+});
+
+assertSourceIncludes({
+  fileName: "routesCompany/companyDashRoutes.js",
+  source: sources.companyDash,
+  required: [
+    'router.post("/subscription/request", upload.none(), companySubscriptionController.requestPlanChange)',
+    'router.get("/support-tickets", requireCompanyPermission("support.manage")',
+    'router.post("/support-tickets", requireCompanyPermission("support.manage")',
+    'router.post("/support-tickets/:ticketId/messages", requireCompanyPermission("support.manage")',
+    'router.get("/members", requireCompanyPermission("company.members.manage")',
+    'router.post("/members", requireCompanyPermission("company.members.manage")',
+    'router.patch("/members/:memberId", requireCompanyPermission("company.members.manage")',
+    'router.delete("/members/:memberId", requireCompanyPermission("company.members.manage")',
+    'router.get("/question-library", requireCompanyPermission("question_library.manage")',
+    'router.post("/question-library", requireCompanyPermission("question_library.manage")',
+    'router.patch("/question-library/:questionId", requireCompanyPermission("question_library.manage")',
+    'router.delete("/question-library/:questionId", requireCompanyPermission("question_library.manage")',
+    'router.get("/message-templates", requireCompanyPermission("message_templates.manage")',
+    'router.post("/message-templates", requireCompanyPermission("message_templates.manage")',
+    'router.patch("/message-templates/:templateId", requireCompanyPermission("message_templates.manage")',
+    'router.delete("/message-templates/:templateId", requireCompanyPermission("message_templates.manage")',
+  ],
+});
+
+assertSourceIncludes({
+  fileName: "routesCompany/jobRoute.js",
+  source: sources.companyJobs,
+  required: [
+    'router.patch("/hiring/applications/:applicationId/restore", requireCompanyPermission("ats.status.change")',
+    'router.post("/hiring/applications/:applicationId/messages", requireCompanyPermission("ats.messages.send")',
+    'router.patch("/hiring/applications/:applicationId/block-applicant", requireCompanyPermission("ats.reject")',
+    'router.post("/hiring/applications/bulk-cv", requireCompanyPermission("ats.view")',
+    'router.post("/hiring/applications/bulk-export", requireCompanyPermission("ats.view")',
+    'router.post("/hiring/:jobId/invitations", requireCompanyPermission("ats.messages.send")',
+    'router.patch("/hiring/invitations/:invitationId/cancel", requireCompanyPermission("ats.messages.send")',
+    'router.post("/talent/:jobId/smart-employees/generate", requireCompanyPermission("ats.view")',
+    'router.get("/talent/:jobId/smart-employees", requireCompanyPermission("ats.view")',
+    'router.get("/talent/:jobId/employees/:employeeId/match", requireCompanyPermission("ats.view")',
+    'router.post("/talent/help-requests", requireCompanyPermission("ats.view")',
+    'router.patch("/talent/help-requests/:requestId/cancel", requireCompanyPermission("ats.view")',
+  ],
+});
+
+assertSourceIncludes({
+  fileName: "routesCompany/campusRoute.js",
+  source: sources.companyCampus,
+  required: [
+    'router.get("/overview", requireCompanyPermission("ats.view")',
+    'router.get("/opportunities", requireCompanyPermission("jobs.manage")',
+    'router.post("/opportunities", requireCompanyPermission("jobs.manage")',
+    'router.get("/students", requireCompanyPermission("ats.view")',
+    'router.get("/partners", requireCompanyPermission("ats.view")',
+    'router.post("/partners", requireCompanyPermission("jobs.manage")',
   ],
 });
 
