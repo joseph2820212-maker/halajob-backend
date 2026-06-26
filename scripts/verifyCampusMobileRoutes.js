@@ -15,6 +15,7 @@ const sources = {
   job: readSource("routesUser/JobRote.js"),
   applyingJob: readSource("routesUser/ApplyingJobRote.js"),
   jobInformation: readSource("routesUser/JobInformationRote.js"),
+  companyRequest: readSource("routesUser/CompanyRote.js"),
   notification: readSource("routesUser/NotificationRote.js"),
   fcm: readSource("routesUser/FcmRote.js"),
   helper: readSource("routesUser/HelperRote.js"),
@@ -78,6 +79,7 @@ assertMounts({
     "/helper",
     "/job",
     "/employee",
+    "/company",
     "/job-information",
     "/applying-job",
     "/app/dashboard",
@@ -142,6 +144,17 @@ assertRoutes({
     "POST /rate-job/:id",
     "POST /review-job/:id",
     "POST /report-job/:id",
+  ],
+});
+
+assertRoutes({
+  fileName: "routesUser/CompanyRote.js",
+  routes: declaredRoutes(sources.companyRequest),
+  required: [
+    "POST /join-request",
+    "POST /upload-file",
+    "POST /delete-file",
+    "GET /get-files",
   ],
 });
 

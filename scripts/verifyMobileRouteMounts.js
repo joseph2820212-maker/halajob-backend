@@ -88,6 +88,11 @@ const requiredEndpoints = [
   ["POST", "/user/v1/applying-job/insert/:id"],
   ["GET", "/user/v1/app/dashboard/overview"],
 
+  ["GET", "/user/v1/company/get-files"],
+  ["POST", "/user/v1/company/join-request"],
+  ["POST", "/user/v1/company/upload-file"],
+  ["POST", "/user/v1/company/delete-file"],
+
   ["GET", "/user/v1/notifications"],
   ["GET", "/user/v1/notifications/get"],
   ["POST", "/user/v1/notifications/read-all"],

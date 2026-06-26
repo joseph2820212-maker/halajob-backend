@@ -10,9 +10,14 @@ const ALLOWED_FILES = {
   '.jpg': ['image/jpeg'],
   '.jpeg': ['image/jpeg'],
   '.png': ['image/png'],
+  '.webp': ['image/webp'],
   '.pdf': ['application/pdf'],
+  '.doc': ['application/msword'],
+  '.docx': [
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ],
 };
-const DOC_EXTS = ['.pdf'];
+const DOC_EXTS = ['.pdf', '.doc', '.docx'];
 
 const sanitizeFileName = (originalName = '') => {
   const ext = path.extname(originalName).toLowerCase();
