@@ -8,6 +8,7 @@ import keywordRoute from './keywordRoute.js';
 import dashboardRoute from './DashboardRoute.js';
 import dashboardController from '../controllers/dash/adminDashboardController.js';
 import adminModerationController from '../controllers/dash/adminModerationController.js';
+import adminOperationsController from '../controllers/dash/adminOperationsController.js';
 import adminSearchController from '../controllers/dash/adminSearchController.js';
 import resourceController from '../controllers/dash/adminResourceController.js';
 import TrustAdminController from '../controllers/trust/TrustAdminController.js';
@@ -92,6 +93,14 @@ router.get('/ai/requests', AiAdminController.listRequests);
 router.get('/ai/requests/:id', AiAdminController.getRequest);
 router.get('/ai/summary', AiAdminController.summary);
 router.get('/ai/usage/summary', AiAdminController.summary);
+
+/* ----------------------------- Operations logs / review readers ----------------------------- */
+router.get('/audit-logs', adminOperationsController.listAuditLogs);
+router.get('/operations/audit-logs', adminOperationsController.listAuditLogs);
+router.get('/translations', adminOperationsController.listTranslations);
+router.get('/translation-logs', adminOperationsController.listTranslations);
+router.get('/notifications/logs', adminOperationsController.listNotificationLogs);
+router.get('/notification-logs', adminOperationsController.listNotificationLogs);
 
 /* ----------------------------- Moderation / operations queues ----------------------------- */
 router.get('/moderation/company-requests', adminModerationController.listCompanyRequests);
