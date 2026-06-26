@@ -8,6 +8,9 @@ export const ANALYTICS_EVENT_GROUPS = Object.freeze({
     "account_context_switched",
     "profile_completed",
     "notification_opened",
+    "career_passport_updated",
+    "career_passport_share_enabled",
+    "career_passport_share_revoked",
   ],
   ai: [
     "ai_copilot_used",

@@ -64,6 +64,9 @@ assert.deepEqual(
 
 assert.equal(analyticsGroupForEvent("job_reported"), "jobs");
 assert.equal(analyticsGroupForEvent("notification_opened"), "activation");
+assert.equal(analyticsGroupForEvent("career_passport_updated"), "activation");
+assert.equal(analyticsGroupForEvent("career_passport_share_enabled"), "activation");
+assert.equal(analyticsGroupForEvent("career_passport_share_revoked"), "activation");
 assert.equal(analyticsGroupForEvent("ai_copilot_used"), "ai");
 assert.equal(analyticsGroupForEvent("ai_shortlist_generated"), "ai");
 assert.equal(analyticsGroupForEvent("ai_job_draft_generated"), "ai");

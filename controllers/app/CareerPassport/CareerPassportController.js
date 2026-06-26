@@ -32,6 +32,20 @@ const get = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const result = await updateCareerPassport({ user: req.user, body: req.body || {}, req });
+    recordAnalyticsEvent({
+      req,
+      event: "career_passport_updated",
+      userId: req.user?._id,
+      activeContext: req.activeContext,
+      entityType: "career_passport",
+      entityId: result.passport?._id,
+      metadata: {
+        source: "career_passport_update",
+        requested_fields: Object.keys(req.body || {}),
+        visibility: result.passport?.visibility || "",
+        score: result.passport?.score?.total ?? null,
+      },
+    }).catch(() => null);
     return ReturnAppData.updateData({
       res,
       data: {
@@ -87,6 +101,22 @@ const refreshScore = async (req, res, next) => {
 const share = async (req, res, next) => {
   try {
     const result = await updateCareerPassportShare({ user: req.user, body: req.body || {}, req });
+    const careerPassportShareEvent = result.passport.share?.enabled
+      ? "career_passport_share_enabled"
+      : "career_passport_share_revoked";
+    recordAnalyticsEvent({
+      req,
+      event: careerPassportShareEvent,
+      userId: req.user?._id,
+      activeContext: req.activeContext,
+      entityType: "career_passport",
+      entityId: result.passport?._id,
+      metadata: {
+        source: "career_passport_share",
+        share_enabled: result.passport.share?.enabled === true,
+        has_expiry: Boolean(result.passport.share?.expires_at),
+      },
+    }).catch(() => null);
     return ReturnAppData.updateData({
       res,
       data: {
@@ -94,7 +124,7 @@ const share = async (req, res, next) => {
         passport: result.snapshot,
         share: result.passport.share,
       },
-      message: result.passport.share?.enabled ? "career_passport_share_enabled" : "career_passport_share_revoked",
+      message: careerPassportShareEvent,
     });
   } catch (error) {
     return next(error);

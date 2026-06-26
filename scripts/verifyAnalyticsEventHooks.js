@@ -164,8 +164,12 @@ const requiredHooks = [
     file: "controllers/app/CareerPassport/CareerPassportController.js",
     snippets: [
       "recordAnalyticsEvent",
+      'event: "career_passport_updated"',
       'event: "ai_score_generated"',
       'source: "career_passport_score"',
+      "careerPassportShareEvent",
+      '"career_passport_share_enabled"',
+      '"career_passport_share_revoked"',
       "generated_by_ai",
     ],
   },
