@@ -11,6 +11,12 @@ import {
 import {CurrencyModel,JobNameModel,JobTypeModel,SkillModel,LanguageModel,EducationLevelModel,WorkModeModel,CountryModel} from "../../../models/index.js";
 import { deleteImage, processUploadImage } from "../../../services/imageService.js";
 import { applyEmployeeProjection, rebuildMatchForEmployee } from "../../../services/search/rebuildSearchData.js";
+import {
+  assertSupportedLaunchCurrencyCode,
+  assertSupportedLaunchCurrencyDoc,
+  isLaunchContractError,
+  normalizeLaunchCurrencyCode,
+} from "../../../services/globalLaunchContract.service.js";
 import mongoose from "mongoose";
 
 const ARRAY_FIELDS = new Set([
@@ -122,6 +128,12 @@ const parseJsonIfString = (value, fallback = value) => {
 const getRequestLang = (req) => {
   const lan = String(req.headers.lan || req.headers.lang || "ar").toLowerCase();
   return lan === "en" ? "en" : "ar";
+};
+
+const launchContractFailure = (res, error) => {
+  if (!isLaunchContractError(error)) return false;
+  fail(res, error.message, error.statusCode || 422, error.details);
+  return true;
 };
 
 const getLocalizedName = (value, lang = "ar") => {
@@ -395,16 +407,20 @@ const calculateBaseAmount = (amount, currency) => {
 
 const resolveCurrencyForSalary = async (payload = {}) => {
   let currency = null;
+  const code = normalizeLaunchCurrencyCode(payload.currency_code);
 
   if (payload.currency_id && mongoose.Types.ObjectId.isValid(payload.currency_id)) {
     currency = await CurrencyModel.findOne({ _id: payload.currency_id, is_active: true });
+    if (currency) assertSupportedLaunchCurrencyDoc(currency, code || payload.currency_id);
   }
 
-  if (!currency && payload.currency_code) {
+  if (!currency && code) {
+    const supportedCode = assertSupportedLaunchCurrencyCode(code);
     currency = await CurrencyModel.findOne({
-      code: String(payload.currency_code).toUpperCase(),
+      code: supportedCode,
       is_active: true,
     });
+    if (currency) assertSupportedLaunchCurrencyDoc(currency, supportedCode);
   }
 
   return currency;
@@ -856,6 +872,7 @@ export const updateBasicEmployeeProfile = async (req, res, next) => {
 
     return success(res, employee, "employee_profile_updated");
   } catch (error) {
+    if (launchContractFailure(res, error)) return;
     next(error);
   }
 };
@@ -941,6 +958,7 @@ export const updateWorkPreferences = async (req, res, next) => {
 
     return success(res, employee, "work_preferences_updated");
   } catch (error) {
+    if (launchContractFailure(res, error)) return;
     next(error);
   }
 };
@@ -978,6 +996,7 @@ export const replaceSection = async (req, res, next) => {
 
     return success(res, employee, `${section}_replaced`);
   } catch (error) {
+    if (launchContractFailure(res, error)) return;
     next(error);
   }
 };

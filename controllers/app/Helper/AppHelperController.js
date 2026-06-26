@@ -16,6 +16,10 @@ import {
   WorkModeModel,
   WorkTimeTypeModel,
 } from "../../../models/index.js";
+import {
+  launchCurrencyQuery,
+  launchWorkModeQuery,
+} from "../../../services/globalLaunchContract.service.js";
 
 const AR_DIACRITICS = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/g;
 const NON_WORD = /[^0-9A-Za-z\u0600-\u06FF\s]/g;
@@ -517,6 +521,8 @@ const currency = createHandler({
   fields: ["code", "name_ar", "name_en", "symbol_ar", "symbol_en", "rate_base"],
   titleFields: ["name_ar", "name_en", "code"],
   mapper: currencyMapper,
+  defaultLimit: 3,
+  extraQuery: () => launchCurrencyQuery(),
 });
 const countryExtraQuery = (req) => {
   const countryCode = String(req.query.country_code || req.query.code || "").trim().toUpperCase();
@@ -576,6 +582,8 @@ const workMode = createHandler({
   model: WorkModeModel,
   fields: ["key", "title_ar", "title_en", "keywords_ar", "keywords_en"],
   mapper: workModeMapper,
+  defaultLimit: 3,
+  extraQuery: () => launchWorkModeQuery(),
 });
 
 const industry = createHandler({

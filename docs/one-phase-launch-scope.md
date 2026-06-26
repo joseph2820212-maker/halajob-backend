@@ -41,7 +41,7 @@ screens from it, and do not let it change the current release behavior.
 | Career Passport | Backend passport API, rule-based score snapshot foundation, and mobile seeker/campus Passport sheet are now implemented. | Add edit flows, employer/university views, AI-backed scoring, and share-link QA. |
 | Campus verification | Backend model/API foundation and Flutter campus verification sheet now support university list, status, email code verification, document upload, resubmit, and university admin approve/reject/request-info. | Complete live email/device QA against production credentials and approve/reject flows. |
 | University dashboard | University admin backend routes now honor active context for overview, students, verification queue/actions, partners, opportunity requests, employability analytics, and outcomes reports under `/university/v1`; Flutter now opens a university admin dashboard from the active `university_admin` context with metrics, verification actions, readiness, students, partners, and account switching. | Add deeper sub-screens, richer report exports, live university admin device QA, and release analytics. |
-| Global country/currency | Partial country/city helpers exist. Currency/work-mode launch rules need enforcement. | Limit salary currencies to USD/EUR/GBP and add country/work-mode contracts across records. |
+| Global country/currency | Country/city helpers plus `/user/v1/global/*` mobile routes are now mounted. Launch salary currencies are constrained to USD/EUR/GBP in company jobs, seeker profile salary, job search filters, mobile job posting, and the backend launch-contract verifier. Work modes are constrained to onsite/remote/hybrid with city required for onsite/hybrid job posts. | Finish production data migration/QA, confirm all old records map to the launch contract, and add richer global admin controls. |
 | Translation | Not implemented as approved AI translation workflow. | Add backend translation endpoints and approval storage. |
 | Trust/anti-scam | Some report/review features exist, no full trust score/admin queue. | Add trust scoring/report/review routes and admin actions. |
 | Push notifications | Backend FCM token routes exist; real Android push delivery still needs release credentials/device QA. | Finish FCM permission, device token lifecycle, and event-driven notifications. |
@@ -297,6 +297,18 @@ Country/currency requirements:
 - Salary display uses `salary_min`, `salary_max`, `currency`, `pay_period`.
 - Do not auto-convert currencies unless verified exchange-rate settings exist.
 - Super admin can enable countries and set default USD/EUR/GBP currency.
+
+Current implementation note:
+
+- `/user/v1/global/countries`, `/user/v1/global/cities`,
+  `/user/v1/global/currencies`, and `/user/v1/global/work-modes` are mounted for
+  mobile/global selection.
+- The launch contract currently allows only `USD`, `EUR`, and `GBP` salary
+  currencies and only `onsite`, `remote`, and `hybrid` work modes.
+- Company job create/update, job browse/search filters, seeker work-preference
+  salary updates, and Flutter company/seeker salary UI now use the launch
+  contract. Remaining work is production data cleanup and admin-managed country
+  rollout controls.
 
 Translation requirements:
 

@@ -1,9 +1,14 @@
 // controllers/employee/EditProfileController.js
 import Joi from "joi";
 import mongoose from "mongoose";
-import { EmployeeModel } from "../../../models/index.js";
+import { CurrencyModel, EmployeeModel } from "../../../models/index.js";
 import { resolveAppAccount } from "../../../services/appAccount.service.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
+import {
+  SUPPORTED_LAUNCH_CURRENCIES,
+  assertSupportedLaunchCurrencyDoc,
+  isLaunchContractError,
+} from "../../../services/globalLaunchContract.service.js";
 
 
 const CANDIDATE_STAGES = [
@@ -117,7 +122,7 @@ const expectedSalarySchema = Joi.object({
   min: Joi.number().min(0).allow(null),
   max: Joi.number().min(0).allow(null),
   currency_id: nullableObjectId(),
-  currency_code: Joi.string().trim().uppercase().allow("").max(12),
+  currency_code: Joi.string().trim().uppercase().allow("").valid("", ...SUPPORTED_LAUNCH_CURRENCIES),
   currency_symbol: Joi.string().trim().allow("").max(12),
   currency_rate_base: Joi.string().trim().uppercase().allow("").max(12),
   currency_rate: Joi.number().min(0),
@@ -204,6 +209,18 @@ function normalizeCareerConsistency(value, employee) {
   }
 
   return { valid: true };
+}
+
+async function validateLaunchSalaryCurrency(value) {
+  const salary = value.expected_salary;
+  if (!salary?.currency_id) return;
+
+  const currency = await CurrencyModel.findOne({
+    _id: salary.currency_id,
+    is_active: true,
+  }).select("code currency_code is_active");
+
+  assertSupportedLaunchCurrencyDoc(currency || {}, salary.currency_id);
 }
 
 function buildSearchFiltersPatch(value) {
@@ -309,6 +326,8 @@ const update = async (req, res, next) => {
       });
     }
 
+    await validateLaunchSalaryCurrency(value);
+
     const careerCheck = normalizeCareerConsistency(value, employee);
     if (!careerCheck.valid) {
       return ReturnAppData.getError({
@@ -349,6 +368,14 @@ const update = async (req, res, next) => {
     });
   } catch (err) {
     console.error("employee profile update error:", err);
+    if (isLaunchContractError(err)) {
+      return ReturnAppData.getError({
+        res,
+        status: err.statusCode || 422,
+        message: err.message,
+        other: { errors: err.details },
+      });
+    }
     return ReturnAppData.getError({
       res,
       status: err.statusCode || 500,

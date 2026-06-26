@@ -14,6 +14,17 @@ import {
   shouldJobRequireAdminApproval,
 } from "../../../services/subscriptions/companySubscription.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import {
+  assertLaunchJobLocation,
+  assertSupportedLaunchCurrencyCode,
+  assertSupportedLaunchCurrencyDoc,
+  assertSupportedLaunchWorkModeDoc,
+  isLaunchContractError,
+  isRemoteLaunchWorkMode,
+  launchWorkModeDefinition,
+  normalizeLaunchCurrencyCode,
+  normalizeLaunchWorkModeKey,
+} from "../../../services/globalLaunchContract.service.js";
 
 import {
   getCompanyUserIdOrFail,
@@ -296,37 +307,68 @@ const resolveCurrency = async (value) => {
   if (!CurrencyModel || value === undefined || value === null || value === "") return null;
 
   const id = validObjectIdOrNull(value);
-  if (id) return await CurrencyModel.findById(id).lean();
+  if (id) {
+    const existingById = await CurrencyModel.findById(id).lean();
+    return existingById ? assertSupportedLaunchCurrencyDoc(existingById, value) : null;
+  }
 
   const parsed = parseMaybeJson(value);
   const label = getLabel(parsed) || cleanText(value);
-  const code = cleanText(parsed?.code || parsed?.currency_code || label).toUpperCase();
-  if (!code) return null;
+  const code = normalizeLaunchCurrencyCode(parsed?.code || parsed?.currency_code || label);
+  if (!code && !label) return null;
 
+  const codeQuery = /^[A-Z]{3}$/.test(code) ? [{ code }] : [];
   const existing = await CurrencyModel.findOne({
     $or: [
-      { code },
+      ...codeQuery,
       { name_en: new RegExp(`^${escapeRegex(label)}$`, "i") },
       { name_ar: new RegExp(`^${escapeRegex(label)}$`, "i") },
     ],
   }).lean();
 
-  if (existing) return existing;
-  if (!/^[A-Z]{3}$/.test(code)) return null;
+  if (existing) return assertSupportedLaunchCurrencyDoc(existing, code || label);
+
+  const supportedCode = assertSupportedLaunchCurrencyCode(code);
 
   const created = await CurrencyModel.create({
-    code,
-    name_en: code,
-    name_ar: code,
-    symbol_en: code,
-    symbol_ar: code,
+    code: supportedCode,
+    name_en: supportedCode,
+    name_ar: supportedCode,
+    symbol_en: supportedCode,
+    symbol_ar: supportedCode,
     rate_base: "USD",
     rate: 1,
     is_active: true,
     is_auto_update: false,
   });
 
-  return created?.toObject ? created.toObject() : created;
+  const doc = created?.toObject ? created.toObject() : created;
+  return assertSupportedLaunchCurrencyDoc(doc, supportedCode);
+};
+
+const resolveWorkMode = async (value) => {
+  if (!WorkModeModel || value === undefined || value === null || value === "") return null;
+
+  const id = validObjectIdOrNull(value);
+  if (id) {
+    const existingById = await WorkModeModel.findById(id).lean();
+    return existingById ? assertSupportedLaunchWorkModeDoc(existingById, value) : null;
+  }
+
+  const key = normalizeLaunchWorkModeKey(value);
+  if (!key) return assertSupportedLaunchWorkModeDoc({}, value);
+
+  const existing = await WorkModeModel.findOne({ key }).lean();
+  if (existing) return assertSupportedLaunchWorkModeDoc(existing, key);
+
+  const created = await WorkModeModel.create({
+    ...launchWorkModeDefinition(key),
+    is_active: true,
+    is_system: true,
+  });
+
+  const doc = created?.toObject ? created.toObject() : created;
+  return assertSupportedLaunchWorkModeDoc(doc, key);
 };
 
 const normalizeSkills = async (value) => {
@@ -516,7 +558,7 @@ const buildJobPayload = async (body = {}, companyData) => {
     payload.job_keywords = toArray(body.job_keywords ?? body.keywords ?? body.tags).map(cleanText).filter(Boolean);
   }
 
-  const workMode = await createLookupIfMissing(WorkModeModel, body.work_mode_id || body.work_mode);
+  const workMode = await resolveWorkMode(body.work_mode_id || body.work_mode);
   if (workMode?._id) {
     payload.work_mode_id = workMode._id;
     payload.work_mode_info = workMode;
@@ -540,11 +582,28 @@ const buildJobPayload = async (body = {}, companyData) => {
     payload.job_salary_info = salaryType;
   }
 
+  const hasSalaryInput =
+    body.min_salary !== undefined ||
+    body.max_salary !== undefined ||
+    body.salary !== undefined ||
+    body.currency_id !== undefined ||
+    body.currency !== undefined ||
+    body.currency_code !== undefined ||
+    body?.salary?.currency_id !== undefined ||
+    body?.salary?.currency_code !== undefined ||
+    body["salary.currency_id"] !== undefined;
+
   const currencyDoc = await resolveCurrency(
-    body.currency_id || body.currency || body.currency_code || body?.salary?.currency_id || body?.salary?.currency_code || body["salary.currency_id"]
+    body.currency_id ||
+      body.currency ||
+      body.currency_code ||
+      body?.salary?.currency_id ||
+      body?.salary?.currency_code ||
+      body["salary.currency_id"] ||
+      (hasSalaryInput ? "USD" : "")
   );
 
-  if (currencyDoc?._id || body.min_salary !== undefined || body.max_salary !== undefined || body.salary !== undefined) {
+  if (currencyDoc?._id || hasSalaryInput) {
     payload.salary = {
       min: toNumberOrNull(body.min_salary ?? body.salary?.min),
       max: toNumberOrNull(body.max_salary ?? body.salary?.max),
@@ -599,6 +658,15 @@ const buildJobPayload = async (body = {}, companyData) => {
   ].forEach((field) => {
     if (body[field] !== undefined) payload[field] = Boolean(toBool(body[field]));
   });
+
+  if (payload.work_mode_info?.key) {
+    payload.is_remote = isRemoteLaunchWorkMode(payload.work_mode_info.key);
+    assertLaunchJobLocation({
+      workModeKey: payload.work_mode_info.key,
+      city: payload.city,
+      cities: payload.cities,
+    });
+  }
 
   if (body.out_link !== undefined) payload.out_link = cleanText(body.out_link);
 
@@ -770,6 +838,9 @@ export const getMyJobs = async (req, res, next) => {
 
     return success(res, items, "company_jobs", 200, result.meta);
   } catch (error) {
+    if (isLaunchContractError(error)) {
+      return fail(res, error.message, error.statusCode || 422, error.details);
+    }
     next(error);
   }
 };
@@ -797,6 +868,9 @@ export const getJobsStatistics = async (req, res, next) => {
       "company_jobs_statistics"
     );
   } catch (error) {
+    if (isLaunchContractError(error)) {
+      return fail(res, error.message, error.statusCode || 422, error.details);
+    }
     next(error);
   }
 };

@@ -40,6 +40,11 @@ import {
 
 import { calculateAtsApplicationResult } from "../../../services/matching/atsScoring.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import {
+  assertSupportedLaunchCurrencyCode,
+  isLaunchContractError,
+  normalizeLaunchWorkModeKey,
+} from "../../../services/globalLaunchContract.service.js";
 
 import {
   getEmployeeUserIdOrFail,
@@ -110,6 +115,7 @@ const applyCommonJobFilters = (filter, query) => {
     city,
     job_type_id,
     work_mode_id,
+    work_mode,
     job_time_id,
     job_salary_id,
     experience_level_id,
@@ -131,6 +137,16 @@ const applyCommonJobFilters = (filter, query) => {
 
   if (job_type_id && isValidObjectId(job_type_id)) filter.job_type_id = job_type_id;
   if (work_mode_id && isValidObjectId(work_mode_id)) filter.work_mode_id = work_mode_id;
+  const workModeKey = normalizeLaunchWorkModeKey(work_mode);
+  if (workModeKey) {
+    filter.$and = filter.$and || [];
+    filter.$and.push({
+      $or: [
+        { "work_mode_info.key": workModeKey },
+        { "search_index.filters.work_mode": new RegExp(`^${workModeKey}$`, "i") },
+      ],
+    });
+  }
   if (job_time_id && isValidObjectId(job_time_id)) filter.job_time_id = job_time_id;
   if (job_salary_id && isValidObjectId(job_salary_id)) filter.job_salary_id = job_salary_id;
   if (experience_level_id && isValidObjectId(experience_level_id)) filter.experience_level_id = experience_level_id;
@@ -142,7 +158,7 @@ const applyCommonJobFilters = (filter, query) => {
   const targets = parseArrayQuery(candidate_target);
   if (targets.length) filter.candidate_target = { $in: [...targets, "all"] };
 
-  if (currency_code) filter["salary.currency_code"] = String(currency_code).trim().toUpperCase();
+  if (currency_code) filter["salary.currency_code"] = assertSupportedLaunchCurrencyCode(currency_code);
 
   if (min_salary_usd || max_salary_usd) {
     filter.$and = filter.$and || [];
@@ -159,6 +175,7 @@ export const browseJobs = async (req, res, next) => {
     const result = await paginate(jobsModel, filter, req, { populate: publicJobPopulate });
     return success(res, result.items, "jobs_list", 200, result.meta);
   } catch (error) {
+    if (isLaunchContractError(error)) return fail(res, error.message, error.statusCode || 422, error.details);
     next(error);
   }
 };
@@ -208,6 +225,7 @@ export const recommendedJobs = async (req, res, next) => {
 
     return success(res, result.items, "recommended_jobs", 200, result.meta);
   } catch (error) {
+    if (isLaunchContractError(error)) return fail(res, error.message, error.statusCode || 422, error.details);
     next(error);
   }
 };

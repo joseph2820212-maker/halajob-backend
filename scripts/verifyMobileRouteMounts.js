@@ -25,6 +25,11 @@ const requiredEndpoints = [
   ["POST", "/user/v1/career-passport/share"],
   ["POST", "/ai/v1/career-passport/score"],
 
+  ["GET", "/user/v1/global/countries"],
+  ["GET", "/user/v1/global/cities"],
+  ["GET", "/user/v1/global/currencies"],
+  ["GET", "/user/v1/global/work-modes"],
+
   ["GET", "/campus/v1/universities"],
   ["GET", "/campus/v1/universities/:id/campuses"],
   ["GET", "/campus/v1/student-verifications/me"],

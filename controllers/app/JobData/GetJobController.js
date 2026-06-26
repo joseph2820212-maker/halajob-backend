@@ -21,6 +21,11 @@ import {
 } from "../../../models/index.js";
 import { calculateJobEmployeeMatch } from "../../../services/matching/jobEmployeeMatching.js";
 import { resolveAppAccount } from "../../../services/appAccount.service.js";
+import {
+  assertSupportedLaunchCurrencyCode,
+  isLaunchContractError,
+  normalizeLaunchWorkModeKey,
+} from "../../../services/globalLaunchContract.service.js";
 
 const { Types } = mongoose;
 const PUBLIC_BASE = process.env.PUBLIC_BASE_URL || "";
@@ -168,6 +173,14 @@ const readFilters = (req) => {
     services: parseArray(req.query.service, req.query.services, body.service, body.services).map(normalizeText).filter(Boolean),
     candidate_target: parseArray(req.query.candidate_target, body.candidate_target),
     is_remote: parseBool(req.query.is_remote ?? body.is_remote ?? body.remote),
+    work_mode_key: normalizeLaunchWorkModeKey(
+      req.query.work_mode ?? req.query.workMode ?? body.work_mode ?? body.workMode
+    ),
+    currency_code: String(
+      req.query.currency_code ?? req.query.currency ?? body.currency_code ?? body.currency ?? ""
+    ).trim().toUpperCase(),
+    salary_min: parseNumber(req.query.salary_min ?? req.query.min_salary ?? body.salary_min ?? body.min_salary),
+    salary_max: parseNumber(req.query.salary_max ?? req.query.max_salary ?? body.salary_max ?? body.max_salary),
     not_seen: parseBool(req.query.not_seen ?? body.not_seen) === true,
     not_applied: parseBool(req.query.not_applied ?? body.not_applied) === true,
     saved_only: parseBool(req.query.saved_only ?? body.saved_only) === true,
@@ -224,6 +237,17 @@ const buildFilterMatch = (filters) => {
   if (filters.services.length) and.push({ "search_index.filters.services": { $in: filters.services } });
   if (filters.candidate_target.length) and.push({ candidate_target: { $in: [...filters.candidate_target, "all"] } });
   if (filters.is_remote !== null) match.is_remote = filters.is_remote;
+  if (filters.work_mode_key) {
+    and.push({
+      $or: [
+        { "work_mode_info.key": filters.work_mode_key },
+        { "search_index.filters.work_mode": new RegExp(`^${filters.work_mode_key}$`, "i") },
+      ],
+    });
+  }
+  if (filters.currency_code) match["salary.currency_code"] = assertSupportedLaunchCurrencyCode(filters.currency_code);
+  if (filters.salary_min !== null) and.push({ $or: [{ "salary.max": null }, { "salary.max": { $gte: filters.salary_min } }] });
+  if (filters.salary_max !== null) and.push({ $or: [{ "salary.min": null }, { "salary.min": { $lte: filters.salary_max } }] });
   if (filters.salary_min_usd !== null) and.push({ $or: [{ "salary.max_usd": null }, { "salary.max_usd": { $gte: filters.salary_min_usd } }] });
   if (filters.salary_max_usd !== null) and.push({ $or: [{ "salary.min_usd": null }, { "salary.min_usd": { $lte: filters.salary_max_usd } }] });
   const createdAt = dateFromBucket(filters.publish_date);
@@ -447,6 +471,14 @@ const get = async (req, res, next) => {
       other: { pagination: { page, limit, total, pages: Math.ceil(total / limit), has_more: page * limit < total }, employee_profile_ready: Boolean(employee?.matching_profile) },
     });
   } catch (error) {
+    if (isLaunchContractError(error)) {
+      return ReturnAppData.getError({
+        res,
+        status: error.statusCode || 422,
+        message: error.message,
+        other: { errors: error.details },
+      });
+    }
     next(error);
   }
 };
@@ -797,6 +829,14 @@ const getFilters = async (req, res, next) => {
       },
     });
   } catch (error) {
+    if (isLaunchContractError(error)) {
+      return ReturnAppData.getError({
+        res,
+        status: error.statusCode || 422,
+        message: error.message,
+        other: { errors: error.details },
+      });
+    }
     next(error);
   }
 };
