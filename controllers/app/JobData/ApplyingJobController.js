@@ -11,6 +11,7 @@ import {
 import { calculateJobEmployeeMatch } from "../../../services/matching/jobEmployeeMatching.js";
 import { calculateAtsApplicationResult } from "../../../services/matching/atsScoring.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import { ApplicationStatusHistoryModel } from "../../../models/index.js";
 import { job_applied_notification } from "../../../notification/JobCompanyNotifications.js";
 
@@ -653,6 +654,22 @@ const applyJob = async (req, res, next) => {
     ]);
 
     job_applied_notification(job, created).catch?.(console.error);
+    recordAnalyticsEvent({
+      req,
+      event: "job_applied",
+      entityType: "application",
+      entityId: created._id,
+      jobId: job._id,
+      companyId: job.company_id,
+      applicationId: created._id,
+      metadata: {
+        source: "internal_application",
+        status: initialStatus,
+        ats_score: atsResult.score,
+        match_score: matchResult?.score ?? null,
+        has_knockout_failure: Boolean(atsResult.questions.knockout.has_failed),
+      },
+    }).catch(() => null);
 
     return ReturnAppData.createData({
       res,

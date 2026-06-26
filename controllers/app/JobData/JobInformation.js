@@ -14,6 +14,7 @@ import {
   job_reviewed_notification,
   job_seeker_saved_notification,
 } from "../../../notification/JobCompanyNotifications.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 const { Types } = mongoose;
 const toObjectId = (value) => (mongoose.isValidObjectId(String(value || "")) ? new Types.ObjectId(String(value)) : null);
@@ -89,6 +90,18 @@ const applyOutsideJob = async (req, res, next) => {
     const doc = await UserOutSideApplyingJobModel.create({ user_id: req.user._id, job_id: jobId });
     await jobsModel.updateOne({ _id: jobId }, { $inc: { out_side_applying: 1, "search_index.score_signals.applies": 1 } });
     job_applied_notification(job, doc).catch?.(console.error);
+    recordAnalyticsEvent({
+      req,
+      event: "job_applied",
+      entityType: "application",
+      entityId: doc._id,
+      jobId,
+      companyId: job.company_id,
+      metadata: {
+        source: "external_application",
+        out_link: job.out_link || "",
+      },
+    }).catch(() => null);
     return ReturnAppData.createData({ res, data: { application: doc, out_link: job.out_link }, message: msg(req, "تم تسجيل التقديم الخارجي.", "External application recorded.") });
   } catch (error) {
     if (error?.code === 11000) return ReturnAppData.getError({ res, status: 409, message: msg(req, "تم تسجيل التقديم الخارجي مسبقاً.", "External application already recorded.") });
@@ -134,6 +147,15 @@ const toggleSaveJob = async (req, res, next) => {
     await UserSavedJobModel.create({ user_id: req.user._id, job_id: jobId });
     await clampInc(jobId, "user_saved", 1);
     job_seeker_saved_notification(job, { candidate_user_id: req.user._id, dedupeKey: `job:${jobId}:saved:${req.user._id}` }).catch?.(console.error);
+    recordAnalyticsEvent({
+      req,
+      event: "job_saved",
+      entityType: "job",
+      entityId: jobId,
+      jobId,
+      companyId: job.company_id,
+      metadata: { source: "job_information" },
+    }).catch(() => null);
     return ReturnAppData.createData({ res, data: { is_saved: true }, message: msg(req, "تم حفظ الوظيفة.", "Job saved.") });
   } catch (error) {
     if (error?.code === 11000) return ReturnAppData.createData({ res, data: { is_saved: true }, message: msg(req, "الوظيفة محفوظة مسبقاً.", "Job already saved.") });

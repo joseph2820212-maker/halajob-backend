@@ -19,6 +19,7 @@ import {
 } from "../../../models/index.js";
 import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import {
   campusEventRegisteredNotification,
   campusVerificationApprovedNotification,
@@ -663,6 +664,18 @@ const registerEvent = async (req, res, next) => {
     ).lean();
 
     campusEventRegisteredNotification(registration).catch?.(console.error);
+    recordAnalyticsEvent({
+      req,
+      event: "event_joined",
+      entityType: "campus",
+      entityId: registration._id,
+      metadata: {
+        event_id: eventId,
+        title: registration.title || payload.title,
+        start_at: registration.start_at || payload.start_at || null,
+        mode: registration.mode || payload.mode,
+      },
+    }).catch(() => null);
 
     return ReturnAppData.createData({ res, data: registration, message: "campus_event_registered" });
   } catch (error) {
@@ -820,6 +833,18 @@ const startStudentVerification = async (req, res, next) => {
         university_id: university._id,
       },
     });
+    recordAnalyticsEvent({
+      req,
+      event: "campus_verification_started",
+      entityType: "campus",
+      entityId: verificationObject._id,
+      metadata: {
+        method,
+        status: verificationObject.status,
+        university_id: String(university._id || ""),
+        email_sent: emailSent,
+      },
+    }).catch(() => null);
 
     return ReturnAppData.createData({
       res,
@@ -1378,6 +1403,18 @@ const adminApproveVerification = async (req, res, next) => {
     });
 
     campusVerificationApprovedNotification(verification.toObject()).catch?.(console.error);
+    recordAnalyticsEvent({
+      req,
+      event: "campus_verification_approved",
+      userId: verification.user_id,
+      entityType: "campus",
+      entityId: verification._id,
+      metadata: {
+        university_id: String(verification.university_id?._id || verification.university_id || ""),
+        reviewed_by: String(req.user._id || ""),
+        admin_scope: scoped.superAdmin ? "super_admin" : "university_admin",
+      },
+    }).catch(() => null);
 
     return ReturnAppData.updateData({
       res,

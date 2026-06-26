@@ -26,6 +26,7 @@ import {
   isLaunchContractError,
   normalizeLaunchWorkModeKey,
 } from "../../../services/globalLaunchContract.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 const { Types } = mongoose;
 const PUBLIC_BASE = process.env.PUBLIC_BASE_URL || "";
@@ -407,6 +408,31 @@ const markSeen = async (userId, jobIds = []) => {
   await jobsModel.updateMany({ _id: { $in: jobIds } }, { $inc: { user_show: 1, "search_index.score_signals.views": 1 } }).catch(() => null);
 };
 
+const recordJobFilterAnalytics = ({ req, filters, page, limit, total }) => {
+  const events = [];
+  if (filters.is_remote === true || filters.work_mode_key === "remote") {
+    events.push(["remote_filter_used", "remote"]);
+  }
+  if (filters.work_mode_key === "hybrid") {
+    events.push(["hybrid_filter_used", "hybrid"]);
+  }
+
+  events.forEach(([event, workMode]) => {
+    recordAnalyticsEvent({
+      req,
+      event,
+      entityType: "other",
+      metadata: {
+        work_mode: workMode,
+        page,
+        limit,
+        total,
+        has_search_text: Boolean(filters.q),
+      },
+    }).catch(() => null);
+  });
+};
+
 const get = async (req, res, next) => {
   try {
     const { userId, employee } = await getEmployeeForRequest(req);
@@ -464,6 +490,7 @@ const get = async (req, res, next) => {
     const data = await decorateJobs(rawItems, userId, employee);
 
     if (parseBool(req.query.mark_seen) === true) await markSeen(userId, rawItems.map((x) => x._id));
+    recordJobFilterAnalytics({ req, filters, page, limit, total });
 
     return ReturnAppData.getData({
       res,
@@ -869,6 +896,15 @@ const getById = async (req, res, next) => {
     }
 
     await markSeen(userId, [job._id]);
+    recordAnalyticsEvent({
+      req,
+      event: "job_viewed",
+      entityType: "job",
+      entityId: job._id,
+      jobId: job._id,
+      companyId: job.company_id,
+      metadata: { source: "job_detail" },
+    }).catch(() => null);
 
     const [item] = await decorateJobs([job], userId, employee);
 
