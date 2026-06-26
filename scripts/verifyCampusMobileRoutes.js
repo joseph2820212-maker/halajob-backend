@@ -262,6 +262,19 @@ assertRoutes({
   ],
 });
 
+assertSourceIncludes({
+  fileName: "routesCampus/index.js",
+  source: sources.campusPublic,
+  required: [
+    "requireUniversityAdminContext",
+    "const universityAdminGuard = [authUser, requireUniversityAdminContext]",
+    'router.get("/admin/verifications", universityAdminGuard',
+    'router.post("/admin/verifications/:id/approve", universityAdminGuard',
+    'router.post("/admin/verifications/:id/reject", universityAdminGuard',
+    'router.post("/admin/verifications/:id/request-info", universityAdminGuard',
+  ],
+});
+
 assertRoutes({
   fileName: "routesUniversity/index.js",
   routes: declaredRoutes(sources.university),
@@ -285,9 +298,31 @@ assertRoutes({
 });
 
 assertSourceIncludes({
+  fileName: "routesUniversity/index.js",
+  source: sources.university,
+  required: [
+    "requireUniversityAdminContext",
+    "const universityAdminGuard = [authUser, requireUniversityAdminContext]",
+    'router.get("/dashboard", universityAdminGuard',
+    'router.get("/dashboard/overview", universityAdminGuard',
+    'router.get("/students", universityAdminGuard',
+    'router.get("/students/:studentId/career-passport", universityAdminGuard',
+    'router.get("/verifications", universityAdminGuard',
+    'router.post("/verifications/:id/approve", universityAdminGuard',
+    'router.post("/verifications/:id/reject", universityAdminGuard',
+    'router.post("/verifications/:id/request-info", universityAdminGuard',
+    'router.get("/analytics/employability", universityAdminGuard',
+    'router.get("/reports/outcomes", universityAdminGuard',
+    'router.get("/opportunities", universityAdminGuard',
+    'router.post("/opportunities", universityAdminGuard',
+  ],
+});
+
+assertSourceIncludes({
   fileName: "routesUser/CampusRote.js",
   source: sources.campus,
   required: [
+    "requireUniversityAdminContext",
     'router.get("/profile", campusMobileGuard',
     'router.post("/profile", campusMobileGuard',
     'router.put("/profile", campusMobileGuard',
@@ -298,6 +333,15 @@ assertSourceIncludes({
     'router.post("/events/:eventId/register", campusMobileGuard',
     'router.patch("/events/:eventId/cancel", campusMobileGuard',
     'router.post("/events/:eventId/cancel", campusMobileGuard',
+    'router.get("/admin/verifications", universityAdminGuard',
+    'router.post("/admin/verifications/:id/approve", universityAdminGuard',
+    'router.post("/admin/verifications/:id/reject", universityAdminGuard',
+    'router.post("/admin/verifications/:id/request-info", universityAdminGuard',
+    'router.get("/university/overview", universityAdminGuard',
+    'router.get("/university/opportunities", universityAdminGuard',
+    'router.post("/university/opportunities", universityAdminGuard',
+    'router.get("/university/students", universityAdminGuard',
+    'router.get("/university/partners", universityAdminGuard',
   ],
 });
 

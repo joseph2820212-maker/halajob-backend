@@ -7,6 +7,45 @@ const contextTypesForAccount = {
   company: ["company_member", "company_admin"],
 };
 
+export const requireActiveContext = (allowedContextTypes, options = {}) => {
+  const allowedTypes = Array.isArray(allowedContextTypes)
+    ? allowedContextTypes
+    : [allowedContextTypes].filter(Boolean);
+
+  return async function activeContextGuard(req, res, next) {
+    try {
+      const activeContext = req.activeContext || {};
+      const status = activeContext.status || "";
+      const contextType = activeContext.context_type || "";
+
+      if (!allowedTypes.includes(contextType) || status !== "active") {
+        return ReturnAppData.getError({
+          res,
+          status: 403,
+          message: options.message || "active_context_required",
+          other: {
+            data: {
+              expected_context_type: allowedTypes,
+              active_context_type: contextType,
+              active_context_id: activeContext.id || "",
+              active_context_status: status,
+            },
+          },
+        });
+      }
+
+      return next();
+    } catch (error) {
+      return next(error);
+    }
+  };
+};
+
+export const requireUniversityAdminContext = requireActiveContext(
+  ["university_admin", "super_admin"],
+  { message: "university_admin_context_required" }
+);
+
 export const attachAppAccount = async (req, res, next) => {
   try {
     if (!req.user?._id) return next();

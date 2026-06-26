@@ -331,6 +331,35 @@ const requiredCampusStudentPaths = [
   "/user/v1/campus/events/:eventId/cancel",
 ];
 
+const requiredUniversityAdminPaths = [
+  "/campus/v1/admin/verifications",
+  "/campus/v1/admin/verifications/:id/approve",
+  "/campus/v1/admin/verifications/:id/reject",
+  "/campus/v1/admin/verifications/:id/request-info",
+  "/university/v1/dashboard",
+  "/university/v1/dashboard/overview",
+  "/university/v1/overview",
+  "/university/v1/students",
+  "/university/v1/students/:studentId/career-passport",
+  "/university/v1/verifications",
+  "/university/v1/verifications/:id/approve",
+  "/university/v1/verifications/:id/reject",
+  "/university/v1/verifications/:id/request-info",
+  "/university/v1/analytics/employability",
+  "/university/v1/reports/outcomes",
+  "/university/v1/partners",
+  "/university/v1/employer-partners",
+  "/university/v1/opportunities",
+  "/user/v1/campus/admin/verifications",
+  "/user/v1/campus/admin/verifications/:id/approve",
+  "/user/v1/campus/admin/verifications/:id/reject",
+  "/user/v1/campus/admin/verifications/:id/request-info",
+  "/user/v1/campus/university/overview",
+  "/user/v1/campus/university/opportunities",
+  "/user/v1/campus/university/students",
+  "/user/v1/campus/university/partners",
+];
+
 function hasEndpoint(method, path) {
   return endpointByPath.get(path)?.methods.includes(method) === true;
 }
@@ -347,6 +376,17 @@ const missingCampusGuards = requiredCampusStudentPaths.filter((path) => {
 });
 
 assert.deepEqual(missingCampusGuards, [], "Campus mobile endpoints must require a signed-in campus student");
+
+const missingUniversityAdminGuards = requiredUniversityAdminPaths.filter((path) => {
+  const middlewares = endpointByPath.get(path)?.middlewares || [];
+  return !middlewares.includes("authUser") || !middlewares.includes("activeContextGuard");
+});
+
+assert.deepEqual(
+  missingUniversityAdminGuards,
+  [],
+  "University admin mobile endpoints must require an active university_admin or super_admin context"
+);
 
 const sharedCareerPassportEndpoint = endpointByPath.get("/user/v1/career-passport/share/:token");
 assert.ok(
