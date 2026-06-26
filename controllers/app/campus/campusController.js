@@ -69,7 +69,7 @@ const parseDateOrNull = (value) => {
 const hashVerificationCode = ({ code, userId }) =>
   crypto
     .createHash("sha256")
-    .update(`${code}:${userId}:${process.env.JWT_SECRET || "halajob-campus"}`)
+    .update(`${code}:${userId}:${process.env.JWT_SECRET}`)
     .digest("hex");
 
 const createVerificationCode = () => String(crypto.randomInt(100000, 1000000));
