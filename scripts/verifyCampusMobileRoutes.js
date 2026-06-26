@@ -23,6 +23,7 @@ const sources = {
   campus: readSource("routesUser/CampusRote.js"),
   campusPublic: readSource("routesCampus/index.js"),
   university: readSource("routesUniversity/index.js"),
+  campusController: readSource("controllers/app/campus/campusController.js"),
   companyIndex: readSource("routesCompany/index.js"),
   companyHelpers: readSource("helper/companyDash/companyDashHelpers.js"),
   employeeDash: readSource("routesEmployee/employeeDashRoutes.js"),
@@ -340,6 +341,17 @@ assertSourceIncludes({
     'router.get("/reports/outcomes", universityAdminGuard',
     'router.get("/opportunities", universityAdminGuard',
     'router.post("/opportunities", universityAdminGuard',
+  ],
+});
+
+assertSourceIncludes({
+  fileName: "controllers/app/campus/campusController.js",
+  source: sources.campusController,
+  required: [
+    'cleanText(req.query?.format).toLowerCase() === "csv"',
+    'res.setHeader("Content-Type", "text/csv; charset=utf-8")',
+    'res.setHeader("Content-Disposition", \'attachment; filename="university-outcomes.csv"\')',
+    'export_formats: ["json", "csv"]',
   ],
 });
 
