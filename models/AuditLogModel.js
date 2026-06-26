@@ -6,7 +6,7 @@ const AuditLogSchema = new Schema(
   {
     company_id: { type: Schema.Types.ObjectId, ref: "companies", default: null, index: true },
     actor_user_id: { type: Schema.Types.ObjectId, ref: "users", default: null, index: true },
-    actor_type: { type: String, enum: ["system", "admin", "company_owner", "company_member", "employee"], default: "system", index: true },
+    actor_type: { type: String, enum: ["system", "admin", "company_owner", "company_member", "employee", "university_admin"], default: "system", index: true },
     action: { type: String, required: true, trim: true, index: true },
     entity_type: {
       type: String,

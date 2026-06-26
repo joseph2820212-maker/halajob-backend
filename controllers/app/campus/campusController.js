@@ -19,6 +19,12 @@ import {
 } from "../../../models/index.js";
 import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import {
+  campusEventRegisteredNotification,
+  campusVerificationApprovedNotification,
+  campusVerificationMoreInfoNotification,
+  campusVerificationRejectedNotification,
+} from "../../../notification/CampusNotifications.js";
 
 const { isValidObjectId } = mongoose;
 
@@ -636,6 +642,8 @@ const registerEvent = async (req, res, next) => {
       { $setOnInsert: payload, $set: { status: "registered" } },
       { new: true, upsert: true, runValidators: true }
     ).lean();
+
+    campusEventRegisteredNotification(registration).catch?.(console.error);
 
     return ReturnAppData.createData({ res, data: registration, message: "campus_event_registered" });
   } catch (error) {
@@ -1350,6 +1358,8 @@ const adminApproveVerification = async (req, res, next) => {
       },
     });
 
+    campusVerificationApprovedNotification(verification.toObject()).catch?.(console.error);
+
     return ReturnAppData.updateData({
       res,
       data: serializeVerification(verification.toObject()),
@@ -1391,6 +1401,8 @@ const adminRejectVerification = async (req, res, next) => {
       },
     });
 
+    campusVerificationRejectedNotification(verification.toObject(), reason).catch?.(console.error);
+
     return ReturnAppData.updateData({
       res,
       data: serializeVerification(verification.toObject()),
@@ -1431,6 +1443,8 @@ const adminRequestVerificationInfo = async (req, res, next) => {
         requested_information: requestedInformation,
       },
     });
+
+    campusVerificationMoreInfoNotification(verification.toObject(), requestedInformation).catch?.(console.error);
 
     return ReturnAppData.updateData({
       res,

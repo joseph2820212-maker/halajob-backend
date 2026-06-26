@@ -20,7 +20,7 @@
     "test:ai-safety": "node scripts/verifyAiSafetyContract.js && node scripts/verifyAiRouteMounts.js",
     "test:global-launch-contract": "node scripts/verifyGlobalLaunchContract.js",
     "test:trust-routes": "node scripts/verifyTrustRouteMounts.js",
-    "test:notification-routes": "node scripts/verifyNotificationRouteMounts.js",
+    "test:notification-routes": "node scripts/verifyNotificationRouteMounts.js && node scripts/verifyNotificationEventContract.js",
     "test:analytics-routes": "node scripts/verifyAnalyticsRouteMounts.js",
     "test:translation-routes": "node scripts/verifyTranslationRouteMounts.js",
     "test:mobile-routes": "node scripts/verifyCampusMobileRoutes.js && node scripts/verifyMobileRouteMounts.js",

@@ -128,6 +128,33 @@ export const NOTIFICATION_TEXT = {
     ar: { title: 'رد على عرض العمل', body: 'قام {candidate} بالرد على عرض وظيفة {job}.' },
     en: { title: 'Job invitation response', body: '{candidate} responded to the invitation for {job}.' },
   },
+  campus_verification_approved: {
+    en: { title: 'Campus status approved', body: 'Your student status at {university} was approved.' },
+  },
+  campus_verification_rejected: {
+    en: { title: 'Campus verification rejected', body: 'Your student verification for {university} was rejected. {reason}' },
+  },
+  campus_verification_more_information_requested: {
+    en: { title: 'Campus verification needs information', body: '{university} needs more information to verify your student status. {reason}' },
+  },
+  campus_event_registered: {
+    en: { title: 'Campus event saved', body: 'You registered for {event}.' },
+  },
+  campus_event_reminder: {
+    en: { title: 'Campus event reminder', body: '{event} is coming up. Check the event details before it starts.' },
+  },
+  company_viewed_profile: {
+    en: { title: 'A company viewed your profile', body: '{company} viewed your profile.' },
+  },
+  new_matching_job: {
+    en: { title: 'New matching job', body: '{job} looks like a good match for your profile.' },
+  },
+  cv_export_ready: {
+    en: { title: 'CV export ready', body: 'Your CV export is ready to download.' },
+  },
+  ai_result_ready: {
+    en: { title: 'AI result ready', body: 'Your {feature} result is ready to review.' },
+  },
   profile_completion_tip: {
     ar: { title: 'أكمل ملفك الشخصي', body: 'إكمال قسم {section} يزيد فرص ظهورك للشركات.' },
     en: { title: 'Complete your profile', body: 'Completing {section} improves your visibility to companies.' },
@@ -168,6 +195,15 @@ export const EVENT_ROUTE = {
   job_invitation_sent: { audience: 'employee', routeKey: 'applications.offers' },
   job_invitation_cancelled: { audience: 'employee', routeKey: 'applications.offers' },
   job_invitation_response_company: { audience: 'company', routeKey: 'applications.offers' },
+  campus_verification_approved: { audience: 'employee', routeKey: 'campus.verification' },
+  campus_verification_rejected: { audience: 'employee', routeKey: 'campus.verification' },
+  campus_verification_more_information_requested: { audience: 'employee', routeKey: 'campus.verification' },
+  campus_event_registered: { audience: 'employee', routeKey: 'campus.events' },
+  campus_event_reminder: { audience: 'employee', routeKey: 'campus.events' },
+  company_viewed_profile: { audience: 'employee', routeKey: 'profile.company_views' },
+  new_matching_job: { audience: 'employee', routeKey: 'jobs.recommended' },
+  cv_export_ready: { audience: 'employee', routeKey: 'cvs.my' },
+  ai_result_ready: { audience: 'employee', routeKey: 'dashboard' },
   profile_completion_tip: { audience: 'employee', routeKey: 'profile.personal_info' },
 };
 
