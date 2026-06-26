@@ -32,15 +32,16 @@ router.get("/subscription/billing-summary", requireCompanyPermission("billing.ma
 router.get("/subscription/invoices", requireCompanyPermission("billing.manage"), companySubscriptionController.getMyInvoices);
 router.get("/subscription/invoices/:invoiceId", requireCompanyPermission("billing.manage"), companySubscriptionController.getMyInvoiceDetails);
 router.post("/subscription/request", requireCompanyPermission("billing.manage"), upload.none(), companySubscriptionController.requestPlanChange);
-router.post("/profile/rebuild-search-filters", upload.none(), infoController.rebuildMyCompanySearchFilters);
+router.post("/profile/rebuild-search-filters", requireCompanyPermission("company.profile.manage"), upload.none(), infoController.rebuildMyCompanySearchFilters);
 
 /* Company profile */
-router.put("/profile", upload.none(), infoController.updateBasicCompanyProfile);
-router.put("/profile/about", upload.none(), infoController.updateCompanyAbout);
-router.put("/profile/contact", upload.none(), infoController.updateCompanyContact);
-router.put("/profile/location", upload.none(), infoController.updateCompanyLocation);
+router.put("/profile", requireCompanyPermission("company.profile.manage"), upload.none(), infoController.updateBasicCompanyProfile);
+router.put("/profile/about", requireCompanyPermission("company.profile.manage"), upload.none(), infoController.updateCompanyAbout);
+router.put("/profile/contact", requireCompanyPermission("company.profile.manage"), upload.none(), infoController.updateCompanyContact);
+router.put("/profile/location", requireCompanyPermission("company.profile.manage"), upload.none(), infoController.updateCompanyLocation);
 router.put(
   "/profile/media",
+  requireCompanyPermission("company.profile.manage"),
   upload.fields([
     { name: "logo", maxCount: 1 },
     { name: "cover_image", maxCount: 1 },
@@ -48,16 +49,16 @@ router.put(
   infoController.updateCompanyMedia
 );
 router.get("/profile/files", infoController.listCompanyFiles);
-router.post("/profile/files", companyFileUpload.single("file"), infoController.uploadCompanyFile);
-router.delete("/profile/files/:filename", infoController.deleteCompanyFile);
+router.post("/profile/files", requireCompanyPermission("company.profile.manage"), companyFileUpload.single("file"), infoController.uploadCompanyFile);
+router.delete("/profile/files/:filename", requireCompanyPermission("company.profile.manage"), infoController.deleteCompanyFile);
 router.get("/profile/files/:filename/download", infoController.downloadCompanyFile);
 
 /* Dynamic company sections */
 router.get("/profile/:section", infoController.getMySection);
-router.put("/profile/:section", upload.none(), infoController.replaceSection);
-router.post("/profile/:section", upload.none(), infoController.addSectionItems);
-router.patch("/profile/:section/:itemId", upload.none(), infoController.updateSectionItem);
-router.delete("/profile/:section/:itemId", upload.none(), infoController.deleteSectionItem);
+router.put("/profile/:section", requireCompanyPermission("company.profile.manage"), upload.none(), infoController.replaceSection);
+router.post("/profile/:section", requireCompanyPermission("company.profile.manage"), upload.none(), infoController.addSectionItems);
+router.patch("/profile/:section/:itemId", requireCompanyPermission("company.profile.manage"), upload.none(), infoController.updateSectionItem);
+router.delete("/profile/:section/:itemId", requireCompanyPermission("company.profile.manage"), upload.none(), infoController.deleteSectionItem);
 
 /* Jobs */
 router.get("/jobs", requireCompanyPermission("jobs.manage"), jobsController.getMyJobs);

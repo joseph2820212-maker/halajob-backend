@@ -69,7 +69,10 @@ function assertMounts({ fileName, mounts, required }) {
 }
 
 function assertSourceIncludes({ fileName, source, required }) {
-  const missing = required.filter((snippet) => !source.includes(snippet));
+  const normalizedSource = source.replace(/\r\n/g, "\n");
+  const missing = required.filter(
+    (snippet) => !source.includes(snippet) && !normalizedSource.includes(snippet)
+  );
   assert.deepEqual(missing, [], `${fileName} is missing required mobile route source`);
 }
 
@@ -120,6 +123,18 @@ assertSourceIncludes({
   fileName: "routesCompany/companyDashRoutes.js",
   source: sources.companyDash,
   required: [
+    'router.post("/profile/rebuild-search-filters", requireCompanyPermission("company.profile.manage")',
+    'router.put("/profile", requireCompanyPermission("company.profile.manage")',
+    'router.put("/profile/about", requireCompanyPermission("company.profile.manage")',
+    'router.put("/profile/contact", requireCompanyPermission("company.profile.manage")',
+    'router.put("/profile/location", requireCompanyPermission("company.profile.manage")',
+    '"/profile/media",\n  requireCompanyPermission("company.profile.manage")',
+    'router.post("/profile/files", requireCompanyPermission("company.profile.manage")',
+    'router.delete("/profile/files/:filename", requireCompanyPermission("company.profile.manage")',
+    'router.put("/profile/:section", requireCompanyPermission("company.profile.manage")',
+    'router.post("/profile/:section", requireCompanyPermission("company.profile.manage")',
+    'router.patch("/profile/:section/:itemId", requireCompanyPermission("company.profile.manage")',
+    'router.delete("/profile/:section/:itemId", requireCompanyPermission("company.profile.manage")',
     'router.get("/subscription/current", requireCompanyPermission("billing.manage")',
     'router.get("/subscription", requireCompanyPermission("billing.manage")',
     'router.get("/subscription/billing-summary", requireCompanyPermission("billing.manage")',
