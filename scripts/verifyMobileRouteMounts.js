@@ -89,6 +89,12 @@ const requiredEndpoints = [
   ["DELETE", "/user/v1/notifications/:id"],
   ["POST", "/user/v1/notifications/:id/delete"],
 
+  ["GET", "/notifications/v1/list"],
+  ["GET", "/notifications/v1/unread-count"],
+  ["POST", "/notifications/v1/read"],
+  ["POST", "/notifications/v1/device-token"],
+  ["DELETE", "/notifications/v1/device-token"],
+
   ["GET", "/user/v1/fcm/tokens"],
   ["POST", "/user/v1/fcm/tokens"],
   ["POST", "/user/v1/fcm/update-tokens/:id"],
