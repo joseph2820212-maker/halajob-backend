@@ -19,6 +19,7 @@
     "smoke:http": "node scripts/smokeHttp.js",
     "smoke:cors": "node scripts/smokeCors.js",
     "check:secrets": "node scripts/verifyNoSecrets.js",
+    "test:security-http": "node scripts/verifySecurityHttpContracts.js",
     "test:ai-safety": "node scripts/verifyAiSafetyContract.js && node scripts/verifyAiRouteMounts.js",
     "test:global-launch-contract": "node scripts/verifyGlobalLaunchContract.js",
     "test:trust-routes": "node scripts/verifyTrustRouteMounts.js",
