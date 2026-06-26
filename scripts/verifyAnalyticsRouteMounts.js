@@ -63,7 +63,9 @@ assert.deepEqual(
 );
 
 assert.equal(analyticsGroupForEvent("job_reported"), "jobs");
+assert.equal(analyticsGroupForEvent("ai_copilot_used"), "ai");
 assert.equal(analyticsGroupForEvent("ai_shortlist_generated"), "ai");
+assert.equal(analyticsGroupForEvent("ai_job_draft_generated"), "ai");
 assert.equal(analyticsGroupForEvent("event_joined"), "campus");
 assert.deepEqual(Object.keys(ANALYTICS_EVENT_GROUPS), [
   "activation",

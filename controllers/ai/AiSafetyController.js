@@ -3,12 +3,15 @@ import { handleSafeAiRequest } from "../../services/ai/aiSafety.service.js";
 import { recordAnalyticsEvent } from "../../services/analytics/analyticsEvent.service.js";
 
 const AI_ANALYTICS_EVENTS = Object.freeze({
+  "career_copilot": "ai_copilot_used",
   "profile_score": "ai_score_generated",
   "cv_rewrite": "ai_cv_rewritten",
   "job_match_explanation": "ai_job_match_viewed",
   "job_cover_letter": "ai_cover_letter_generated",
   "interview_practice": "ai_interview_practiced",
+  "company_job_generate": "ai_job_draft_generated",
   "company_shortlist": "ai_shortlist_generated",
+  "company_message_generate": "ai_hiring_message_generated",
 });
 
 const respond = (res, result) => {
