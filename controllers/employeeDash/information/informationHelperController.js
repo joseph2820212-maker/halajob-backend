@@ -18,6 +18,10 @@ import {
   WorkModeModel,
   WorkTimeTypeModel,
 } from "../../../models/index.js";
+import {
+  launchCurrencyQuery,
+  launchWorkModeQuery,
+} from "../../../services/globalLaunchContract.service.js";
 
 const escapeRegex = (value = "") => {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -121,10 +125,11 @@ const getList = async ({
   searchBuilder = buildTitleKeywordSearch,
   mapper = mapTitleKeywordResponse,
   sort = { sort_order: 1, title_en: 1 },
+  extraQuery = () => ({}),
 }) => {
   try {
     const is_ar = req.get("lan") === "ar";
-    const query = searchBuilder(req);
+    const query = { ...searchBuilder(req), ...extraQuery(req) };
 
     const items = await model
       .find(query)
@@ -170,6 +175,7 @@ const getCurrencies = async (req, res, next) => {
         code: d.code,
         symbol: d.symbol,
       })),
+    extraQuery: () => launchCurrencyQuery(),
   });
 };
 
@@ -186,6 +192,7 @@ const workMode = async (req, res, next) => {
     req,
     res,
     model: WorkModeModel,
+    extraQuery: () => launchWorkModeQuery(),
   });
 };
 
