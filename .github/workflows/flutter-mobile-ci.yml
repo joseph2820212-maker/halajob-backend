@@ -204,6 +204,16 @@ jobs:
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Campus auth mode: ``$env:HALA_CI_CAMPUS_AUTH_MODE``"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Diagnostics: ``$env:HALA_CI_SHOW_DIAGNOSTICS``"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Simple APK ZIP artifact: ``halajob-mobile-simple-apk-zip``"
+
+          $apkMetadataPath = 'mobile\dist\android\halajob-mobile-latest-release-local.apk.json'
+          if (Test-Path -LiteralPath $apkMetadataPath) {
+            $apkMetadata = Get-Content -Raw -LiteralPath $apkMetadataPath | ConvertFrom-Json
+            $installsSeparately = $apkMetadata.applicationId -ne 'com.llill.halajob'
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Android package ID: ``$($apkMetadata.applicationId)``"
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Android versionCode: ``$($apkMetadata.buildNumber)``"
+            Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Separate from developer APK package ``com.llill.halajob``: ``$installsSeparately``"
+          }
+
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value ""
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "Use ``remote-backend`` for production campus accounts. Use ``local-device`` only for campus screen/device QA while the campus backend is not deployed."
 
