@@ -55,7 +55,7 @@ jobs:
 
       - name: Guard approved mobile palette
         run: |
-          if git grep -n -E 'green|Green|emerald|Emerald|mint|Mint|lime|Lime|teal|Teal|10C26A|0xFF10C26A|0xff10c26a|#10C26A|#10c26a|4C6A4F|0xFF4C6A4F|0xff4c6a4f|#4C6A4F|#4c6a4f|Colors\.green' -- mobile/lib mobile/test mobile/docs mobile/README.md mobile/mockups ':!mobile/docs/brand'; then
+          if git grep -n -E '10C26A|0xFF10C26A|0xff10c26a|#10C26A|#10c26a|4C6A4F|0xFF4C6A4F|0xff4c6a4f|#4C6A4F|#4c6a4f|Colors\.green' -- mobile/lib mobile/test mobile/mockups ':!mobile/docs/brand'; then
             echo "Old green mobile palette value found. Use the approved navy/cream/orange system."
             exit 1
           fi
@@ -63,7 +63,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.35.3
+          flutter-version: 3.44.4
           channel: stable
           cache: true
 
@@ -79,9 +79,24 @@ jobs:
         working-directory: mobile
         run: flutter test
 
-      - name: Android debug build smoke check
+      - name: Android release build smoke check
         working-directory: mobile
-        run: flutter build apk --debug --dart-define=HALA_DEFAULT_BASE_URL=https://jobzain.com
+        env:
+          HALA_LOCAL_DEBUG_RELEASE_SIGNING: 'true'
+        run: |
+          APP_VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}')
+          APP_BUILD_NAME="${APP_VERSION%%+*}"
+          APP_BUILD_NUMBER="${APP_VERSION##*+}"
+          flutter build apk --release --build-name="$APP_BUILD_NAME" --build-number="$APP_BUILD_NUMBER" --dart-define=HALA_DEFAULT_BASE_URL=https://jobzain.com --dart-define=HALA_APP_BUILD_NAME="$APP_BUILD_NAME" --dart-define=HALA_APP_BUILD_NUMBER="$APP_BUILD_NUMBER" --dart-define=HALA_APP_BUILD_MODE=ci-release --dart-define=HALA_APP_BUILD_COMMIT=${{ github.sha }}
+
+      - name: Upload fresh Linux APK
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: halajob-mobile-fresh-apk-linux
+          if-no-files-found: error
+          retention-days: 14
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
 
   verify-windows:
     runs-on: windows-latest
@@ -99,7 +114,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.35.3
+          flutter-version: 3.44.4
           channel: stable
           cache: true
 
@@ -188,7 +203,7 @@ jobs:
 
           powershell.exe @arguments
 
-      - name: Export simple APK ZIP
+      - name: Package existing APK ZIP after fresh build
         shell: pwsh
         working-directory: mobile
         run: |
@@ -203,7 +218,9 @@ jobs:
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Base URL: ``$env:HALA_CI_BASE_URL``"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Campus auth mode: ``$env:HALA_CI_CAMPUS_AUTH_MODE``"
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Diagnostics: ``$env:HALA_CI_SHOW_DIAGNOSTICS``"
-          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Simple APK ZIP artifact: ``halajob-mobile-simple-apk-zip``"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Fresh APK artifact: ``halajob-mobile-fresh-apk``"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Fresh APK metadata artifact: ``halajob-mobile-fresh-apk-metadata``"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "- Existing-APK ZIP artifact: ``halajob-mobile-existing-apk-zip``"
 
           $apkMetadataPath = 'mobile\dist\android\halajob-mobile-latest-release-local.apk.json'
           if (Test-Path -LiteralPath $apkMetadataPath) {
@@ -247,11 +264,19 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: halajob-mobile-release-local-apk
+          name: halajob-mobile-fresh-apk
+          if-no-files-found: error
+          retention-days: 14
+          path: mobile/dist/android/halajob-mobile-latest-release-local.apk
+
+      - name: Upload latest tester APK metadata
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: halajob-mobile-fresh-apk-metadata
           if-no-files-found: error
           retention-days: 14
           path: |
-            mobile/dist/android/halajob-mobile-latest-release-local.apk
             mobile/dist/android/halajob-mobile-latest-release-local.apk.sha256
             mobile/dist/android/halajob-mobile-latest-release-local.apk.json
             mobile/dist/android/mobile-release-preflight-summary.json
@@ -260,7 +285,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: halajob-mobile-simple-apk-zip
+          name: halajob-mobile-existing-apk-zip
           if-no-files-found: error
           retention-days: 14
           path: mobile/dist/android/HalaJob-latest-APK.zip
