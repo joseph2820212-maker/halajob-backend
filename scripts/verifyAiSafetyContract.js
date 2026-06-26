@@ -4,6 +4,7 @@ import {
   buildAiSafetyPayload,
   buildAiProviderPrompt,
   createMockAiOutput,
+  estimateAiProviderCost,
   hashAiInput,
   normalizeAiFeatureKey,
   normalizeAiProviderName,
@@ -85,5 +86,15 @@ assert.ok(providerPrompt.includes("protected characteristics"));
 
 assert.deepEqual(parseAiProviderJson('{"score":72}'), { score: 72 });
 assert.deepEqual(parseAiProviderJson('```json\n{"score":72}\n```'), { score: 72 });
+
+process.env.HALA_AI_INPUT_COST_PER_1M_TOKENS = "1";
+process.env.HALA_AI_OUTPUT_COST_PER_1M_TOKENS = "3";
+assert.equal(
+  estimateAiProviderCost({ prompt_tokens: 500000, completion_tokens: 250000 }),
+  1.25,
+  "AI cost estimate must use configurable per-million token pricing"
+);
+delete process.env.HALA_AI_INPUT_COST_PER_1M_TOKENS;
+delete process.env.HALA_AI_OUTPUT_COST_PER_1M_TOKENS;
 
 console.log("AI safety contract verified.");

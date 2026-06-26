@@ -191,6 +191,22 @@ const providerTemperature = () => {
   return Number.isFinite(value) && value >= 0 && value <= 2 ? value : 0.2;
 };
 
+const costPerMillionTokens = (key) => {
+  const value = Number.parseFloat(process.env[key] || "");
+  return Number.isFinite(value) && value >= 0 ? value : 0;
+};
+
+export const estimateAiProviderCost = (usage = {}) => {
+  const promptTokens = Number(usage.prompt_tokens || 0);
+  const completionTokens = Number(usage.completion_tokens || 0);
+  const inputCost = costPerMillionTokens("HALA_AI_INPUT_COST_PER_1M_TOKENS");
+  const outputCost = costPerMillionTokens("HALA_AI_OUTPUT_COST_PER_1M_TOKENS");
+  const estimate =
+    (Math.max(promptTokens, 0) * inputCost + Math.max(completionTokens, 0) * outputCost) / 1000000;
+
+  return Number.isFinite(estimate) ? Number(estimate.toFixed(6)) : 0;
+};
+
 export const buildAiProviderPrompt = ({ feature, outputKeys = [] } = {}) => [
   "You are Hala Job's backend AI assistant.",
   "Return only a valid JSON object. Do not wrap it in markdown and do not include prose outside JSON.",
@@ -615,11 +631,13 @@ export const handleSafeAiRequest = async ({
       model: limit.model,
     });
     const tokenEstimate = Number(providerResult.usage?.total_tokens || 0);
+    const costEstimate = estimateAiProviderCost(providerResult.usage || {});
 
     record.status = "completed";
     record.output_json = providerResult.output;
     record.error = "";
     record.token_estimate = Number.isFinite(tokenEstimate) ? tokenEstimate : 0;
+    record.cost_estimate = costEstimate;
     await record.save();
 
     const providerUsage = {
@@ -629,6 +647,7 @@ export const handleSafeAiRequest = async ({
       prompt_tokens: providerResult.usage?.prompt_tokens || 0,
       completion_tokens: providerResult.usage?.completion_tokens || 0,
       total_tokens: providerResult.usage?.total_tokens || 0,
+      cost_estimate: costEstimate,
     };
     await auditAiRequest({
       req,
