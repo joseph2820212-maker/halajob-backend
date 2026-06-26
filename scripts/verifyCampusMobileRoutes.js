@@ -23,6 +23,8 @@ const sources = {
   campus: readSource("routesUser/CampusRote.js"),
   campusPublic: readSource("routesCampus/index.js"),
   university: readSource("routesUniversity/index.js"),
+  companyIndex: readSource("routesCompany/index.js"),
+  companyHelpers: readSource("helper/companyDash/companyDashHelpers.js"),
   employeeDash: readSource("routesEmployee/employeeDashRoutes.js"),
   employeeCv: readSource("routesEmployee/cvRoute.js"),
 };
@@ -95,6 +97,29 @@ assertMounts({
   fileName: "routesEmployee/index.js",
   mounts: declaredMounts(sources.employeeIndex),
   required: ["/global", "/cv"],
+});
+
+assertSourceIncludes({
+  fileName: "routesCompany/index.js",
+  source: sources.companyIndex,
+  required: [
+    "requireCompanyContext",
+    'router.use("/global", authUser, requireCompanyContext, companyDashRoutes)',
+    'router.use("/helper", authUser, requireCompanyContext, informationHelperRoute)',
+    'router.use("/jobs", authUser, requireCompanyContext, jobRoute)',
+    'router.use("/campus", authUser, requireCompanyContext, campusRoute)',
+  ],
+});
+
+assertSourceIncludes({
+  fileName: "helper/companyDash/companyDashHelpers.js",
+  source: sources.companyHelpers,
+  required: [
+    "const activeContext = req.activeContext || {}",
+    '["company_admin", "company_member"].includes(activeContextType)',
+    "CompanyModel.findById(activeCompanyId)",
+    'fail(res, "company_context_forbidden", 403)',
+  ],
 });
 
 assertRoutes({

@@ -11,6 +11,7 @@ export const requireActiveContext = (allowedContextTypes, options = {}) => {
   const allowedTypes = Array.isArray(allowedContextTypes)
     ? allowedContextTypes
     : [allowedContextTypes].filter(Boolean);
+  const allowedStatuses = options.allowedStatuses || ["active"];
 
   return async function activeContextGuard(req, res, next) {
     try {
@@ -18,7 +19,7 @@ export const requireActiveContext = (allowedContextTypes, options = {}) => {
       const status = activeContext.status || "";
       const contextType = activeContext.context_type || "";
 
-      if (!allowedTypes.includes(contextType) || status !== "active") {
+      if (!allowedTypes.includes(contextType) || !allowedStatuses.includes(status)) {
         return ReturnAppData.getError({
           res,
           status: 403,
@@ -44,6 +45,11 @@ export const requireActiveContext = (allowedContextTypes, options = {}) => {
 export const requireUniversityAdminContext = requireActiveContext(
   ["university_admin", "super_admin"],
   { message: "university_admin_context_required" }
+);
+
+export const requireCompanyContext = requireActiveContext(
+  ["company_admin", "company_member"],
+  { message: "company_context_required", allowedStatuses: ["active", "pending"] }
 );
 
 export const attachAppAccount = async (req, res, next) => {

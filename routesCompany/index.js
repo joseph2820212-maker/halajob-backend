@@ -6,14 +6,15 @@ import jobRoute from "./jobRoute.js";
 import campusRoute from "./campusRoute.js";
 
 import { authUser } from "../middlewares/userAuth.js";
+import { requireCompanyContext } from "../middlewares/appAccountGuard.js";
 
 const router = express.Router();
 
 router.use("/auth", authRoute);
-router.use("/global", authUser, companyDashRoutes);
-router.use("/helper", authUser, informationHelperRoute);
-router.use("/jobs", authUser, jobRoute);
-router.use("/campus", authUser, campusRoute);
+router.use("/global", authUser, requireCompanyContext, companyDashRoutes);
+router.use("/helper", authUser, requireCompanyContext, informationHelperRoute);
+router.use("/jobs", authUser, requireCompanyContext, jobRoute);
+router.use("/campus", authUser, requireCompanyContext, campusRoute);
 
 
 export default router;

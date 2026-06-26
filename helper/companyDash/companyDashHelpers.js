@@ -116,6 +116,45 @@ export const getCompanyPlain = async (req, res) => {
     return null;
   }
 
+  const activeContext = req.activeContext || {};
+  const activeContextType = activeContext.context_type || "";
+  const activeCompanyId =
+    ["company_admin", "company_member"].includes(activeContextType) && isValidObjectId(activeContext.entity_id)
+      ? activeContext.entity_id
+      : null;
+
+  if (activeCompanyId) {
+    const company = await CompanyModel.findById(activeCompanyId);
+    if (!company) {
+      fail(res, "company_profile_not_found", 404);
+      return null;
+    }
+
+    const ownerId = company.owner_user_id || company.user_id;
+    if (String(ownerId || "") === String(userId)) {
+      req.companyAccess = { role: "owner", permissions: ["*"] };
+      return company;
+    }
+
+    const member = await CompanyMemberModel.findOne({
+      user_id: userId,
+      company_id: company._id,
+      status: "active",
+    });
+
+    if (member) {
+      req.companyAccess = {
+        role: member.member_role,
+        member_id: member._id,
+        permissions: member.permissions || [],
+      };
+      return company;
+    }
+
+    fail(res, "company_context_forbidden", 403);
+    return null;
+  }
+
   const requestedCompanyId = req.headers?.company_id || req.headers?.["x-company-id"] || req.query?.company_id || req.body?.company_id;
 
   let company = await CompanyModel.findOne({ owner_user_id: userId });
