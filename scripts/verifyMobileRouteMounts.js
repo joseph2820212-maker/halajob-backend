@@ -221,6 +221,8 @@ const requiredEndpoints = [
   ["POST", "/employee/v1/cv/generate/download-url"],
 
   ["POST", "/company/v1/auth/login"],
+  ["POST", "/company/v1/auth/logout"],
+  ["POST", "/dash/v1/auth/logout"],
   ["GET", "/company/v1/global"],
   ["GET", "/company/v1/global/profile"],
   ["PUT", "/company/v1/global/profile"],

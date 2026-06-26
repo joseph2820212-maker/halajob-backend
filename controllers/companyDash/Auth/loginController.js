@@ -1,7 +1,7 @@
 import bcryptjs from "bcryptjs";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { CompanyModel, RoleModel, UserModel } from "../../../models/index.js";
-import { generateAuthTokens } from "../../../services/tokenService.js";
+import { clearRefreshToken, generateAuthTokens } from "../../../services/tokenService.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 const msg = (lan, ar, en) => (lan === "ar" ? ar : en);
@@ -341,4 +341,29 @@ const login = async (req, res, next) => {
   }
 };
 
-export default { login };
+const logout = async (req, res) => {
+  const lan = req.get("lan") || "en";
+  const refreshToken = req.body?.refreshToken || req.body?.refresh_token || req.get("x-refresh-token");
+
+  if (!refreshToken) {
+    return ReturnAppData.createError({
+      res,
+      status: 400,
+      message: msg(
+        lan,
+        "رمز التحديث مطلوب.",
+        "Refresh token is required."
+      ),
+    });
+  }
+
+  await clearRefreshToken(refreshToken);
+
+  return ReturnAppData.deleteData({
+    res,
+    status: 200,
+    message: msg(lan, "تم تسجيل الخروج بنجاح.", "Successfully logged out."),
+  });
+};
+
+export default { login, logout };

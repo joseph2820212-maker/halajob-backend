@@ -185,7 +185,8 @@ const logout = async (req, res, next) => {
   const lan = req.get("lan") || "en";
 
   try {
-    const { refreshToken } = req.body || {};
+    const refreshToken =
+      req.body?.refreshToken || req.body?.refresh_token || req.get("x-refresh-token");
 
     if (!refreshToken) {
       return ReturnAppData.createError({

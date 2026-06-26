@@ -6,5 +6,6 @@ const upload = multer;
 const router = express.Router();
 
 router.post("/login", upload.none(), Login.login);
+router.post("/logout", upload.none(), Login.logout);
 
 export default router;

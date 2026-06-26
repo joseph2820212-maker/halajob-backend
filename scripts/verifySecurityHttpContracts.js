@@ -63,6 +63,16 @@ async function assertJsonMessage({ response, expectedStatus, label, includes }) 
   }
 }
 
+async function assertJsonMessageFlexible({ response, expectedStatus, label, includes }) {
+  await assertStatus({ response, expectedStatus, label });
+  const payload = await response.json();
+  assert.match(
+    String(payload.message || payload.error || ""),
+    includes,
+    `${label} should include ${includes} in its message`
+  );
+}
+
 try {
   await new Promise((resolve) => server.once("listening", resolve));
   const { port } = server.address();
@@ -110,6 +120,20 @@ try {
     [400, 404].includes(traversalCvPath.status),
     `generated CV traversal attempt should fail safely; got ${traversalCvPath.status}`
   );
+
+  for (const [path, label] of [
+    ["/user/v1/auth/logout", "user logout"],
+    ["/company/v1/auth/logout", "company logout"],
+    ["/dash/v1/auth/logout", "dashboard logout"],
+  ]) {
+    const missingRefresh = await request(baseUrl, "POST", path);
+    await assertJsonMessageFlexible({
+      response: missingRefresh,
+      expectedStatus: 400,
+      label: `${label} missing refresh token`,
+      includes: /Refresh token is required/,
+    });
+  }
 
   for (const [method, path, label] of protectedChecks) {
     const missingAuth = await request(baseUrl, method, path);

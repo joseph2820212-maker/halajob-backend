@@ -271,7 +271,15 @@ const refresh = async (req, res) => {
 };
 
 const logout = async (req, res) => {
+  const lan = req.get('lan') || 'en';
   const refreshToken = req.body?.refreshToken || req.body?.refresh_token || req.get('x-refresh-token');
+  if (!refreshToken) {
+    return ReturnAppData.createError({
+      res,
+      status: 400,
+      message: msg(lan, 'Ø±Ù…Ø² Ø§Ù„ØªØ­Ø¯ÙŠØ« Ù…Ø·Ù„ÙˆØ¨.', 'Refresh token is required.'),
+    });
+  }
   await clearRefreshToken(refreshToken);
   return ReturnAppData.deleteData({
     res,

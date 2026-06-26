@@ -23,7 +23,7 @@ router.post('/register', upload.none(), Register.register);
 router.post('/campus/register', upload.none(), CampusAuthController.campusRegister);
 router.post('/campus/university-login', upload.none(), CampusAuthController.universityLogin);
 router.post('/login', upload.none(), Login.login);
-router.post('/logout', authUser, Login.logout);
+router.post('/logout', upload.none(), Login.logout);
 router.post('/refresh-token', upload.none(), Login.refreshToken);
 router.post("/passcode-verify", PassCodeController.passcodeVerify);
 router.post("/passcode-forgot-password", PassCodeForgotPasswordController.passcodeVerify);
