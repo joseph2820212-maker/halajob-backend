@@ -67,6 +67,7 @@ import {
   recordCompanyUsage,
 } from "../../../services/subscriptions/companySubscription.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 
 const failSubscription = (res, check) => fail(res, check.message || "subscription_not_allowed", check.status || 403, {
@@ -76,6 +77,30 @@ const failSubscription = (res, check) => fail(res, check.message || "subscriptio
   used: check.used,
   requested: check.requested,
 });
+
+const recordCompanyHiringAnalytics = ({
+  req,
+  event,
+  companyData,
+  entityType = "application",
+  entityId = null,
+  jobId = null,
+  applicationId = null,
+  metadata = {},
+}) => {
+  if (!companyData?.company?._id) return;
+  recordAnalyticsEvent({
+    req,
+    event,
+    userId: companyData.userId,
+    companyId: companyData.company._id,
+    entityType,
+    entityId,
+    jobId,
+    applicationId,
+    metadata,
+  }).catch(() => null);
+};
 
 const parseIntBounded = (value, fallback, min, max) => {
   const n = Number.parseInt(String(value ?? ""), 10);
@@ -468,6 +493,20 @@ export const updateApplicationStatus = async (req, res, next) => {
       job_id: application.job_id,
       job_name: job?.job_name || "",
     }).catch?.(console.error);
+    if (status === "shortlisted") {
+      recordCompanyHiringAnalytics({
+        req,
+        event: "candidate_shortlisted",
+        companyData,
+        entityId: application._id,
+        jobId: application.job_id,
+        applicationId: application._id,
+        metadata: {
+          old_status: oldStatus,
+          new_status: status,
+        },
+      });
+    }
 
     return success(res, normalizeApplication(application), "application_status_updated");
   } catch (error) {
@@ -538,6 +577,20 @@ export const createInterview = async (req, res, next) => {
     }).catch?.(console.error);
 
     await recordCompanyUsage(companyData.company._id, "interviews", 1);
+    recordCompanyHiringAnalytics({
+      req,
+      event: "interview_scheduled",
+      companyData,
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: application.job_id,
+      applicationId: application._id,
+      metadata: {
+        type: interview.type,
+        start_at: interview.start_at,
+        end_at: interview.end_at,
+      },
+    });
     return success(res, normalizeInterview(populated || interview), "interview_created", 201);
   } catch (error) {
     next(error);
@@ -859,6 +912,18 @@ export const getApplicationCv = async (req, res, next) => {
       { $set: { cv_download: true, last_activity_at: new Date() } }
     );
     await recordCompanyUsage(companyData.company._id, "cv_downloads", 1);
+    recordCompanyHiringAnalytics({
+      req,
+      event: "cv_exported",
+      companyData,
+      entityId: application._id,
+      jobId: application.job_id?._id || application.job_id,
+      applicationId: application._id,
+      metadata: {
+        source: "single_cv_download",
+        file_name: selectedCv.fileName || selectedCv.filename || "",
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -958,6 +1023,18 @@ export const bulkApplicationCvs = async (req, res, next) => {
       );
     }
     await recordCompanyUsage(companyData.company._id, "cv_downloads", Math.max(zipFiles.length, 1));
+    recordCompanyHiringAnalytics({
+      req,
+      event: "cv_exported",
+      companyData,
+      entityType: "company",
+      entityId: companyData.company._id,
+      metadata: {
+        source: "bulk_cv_zip",
+        applications_count: applications.length,
+        files_count: zipFiles.length,
+      },
+    });
 
     const fileName = `jobzain-cvs-${Date.now()}.zip`;
     res.setHeader("Content-Type", "application/zip");
@@ -987,6 +1064,18 @@ export const bulkExportApplications = async (req, res, next) => {
     ).lean();
 
     await recordCompanyUsage(companyData.company._id, "application_exports", 1);
+    recordCompanyHiringAnalytics({
+      req,
+      event: "cv_exported",
+      companyData,
+      entityType: "company",
+      entityId: companyData.company._id,
+      metadata: {
+        source: "applications_export",
+        applications_count: applications.length,
+        format: req.query.format || req.body?.format || "xlsx",
+      },
+    });
 
     if (req.query.format === "json" || req.body?.format === "json") {
       return success(

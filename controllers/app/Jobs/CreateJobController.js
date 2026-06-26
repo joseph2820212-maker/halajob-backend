@@ -11,6 +11,7 @@ import {
   recordCompanyUsage,
   shouldJobRequireAdminApproval,
 } from "../../../services/subscriptions/companySubscription.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 /* ========== i18n ========== */
 const buildLocale = (lan = "en") =>
@@ -350,6 +351,33 @@ export const create = async (req, res) => {
     await recordCompanyUsage(company._id, "job_posts", 1);
     if (validated.is_out_side) await recordCompanyUsage(company._id, "external_jobs", 1);
 Job_created_notification(job).catch?.(console.error);
+    recordAnalyticsEvent({
+      req,
+      event: "job_created",
+      userId: req.user._id,
+      companyId: company._id,
+      entityType: "job",
+      entityId: job._id,
+      jobId: job._id,
+      metadata: {
+        source: "legacy_company_job_create",
+        publish_status: job.publish_status,
+        requires_approval: requiresApproval,
+        is_external: Boolean(job.is_out_side),
+      },
+    }).catch(() => null);
+    if (job.publish_status === "published") {
+      recordAnalyticsEvent({
+        req,
+        event: "job_published",
+        userId: req.user._id,
+        companyId: company._id,
+        entityType: "job",
+        entityId: job._id,
+        jobId: job._id,
+        metadata: { source: "legacy_job_create" },
+      }).catch(() => null);
+    }
     return ReturnAppData.createData({
       res,
       data: job,

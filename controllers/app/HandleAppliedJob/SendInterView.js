@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { jobsModel, UserApplyingJobModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { SendInterViewNotification } from "../../../notification/JobEmployeeNotifications.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
 export const SendInterView = async (req, res, next) => {
   try {
@@ -88,6 +89,23 @@ export const SendInterView = async (req, res, next) => {
       longitude: applied.interview_information.longitude,
       latitude: applied.interview_information.latitude,
     });
+    recordAnalyticsEvent({
+      req,
+      event: "interview_scheduled",
+      userId: user._id,
+      companyId: job.company_id,
+      entityType: "application",
+      entityId: applied._id,
+      jobId: applied.job_id,
+      applicationId: applied._id,
+      metadata: {
+        source: "legacy_send_interview",
+        date: applied.interview_information.date,
+        is_online: applied.interview_information.is_online,
+        is_on_app: applied.interview_information.is_on_app,
+        is_in_office: applied.interview_information.is_in_office,
+      },
+    }).catch(() => null);
 
     return ReturnAppData.createData({
       res,

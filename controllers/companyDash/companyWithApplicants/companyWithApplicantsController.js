@@ -23,6 +23,31 @@ import {
   normalizeInterview,
 } from "../../../helper/companyDash/companyDashHelpers.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
+
+const recordCompanyApplicationAnalytics = ({
+  req,
+  event,
+  companyData,
+  entityType = "application",
+  entityId = null,
+  jobId = null,
+  applicationId = null,
+  metadata = {},
+}) => {
+  if (!companyData?.company?._id) return;
+  recordAnalyticsEvent({
+    req,
+    event,
+    userId: companyData.userId,
+    companyId: companyData.company._id,
+    entityType,
+    entityId,
+    jobId,
+    applicationId,
+    metadata,
+  }).catch(() => null);
+};
 
 const applicationPopulate = [
   { path: "job_id", populate: companyJobPopulate },
@@ -304,6 +329,20 @@ export const changeApplicationStatus = async (req, res, next) => {
       job_id: application.job_id,
       job_name: job?.job_name || "",
     }).catch?.(console.error);
+    if (newStatus === "shortlisted") {
+      recordCompanyApplicationAnalytics({
+        req,
+        event: "candidate_shortlisted",
+        companyData,
+        entityId: application._id,
+        jobId: application.job_id,
+        applicationId: application._id,
+        metadata: {
+          old_status: oldStatus,
+          new_status: newStatus,
+        },
+      });
+    }
 
     return success(res, application, "application_status_updated");
   } catch (error) {
@@ -468,6 +507,20 @@ export const scheduleInterview = async (req, res, next) => {
       office_address: interview.office_address,
       note: interview.candidate_note || interview.company_note || "",
     }).catch?.(console.error);
+    recordCompanyApplicationAnalytics({
+      req,
+      event: "interview_scheduled",
+      companyData,
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: application.job_id,
+      applicationId: application._id,
+      metadata: {
+        type: interview.type,
+        start_at: interview.start_at,
+        end_at: interview.end_at,
+      },
+    });
 
     return success(res, interview, "interview_scheduled", 201);
   } catch (error) {

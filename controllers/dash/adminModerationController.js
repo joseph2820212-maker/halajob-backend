@@ -14,6 +14,7 @@ import {
   getCompanySubscriptionSummary,
 } from "../../services/subscriptions/companySubscription.service.js";
 import { rebuildJobIntegration } from "../../services/search/rebuildSearchData.js";
+import { recordAnalyticsEvent } from "../../services/analytics/analyticsEvent.service.js";
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(String(id || ""));
 const toObjectId = (id) => (isValidObjectId(id) ? new mongoose.Types.ObjectId(String(id)) : null);
@@ -275,6 +276,22 @@ export const approveJob = async (req, res) => {
 
     if (!job) return ReturnDashData.updateError({ res, status: 404, message: "job_not_found" });
     await rebuildJobIntegration(job._id, { rebuildMatches: true });
+    if (publishStatus === "published") {
+      recordAnalyticsEvent({
+        req,
+        event: "job_published",
+        userId: job.user_id,
+        companyId: job.company_id?._id || job.company_id,
+        entityType: "job",
+        entityId: job._id,
+        jobId: job._id,
+        metadata: {
+          source: "admin_approval",
+          reviewed_by: String(adminId(req) || ""),
+          publish_status: publishStatus,
+        },
+      }).catch(() => null);
+    }
     return ReturnDashData.updateData({ res, data: job, message: "job_approved" });
   } catch (error) {
     return ReturnDashData.updateError({ res, status: 500, message: error.message || "job_approve_failed" });

@@ -21,6 +21,7 @@ import { CountryModel, IndustryModel, LanguageModel, UserModel } from "../../../
 import normalizeArabicKeyword from "../../../helper/normalizeArabicKeyword.js";
 import { deleteImage, processUploadImage } from "../../../services/imageService.js";
 import { applyCompanyProjection, rebuildCompanyJobsProjection } from "../../../services/search/rebuildSearchData.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import tz_lookup from "tz-lookup";
 
 const SINGLE_FIELDS = new Set([
@@ -108,6 +109,22 @@ const serializeCompanyFiles = (company = {}) => {
         download_path: `/company/v1/global/profile/files/${encodeURIComponent(filename)}/download`,
       })),
   };
+};
+
+const recordCompanyProfileUpdated = ({ req, company, section = "profile", fields = [] }) => {
+  if (!company?._id) return;
+  recordAnalyticsEvent({
+    req,
+    event: "company_profile_updated",
+    userId: company.owner_user_id || req?.user?._id,
+    companyId: company._id,
+    entityType: "company",
+    entityId: company._id,
+    metadata: {
+      section,
+      fields,
+    },
+  }).catch(() => null);
 };
 
 const deleteCompanyUploadedFile = async (filename = "") => {
@@ -538,6 +555,7 @@ export const updateBasicCompanyProfile = async (req, res, next) => {
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
     await populateCompanyBase(company);
+    recordCompanyProfileUpdated({ req, company, section: "basic", fields: touchedFields });
     return success(res, company, "company_profile_updated");
   } catch (error) {
     if (error.message === "invalid_company_slug") return fail(res, "invalid_company_slug", 400);
@@ -572,6 +590,7 @@ export const updateCompanyAbout = async (req, res, next) => {
     await applyCompanyProjection(company);
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
+    recordCompanyProfileUpdated({ req, company, section: "about", fields: touchedFields });
     return success(res, company, "company_about_updated");
   } catch (error) { next(error); }
 };
@@ -602,6 +621,7 @@ export const updateCompanyContact = async (req, res, next) => {
     await applyCompanyProjection(company);
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
+    recordCompanyProfileUpdated({ req, company, section: "contact", fields: touchedFields });
     return success(res, company, "company_contact_updated");
   } catch (error) {
     if (error.code === 11000) return fail(res, "company_unique_field_already_exists", 409, error.keyValue);
@@ -688,6 +708,7 @@ export const updateCompanyLocation = async (req, res, next) => {
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
     await company.populate([{ path: "country_id" }, { path: "city_id" }]);
+    recordCompanyProfileUpdated({ req, company, section: "location", fields: touchedFields });
     return success(res, company, "company_location_updated");
   } catch (error) { next(error); }
 };
@@ -737,6 +758,7 @@ export const updateCompanyMedia = async (req, res, next) => {
 
     await company.populate(companyPopulate);
 
+    recordCompanyProfileUpdated({ req, company, section: "media", fields: touchedFields });
     return success(res, company, "company_media_updated_successfully");
   } catch (error) {
     next(error);
@@ -785,6 +807,7 @@ export const uploadCompanyFile = async (req, res, next) => {
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
 
+    recordCompanyProfileUpdated({ req, company, section: "files", fields: ["files"] });
     return success(res, serializeCompanyFiles(company), "company_file_uploaded", 201);
   } catch (error) {
     if (req.file?.filename) await deleteCompanyUploadedFile(req.file.filename);
@@ -814,6 +837,7 @@ export const deleteCompanyFile = async (req, res, next) => {
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
 
+    recordCompanyProfileUpdated({ req, company, section: "files", fields: ["files"] });
     return success(res, serializeCompanyFiles(company), "company_file_deleted");
   } catch (error) {
     next(error);
@@ -873,6 +897,7 @@ export const replaceSection = async (req, res, next) => {
     await applyCompanyProjection(company);
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
+    recordCompanyProfileUpdated({ req, company, section, fields: touchedFields });
     return success(res, company, `${section}_replaced`);
   } catch (error) {
     if (error.message === "invalid_company_slug") return fail(res, "invalid_company_slug", 400);
@@ -901,6 +926,7 @@ export const addSectionItems = async (req, res, next) => {
     await applyCompanyProjection(company);
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
+    recordCompanyProfileUpdated({ req, company, section, fields: [section] });
     return success(res, company[section], `${section}_items_added`, 201);
   } catch (error) { next(error); }
 };
@@ -928,6 +954,7 @@ export const updateSectionItem = async (req, res, next) => {
     await applyCompanyProjection(company);
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
+    recordCompanyProfileUpdated({ req, company, section, fields: [section] });
     return success(res, company[section], `${section}_item_updated`);
   } catch (error) { next(error); }
 };
@@ -974,6 +1001,7 @@ export const deleteSectionItem = async (req, res, next) => {
     await company.save();
     await rebuildCompanyJobsProjection(company._id);
 
+    recordCompanyProfileUpdated({ req, company, section, fields: [section] });
     return success(res, company, `${section}_item_deleted`);
   } catch (error) {
     next(error);

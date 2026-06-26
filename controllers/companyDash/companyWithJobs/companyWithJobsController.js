@@ -14,6 +14,7 @@ import {
   shouldJobRequireAdminApproval,
 } from "../../../services/subscriptions/companySubscription.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import {
   assertLaunchJobLocation,
   assertSupportedLaunchCurrencyCode,
@@ -741,6 +742,20 @@ const rebuildJobAfterSave = async (job) => {
   return await rebuildJobIntegration(job._id, { rebuildMatches: canRebuildMatches });
 };
 
+const recordCompanyJobAnalytics = ({ req, event, companyData, job, metadata = {} }) => {
+  if (!job?._id || !companyData?.company?._id) return;
+  recordAnalyticsEvent({
+    req,
+    event,
+    userId: companyData.userId,
+    companyId: companyData.company._id,
+    entityType: "job",
+    entityId: job._id,
+    jobId: job._id,
+    metadata,
+  }).catch(() => null);
+};
+
 export const getMyJobs = async (req, res, next) => {
   try {
     const companyData = await getCompanyUserIdOrFail(req, res);
@@ -968,6 +983,26 @@ export const createJob = async (req, res, next) => {
       jobId: job._id,
       newValue: payload,
     });
+    recordCompanyJobAnalytics({
+      req,
+      event: "job_created",
+      companyData,
+      job,
+      metadata: {
+        publish_status: job.publish_status,
+        requires_approval: requiresApproval,
+        is_external: Boolean(job.is_out_side),
+      },
+    });
+    if (job.publish_status === "published") {
+      recordCompanyJobAnalytics({
+        req,
+        event: "job_published",
+        companyData,
+        job,
+        metadata: { source: "job_create" },
+      });
+    }
     return success(
       res,
       normalizeJob(rebuiltJob || job),
@@ -1155,6 +1190,15 @@ const setPublishStatus = (publish_status) => async (req, res, next) => {
       jobId: job._id,
       newValue: { publish_status: safeStatus },
     });
+    if (safeStatus === "published") {
+      recordCompanyJobAnalytics({
+        req,
+        event: "job_published",
+        companyData,
+        job,
+        metadata: { source: "publish_status_change" },
+      });
+    }
 
     return success(res, normalizeJob(job), `company_job_${safeStatus}`);
   } catch (error) {
