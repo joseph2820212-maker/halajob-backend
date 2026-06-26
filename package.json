@@ -30,6 +30,7 @@
     "test:admin-operations-routes": "node scripts/verifyAdminOperationsRouteMounts.js",
     "test:career-passport": "node scripts/verifyCareerPassportContract.js",
     "test:mobile-routes": "node scripts/verifyCampusMobileRoutes.js && node scripts/verifyMobileRouteMounts.js",
+    "check:i18n": "node scripts/checkI18n.js",
     "check:syntax": "node scripts/checkSyntax.js",
     "check:imports": "node scripts/checkRelativeImports.js"
   },
