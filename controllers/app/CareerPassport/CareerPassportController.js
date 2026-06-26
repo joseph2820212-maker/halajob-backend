@@ -1,6 +1,7 @@
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import {
   getCareerPassport,
+  getSharedCareerPassport,
   refreshCareerPassportScore,
   updateCareerPassport,
   updateCareerPassportShare,
@@ -24,6 +25,29 @@ const get = async (req, res, next) => {
   try {
     const result = await getCareerPassport({ user: req.user, req });
     return sendPassport({ res, result, message: "career_passport" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const shared = async (req, res, next) => {
+  try {
+    const result = await getSharedCareerPassport({
+      token: req.params.token,
+      viewerType: req.query.viewer || "public",
+    });
+    return ReturnAppData.getData({
+      res,
+      data: {
+        passport_id: result.passport._id,
+        passport: result.snapshot,
+        score: result.score,
+        visibility: result.visibility,
+        share: result.share,
+        viewer_type: result.viewerType,
+      },
+      message: "career_passport_shared",
+    });
   } catch (error) {
     return next(error);
   }
@@ -131,4 +155,4 @@ const share = async (req, res, next) => {
   }
 };
 
-export default { get, update, refreshScore, share };
+export default { get, shared, update, refreshScore, share };

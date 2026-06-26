@@ -23,6 +23,7 @@ const requiredEndpoints = [
   ["GET", "/user/v1/career-passport"],
   ["PUT", "/user/v1/career-passport"],
   ["POST", "/user/v1/career-passport/share"],
+  ["GET", "/user/v1/career-passport/share/:token"],
   ["POST", "/ai/v1/career-passport/score"],
 
   ["POST", "/analytics/v1/events"],
@@ -345,5 +346,15 @@ const missingCampusGuards = requiredCampusStudentPaths.filter((path) => {
 });
 
 assert.deepEqual(missingCampusGuards, [], "Campus mobile endpoints must require a signed-in campus student");
+
+const sharedCareerPassportEndpoint = endpointByPath.get("/user/v1/career-passport/share/:token");
+assert.ok(
+  sharedCareerPassportEndpoint?.methods.includes("GET"),
+  "Shared Career Passport token endpoint must be mounted"
+);
+assert.ok(
+  !sharedCareerPassportEndpoint.middlewares.includes("authUser"),
+  "Shared Career Passport token endpoint must stay public and token-gated"
+);
 
 console.log(`Mobile route mounts verified (${requiredEndpoints.length} method/path checks).`);

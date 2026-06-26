@@ -18,6 +18,7 @@ const sources = {
   companyRequest: readSource("routesUser/CompanyRote.js"),
   notification: readSource("routesUser/NotificationRote.js"),
   fcm: readSource("routesUser/FcmRote.js"),
+  careerPassport: readSource("routesUser/CareerPassportRote.js"),
   helper: readSource("routesUser/HelperRote.js"),
   campus: readSource("routesUser/CampusRote.js"),
   campusPublic: readSource("routesCampus/index.js"),
@@ -85,6 +86,7 @@ assertMounts({
     "/app/dashboard",
     "/notifications",
     "/fcm",
+    "/career-passport",
     "/campus",
   ],
 });
@@ -183,6 +185,12 @@ assertRoutes({
     "POST /update-tokens/:id",
     "POST /delete-tokens/:id",
   ],
+});
+
+assertRoutes({
+  fileName: "routesUser/CareerPassportRote.js",
+  routes: declaredRoutes(sources.careerPassport),
+  required: ["GET /", "PUT /", "POST /share", "GET /share/:token"],
 });
 
 assertRoutes({

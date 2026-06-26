@@ -5,6 +5,7 @@ import CareerPassportController from "../controllers/app/CareerPassport/CareerPa
 
 const router = express.Router();
 
+router.get("/share/:token", CareerPassportController.shared);
 router.get("/", authUser, requireAppAccount("employee"), CareerPassportController.get);
 router.put("/", authUser, requireAppAccount("employee"), express.json(), CareerPassportController.update);
 router.post("/share", authUser, requireAppAccount("employee"), express.json(), CareerPassportController.share);

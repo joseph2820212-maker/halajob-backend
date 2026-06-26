@@ -173,6 +173,138 @@ function buildSnapshot({ user, employee, passport, stats }) {
   };
 }
 
+const safeDate = (value) => dateValue(value);
+
+const safeText = (value, limit = 500) => text(value).slice(0, limit);
+
+const safeStrings = (items = [], limit = 20) => uniqueStrings(list(items)).slice(0, limit);
+
+const nonNegativeInt = (value) => Math.max(0, Math.round(Number(value) || 0));
+
+const safeRecord = (item = {}, fields = []) => {
+  const record = {};
+  for (const field of fields) {
+    if (field === "technologies") {
+      const values = safeStrings(item[field], 12);
+      if (values.length) record[field] = values;
+    } else if (field === "start_date" || field === "end_date" || field === "end_in") {
+      const value = safeDate(item[field]);
+      if (value) record[field] = value;
+    } else if (field === "is_until_now" || field === "is_for_ever" || field === "created_from_builder") {
+      record[field] = item[field] === true;
+    } else {
+      const value = safeText(item[field]);
+      if (value) record[field] = value;
+    }
+  }
+  return record;
+};
+
+export function sanitizeCareerPassportScore(score = {}) {
+  return {
+    total: clampScore(score.total ?? score.score),
+    source: safeText(score.source || "rule_based_v1", 80),
+    generated_by_ai: score.generated_by_ai === true || score.generatedByAi === true,
+    explanation: safeText(score.explanation, 1200),
+    components: list(score.components)
+      .map((item) =>
+        component({
+          key: safeText(item.key, 80),
+          label: safeText(item.label, 120),
+          weight: item.weight,
+          score: item.score,
+          explanation: safeText(item.explanation, 500),
+        })
+      )
+      .filter((item) => item.key || item.label),
+    strengths: safeStrings(score.strengths, 12),
+    next_actions: safeStrings(score.next_actions || score.nextActions, 12),
+    updated_at: safeDate(score.updated_at || score.updatedAt),
+  };
+}
+
+export function sanitizeCareerPassportSnapshotForShare(snapshot = {}, { viewerType = "public" } = {}) {
+  const identity = snapshot.identity || {};
+  const education = snapshot.education || {};
+  const experienceProjects = snapshot.experience_projects || snapshot.experienceProjects || {};
+  const skills = snapshot.skills || {};
+  const cvAssets = snapshot.cv_assets || snapshot.cvAssets || {};
+  const readiness = snapshot.readiness || {};
+  const privacy = snapshot.privacy || {};
+  const score = sanitizeCareerPassportScore(readiness.employability_score || snapshot.score || {});
+
+  return {
+    identity: {
+      name: safeText(identity.name, 160),
+      headline: safeText(identity.headline, 160),
+      current_job_title: safeText(identity.current_job_title || identity.currentJobTitle, 160),
+      location_country: safeText(identity.location_country || identity.locationCountry, 120),
+      location_city: safeText(identity.location_city || identity.locationCity, 120),
+      preferred_work_mode: safeText(identity.preferred_work_mode || identity.preferredWorkMode, 80),
+      candidate_stage: safeText(identity.candidate_stage || identity.candidateStage, 80),
+      is_student: identity.is_student === true || identity.isStudent === true,
+      badges: {
+        student_verified: identity.badges?.student_verified === true || identity.badges?.studentVerified === true,
+        education_added: identity.badges?.education_added === true || identity.badges?.educationAdded === true,
+        cv_added: identity.badges?.cv_added === true || identity.badges?.cvAdded === true,
+      },
+    },
+    education: {
+      university: safeText(education.university, 160),
+      major: safeText(education.major, 160),
+      graduation_year: safeText(education.graduation_year || education.graduationYear, 20),
+      verification_status: safeText(education.verification_status || education.verificationStatus, 80),
+      records: list(education.records)
+        .map((item) => safeRecord(item, ["level", "study", "institution", "start_date", "end_date", "is_until_now"]))
+        .filter((item) => Object.keys(item).length > 0),
+      certificates: list(education.certificates)
+        .map((item) => safeRecord(item, ["name", "end_in", "is_for_ever"]))
+        .filter((item) => Object.keys(item).length > 0),
+    },
+    experience_projects: {
+      experience: list(experienceProjects.experience)
+        .map((item) => safeRecord(item, ["company_name", "position", "details", "start_date", "end_date", "is_until_now"]))
+        .filter((item) => Object.keys(item).length > 0),
+      projects: list(experienceProjects.projects)
+        .map((item) => safeRecord(item, ["name", "description", "type", "technologies", "url"]))
+        .filter((item) => Object.keys(item).length > 0),
+      links: list(experienceProjects.links)
+        .map((item) => safeRecord(item, ["title", "url"]))
+        .filter((item) => Object.keys(item).length > 0),
+    },
+    skills: {
+      hard_skills: safeStrings(skills.hard_skills || skills.hardSkills, 30),
+      soft_skills: safeStrings(skills.soft_skills || skills.softSkills, 30),
+      languages: safeStrings(skills.languages, 20),
+      missing_skills: safeStrings(skills.missing_skills || skills.missingSkills, 20),
+    },
+    cv_assets: {
+      uploaded_count: nonNegativeInt(cvAssets.uploaded_count || cvAssets.uploadedCount),
+      generated_count: nonNegativeInt(cvAssets.generated_count || cvAssets.generatedCount),
+      active_cv: cvAssets.active_cv || cvAssets.activeCv
+        ? safeRecord(cvAssets.active_cv || cvAssets.activeCv, ["title", "file_name", "status", "template_key", "created_from_builder"])
+        : null,
+      cvs: list(cvAssets.cvs)
+        .map((item) => safeRecord(item, ["title", "file_name", "status", "template_key", "created_from_builder"]))
+        .filter((item) => Object.keys(item).length > 0),
+    },
+    readiness: {
+      employability_score: score,
+      profile_completion: clampScore(readiness.profile_completion || readiness.profileCompletion),
+      interview_count: nonNegativeInt(readiness.interview_count || readiness.interviewCount),
+      application_count: nonNegativeInt(readiness.application_count || readiness.applicationCount),
+      saved_jobs_count: nonNegativeInt(readiness.saved_jobs_count || readiness.savedJobsCount),
+      hired_count: nonNegativeInt(readiness.hired_count || readiness.hiredCount),
+    },
+    privacy: {
+      visibility: safeText(privacy.visibility || "private", 80),
+      share_enabled: privacy.share_enabled === true || privacy.shareEnabled === true,
+      share_expires_at: safeDate(privacy.share_expires_at || privacy.shareExpiresAt),
+      viewer_type: safeText(viewerType, 40),
+    },
+  };
+}
+
 function calculateScore({ employee, snapshot, stats }) {
   const activeCv = snapshot.cv_assets.active_cv;
   const profileCompleteness = employee.profile_completion
@@ -291,6 +423,75 @@ export async function getCareerPassport({ user, req }) {
     activeContextId: req?.activeContext?.id || null,
     refreshScore: false,
   });
+}
+
+export async function getSharedCareerPassport({ token, viewerType = "public" }) {
+  const normalizedToken = text(token);
+  if (
+    normalizedToken.length < 16 ||
+    normalizedToken.length > 128 ||
+    !/^[A-Za-z0-9._-]+$/.test(normalizedToken)
+  ) {
+    const error = new Error("career_passport_share_not_found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const now = new Date();
+  const passport = await CareerPassportModel.findOne({
+    "share.token": normalizedToken,
+    "share.enabled": true,
+    $and: [
+      {
+        $or: [
+          { "share.revoked_at": null },
+          { "share.revoked_at": { $exists: false } },
+        ],
+      },
+      {
+        $or: [
+          { "share.expires_at": null },
+          { "share.expires_at": { $exists: false } },
+          { "share.expires_at": { $gt: now } },
+        ],
+      },
+    ],
+  }).lean();
+
+  if (!passport) {
+    const error = new Error("career_passport_share_not_found");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  const snapshot = {
+    ...(passport.snapshot || {}),
+    readiness: {
+      ...((passport.snapshot || {}).readiness || {}),
+      employability_score: passport.score || (passport.snapshot || {}).readiness?.employability_score,
+    },
+    privacy: {
+      ...((passport.snapshot || {}).privacy || {}),
+      visibility: passport.visibility || (passport.snapshot || {}).privacy?.visibility || "private",
+      share_enabled: true,
+      share_expires_at: passport.share?.expires_at || null,
+    },
+  };
+
+  const safeSnapshot = sanitizeCareerPassportSnapshotForShare(snapshot, { viewerType });
+  const safeScore = sanitizeCareerPassportScore(passport.score || snapshot.readiness?.employability_score || {});
+
+  return {
+    passport,
+    snapshot: safeSnapshot,
+    score: safeScore,
+    visibility: passport.visibility || "private",
+    share: {
+      enabled: true,
+      expires_at: safeDate(passport.share?.expires_at),
+    },
+    viewerType,
+  };
 }
 
 export async function refreshCareerPassportScore({ user, req }) {
