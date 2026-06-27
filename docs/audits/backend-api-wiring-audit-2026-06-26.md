@@ -32,6 +32,7 @@ Current generated artifacts:
 | `docs/api/HALAJOB_API_REFERENCE.md` | Route/auth skeleton regenerated. |
 | `docs/api/HALAJOB_OPENAPI.yaml` | Generated skeleton exists; exact schemas still need expansion. |
 | `docs/api/HALAJOB_POSTMAN_COLLECTION.json` | Generated collection exists; endpoint-specific request bodies still need expansion. |
+| `docs/architecture/BACKEND_MODULE_MAP.md` | Route ownership, compatibility alias policy, controller/service/model boundaries, and admin resource policy documented. |
 
 ## 2. Readiness Scores
 
