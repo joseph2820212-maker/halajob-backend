@@ -1,6 +1,6 @@
 # HalaJob API Reference
 
-Generated: 2026-06-27T03:25:17.599Z
+Generated: 2026-06-27T03:40:53.593Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -30,8 +30,8 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Company | 134 |
 | Files | 1 |
 | Health | 1 |
-| Jobs | 1 |
-| Legacy User | 148 |
+| Jobs | 2 |
+| Legacy User | 149 |
 | Notifications | 13 |
 | Seeker | 94 |
 | Trust | 4 |
@@ -3175,6 +3175,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 
 | Method | Path | Auth | Guard source | Middleware/guards |
 | --- | --- | --- | --- | --- |
+| GET | `/jobs/v1/:jobId/translations/:lang` | Bearer token | explicit | authUser, anonymous, multerMiddleware, saveJobTranslation |
 | PUT | `/jobs/v1/:jobId/translations/:lang` | Bearer token | explicit | authUser, anonymous, multerMiddleware, saveJobTranslation |
 
 ## Legacy User
@@ -3214,6 +3215,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/user/v1/company/update-my-company` | Bearer token | explicit | authUser, update |
 | POST | `/user/v1/company/update-my-company-image` | Bearer token | explicit | authUser, multerMiddleware, updateImage |
 | POST | `/user/v1/company/upload-file` | Bearer token | explicit | authUser, multerMiddleware, uploadFile |
+| GET | `/user/v1/cv/translations/:lang` | Bearer token | explicit | authUser, anonymous, multerMiddleware, saveCvTranslation |
 | PUT | `/user/v1/cv/translations/:lang` | Bearer token | explicit | authUser, anonymous, multerMiddleware, saveCvTranslation |
 | GET | `/user/v1/employee/profile-get` | Bearer token | explicit | authUser, anonymous, multerMiddleware, profile |
 | POST | `/user/v1/employee/profile-update` | Bearer token | explicit | authUser, anonymous, multerMiddleware, update |

@@ -64,6 +64,7 @@ Runtime verifier: `npm run test:integration:company-permissions` proves owner wi
 | `audit.view` | Admin audit-log reads. |
 | `translations.view` | Content translation/translation-log reads. |
 | `notifications.view` | Notification log reads. |
+| `notifications.manage` | Dashboard admin notification sending. |
 | `files.read` | Protected dashboard file downloads under `/dash/v1/file/:name`. |
 | `support.view` | Dashboard support ticket queue/detail reads. |
 | `support.manage` | Dashboard support ticket status updates, assignment, closure, and admin replies. |

@@ -9,17 +9,17 @@ Repository: `joseph2820212-maker/halajobe`
 
 The backend is broadly mounted, the main web API client is wired to existing backend routes, and the current source-level route contract checks pass. The project is no longer in a state where the main problem is "missing route files" for the core product areas.
 
-However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is now narrower than the original audit: route mounting, guard classification, mobile fallback aliases, core auth/context, object authorization, file-export, AI, notification, analytics, subscription/billing, company member permissions, dashboard admin permission boundaries, protected dashboard file downloads, admin support workflow, translation save/read/approval, admin-resource lifecycle, audit redaction, and employee-CV download paths have seeded or contract coverage. The remaining risk is deeper per-feature behavior: exact request/response schemas, per-route validators, live deployed smoke testing, remaining private download/upload edge cases, support-role policy, and full web/mobile user journeys.
+However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is now narrower than the original audit: route mounting, guard classification, mobile fallback aliases, core auth/context, object authorization, file-export, AI, notification preferences/admin send, analytics, subscription/billing, company member permissions, dashboard admin permission boundaries, protected dashboard file downloads, admin support workflow, translation save/read/approval, admin-resource lifecycle, audit redaction, and employee-CV download paths have seeded or contract coverage. The remaining risk is deeper per-feature behavior: exact request/response schemas, per-route validators, live deployed smoke testing, remaining private download/upload edge cases, support-role policy, and full web/mobile user journeys.
 
 ## 1.1 Current 2026-06-27 Endpoint Inventory Update
 
-The live Express route inventory was regenerated after the admin support ticket workflow and translation read workflow were wired.
+The live Express route inventory was regenerated after the admin support ticket workflow, translation read workflow, notification preferences, and admin notification send workflow were wired.
 
 | Metric | Current evidence |
 |---|---:|
-| Raw Express endpoint entries | 2135 |
-| Unique method/path endpoints | 3372 |
-| Endpoints with detected auth/role guard | 3283 |
+| Raw Express endpoint entries | 2141 |
+| Unique method/path endpoints | 3384 |
+| Endpoints with detected auth/role guard | 3295 |
 | Known public/system endpoints | 89 |
 | Unguarded endpoints needing manual classification | 0 |
 
@@ -41,11 +41,11 @@ Current generated artifacts:
 | Backend route mounting | 9 | Core route groups are mounted across seeker, company, admin, campus, university, AI, trust, analytics, notifications, jobs, and health; current route report has zero unclassified unguarded endpoints. |
 | Web API wiring | 8 | No obvious hard 404s found in the centralized web API client against mounted backend route families; browser click-through remains separate. |
 | Mobile API wiring | 8.5 | Legacy mobile fallback aliases are now covered by `npm run test:mobile-routes`, including older `/employee/v1/...` compatibility paths. |
-| Feature API coverage | 8.2 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notifications, analytics, subscriptions, company/admin permissions, translation save/read/approval, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
+| Feature API coverage | 8.3 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notification preferences/admin send, analytics, subscriptions, company/admin permissions, translation save/read/approval, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
 | Auth and account-context safety | 8.7 | Seeded auth/context integration now covers missing/malformed/expired app and admin tokens, inactive app-user denial, role/context denial, cross-role borrowing, suspended context, invalid context, and refresh-token revocation. |
-| Admin operational coverage | 8.35 | Admin resources are broad, redacted, lifecycle-audited, and now guarded by fine-grained permissions on generic resources plus high-risk operation/file/support routes; remaining risk is newer workflow-specific admin handling and support-role policy. |
-| Automated backend test depth | 7.75 | Static checks plus multiple seeded runtime integration harnesses exist; still short of route-by-route validator/schema and full journey coverage. |
-| Launch confidence from backend/API only | 8.2 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
+| Admin operational coverage | 8.4 | Admin resources are broad, redacted, lifecycle-audited, and now guarded by fine-grained permissions on generic resources plus high-risk operation/file/support/notification-send routes; remaining risk is newer workflow-specific admin handling and support-role policy. |
+| Automated backend test depth | 7.8 | Static checks plus multiple seeded runtime integration harnesses exist; still short of route-by-route validator/schema and full journey coverage. |
+| Launch confidence from backend/API only | 8.25 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
 
 ## 3. Audit Method
 
@@ -74,7 +74,7 @@ Main Express mounts are in `app.js` and include:
 | `/analytics/v1` | Analytics tracking and admin analytics | Mounted |
 | `/trust/v1` | Job trust score/report routes | Mounted |
 | `/admin/v1/trust` | Trust moderation/admin queue | Mounted |
-| `/notifications/v1` | Notification inbox/device/admin-style notification APIs | Mounted |
+| `/notifications/v1` | Notification inbox/preferences/device APIs | Mounted |
 | `/campus/v1` | Campus mobile dashboard/events/opportunities/applications | Mounted |
 | `/university/v1` | University admin dashboard, students, passports, verification, reports | Mounted |
 | `/health` | Health check | Mounted |
@@ -84,12 +84,12 @@ Generated inventory summary:
 
 | Namespace | Method count |
 |---|---:|
-| `/dash/v1` | 2879 |
-| `/user/v1` | 192 |
+| `/dash/v1` | 2882 |
+| `/user/v1` | 198 |
 | `/company/v1` | 134 |
 | `/employee/v1` | 94 |
 | `/university/v1` | 15 |
-| `/notifications/v1` | 13 |
+| `/notifications/v1` | 16 |
 | `/campus/v1` | 12 |
 | `/ai/v1` | 12 |
 | `/admin/v1` | 7 |
@@ -99,7 +99,7 @@ Generated inventory summary:
 | `/health` | 1 |
 | `/cv/generated` | 1 |
 
-The high `/dash/v1` count is mainly from broad generic dashboard CRUD aliases. The current module-level route report counts `2886` Admin endpoints because it also includes admin-mounted trust routes.
+The high `/dash/v1` count is mainly from broad generic dashboard CRUD aliases. The current module-level route report counts `2889` Admin endpoints because it also includes admin-mounted trust routes.
 
 ## 5. Feature Coverage Findings
 
@@ -120,7 +120,7 @@ The high `/dash/v1` count is mainly from broad generic dashboard CRUD aliases. T
 | Career Passport get/update/share/score refresh | Routed and service-backed. |
 | AI safe suggestions/logging/usage limits | Routed and service-backed. |
 | Trust score/report/admin moderation | Routed and service-backed. |
-| Notification inbox/read/device token persistence | Routed and service-backed. |
+| Notification inbox/read/preferences/admin-send/device token persistence | Routed and service-backed. |
 | Analytics track/list/admin reports | Routed. |
 
 ### Partial or Missing Workflow Coverage
@@ -133,7 +133,7 @@ The high `/dash/v1` count is mainly from broad generic dashboard CRUD aliases. T
 | University team/member management is missing | University context exists, but there is no clear university equivalent of company member invite/management APIs. |
 | Trust document request workflow was originally incomplete | This has since been improved with company-facing trust document response routes and seeded integration coverage. Remaining work is edge-case file/evidence coverage and full UI flow QA. |
 | Support handling now has an admin baseline | Company support tickets now have dashboard queue/detail/status/reply endpoints with `support.view` and `support.manage`, assignment/closure fields, and audit logs. Remaining work is admin UI click-through and support-role staffing policy. |
-| Newer operational records are not all admin-manageable | Examples include career passports, student verifications, university memberships, invoices, AI requests/limits, analytics events, and content translations. Support tickets now have explicit admin workflow routes. |
+| Newer operational records are not all admin-manageable | Examples include career passports, student verifications, university memberships, invoices, AI requests/limits, analytics events, and content translations. Support tickets and admin notification sending now have explicit admin workflow routes. |
 
 ## 6. Web and Mobile API Wiring
 
@@ -179,7 +179,7 @@ Current status: explicit backend compatibility aliases have since been added and
 
 | Finding | Risk |
 |---|---|
-| Dashboard authorization is now permission-scoped for high-risk surfaces | `/dash/v1` still starts with dashboard-session auth, but generic resource aliases, generic `/resources/:resource` routes, AI/admin operations, moderation, trust, subscriptions, support tickets, campus university admin endpoints, dashboard summaries, search, and protected dashboard file downloads now enforce fine-grained permission keys. Remaining work is route-by-route policy documentation, support-role modelling, and any future admin feature routes. |
+| Dashboard authorization is now permission-scoped for high-risk surfaces | `/dash/v1` still starts with dashboard-session auth, but generic resource aliases, generic `/resources/:resource` routes, AI/admin operations, moderation, trust, subscriptions, support tickets, notification sending, campus university admin endpoints, dashboard summaries, search, and protected dashboard file downloads now enforce fine-grained permission keys. Remaining work is route-by-route policy documentation, support-role modelling, and any future admin feature routes. |
 | Active context requires careful handling | Explicit context safety now fails closed for malformed, wrong-user, suspended, or removed contexts, and seeded tests cover context denial cases. Per-request context UX and multi-device behavior should still be validated through app/web journeys. |
 | Public generated CV PDF route | `/cv/generated/:fileName` is public with filename validation, traversal rejection, attachment disposition, `nosniff`, and `no-store`; generated names should remain unguessable and expiry/access rules still need product review. |
 | Public uploads route | `/uploads/files/*` is now blocked from public static serving, non-image root uploads are forced to attachment, and dashboard protected file downloads require `files.read`, allow image/PDF extensions only, and serve PDFs as attachment/no-store/nosniff. Remaining work is route-by-route MIME/size/private download coverage. |
@@ -198,7 +198,7 @@ Current checks are useful and now include multiple seeded runtime integration ha
 | Secrets/imports/syntax | Scripted checks |
 | Express smoke import/HTTP/CORS | Smoke scripts |
 | AI route contracts/safety outputs | Source and behavior-level scripts |
-| Trust/analytics/notifications/translations/admin operations/Career Passport | Route/source contract scripts plus selected runtime coverage for trust, analytics, notifications, and translation save/read/approval |
+| Trust/analytics/notifications/translations/admin operations/Career Passport | Route/source contract scripts plus selected runtime coverage for trust, analytics, notification preferences/admin send, and translation save/read/approval |
 | Mobile/backend route inventory | Static route reference checks plus compatibility aliases for older mobile fallbacks |
 | Auth/context/object authorization | Seeded runtime MongoDB integration |
 | File export/private employee CV downloads | Seeded runtime MongoDB integration |

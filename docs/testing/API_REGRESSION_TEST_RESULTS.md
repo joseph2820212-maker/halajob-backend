@@ -4,7 +4,7 @@ Date: 2026-06-27
 Branch: `flutter-seeker-campus`
 Commit tested: current `flutter-seeker-campus` branch state as of the latest update below.
 Environment: local Codex workspace
-Latest update: object authorization, private upload static-serving, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime integration coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, company permission-boundary coverage, admin permission-boundary coverage, admin support workflow coverage, translation read/write workflow coverage, admin resource redaction/lifecycle audit coverage, and auth/context negative coverage added on 2026-06-27.
+Latest update: object authorization, private upload static-serving, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime/preferences/admin-send coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, company permission-boundary coverage, admin permission-boundary coverage, admin support workflow coverage, translation read/write workflow coverage, admin resource redaction/lifecycle audit coverage, and auth/context negative coverage added on 2026-06-27.
 
 ## Passed Commands
 
@@ -21,7 +21,8 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `npm run test:audit-logging` | Passed, including admin auth audit rows, admin creation audit rows, and central audit redaction of password/passcode/token/secret/cookie/OTP/API-key/private-key/device-code fields |
 | `npm run test:file-export-audit` | Passed, including dashboard company file download, app company request file download, traversal rejection, other-company denial, and export audit logs |
 | `npm run test:integration:ai-runtime` | Passed, including disabled, completed, cached, daily-limited, employee, company, analytics, audit-log, and wrong-role AI request paths |
-| `npm run test:integration:notifications` | Passed, including notification list/read ownership and device-token create/update/conflict/revoke ownership |
+| `npm run test:integration:notifications` | Passed, including notification list/read ownership, preference read/update, admin-send permission denial/allow, preference enforcement, admin-send audit logs, and device-token create/update/conflict/revoke ownership |
+| `npm run docs:database` | Passed, regenerated live Mongoose model documentation |
 | `npm run test:integration:analytics` | Passed, including event tracking, own-event listing, group mismatch rejection, super-admin reports, university-scoped reports, cohorts, and borrowed-context denial |
 | `npm run test:integration:subscriptions` | Passed, including billing permission checks, own-company invoice list/detail, cross-company invoice denial, plan-change ticket audit logging, dashboard-admin subscription reads, free-plan seeding, plan reassignment, and missing-plan failure behavior |
 | `npm run test:integration:company-permissions` | Passed, including company owner wildcard access, member `ats.view` allow, missing `jobs.manage`/`billing.manage` denial, and suspended member denial |
@@ -55,6 +56,7 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `docs/api/HALAJOB_POSTMAN_ENV_LOCAL.json` | JSON parsed successfully. |
 | `docs/api/HALAJOB_POSTMAN_ENV_DEV.json` | JSON parsed successfully. |
 | `docs/api/HALAJOB_OPENAPI.yaml` | Operation IDs checked; duplicate count is zero. |
+| `docs/DATABASE_MODELS.md` | Regenerated from live Mongoose schemas. |
 
 ## Notes
 

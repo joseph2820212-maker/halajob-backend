@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-27T03:25:19.815Z",
+  "generatedAt": "2026-06-27T03:40:55.783Z",
   "records": [
     {
       "method": "PATCH",
@@ -26043,6 +26043,22 @@
       "knownPublic": false
     },
     {
+      "method": "POST",
+      "path": "/dash/v1/notification/send",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "sendNotification"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
       "method": "PATCH",
       "path": "/dash/v1/Notification/update/:id",
       "module": "Admin",
@@ -26430,6 +26446,22 @@
       "knownPublic": false
     },
     {
+      "method": "POST",
+      "path": "/dash/v1/notifications/send",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "sendNotification"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
       "method": "PATCH",
       "path": "/dash/v1/notifications/update/:id",
       "module": "Admin",
@@ -26484,6 +26516,22 @@
       "middlewares": [
         "checkPermissionMiddleware",
         "listAuditLogs"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/operations/notifications/send",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "sendNotification"
       ],
       "inferredGuards": [
         "inferred:isAdmin"
@@ -49547,6 +49595,45 @@
       "knownPublic": false
     },
     {
+      "method": "GET",
+      "path": "/user/v1/notification/preferences",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "getPreferences"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/notification/preferences",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "getPreferences"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/user/v1/notification/preferences",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "getPreferences"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
       "method": "PATCH",
       "path": "/user/v1/notification/read-all",
       "module": "Legacy User",
@@ -49683,6 +49770,45 @@
       "middlewares": [
         "authUser",
         "list"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/notifications/preferences",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "getPreferences"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/notifications/preferences",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "getPreferences"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/user/v1/notifications/preferences",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "getPreferences"
       ],
       "inferredGuards": [],
       "hasAuthGuard": true,
@@ -49859,6 +49985,48 @@
       "module": "Notifications",
       "middlewares": [
         "list"
+      ],
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/notifications/v1/preferences",
+      "module": "Notifications",
+      "middlewares": [
+        "getPreferences"
+      ],
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/notifications/v1/preferences",
+      "module": "Notifications",
+      "middlewares": [
+        "getPreferences"
+      ],
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/notifications/v1/preferences",
+      "module": "Notifications",
+      "middlewares": [
+        "getPreferences"
       ],
       "inferredGuards": [
         "inferred:authUser"

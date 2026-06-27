@@ -12,8 +12,10 @@ Notification routes are mounted under `/notifications/v1` and legacy user notifi
 | List notifications | `GET /notifications/v1/list`, `GET /user/v1/notifications` |
 | Unread count | `GET /notifications/v1/unread-count` |
 | Mark read/all | `POST/PATCH /notifications/v1/read`, `POST/PATCH /notifications/v1/read-all` |
+| User preferences | `GET/PUT/PATCH /notifications/v1/preferences`, `GET/PUT/PATCH /user/v1/notifications/preferences` |
 | Register device token | `POST /notifications/v1/device-token`, `POST /user/v1/fcm/tokens` |
 | Delete device token | `DELETE /notifications/v1/device-token`, legacy FCM delete routes |
+| Admin send | `POST /dash/v1/notifications/send`, `POST /dash/v1/operations/notifications/send` |
 
 ## Rules
 
@@ -22,6 +24,8 @@ Notification routes are mounted under `/notifications/v1` and legacy user notifi
 - Notification payloads should include route metadata that opens normal app screens.
 - Mobile/web should not show webview popups for internal actions.
 - Duplicate prevention should use backend dedupe keys where implemented.
+- User preferences control in-app and push delivery by channel and category.
+- Admin notification sending requires `notifications.manage`, writes audit logs, and still respects user preferences.
 
 ## Required Triggers
 
@@ -36,6 +40,7 @@ Notification routes are mounted under `/notifications/v1` and legacy user notifi
 
 ```bash
 npm run test:notification-routes
+npm run test:integration:notifications
 ```
 
 ## Gaps

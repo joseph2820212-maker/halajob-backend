@@ -75026,6 +75026,33 @@ paths:
         "400":
           description: Validation or request error
   "/jobs/v1/{jobId}/translations/{lang}":
+    get:
+      tags: ["Jobs"]
+      summary: "GET /jobs/v1/:jobId/translations/:lang"
+      operationId: "jobs_get_jobs_v1_jobid_translations_lang"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "jobId"
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: "lang"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     put:
       tags: ["Jobs"]
       summary: "PUT /jobs/v1/:jobId/translations/:lang"
@@ -77350,6 +77377,28 @@ paths:
         "403":
           description: Forbidden
   "/user/v1/cv/translations/{lang}":
+    get:
+      tags: ["Legacy User"]
+      summary: "GET /user/v1/cv/translations/:lang"
+      operationId: "legacy_user_get_user_v1_cv_translations_lang"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "lang"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     put:
       tags: ["Legacy User"]
       summary: "PUT /user/v1/cv/translations/:lang"

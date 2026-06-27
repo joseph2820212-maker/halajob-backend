@@ -47,6 +47,7 @@ import ResumeModel from './ResumeModel.js';
 import UserResumeModel from './UserResumeModel.js';
 import FcmTokenModel from './FcmTokenModel.js';
 import NotificationModel from './NotificationModel.js';
+import NotificationPreferenceModel from './NotificationPreferenceModel.js';
 import KeywordModel from './KeywordModel.js';
 import BannerModel from './BannerModel.js';
 import SearchHistoryModel from './SearchHistoryModel.js';
@@ -121,6 +122,7 @@ export {
   UserResumeModel,
   FcmTokenModel,
   NotificationModel,
+  NotificationPreferenceModel,
   KeywordModel,
   BannerModel,
   SearchHistoryModel,

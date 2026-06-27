@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { FcmTokenModel, NotificationModel } from "../../../models/index.js";
 import FcmTokenController from "../FcmToken/FcmTokenController.js";
+import {
+  getOrCreateNotificationPreferences,
+  updateNotificationPreferences,
+} from "../../../services/notifications/notificationPreference.service.js";
 
 const toObjectId = (value) => {
   const id = String(value || "").trim();
@@ -94,6 +98,28 @@ export const unreadCount = async (req, res, next) => {
   }
 };
 
+export const getPreferences = async (req, res, next) => {
+  try {
+    const preferences = await getOrCreateNotificationPreferences(userIdFrom(req));
+    return res.json({ status: true, message: "notification_preferences", data: preferences });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updatePreferences = async (req, res, next) => {
+  try {
+    const preferences = await updateNotificationPreferences({
+      userId: userIdFrom(req),
+      actorUserId: userIdFrom(req),
+      body: req.body || {},
+    });
+    return res.json({ status: true, message: "notification_preferences_updated", data: preferences });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const markRead = async (req, res, next) => {
   try {
     const userId = userIdFrom(req);
@@ -164,6 +190,8 @@ export const deleteDeviceToken = async (req, res, next) => {
 export default {
   list,
   unreadCount,
+  getPreferences,
+  updatePreferences,
   markRead,
   registerDeviceToken,
   deleteDeviceToken,

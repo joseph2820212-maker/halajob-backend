@@ -3,6 +3,7 @@ import { FcmTokenModel, NotificationModel, UserModel } from '../models/index.js'
 import { sendToTokens } from './SendNotification.js';
 import { buildDashboardTarget } from './dashboardRoutes.js';
 import { renderNotificationText, routeForEvent } from './notificationCatalog.js';
+import { notificationDeliveryDecision } from '../services/notifications/notificationPreference.service.js';
 
 const VALID_LANGS = new Set(['ar', 'en']);
 const DEFAULT_LANG = 'en';
@@ -137,18 +138,50 @@ export async function notifyUser({
       dedupeKey: dedupeKey || undefined,
     };
 
-    let savedNotification = null;
-    if (save) savedNotification = await saveNotification({ userId: normalizedUserId, payload: notificationPayload, dedupeKey });
+    const delivery = await notificationDeliveryDecision({
+      userId: normalizedUserId,
+      eventKey,
+      save,
+      push,
+    });
 
-    if (!push) {
-      return { saved: savedNotification?._id || savedNotification?.id || null, success: 0, failure: 0, revoked: 0, note: 'push_disabled' };
+    if (!delivery.in_app && !delivery.push) {
+      return {
+        saved: null,
+        success: 0,
+        failure: 0,
+        revoked: 0,
+        preference_category: delivery.category,
+        note: delivery.reason || 'notification_disabled_by_preferences',
+      };
+    }
+
+    let savedNotification = null;
+    if (delivery.in_app) savedNotification = await saveNotification({ userId: normalizedUserId, payload: notificationPayload, dedupeKey });
+
+    if (!delivery.push) {
+      return {
+        saved: savedNotification?._id || savedNotification?.id || null,
+        success: 0,
+        failure: 0,
+        revoked: 0,
+        preference_category: delivery.category,
+        note: push ? 'push_disabled_by_preferences' : 'push_disabled',
+      };
     }
 
     const tokenDocs = await getActiveTokenDocs(normalizedUserId);
     const tokens = [...new Set(tokenDocs.map((doc) => doc.token).filter(Boolean))];
 
     if (!tokens.length) {
-      return { saved: savedNotification?._id || savedNotification?.id || null, success: 0, failure: 0, revoked: 0, note: 'no_tokens' };
+      return {
+        saved: savedNotification?._id || savedNotification?.id || null,
+        success: 0,
+        failure: 0,
+        revoked: 0,
+        preference_category: delivery.category,
+        note: 'no_tokens',
+      };
     }
 
     let success = 0;
@@ -170,7 +203,7 @@ export async function notifyUser({
       revoked += await revokeBadTokens(batch, response?.responses || []);
     }
 
-    return { saved: savedNotification?._id || savedNotification?.id || null, success, failure, revoked };
+    return { saved: savedNotification?._id || savedNotification?.id || null, success, failure, revoked, preference_category: delivery.category };
   } catch (error) {
     console.error('notifyUser error', {
       eventKey,

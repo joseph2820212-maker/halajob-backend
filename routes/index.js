@@ -8,6 +8,7 @@ import keywordRoute from './keywordRoute.js';
 import dashboardRoute from './DashboardRoute.js';
 import dashboardController from '../controllers/dash/adminDashboardController.js';
 import adminModerationController from '../controllers/dash/adminModerationController.js';
+import adminNotificationController from '../controllers/dash/adminNotificationController.js';
 import adminOperationsController from '../controllers/dash/adminOperationsController.js';
 import adminSearchController from '../controllers/dash/adminSearchController.js';
 import adminSupportController from '../controllers/dash/adminSupportController.js';
@@ -109,6 +110,9 @@ router.get('/translations', can('translations.view'), adminOperationsController.
 router.get('/translation-logs', can('translations.view'), adminOperationsController.listTranslations);
 router.get('/notifications/logs', can('notifications.view'), adminOperationsController.listNotificationLogs);
 router.get('/notification-logs', can('notifications.view'), adminOperationsController.listNotificationLogs);
+router.post('/notifications/send', can('notifications.manage'), upload.none(), adminNotificationController.sendNotification);
+router.post('/notification/send', can('notifications.manage'), upload.none(), adminNotificationController.sendNotification);
+router.post('/operations/notifications/send', can('notifications.manage'), upload.none(), adminNotificationController.sendNotification);
 
 router.get('/support-tickets', can('support.view'), adminSupportController.listTickets);
 router.get('/operations/support-tickets', can('support.view'), adminSupportController.listTickets);

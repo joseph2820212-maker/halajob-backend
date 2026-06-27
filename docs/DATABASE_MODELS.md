@@ -1,6 +1,6 @@
 # Database Models
 
-Generated: 2026-06-27T00:32:42.150Z
+Generated: 2026-06-27T03:40:54.192Z
 Source: live Mongoose schemas loaded from `models/index.js`.
 
 This is a generated schema inventory. It documents collections, fields, required/default/enum/ref metadata, and declared indexes. Business meaning, migration history, and data-retention rules still need owner/developer review.
@@ -27,7 +27,7 @@ This is a generated schema inventory. It documents collections, fields, required
 | company_question_library | `company_question_library` | 19 | 9 |
 | company_reviews | `company_reviews` | 10 | 5 |
 | company_subscriptions | `company_subscriptions` | 18 | 9 |
-| company_support_tickets | `company_support_tickets` | 15 | 7 |
+| company_support_tickets | `company_support_tickets` | 20 | 9 |
 | content_translations | `content_translations` | 24 | 15 |
 | countries | `countries` | 7 | 1 |
 | currencies | `currencies` | 15 | 4 |
@@ -53,6 +53,7 @@ This is a generated schema inventory. It documents collections, fields, required
 | keyword | `Keywords` | 4 | 2 |
 | languages | `languages` | 5 | 1 |
 | Notification | `notification` | 19 | 8 |
+| NotificationPreference | `notification_preferences` | 10 | 1 |
 | pages | `pages` | 13 | 3 |
 | permissions | `permissions` | 12 | 5 |
 | RefreshToken | `refreshtokens` | 6 | 2 |
@@ -926,6 +927,11 @@ No explicit schema indexes.
 | `priority` | String |  | medium | low, medium, high, urgent |  |
 | `attachments` | Array<String> |  | defaultFn |  |  |
 | `messages` | Array<Function> |  | function |  |  |
+| `assigned_to` | ObjectID |  | null |  | users |
+| `assigned_at` | Date |  | null |  |  |
+| `admin_note` | String |  |  |  |  |
+| `last_admin_response_at` | Date |  | null |  |  |
+| `closed_by` | ObjectID |  | null |  | users |
 | `closed_at` | Date |  | null |  |  |
 | `_id` | ObjectID |  | defaultId |  |  |
 | `createdAt` | Date |  |  |  |  |
@@ -941,7 +947,9 @@ No explicit schema indexes.
 | `{"type":1}` (background=true) |
 | `{"status":1}` (background=true) |
 | `{"priority":1}` (background=true) |
+| `{"assigned_to":1}` (background=true) |
 | `{"company_id":1,"status":1,"createdAt":-1}` (background=true) |
+| `{"status":1,"priority":1,"updatedAt":-1}` (background=true) |
 
 ## content_translations
 
@@ -2244,6 +2252,33 @@ No explicit schema indexes.
 | `{"user_id":1,"read":1,"createdAt":-1}` (background=true) |
 | `{"user_id":1,"type":1,"createdAt":-1}` (background=true) |
 | `{"user_id":1,"dedupeKey":1}` (unique=true, partialFilterExpression={"dedupeKey":{"$exists":true,"$type":"string"}}, background=true) |
+
+## NotificationPreference
+
+| Item | Value |
+|---|---|
+| Collection | `notification_preferences` |
+| Timestamps | yes |
+
+### Fields
+
+| Field | Type | Required | Default | Enum | Ref |
+| --- | --- | --- | --- | --- | --- |
+| `user_id` | ObjectID | yes |  |  | users |
+| `channels` | Embedded |  | default |  |  |
+| `categories` | Embedded |  | default |  |  |
+| `quiet_hours` | Embedded |  | default |  |  |
+| `lang` | String |  | en | ar, en |  |
+| `updated_by` | ObjectID |  | null |  | users |
+| `_id` | ObjectID |  | defaultId |  |  |
+| `createdAt` | Date |  |  |  |  |
+| `updatedAt` | Date |  |  |  |  |
+
+### Indexes
+
+| Index |
+| --- |
+| `{"user_id":1}` (unique=true, background=true) |
 
 ## pages
 

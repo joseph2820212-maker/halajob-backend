@@ -9,6 +9,9 @@ router.use(authUser);
 router.get("/", NotificationV1Controller.list);
 router.get("/list", NotificationV1Controller.list);
 router.get("/unread-count", NotificationV1Controller.unreadCount);
+router.get("/preferences", NotificationV1Controller.getPreferences);
+router.put("/preferences", express.json(), NotificationV1Controller.updatePreferences);
+router.patch("/preferences", express.json(), NotificationV1Controller.updatePreferences);
 
 router.post("/read", NotificationV1Controller.markRead);
 router.patch("/read", NotificationV1Controller.markRead);

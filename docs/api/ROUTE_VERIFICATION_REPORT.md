@@ -1,15 +1,15 @@
 # Route Verification Report
 
-Generated: 2026-06-27T03:25:19.815Z
+Generated: 2026-06-27T03:40:55.783Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 2135 |
-| Unique method/path endpoints | 3372 |
-| Endpoints with detected auth/role guard | 3283 |
+| Raw Express endpoint entries | 2141 |
+| Unique method/path endpoints | 3384 |
+| Endpoints with detected auth/role guard | 3295 |
 | Known public/system endpoints | 89 |
 | Unguarded endpoints needing manual classification | 0 |
 
@@ -23,7 +23,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 
 | Module | Total | Protected | Known public | Needs classification |
 | --- | --- | --- | --- | --- |
-| Admin | 2886 | 2881 | 5 | 0 |
+| Admin | 2889 | 2884 | 5 | 0 |
 | AI | 12 | 12 | 0 | 0 |
 | Analytics | 5 | 5 | 0 | 0 |
 | Campus | 12 | 10 | 2 | 0 |
@@ -32,8 +32,8 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Files | 1 | 0 | 1 | 0 |
 | Health | 2 | 0 | 2 | 0 |
 | Jobs | 2 | 2 | 0 | 0 |
-| Legacy User | 149 | 75 | 74 | 0 |
-| Notifications | 13 | 13 | 0 | 0 |
+| Legacy User | 155 | 81 | 74 | 0 |
+| Notifications | 16 | 16 | 0 | 0 |
 | Seeker | 94 | 93 | 1 | 0 |
 | Trust | 4 | 4 | 0 | 0 |
 | University | 15 | 15 | 0 | 0 |
@@ -190,6 +190,7 @@ getMyJobs
 getMySection
 getMySubscription
 getMyUploadedCvs
+getPreferences
 getProfileAnalytics
 getRecommendedEmployeesForJob
 getRequest
@@ -295,6 +296,7 @@ searchEmployees
 seedFreePlan
 sendApplicationMessage
 sendJobInvitation
+sendNotification
 services
 setActiveContext
 setActiveCv

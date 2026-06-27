@@ -103547,6 +103547,40 @@
       "name": "Jobs",
       "item": [
         {
+          "name": "GET /jobs/v1/:jobId/translations/:lang",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/jobs/v1/:jobId/translations/:lang",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "jobs",
+                "v1",
+                ":jobId",
+                "translations",
+                ":lang"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Jobs. Guard source: explicit."
+          }
+        },
+        {
           "name": "PUT /jobs/v1/:jobId/translations/:lang",
           "request": {
             "method": "PUT",
@@ -104622,6 +104656,40 @@
                 "v1",
                 "company",
                 "upload-file"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/cv/translations/:lang",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/cv/translations/:lang",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "cv",
+                "translations",
+                ":lang"
               ]
             },
             "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."

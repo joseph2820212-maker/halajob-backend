@@ -64,8 +64,11 @@ async function main() {
   ]);
 
   const {
+    AuditLogModel,
     FcmTokenModel,
     NotificationModel,
+    NotificationPreferenceModel,
+    PermissionModel,
     RoleModel,
     UserModel,
   } = models;
@@ -87,7 +90,57 @@ async function main() {
     is_system: true,
   });
 
-  const [user, otherUser] = await UserModel.create([
+  const createPermission = async (key) => {
+    const [group, action = "manage"] = key.split(".");
+    return PermissionModel.create({
+      key,
+      group,
+      action,
+      title_ar: key,
+      title_en: key,
+      status: true,
+    });
+  };
+
+  const [notificationsViewPermission, notificationsManagePermission] = await Promise.all([
+    createPermission("notifications.view"),
+    createPermission("notifications.manage"),
+  ]);
+
+  const [notificationsViewRole, notificationsManageRole, dashNoNotificationsRole] = await RoleModel.create([
+    {
+      log_to: "dash",
+      name: `notification-runtime-view-${suffix}`,
+      role_number: 970001,
+      title_ar: "Notification Viewer",
+      title_en: "Notification Viewer",
+      permissions: [notificationsViewPermission._id],
+      status: true,
+      is_system: false,
+    },
+    {
+      log_to: "dash",
+      name: `notification-runtime-manage-${suffix}`,
+      role_number: 970002,
+      title_ar: "Notification Manager",
+      title_en: "Notification Manager",
+      permissions: [notificationsManagePermission._id],
+      status: true,
+      is_system: false,
+    },
+    {
+      log_to: "dash",
+      name: `notification-runtime-none-${suffix}`,
+      role_number: 970003,
+      title_ar: "No Notifications",
+      title_en: "No Notifications",
+      permissions: [],
+      status: true,
+      is_system: false,
+    },
+  ]);
+
+  const [user, otherUser, notificationViewAdmin, notificationManageAdmin, noNotificationAdmin] = await UserModel.create([
     {
       first_name: "Notify",
       last_name: "Owner",
@@ -115,6 +168,48 @@ async function main() {
       phone_country: "US",
       phone_code: "+1",
       phone_national: `555${phoneSeed}02`,
+    },
+    {
+      first_name: "Notify",
+      last_name: "Viewer",
+      email: `notify.viewer.${suffix}@example.com`,
+      gender: "male",
+      role_id: notificationsViewRole._id,
+      password: "not-used",
+      status: true,
+      phone: `+1555${phoneSeed}03`,
+      phone_e164: `+1555${phoneSeed}03`,
+      phone_country: "US",
+      phone_code: "+1",
+      phone_national: `555${phoneSeed}03`,
+    },
+    {
+      first_name: "Notify",
+      last_name: "Manager",
+      email: `notify.manager.${suffix}@example.com`,
+      gender: "female",
+      role_id: notificationsManageRole._id,
+      password: "not-used",
+      status: true,
+      phone: `+1555${phoneSeed}04`,
+      phone_e164: `+1555${phoneSeed}04`,
+      phone_country: "US",
+      phone_code: "+1",
+      phone_national: `555${phoneSeed}04`,
+    },
+    {
+      first_name: "Notify",
+      last_name: "NoPerm",
+      email: `notify.noperm.${suffix}@example.com`,
+      gender: "male",
+      role_id: dashNoNotificationsRole._id,
+      password: "not-used",
+      status: true,
+      phone: `+1555${phoneSeed}05`,
+      phone_e164: `+1555${phoneSeed}05`,
+      phone_country: "US",
+      phone_code: "+1",
+      phone_national: `555${phoneSeed}05`,
     },
   ]);
 
@@ -151,7 +246,7 @@ async function main() {
     },
   ]);
 
-  const [tokens, otherTokens] = await Promise.all([
+  const [tokens, otherTokens, viewAdminTokens, manageAdminTokens, noNotificationAdminTokens] = await Promise.all([
     generateAuthTokens(user, {
       brand: "Notification Runtime",
       model_name: "Integration",
@@ -159,6 +254,21 @@ async function main() {
     }),
     generateAuthTokens(otherUser, {
       brand: "Notification Runtime Other",
+      model_name: "Integration",
+      is_device: false,
+    }),
+    generateAuthTokens(notificationViewAdmin, {
+      brand: "Notification Runtime View Admin",
+      model_name: "Integration",
+      is_device: false,
+    }),
+    generateAuthTokens(notificationManageAdmin, {
+      brand: "Notification Runtime Manage Admin",
+      model_name: "Integration",
+      is_device: false,
+    }),
+    generateAuthTokens(noNotificationAdmin, {
+      brand: "Notification Runtime No Perm Admin",
       model_name: "Integration",
       is_device: false,
     }),
@@ -210,6 +320,176 @@ async function main() {
     );
     assert.equal(unreadListPayload.data.length, 2);
 
+    const defaultPreferencesPayload = await expectStatus(
+      request(baseUrl, "GET", "/notifications/v1/preferences", {
+        token: tokens.accessToken,
+      }),
+      200,
+      "notification preferences default read"
+    );
+    assert.equal(defaultPreferencesPayload.data.channels.in_app, true);
+    assert.equal(defaultPreferencesPayload.data.channels.push, true);
+    assert.equal(defaultPreferencesPayload.data.categories.applications, true);
+
+    const updatedPreferencesPayload = await expectStatus(
+      request(baseUrl, "PUT", "/notifications/v1/preferences", {
+        token: tokens.accessToken,
+        body: {
+          channels: { push: false },
+          categories: { applications: false },
+          quiet_hours: { enabled: true, start: "23:00", end: "06:00", timezone: "Europe/London" },
+          lang: "ar",
+        },
+      }),
+      200,
+      "notification preferences update"
+    );
+    assert.equal(updatedPreferencesPayload.data.channels.push, false);
+    assert.equal(updatedPreferencesPayload.data.channels.in_app, true);
+    assert.equal(updatedPreferencesPayload.data.categories.applications, false);
+    assert.equal(updatedPreferencesPayload.data.quiet_hours.enabled, true);
+    assert.equal(updatedPreferencesPayload.data.lang, "ar");
+
+    const legacyPreferencesPayload = await expectStatus(
+      request(baseUrl, "GET", "/user/v1/notifications/preferences", {
+        token: tokens.accessToken,
+      }),
+      200,
+      "legacy notification preferences read"
+    );
+    assert.equal(legacyPreferencesPayload.data.categories.applications, false);
+
+    const patchedPreferencesPayload = await expectStatus(
+      request(baseUrl, "PATCH", "/notifications/v1/preferences", {
+        token: tokens.accessToken,
+        body: {
+          marketing: true,
+        },
+      }),
+      200,
+      "notification preferences patch aliases"
+    );
+    assert.equal(patchedPreferencesPayload.data.categories.marketing, true);
+
+    const storedPreferences = await NotificationPreferenceModel.findOne({ user_id: user._id }).lean();
+    assert.equal(storedPreferences.categories.applications, false);
+    assert.equal(storedPreferences.channels.push, false);
+
+    await expectStatus(
+      request(baseUrl, "POST", "/dash/v1/notifications/send", {
+        token: tokens.accessToken,
+        body: {
+          user_id: user._id,
+          title: "Should not send",
+          body: "A normal app token cannot send dashboard notifications.",
+        },
+      }),
+      403,
+      "app user cannot send dashboard notifications"
+    );
+
+    await expectStatus(
+      request(baseUrl, "POST", "/dash/v1/notifications/send", {
+        token: noNotificationAdminTokens.accessToken,
+        body: {
+          user_id: user._id,
+          title: "Should not send",
+          body: "Missing notifications.manage permission.",
+        },
+      }),
+      403,
+      "dashboard admin without notification permission cannot send"
+    );
+
+    await expectStatus(
+      request(baseUrl, "POST", "/dash/v1/notifications/send", {
+        token: viewAdminTokens.accessToken,
+        body: {
+          user_id: user._id,
+          title: "Should not send",
+          body: "notifications.view is not enough to send.",
+        },
+      }),
+      403,
+      "notification viewer cannot send"
+    );
+
+    await expectStatus(
+      request(baseUrl, "POST", "/dash/v1/notifications/send", {
+        token: manageAdminTokens.accessToken,
+        body: {},
+      }),
+      400,
+      "admin notification requires recipients"
+    );
+
+    const blockedBeforeCount = await NotificationModel.countDocuments({ user_id: user._id });
+    const blockedAdminSendPayload = await expectStatus(
+      request(baseUrl, "POST", "/dash/v1/notifications/send", {
+        token: manageAdminTokens.accessToken,
+        body: {
+          user_id: user._id,
+          event_key: "application_status_rejected",
+          route_key: "applications.status",
+          params: { job: "Runtime Job" },
+          push: true,
+        },
+      }),
+      202,
+      "admin notification respects disabled application category"
+    );
+    assert.equal(blockedAdminSendPayload.data.summary.saved_count, 0);
+    assert.equal(blockedAdminSendPayload.data.summary.preference_blocked_count, 1);
+    assert.equal(
+      await NotificationModel.countDocuments({ user_id: user._id }),
+      blockedBeforeCount,
+      "disabled notification category should not create a notification record"
+    );
+
+    await expectStatus(
+      request(baseUrl, "PUT", "/notifications/v1/preferences", {
+        token: tokens.accessToken,
+        body: {
+          channels: { in_app: true, push: false },
+          categories: { applications: true },
+        },
+      }),
+      200,
+      "notification preferences re-enable application in-app"
+    );
+
+    const allowedAdminSendPayload = await expectStatus(
+      request(baseUrl, "POST", "/dash/v1/notifications/send", {
+        token: manageAdminTokens.accessToken,
+        body: {
+          user_ids: [user._id, otherUser._id],
+          title: "Campus application update",
+          body: "Your application has a new update.",
+          event_key: "application_status_shortlisted",
+          route_key: "applications.status",
+          push: true,
+          data: { application_id: "runtime-application-1" },
+        },
+      }),
+      202,
+      "admin notification send"
+    );
+    assert.equal(allowedAdminSendPayload.data.summary.recipient_count, 2);
+    assert.equal(allowedAdminSendPayload.data.summary.saved_count, 2);
+    assert.equal(allowedAdminSendPayload.data.summary.push_success_count, 0);
+    assert.ok(
+      allowedAdminSendPayload.data.results.some((item) => item.note === "push_disabled_by_preferences"),
+      "user with push disabled should save in-app but skip push"
+    );
+
+    const adminNotificationAudit = await AuditLogModel.findOne({
+      action: "admin_notification_sent",
+      entity_type: "notification",
+    }).lean();
+    assert.ok(adminNotificationAudit, "admin notification send should write an audit log");
+    assert.equal(adminNotificationAudit.actor_type, "admin");
+
+    const unreadBeforeMarkOne = await NotificationModel.countDocuments({ user_id: user._id, read: false });
     const markOnePayload = await expectStatus(
       request(baseUrl, "POST", `/notifications/v1/${notificationA._id}/read`, {
         token: tokens.accessToken,
@@ -220,8 +500,8 @@ async function main() {
     assert.equal(markOnePayload.data.read, true);
     assert.equal(
       await NotificationModel.countDocuments({ user_id: user._id, read: false }),
-      1,
-      "mark one read should leave one unread notification"
+      unreadBeforeMarkOne - 1,
+      "mark one read should only change the selected notification"
     );
 
     await expectStatus(
@@ -237,6 +517,8 @@ async function main() {
       "cross-user mark-read attempt must not mutate the other user's notification"
     );
 
+    const unreadBeforeMarkAll = await NotificationModel.countDocuments({ user_id: user._id, read: false });
+    const otherUnreadBeforeMarkAll = await NotificationModel.countDocuments({ user_id: otherUser._id, read: false });
     const markAllPayload = await expectStatus(
       request(baseUrl, "POST", "/notifications/v1/read-all", {
         token: tokens.accessToken,
@@ -244,7 +526,7 @@ async function main() {
       200,
       "mark all notifications read"
     );
-    assert.equal(markAllPayload.data.modified_count, 1);
+    assert.equal(markAllPayload.data.modified_count, unreadBeforeMarkAll);
     assert.equal(
       await NotificationModel.countDocuments({ user_id: user._id, read: false }),
       0,
@@ -252,7 +534,7 @@ async function main() {
     );
     assert.equal(
       await NotificationModel.countDocuments({ user_id: otherUser._id, read: false }),
-      1,
+      otherUnreadBeforeMarkAll,
       "mark all read must not mutate another user's notifications"
     );
 
@@ -341,7 +623,7 @@ async function main() {
       "second notification should be marked read by read-all"
     );
 
-    console.log("Notification runtime integration verified for list/read ownership and device token lifecycle.");
+    console.log("Notification runtime integration verified for list/read ownership, preferences, admin send permissions, preference enforcement, audit logs, and device token lifecycle.");
   } finally {
     await new Promise((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));
