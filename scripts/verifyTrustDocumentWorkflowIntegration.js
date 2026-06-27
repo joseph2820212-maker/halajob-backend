@@ -336,6 +336,39 @@ async function main() {
     "company document links must use https"
   );
 
+  const unsafeEvidenceUrls = [
+    "https://localhost/license.pdf",
+    "https://metadata.google.internal/latest/meta-data",
+    "https://intranet/license.pdf",
+    "https://127.0.0.1/license.pdf",
+    "https://0x7f000001/license.pdf",
+    "https://2130706433/license.pdf",
+    "https://10.0.0.4/license.pdf",
+    "https://172.16.0.5/license.pdf",
+    "https://192.168.1.20/license.pdf",
+    "https://169.254.169.254/latest/meta-data",
+    "https://[::1]/license.pdf",
+    "https://[::ffff:127.0.0.1]/license.pdf",
+    "https://admin:secret@docs.example.com/license.pdf",
+  ];
+  for (const unsafeUrl of unsafeEvidenceUrls) {
+    await expectStatus(
+      request(baseUrl, "POST", `/trust/v1/jobs/${jobId}/documents`, {
+        token: companyTokens.accessToken,
+        body: { document_links: [{ url: unsafeUrl }] },
+      }),
+      422,
+      `unsafe company document link should be rejected: ${unsafeUrl}`
+    );
+  }
+
+  const rejectedAttemptJob = await jobsModel.findById(jobId).lean();
+  assert.equal(
+    rejectedAttemptJob.trust.document_response.status,
+    "requested",
+    "rejected evidence links should not mark trust documents as submitted"
+  );
+
   await expectStatus(
     request(baseUrl, "POST", `/trust/v1/jobs/${jobId}/documents`, {
       token: otherCompanyTokens.accessToken,

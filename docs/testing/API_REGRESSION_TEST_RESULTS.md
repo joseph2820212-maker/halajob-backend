@@ -4,7 +4,7 @@ Date: 2026-06-27
 Branch: `flutter-seeker-campus`
 Commit tested: current `flutter-seeker-campus` branch state as of the latest update below.
 Environment: local Codex workspace
-Latest update: object authorization, private upload static-serving, student verification document privacy, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime/preferences/admin-send coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, company permission-boundary coverage, company member lifecycle/context-sync coverage, university member lifecycle/context-sync coverage, admin permission-boundary coverage, admin support workflow coverage, translation read/write workflow coverage, admin resource redaction/lifecycle audit coverage, job seeker mutation workflow coverage, ATS/interview/invitation workflow coverage, campus/university workflow coverage, and auth/context negative coverage added on 2026-06-27.
+Latest update: object authorization, private upload static-serving, trust evidence public-URL hardening, student verification document privacy, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime/preferences/admin-send coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, company permission-boundary coverage, company member lifecycle/context-sync coverage, university member lifecycle/context-sync coverage, admin permission-boundary coverage, admin support workflow coverage, translation read/write workflow coverage, admin resource redaction/lifecycle audit coverage, job seeker mutation workflow coverage, ATS/interview/invitation workflow coverage, campus/university workflow coverage, and auth/context negative coverage added on 2026-06-27.
 
 ## Passed Commands
 
@@ -48,7 +48,7 @@ Latest update: object authorization, private upload static-serving, student veri
 | `npm run test:admin-operations-routes` | Passed |
 | `npm run test:career-passport` | Passed |
 | `npm run test:integration:auth-context` | Passed, including missing/malformed/expired app tokens, expired admin tokens, inactive app-user denial, role/context denial, borrowed-context denial, suspended-context denial, invalid-context rejection, pending-company denial, and revoked refresh-session denial |
-| `npm run test:integration:trust-documents` | Passed |
+| `npm run test:integration:trust-documents` | Passed, including missing-token, wrong-role, submit-before-request, HTTPS-only evidence, private/internal public-HTTPS evidence rejection, cross-company denial, owning-company submission, admin review queue, audit logs, and analytics |
 | `npm run docs:route-report` | Passed |
 | `npm run docs:api-artifacts` | Passed |
 

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import net from "node:net";
 import ReturnAppData from "../../helper/ReturnAppData/index.js";
 import {
   JobReportModel,
@@ -19,6 +20,71 @@ const toObjectId = (value) => {
 const lang = (req) => String(req.get("lan") || req.get("x-language") || "en").toLowerCase();
 const message = (req, ar, en) => (lang(req).startsWith("ar") ? ar : en);
 const clean = (value = "") => String(value || "").trim();
+
+const MAX_EVIDENCE_URL_LENGTH = 2048;
+const blockedEvidenceHosts = new Set([
+  "localhost",
+  "ip6-localhost",
+  "ip6-loopback",
+  "metadata.google.internal",
+]);
+
+const normalizeHostname = (hostname = "") =>
+  clean(hostname).toLowerCase().replace(/^\[(.*)\]$/, "$1").replace(/\.$/, "");
+
+const ipv4Parts = (hostname) => {
+  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) return null;
+  const parts = hostname.split(".").map((part) => Number.parseInt(part, 10));
+  return parts.every((part) => Number.isInteger(part) && part >= 0 && part <= 255) ? parts : null;
+};
+
+const isBlockedIpv4 = (hostname) => {
+  const parts = ipv4Parts(hostname);
+  if (!parts) return false;
+  const [a, b, c] = parts;
+
+  return (
+    a === 0 ||
+    a === 10 ||
+    a === 127 ||
+    (a === 169 && b === 254) ||
+    (a === 172 && b >= 16 && b <= 31) ||
+    (a === 192 && b === 168) ||
+    (a === 100 && b >= 64 && b <= 127) ||
+    (a === 192 && b === 0 && c === 0) ||
+    (a === 192 && b === 0 && c === 2) ||
+    a === 198 && (b === 18 || b === 19) ||
+    (a === 198 && b === 51 && c === 100) ||
+    (a === 203 && b === 0 && c === 113) ||
+    a >= 224
+  );
+};
+
+const isBlockedIpv6 = (hostname) => {
+  if (net.isIP(hostname) !== 6) return false;
+  if (hostname === "::" || hostname === "::1" || hostname.startsWith("::ffff:")) return true;
+
+  const firstHextet = Number.parseInt(hostname.split(":")[0] || "0", 16);
+  if (!Number.isFinite(firstHextet)) return true;
+
+  return (
+    (firstHextet & 0xfe00) === 0xfc00 ||
+    (firstHextet & 0xffc0) === 0xfe80 ||
+    hostname.startsWith("2001:db8:")
+  );
+};
+
+const isPublicEvidenceUrl = (parsed) => {
+  const hostname = normalizeHostname(parsed.hostname);
+  if (!hostname || parsed.username || parsed.password) return false;
+  if (blockedEvidenceHosts.has(hostname)) return false;
+  if (hostname.endsWith(".localhost") || hostname.endsWith(".local") || hostname.endsWith(".internal")) return false;
+  if (hostname.endsWith(".test") || hostname.endsWith(".invalid")) return false;
+  if (isBlockedIpv4(hostname) || isBlockedIpv6(hostname)) return false;
+  if (net.isIP(hostname) === 0 && !hostname.includes(".")) return false;
+
+  return true;
+};
 
 const publicJobFilter = () => ({
   status: true,
@@ -79,6 +145,9 @@ const normalizeEvidenceLinks = (body = {}) => {
     const object = item && typeof item === "object" && !Array.isArray(item) ? item : {};
     const url = clean(object.url || object.href || object.link || object.document_url || item);
     if (!url) continue;
+    if (url.length > MAX_EVIDENCE_URL_LENGTH) {
+      return { error: "document_link_too_long" };
+    }
 
     let parsed;
     try {
@@ -90,9 +159,12 @@ const normalizeEvidenceLinks = (body = {}) => {
     if (parsed.protocol !== "https:") {
       return { error: "document_link_must_use_https" };
     }
+    if (!isPublicEvidenceUrl(parsed)) {
+      return { error: "document_link_must_use_public_https" };
+    }
 
     links.push({
-      url,
+      url: parsed.toString(),
       label: clean(object.label || object.title || object.name).slice(0, 120),
       kind: clean(object.kind || object.type || "evidence").slice(0, 50) || "evidence",
     });
