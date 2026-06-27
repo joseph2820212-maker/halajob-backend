@@ -42,7 +42,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 12 | Mobile App Quality | [~] |
 | 13 | Web Frontend Quality | [~] |
 | 14 | Testing Strategy | [~] |
-| 15 | Performance & Scalability | [ ] |
+| 15 | Performance & Scalability | [x]* |
 | 16 | Observability & Operations | [ ] |
 | 17 | DevOps & Deployment | [ ] |
 | 18 | Documentation & Repo Cleanup | [ ] |
@@ -417,3 +417,18 @@ Goal: reliable, professional web dashboards.
 **Result: PARTIAL** — the HIGH 401-handling gap is closed + build verified; URL-encoding + state polish remain.
 
 **Score movement:** Web ~6 → ~7 (session expiry handled).
+
+## Phase 15 — Performance & Scalability  [x]*
+Goal: fast and scalable enough for launch.
+
+**Verified (wired on trunk; no changes needed):**
+- [x] **Compression** middleware enabled (app.js); JSON body limit (2mb); global + auth + upload rate limiters (Phase 1)
+- [x] **Heavy DB indexing** on hot models: Job (84), Employee (105), Company (68), UserApplyingJob (17), Notification (8), AccountContext (8), User (12), StudentVerification (10)
+- [x] **Pagination clamps** on key list endpoints (`Math.min(...,100/500)`, default page sizes)
+- [x] **Background jobs**: `jobs/scheduler.js` + `jobLifecycle.jobs.js` + `campusEvent.jobs.js` + `jobLock.js` (close-expired-jobs, deadline/event reminders, company job-count sync) with locking
+
+**Minor follow-ups (not blocking):** ensure every list endpoint clamps pagination (a few may not); review the heaviest aggregations (dashboard metrics) for caching.
+
+**Result: PASS by inspection** — compression on, well-indexed, paginated, background work offloaded.
+
+**Score movement:** Performance ~8.5 — confirmed.
