@@ -21,6 +21,7 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 - Sensitive CV/document downloads must require auth and correct company/admin context.
 - Bulk exports must be audited and permission-checked.
 - Company file downloads must be audited for both dashboard (`/company/v1/...`) and app (`/user/v1/company/...`) routes.
+- Student verification documents must be stored under private `uploads/files/student-verifications/` storage, blocked from direct public `/uploads/files/*` access, and downloaded only through authenticated student-owner or university-admin routes.
 - Dashboard protected file downloads under `/dash/v1/file/:name` must require `files.read`, allow only image/PDF extensions, and serve PDFs as attachments with `Cache-Control: no-store`.
 
 ## File Types
@@ -38,10 +39,13 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 
 ```bash
 npm run test:security-http
+npm run test:integration:student-verification-documents
 npm run check:secrets
 ```
 
 `npm run test:security-http` creates temporary upload fixtures and proves direct `/uploads/files/*` access returns 404 with `no-store`/`nosniff`, generated CV downloads are PDF attachments with `no-store`/`nosniff`, and root HTML uploads are served as attachments with restrictive CSP.
+
+`npm run test:integration:student-verification-documents` proves student verification document uploads move to private storage, direct public access is denied, student-owner and university-admin downloads are scoped, attachment/no-store/nosniff headers are sent, and upload/download audit rows are written.
 
 `npm run test:file-export-audit` proves company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user.
 

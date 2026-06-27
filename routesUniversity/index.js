@@ -16,6 +16,7 @@ router.get("/students", universityAdminGuard, campusController.userUniversityStu
 router.get("/students/:studentId/career-passport", universityAdminGuard, campusController.userUniversityStudentCareerPassport);
 
 router.get("/verifications", universityAdminGuard, campusController.adminListVerifications);
+router.get("/verifications/:id/document", universityAdminGuard, campusController.adminDownloadStudentVerificationDocument);
 router.post("/verifications/:id/approve", universityAdminGuard, upload.none(), campusController.adminApproveVerification);
 router.post("/verifications/:id/reject", universityAdminGuard, upload.none(), campusController.adminRejectVerification);
 router.post("/verifications/:id/request-info", universityAdminGuard, upload.none(), campusController.adminRequestVerificationInfo);

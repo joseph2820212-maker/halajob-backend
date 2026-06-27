@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import crypto from "crypto";
+import fs from "fs/promises";
+import path from "path";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import {
@@ -34,6 +36,11 @@ import {
 } from "../../../notification/CampusNotifications.js";
 
 const { isValidObjectId } = mongoose;
+const UPLOADS_ROOT = path.resolve(process.cwd(), "uploads");
+const PRIVATE_VERIFICATION_DOCUMENT_DIR = path.resolve(UPLOADS_ROOT, "files", "student-verifications");
+const VERIFICATION_DOCUMENT_PREFIX = "uploads/files/student-verifications";
+const LEGACY_UPLOAD_PREFIX = "uploads";
+const VERIFICATION_DOCUMENT_EXTENSIONS = new Set([".pdf", ".jpg", ".jpeg", ".png", ".webp"]);
 
 const publicJobFilter = {
   status: true,
@@ -81,6 +88,88 @@ const normalizeUniversityMemberStatus = (value, fallback = "active") => {
 const permissionsForUniversityRole = (role, provided = undefined) => {
   const permissions = uniqueStringArray(provided);
   return permissions.length ? permissions : defaultUniversityPermissionsForRole(role);
+};
+
+const toStoredUploadPath = (relativePath = "") => String(relativePath || "").replace(/^\/+/, "").replace(/\\/g, "/");
+
+const persistPrivateVerificationDocument = async (file) => {
+  if (!file?.filename || !file?.path) return "";
+  const extension = path.extname(file.filename).toLowerCase();
+  if (!VERIFICATION_DOCUMENT_EXTENSIONS.has(extension)) return "";
+
+  const safeName = path.basename(file.filename).replace(/["\\]/g, "_");
+  const sourcePath = path.resolve(file.path);
+  const destinationPath = path.resolve(PRIVATE_VERIFICATION_DOCUMENT_DIR, safeName);
+  if (!sourcePath.startsWith(UPLOADS_ROOT + path.sep) || !destinationPath.startsWith(PRIVATE_VERIFICATION_DOCUMENT_DIR + path.sep)) {
+    return "";
+  }
+
+  await fs.mkdir(PRIVATE_VERIFICATION_DOCUMENT_DIR, { recursive: true });
+  await fs.rename(sourcePath, destinationPath);
+  return `${VERIFICATION_DOCUMENT_PREFIX}/${safeName}`;
+};
+
+const normalizeVerificationDocumentUrl = (value = "") => {
+  const raw = cleanText(value);
+  if (!raw) return "";
+  if (/^https:\/\//i.test(raw)) return raw;
+
+  const stored = toStoredUploadPath(raw);
+  if (stored.startsWith(`${VERIFICATION_DOCUMENT_PREFIX}/`)) return stored;
+  return "";
+};
+
+const resolveVerificationDocumentPath = (documentUrl = "") => {
+  const stored = toStoredUploadPath(documentUrl);
+  if (!stored || /^https?:\/\//i.test(stored) || stored.includes("..")) return null;
+
+  const relative = stored.startsWith(`${VERIFICATION_DOCUMENT_PREFIX}/`)
+    ? stored.slice(VERIFICATION_DOCUMENT_PREFIX.length + 1)
+    : stored.startsWith(`${LEGACY_UPLOAD_PREFIX}/`)
+    ? stored.slice(LEGACY_UPLOAD_PREFIX.length + 1)
+    : "";
+  if (!relative || relative.includes("/") || relative.includes("\\")) return null;
+
+  const extension = path.extname(relative).toLowerCase();
+  if (!VERIFICATION_DOCUMENT_EXTENSIONS.has(extension)) return null;
+
+  const baseDir = stored.startsWith(`${VERIFICATION_DOCUMENT_PREFIX}/`) ? PRIVATE_VERIFICATION_DOCUMENT_DIR : UPLOADS_ROOT;
+  const filePath = path.resolve(baseDir, relative);
+  if (!filePath.startsWith(baseDir + path.sep)) return null;
+  return filePath;
+};
+
+const sendVerificationDocumentFile = async ({ req, res, verification, actorType }) => {
+  const filePath = resolveVerificationDocumentPath(verification?.document_url);
+  if (!filePath) {
+    return ReturnAppData.getError({ res, status: 404, message: "student_verification_document_not_found" });
+  }
+
+  try {
+    await fs.access(filePath);
+  } catch {
+    return ReturnAppData.getError({ res, status: 404, message: "student_verification_document_not_found" });
+  }
+
+  await writeAuditLog({
+    req,
+    actorUserId: req.user?._id,
+    actorType,
+    action: "campus_verification_document_downloaded",
+    entityType: "other",
+    entityId: verification._id,
+    newValue: {
+      university_id: verification.university_id,
+      has_document: true,
+    },
+  });
+
+  const safeName = path.basename(filePath).replace(/["\\]/g, "_");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Cross-Origin-Resource-Policy", "same-site");
+  res.setHeader("Content-Disposition", `attachment; filename="${safeName}"`);
+  return res.sendFile(filePath);
 };
 
 const parseDateOrNull = (value) => {
@@ -581,9 +670,10 @@ const serializeVerification = (verification = {}) => {
     verification.university_id && typeof verification.university_id === "object"
       ? verification.university_id
       : null;
+  const verificationId = String(verification._id || "");
 
   return {
-    id: String(verification._id || ""),
+    id: verificationId,
     _id: verification._id,
     method: verification.method || "email",
     status: verification.status || "pending",
@@ -597,6 +687,8 @@ const serializeVerification = (verification = {}) => {
     graduation_year: verification.graduation_year || null,
     invite_code: verification.invite_code || "",
     document_url: verification.document_url || "",
+    document_download_url: verificationId ? `/campus/v1/student-verifications/${verificationId}/document` : "",
+    admin_document_download_url: verificationId ? `/university/v1/verifications/${verificationId}/document` : "",
     email_confirmed_at: verification.email_confirmed_at || null,
     reviewed_by: verification.reviewed_by || null,
     reviewed_at: verification.reviewed_at || null,
@@ -1277,9 +1369,12 @@ const uploadStudentVerificationDocument = async (req, res, next) => {
       return ReturnAppData.createError({ res, status: 422, message: "university_required" });
     }
 
-    const documentUrl = req.file?.filename
-      ? `/uploads/${req.file.filename}`
-      : cleanText(body.document_url);
+    const uploadedDocumentUrl = req.file ? await persistPrivateVerificationDocument(req.file) : "";
+    if (req.file && !uploadedDocumentUrl) {
+      return ReturnAppData.createError({ res, status: 400, message: "invalid_student_document" });
+    }
+
+    const documentUrl = uploadedDocumentUrl || normalizeVerificationDocumentUrl(body.document_url);
     if (!documentUrl) {
       return ReturnAppData.createError({ res, status: 422, message: "student_document_required" });
     }
@@ -1353,6 +1448,60 @@ const uploadStudentVerificationDocument = async (req, res, next) => {
         verification: serializeVerification({ ...verificationObject, university_id: university }),
       },
       message: "student_verification_document_uploaded",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const downloadStudentVerificationDocument = async (req, res, next) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return ReturnAppData.getError({ res, status: 400, message: "invalid_student_verification_id" });
+    }
+
+    const verification = await StudentVerificationModel.findOne({
+      _id: req.params.id,
+      user_id: req.user._id,
+    }).lean();
+    if (!verification) {
+      return ReturnAppData.getError({ res, status: 404, message: "student_verification_not_found" });
+    }
+
+    return sendVerificationDocumentFile({ req, res, verification, actorType: "employee" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const adminDownloadStudentVerificationDocument = async (req, res, next) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return ReturnAppData.getError({ res, status: 400, message: "invalid_student_verification_id" });
+    }
+
+    const scope = await getUniversityAdminScope(req);
+    if (!scope) {
+      return ReturnAppData.getError({ res, status: 403, message: "university_admin_context_required" });
+    }
+
+    const query = { _id: req.params.id };
+    if (!scope.superAdmin) {
+      query.university_id = scope.university._id;
+    } else if (scope.university?._id) {
+      query.university_id = scope.university._id;
+    }
+
+    const verification = await StudentVerificationModel.findOne(query).lean();
+    if (!verification) {
+      return ReturnAppData.getError({ res, status: 404, message: "student_verification_not_found" });
+    }
+
+    return sendVerificationDocumentFile({
+      req,
+      res,
+      verification,
+      actorType: scope.superAdmin ? "admin" : "university_admin",
     });
   } catch (error) {
     next(error);
@@ -2314,6 +2463,8 @@ export default {
   startStudentVerification,
   confirmStudentVerificationEmail,
   uploadStudentVerificationDocument,
+  downloadStudentVerificationDocument,
+  adminDownloadStudentVerificationDocument,
   resubmitStudentVerification,
   adminListVerifications,
   adminApproveVerification,

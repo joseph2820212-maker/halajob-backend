@@ -14,12 +14,14 @@ router.get("/universities/:id/campuses", campusController.listUniversityCampuses
 router.get("/student-verifications/me", authUser, campusController.studentVerificationStatus);
 router.post("/student-verifications", authUser, upload.none(), campusController.startStudentVerification);
 router.post("/student-verifications/:id/resubmit", authUser, upload.none(), campusController.resubmitStudentVerification);
+router.get("/student-verifications/:id/document", authUser, campusController.downloadStudentVerificationDocument);
 
 router.post("/verification/start", authUser, upload.none(), campusController.startStudentVerification);
 router.post("/verification/confirm-email", authUser, upload.none(), campusController.confirmStudentVerificationEmail);
 router.post("/verification/upload-document", authUser, upload.single("document"), campusController.uploadStudentVerificationDocument);
 
 router.get("/admin/verifications", universityAdminGuard, campusController.adminListVerifications);
+router.get("/admin/verifications/:id/document", universityAdminGuard, campusController.adminDownloadStudentVerificationDocument);
 router.post("/admin/verifications/:id/approve", universityAdminGuard, upload.none(), campusController.adminApproveVerification);
 router.post("/admin/verifications/:id/reject", universityAdminGuard, upload.none(), campusController.adminRejectVerification);
 router.post("/admin/verifications/:id/request-info", universityAdminGuard, upload.none(), campusController.adminRequestVerificationInfo);

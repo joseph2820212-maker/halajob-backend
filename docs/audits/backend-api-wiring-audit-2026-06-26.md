@@ -41,11 +41,11 @@ Current generated artifacts:
 | Backend route mounting | 9 | Core route groups are mounted across seeker, company, admin, campus, university, AI, trust, analytics, notifications, jobs, and health; current route report has zero unclassified unguarded endpoints. |
 | Web API wiring | 8 | No obvious hard 404s found in the centralized web API client against mounted backend route families; browser click-through remains separate. |
 | Mobile API wiring | 8.5 | Legacy mobile fallback aliases are now covered by `npm run test:mobile-routes`, including older `/employee/v1/...` compatibility paths. |
-| Feature API coverage | 8.75 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notification preferences/admin send, analytics, subscriptions, company/admin permissions, company member lifecycle/context sync, university member lifecycle/context sync, translation save/read/approval, job seeker mutations, ATS/interview/invitation workflows, campus/university workflows, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
+| Feature API coverage | 8.77 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notification preferences/admin send, analytics, subscriptions, company/admin permissions, company member lifecycle/context sync, university member lifecycle/context sync, student verification document privacy, translation save/read/approval, job seeker mutations, ATS/interview/invitation workflows, campus/university workflows, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
 | Auth and account-context safety | 8.7 | Seeded auth/context integration now covers missing/malformed/expired app and admin tokens, inactive app-user denial, role/context denial, cross-role borrowing, suspended context, invalid context, and refresh-token revocation. |
 | Admin operational coverage | 8.4 | Admin resources are broad, redacted, lifecycle-audited, and now guarded by fine-grained permissions on generic resources plus high-risk operation/file/support/notification-send routes; remaining risk is newer workflow-specific admin handling and support-role policy. |
-| Automated backend test depth | 8.45 | Static checks plus multiple seeded runtime integration harnesses exist, including high-risk company/university member lifecycle/context sync, seeker job mutations, ATS/interview/invitation workflows, and campus/university workflows; still short of route-by-route validator/schema and full journey coverage. |
-| Launch confidence from backend/API only | 8.65 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
+| Automated backend test depth | 8.48 | Static checks plus multiple seeded runtime integration harnesses exist, including high-risk company/university member lifecycle/context sync, student verification document privacy, seeker job mutations, ATS/interview/invitation workflows, and campus/university workflows; still short of route-by-route validator/schema and full journey coverage. |
+| Launch confidence from backend/API only | 8.67 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
 
 ## 3. Audit Method
 
@@ -115,7 +115,7 @@ The high `/dash/v1` count is mainly from broad generic dashboard CRUD aliases. T
 | Company dashboard/profile/files/billing/jobs | Routed and controller-backed. |
 | Company ATS/interviews/audit/question library/templates/support/members/analytics | Routed in company dashboard and job route groups, with seeded workflow coverage for interview scheduling/reschedule/completion, candidate responses, invitation resend/accept/cancel, usage counters, audit logs, and analytics. |
 | Admin dashboard/moderation/trust/AI/audit/translation/notification/subscription/resource CRUD | Mounted. |
-| Campus student verification, campus dashboard/events/opportunities/applications | Routed, with seeded workflow coverage for student access, event lifecycle, opportunity save/apply, and verification submission. |
+| Campus student verification, campus dashboard/events/opportunities/applications | Routed, with seeded workflow coverage for student access, event lifecycle, opportunity save/apply, verification submission/review, and private verification document upload/download. |
 | University admin dashboard/students/passports/verifications/analytics/reports/opportunities | Routed, with seeded workflow coverage for verification review, dashboard counts, opportunity requests, and CSV outcome export. |
 | Career Passport get/update/share/score refresh | Routed and service-backed. |
 | AI safe suggestions/logging/usage limits | Routed and service-backed. |
@@ -182,7 +182,7 @@ Current status: explicit backend compatibility aliases have since been added and
 | Dashboard authorization is now permission-scoped for high-risk surfaces | `/dash/v1` still starts with dashboard-session auth, but generic resource aliases, generic `/resources/:resource` routes, AI/admin operations, moderation, trust, subscriptions, support tickets, notification sending, campus university admin endpoints, dashboard summaries, search, and protected dashboard file downloads now enforce fine-grained permission keys. Remaining work is route-by-route policy documentation, support-role modelling, and any future admin feature routes. |
 | Active context requires careful handling | Explicit context safety now fails closed for malformed, wrong-user, suspended, or removed contexts, and seeded tests cover context denial cases. Per-request context UX and multi-device behavior should still be validated through app/web journeys. |
 | Public generated CV PDF route | `/cv/generated/:fileName` is public with filename validation, traversal rejection, attachment disposition, `nosniff`, and `no-store`; generated names should remain unguessable and expiry/access rules still need product review. |
-| Public uploads route | `/uploads/files/*` is now blocked from public static serving, non-image root uploads are forced to attachment, and dashboard protected file downloads require `files.read`, allow image/PDF extensions only, and serve PDFs as attachment/no-store/nosniff. Remaining work is route-by-route MIME/size/private download coverage. |
+| Public uploads route | `/uploads/files/*` is now blocked from public static serving, non-image root uploads are forced to attachment, student verification documents are moved into private storage with scoped download routes, and dashboard protected file downloads require `files.read`, allow image/PDF extensions only, and serve PDFs as attachment/no-store/nosniff. Remaining work is route-by-route MIME/size/private download coverage for the remaining file families. |
 | Health secret query string | Fixed: health secrets must use the `x-health-secret` header. |
 | Cross-account access | Seeded object-authorization coverage now exists for company, university, and campus student object-scope cases. Expired app/admin token denial, inactive app-user denial, company member permission denial, and dashboard admin permission denial are covered. Remaining work is broader workflow side-effect coverage and support-role boundaries. |
 | Logout/session invalidation | Improved: user, company, and admin logout behavior now has backend handling and security-contract checks; web logout calls backend before clearing local state. |
@@ -227,6 +227,7 @@ npm run check:syntax
 npm run check:imports
 npm run smoke:http
 npm run test:security-http
+npm run test:integration:student-verification-documents
 npm run test:audit-logging
 npm run test:file-export-audit
 npm run test:integration:auth-context
@@ -279,7 +280,7 @@ The following were not run as part of this pass:
 | P0 | Add remaining inactive-context edge-case tests and keep new admin feature routes tied to explicit permission keys. |
 | P0 | Keep mobile fallback aliases until the mobile app no longer uses them, then remove the aliases and update `npm run test:mobile-routes`. |
 | P1 | Add mutation tests for richer campus admin content management, translation publishing/consumption, and any application status journeys beyond the now-covered ATS interview/invitation loop. |
-| P1 | Add upload/download security tests for trust evidence files, exports, generated CV expiry/ownership policy, MIME rejection, size rejection, and remaining private file routes. |
+| P1 | Add upload/download security tests for trust evidence files, remaining export edge cases, generated CV expiry/ownership policy, MIME rejection, size rejection, and remaining private file routes. Student verification documents now have scoped private-storage coverage. |
 | P1 | Add admin APIs or admin UI coverage for newer records: career passports, invoices, AI requests/limits, analytics events, content translations. Student verification and university membership workflows now have app/API baselines. |
 | P1 | Complete AI persistence workflows where product expects generated content to become real saved records. |
 | P1 | Complete translation publish/read workflow so approved translations are returned in job/CV APIs. |
