@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - flutter-seeker-campus
+      - 'claude/**'
   pull_request:
     branches:
       - flutter-seeker-campus
@@ -112,6 +113,26 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: halajob-mobile-fresh-apk-linux
+          if-no-files-found: error
+          retention-days: 14
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Build campus-tester APK (enter-without-signing enabled)
+        if: github.event_name != 'pull_request'
+        working-directory: mobile
+        env:
+          HALA_LOCAL_DEBUG_RELEASE_SIGNING: 'true'
+        run: |
+          APP_VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}')
+          APP_BUILD_NAME="${APP_VERSION%%+*}"
+          APP_BUILD_NUMBER="${APP_VERSION##*+}"
+          flutter build apk --release --build-name="$APP_BUILD_NAME" --build-number="$APP_BUILD_NUMBER" --dart-define=HALA_DEFAULT_BASE_URL=https://jobzain.com --dart-define=HALA_ENABLE_REMOTE_CAMPUS_AUTH=false --dart-define=HALA_APP_BUILD_MODE=ci-tester --dart-define=HALA_APP_BUILD_COMMIT=${{ github.sha }}
+
+      - name: Upload campus-tester APK
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: halajob-mobile-tester-apk
           if-no-files-found: error
           retention-days: 14
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
