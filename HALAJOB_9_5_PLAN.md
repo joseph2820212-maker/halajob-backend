@@ -47,7 +47,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 17 | DevOps & Deployment | [x]* |
 | 18 | Documentation & Repo Cleanup | [x]* |
 | 19 | Privacy, Compliance, Data Safety | [x]* |
-| 20 | Final QA & Launch Gate | [ ] |
+| 20 | Final QA & Launch Gate | [x]* |
 
 ---
 
@@ -506,3 +506,29 @@ Goal: GDPR-aligned self-service data controls; no PII leakage.
 **Result: PASS** — self-service deletion-request + cancel + data-export shipped behind auth, audit-logged, PII-safe. Destructive processing intentionally left to a tested admin/cron step.
 
 **Score movement:** Privacy/compliance ~5 → ~8.5 (self-service GDPR controls present; erasure-execution worker pending).
+
+## Phase 20 — Final QA & Launch Gate  [x]*
+Goal: one consolidated gate confirming the platform is launch-ready, with remaining blockers stated plainly.
+
+**Launch-gate suite (run locally on `claude/harden-trunk`, all exit 0):**
+- [x] `check:syntax`, `check:imports` — all JS parses; no broken relative imports
+- [x] `check:secrets` — no secrets / no tracked runtime files
+- [x] `check:i18n` — generated localizations committed & in sync
+- [x] `smoke:import`, `smoke:http`, `smoke:cors` — app boots, HTTP + CORS contracts hold
+- [x] `test:security-http` — 14 protected route families reject unauthenticated access (401)
+- [x] `test:ai-safety` — 12 product + 9 admin AI safety/mount checks
+- [x] `test:trust-routes` (18), `test:notification-routes` (22 + 13 events), `test:analytics-routes`, `test:translation-routes` (6), `test:mobile-routes` (314 + contract), `test:admin-operations-routes` (6)
+- [x] `test:career-passport`, `test:global-launch-contract`
+
+**DB integration suite (CI only — `mongodb-memory-server` binary download is blocked in the dev sandbox):**
+- [x] Runs in `.github/workflows/flutter-mobile-ci.yml` against a MongoDB 7 service container (`CONNECTION_URL`); Runs #490/#491 confirmed auth-context / trust-document / object-authorization / audit-logging integration tests PASS.
+
+**Mobile (Flutter):** CI `verify-linux` + `verify-windows` run `flutter analyze` + tests; tester APK (`HALA_ENABLE_REMOTE_CAMPUS_AUTH=false`) builds on `claude/**` pushes → artifact `halajob-mobile-tester-apk`.
+
+**Remaining launch blockers (explicit, not silently passed):**
+1. **Online payments (Phase 11)** — provider not selected; subscription/invoicing/limits work, but card capture needs a provider + keys (PayTabs/Tap/HyperPay/Stripe). Launchable today with **manual admin-assign** of plans; online checkout is a fast-follow once keys are supplied.
+2. **Account-erasure worker (Phase 19)** — deletion *requests* + export ship now; the admin/cron job that *executes* anonymisation/cascade should land with DB integration tests before running destructively in prod.
+
+**Result: LAUNCH-READY (conditional)** — all automated gates green; the two items above are scoped, documented fast-follows, not correctness defects. Recommend tag/release off `claude/harden-trunk` after merge of PR #1.
+
+**Score movement:** Overall launch-readiness lifted to the 9+ target across backend hardening, security, observability, DevOps, and compliance; payments remains the one feature-gap by deliberate scoping.
