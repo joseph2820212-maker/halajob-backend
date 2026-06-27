@@ -53,11 +53,35 @@ The backend currently contains legacy role/account names. These are the product-
 
 Runtime verifier: `npm run test:integration:company-permissions` proves owner wildcard access, member `ats.view` allow, missing `jobs.manage`/`billing.manage` denial, and suspended member denial.
 
+## Dashboard Admin Permission Keys
+
+| Permission | Current use |
+|---|---|
+| `dashboard.view` | Dashboard/statistics/project-status summaries and tracking/activity aliases. |
+| `dashboard.search` | Dashboard global search. |
+| `ai.view` | Admin AI feature, limit, request, and usage summary reads. |
+| `ai.manage` | Admin AI limit create/update/deactivate actions. |
+| `audit.view` | Admin audit-log reads. |
+| `translations.view` | Content translation/translation-log reads. |
+| `notifications.view` | Notification log reads. |
+| `companies.moderate` | Company request queues and approve/reject actions. |
+| `jobs.moderate` | Job moderation queues and approve/reject actions. |
+| `trust.view` | Trust review queue reads. |
+| `trust.manage` | Trust mark-safe, suspend, and request-document actions. |
+| `talentrequests.manage` | Talent request queues and admin status updates. |
+| `subscriptions.manage` | Admin subscription plan seeding, company subscription reads, and plan assignment. |
+| `universities.read` | Admin campus university list. |
+| `universities.manage` | Admin campus university create/status actions. |
+| `<resource>.read/create/update/delete/approve/reject/manage` | Legacy dashboard resource aliases and generic `/dash/v1/resources/:resource` routes. `<resource>.manage`, `<resource>.*`, `resources.*`, and `resources.manage` can be used for grouped access. |
+| `*` / `admin.*` | Full dashboard permission wildcard. |
+
+Runtime verifier: `npm run test:integration:admin-permissions` proves role-number-1 super-admin bypass, audit-only allow/deny, read-only resource denial for writes, resource-manager create access, company moderation access, and blocked cross-permission audit access.
+
 ## Launch Gaps
 
 | Gap | Required next step |
 |---|---|
 | Product role names are not fully canonical in code. | Keep compatibility aliases, then gradually migrate docs/API responses to `seeker`, `campus_student`, `company_owner`, `company_member`, `university_admin`, `platform_admin`, `super_admin`, `support`. |
-| Support role is not separately modelled. | Add explicit support role/permissions before giving support users dashboard access. |
+| Support role is not separately modelled. | Add explicit support role/permissions and assign only the dashboard permission keys it needs. |
 | Route-by-route role table is not complete. | Expand this matrix using `docs/api/HALAJOB_ROUTE_INVENTORY.json`. |
 | Audit logging is not proven for every sensitive route. | Add route/action coverage tests for admin, company, campus verification, trust, exports, AI usage, and files. |

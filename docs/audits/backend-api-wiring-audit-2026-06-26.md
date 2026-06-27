@@ -9,7 +9,7 @@ Repository: `joseph2820212-maker/halajobe`
 
 The backend is broadly mounted, the main web API client is wired to existing backend routes, and the current source-level route contract checks pass. The project is no longer in a state where the main problem is "missing route files" for the core product areas.
 
-However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is now narrower than the original audit: route mounting, guard classification, mobile fallback aliases, core auth/context, object authorization, file-export, AI, notification, analytics, subscription/billing, company member permissions, admin-resource lifecycle, audit redaction, and employee-CV download paths have seeded or contract coverage. The remaining risk is deeper per-feature behavior: exact request/response schemas, per-route validators, admin permission boundaries, live deployed smoke testing, remaining private download/upload edge cases, and full web/mobile user journeys.
+However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is now narrower than the original audit: route mounting, guard classification, mobile fallback aliases, core auth/context, object authorization, file-export, AI, notification, analytics, subscription/billing, company member permissions, dashboard admin permission boundaries, admin-resource lifecycle, audit redaction, and employee-CV download paths have seeded or contract coverage. The remaining risk is deeper per-feature behavior: exact request/response schemas, per-route validators, live deployed smoke testing, remaining private download/upload edge cases, support-role policy, and full web/mobile user journeys.
 
 ## 1.1 Current 2026-06-27 Endpoint Inventory Update
 
@@ -41,11 +41,11 @@ Current generated artifacts:
 | Backend route mounting | 9 | Core route groups are mounted across seeker, company, admin, campus, university, AI, trust, analytics, notifications, jobs, and health; current route report has zero unclassified unguarded endpoints. |
 | Web API wiring | 8 | No obvious hard 404s found in the centralized web API client against mounted backend route families; browser click-through remains separate. |
 | Mobile API wiring | 8.5 | Legacy mobile fallback aliases are now covered by `npm run test:mobile-routes`, including older `/employee/v1/...` compatibility paths. |
-| Feature API coverage | 8 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notifications, analytics, subscriptions, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
+| Feature API coverage | 8.1 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notifications, analytics, subscriptions, company/admin permissions, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
 | Auth and account-context safety | 8.7 | Seeded auth/context integration now covers missing/malformed/expired app and admin tokens, inactive app-user denial, role/context denial, cross-role borrowing, suspended context, invalid context, and refresh-token revocation. |
-| Admin operational coverage | 7.5 | Admin resources are broad, redacted, and lifecycle-audited; remaining risk is fine-grained admin permission boundaries and newer workflow-specific admin handling. |
-| Automated backend test depth | 7.5 | Static checks plus multiple seeded runtime integration harnesses exist; still short of route-by-route validator/schema and full journey coverage. |
-| Launch confidence from backend/API only | 8 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
+| Admin operational coverage | 8.2 | Admin resources are broad, redacted, lifecycle-audited, and now guarded by fine-grained permissions on generic resources plus high-risk operation routes; remaining risk is newer workflow-specific admin handling and support-role policy. |
+| Automated backend test depth | 7.7 | Static checks plus multiple seeded runtime integration harnesses exist; still short of route-by-route validator/schema and full journey coverage. |
+| Launch confidence from backend/API only | 8.15 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
 
 ## 3. Audit Method
 
@@ -179,12 +179,12 @@ Current status: explicit backend compatibility aliases have since been added and
 
 | Finding | Risk |
 |---|---|
-| Dashboard authorization is broad | `/dash/v1` is protected by admin middleware and generic resources are now redacted/audited, but fine per-resource admin permission boundaries still need route-by-route policy coverage. |
+| Dashboard authorization is now permission-scoped for high-risk surfaces | `/dash/v1` still starts with dashboard-session auth, but generic resource aliases, generic `/resources/:resource` routes, AI/admin operations, moderation, trust, subscriptions, campus university admin endpoints, dashboard summaries, and search now enforce fine-grained permission keys. Remaining work is route-by-route policy documentation, support-role modelling, and any future admin feature routes. |
 | Active context requires careful handling | Explicit context safety now fails closed for malformed, wrong-user, suspended, or removed contexts, and seeded tests cover context denial cases. Per-request context UX and multi-device behavior should still be validated through app/web journeys. |
 | Public generated CV PDF route | `/cv/generated/:fileName` is public with filename validation, traversal rejection, attachment disposition, `nosniff`, and `no-store`; generated names should remain unguessable and expiry/access rules still need product review. |
 | Public uploads route | `/uploads/files/*` is now blocked from public static serving, and non-image root uploads are forced to attachment. Remaining work is route-by-route MIME/size/private download coverage. |
 | Health secret query string | Fixed: health secrets must use the `x-health-secret` header. |
-| Cross-account access | Seeded object-authorization coverage now exists for company, university, and campus student object-scope cases. Expired app/admin token denial and inactive app-user denial are covered. Remaining work is broader fine-grained admin permission coverage. |
+| Cross-account access | Seeded object-authorization coverage now exists for company, university, and campus student object-scope cases. Expired app/admin token denial, inactive app-user denial, company member permission denial, and dashboard admin permission denial are covered. Remaining work is broader workflow side-effect coverage and support-role boundaries. |
 | Logout/session invalidation | Improved: user, company, and admin logout behavior now has backend handling and security-contract checks; web logout calls backend before clearing local state. |
 
 ## 8. Backend/Test Coverage Assessment
@@ -212,7 +212,7 @@ Current checks are useful and now include multiple seeded runtime integration ha
 | Missing test type | Examples |
 |---|---|
 | Full journey API integration suite | Real HTTP tests now exist for several core areas, but not for every product journey from login to completion. |
-| Negative authorization tests | Baseline exists for wrong role, context borrowing, expired access tokens, inactive app users, company member missing-permission cases, company/university/student IDOR, and revoked refresh sessions; remaining gaps include fine admin permissions and some inactive-context permutations. |
+| Negative authorization tests | Baseline exists for wrong role, context borrowing, expired access tokens, inactive app users, company member missing-permission cases, dashboard admin missing-permission cases, company/university/student IDOR, and revoked refresh sessions; remaining gaps include some inactive-context permutations, support-role policy, and workflow-specific side effects. |
 | Mutation side-effect tests | Coverage exists for several object-scope and admin-resource mutations; still needed for apply/save/report, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
 | Upload/download security tests | Company files, saved employee CV downloads, and generated-CV safety headers are covered; still needed for trust evidence files, generated CV public-link expiry/ownership policy, export files, MIME rejection, size rejection, and all remaining private file routes. |
 | Web API contract tests | Ensure `web/src/shared/api.ts` paths, headers, auth scopes, and error handling stay aligned with backend. |
@@ -236,6 +236,7 @@ npm run test:integration:notifications
 npm run test:integration:analytics
 npm run test:integration:subscriptions
 npm run test:integration:company-permissions
+npm run test:integration:admin-permissions
 npm run test:integration:admin-resources
 npm run test:integration:employee-cv-downloads
 npm run test:object-authorization
@@ -267,8 +268,8 @@ The following were not run as part of this pass:
 
 | Priority | Action |
 |---|---|
-| P0 | Expand seeded backend integration from current core harnesses into remaining business journeys and admin permission boundaries. |
-| P0 | Add remaining inactive-context edge-case and fine-grained admin permission tests. |
+| P0 | Expand seeded backend integration from current core harnesses into remaining business journeys, workflow side effects, and support-role boundaries. |
+| P0 | Add remaining inactive-context edge-case tests and keep new admin feature routes tied to explicit permission keys. |
 | P0 | Keep mobile fallback aliases until the mobile app no longer uses them, then remove the aliases and update `npm run test:mobile-routes`. |
 | P1 | Add mutation tests for applications, job save/apply/review/report, campus verification edge cases, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
 | P1 | Add upload/download security tests for trust evidence files, exports, generated CV expiry/ownership policy, MIME rejection, size rejection, and remaining private file routes. |
@@ -281,4 +282,4 @@ The following were not run as part of this pass:
 
 The backend/API is substantially wired and usable as a foundation. The main route families are mounted, the web client is aligned, route inventory reports zero unclassified unguarded endpoints, and the current contract/runtime/build checks pass.
 
-The project should not yet be treated as fully launch-proven until the remaining seeded integration tests, live smoke checks, route-by-route schema documentation, fine-grained admin permission boundaries, and known partial workflows are resolved. The safest next engineering step is to keep tightening backend tests and endpoint documentation while UI work continues, so future ChatGPT/Claude/Codex implementation work cannot silently break auth, permissions, account scoping, or important mutations.
+The project should not yet be treated as fully launch-proven until the remaining seeded integration tests, live smoke checks, route-by-route schema documentation, support-role policy, and known partial workflows are resolved. The safest next engineering step is to keep tightening backend tests and endpoint documentation while UI work continues, so future ChatGPT/Claude/Codex implementation work cannot silently break auth, permissions, account scoping, or important mutations.

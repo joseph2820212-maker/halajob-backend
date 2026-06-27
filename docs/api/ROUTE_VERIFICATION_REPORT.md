@@ -1,6 +1,6 @@
 # Route Verification Report
 
-Generated: 2026-06-27T02:24:37.703Z
+Generated: 2026-06-27T02:57:42.761Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
@@ -94,6 +94,8 @@ changeApplicationStatus
 changeInterviewStatus
 changeJobStatus
 changeStatus
+checkPermissionMiddleware
+checkResourcePermissionMiddleware
 cities
 cloneJob
 companiesFromMyActivity
