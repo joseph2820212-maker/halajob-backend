@@ -15,11 +15,13 @@ Branch: `flutter-seeker-campus`
 | Explicit account-context safety | `X-Active-Context-Id` now fails closed when malformed, owned by another user, suspended, or removed instead of silently falling back to the default context. | `services/accountContext.service.js`, `npm run test:integration:auth-context` |
 | Approved company route guard | Company dashboard/helper/jobs/campus APIs now require both a company context and an approved company account. Pending company accounts are blocked from approved dashboard APIs. | `routesCompany/index.js`, `npm run test:integration:auth-context` |
 | Seeded auth/context integration coverage | Runtime MongoDB integration coverage now includes missing/malformed token, seeker, student/campus, approved company, pending company, university admin, dashboard admin, cross-role denial, cross-company context denial, suspended context denial, invalid context id, and refresh-token revocation. | `scripts/verifyAuthContextIntegration.js` |
+| Dashboard admin audit logging | Dashboard admin login failure, login success, and admin creation now write audit logs, with a seeded runtime test proving stable failure reason keys and no password storage in audit metadata. | `npm run test:audit-logging`, `controllers/dash/authController.js`, `scripts/verifyAuditLoggingIntegration.js` |
 
 ## Checks Run
 
 ```bash
 npm run test:security-http
+npm run test:audit-logging
 npm run test:integration:auth-context
 npm run test:mobile-routes
 npm run check:syntax

@@ -14,7 +14,7 @@ Audit events are stored in `audit_logs` through `services/auditLog.service.js` a
 | `actor_user_id` | User/admin/member who performed the action. |
 | `actor_type` | Role/context such as `admin`, `company_owner`, `company_member`, `employee`, `university_admin`. |
 | `action` | Stable event key. |
-| `entity_type` | Target type such as `job`, `application`, `company`, `verification`, `translation`. |
+| `entity_type` | Target type such as `job`, `application`, `company`, `verification`, `translation`, `user`, or `admin`. |
 | `entity_id` | Target record ID. |
 | `company_id` | Company scope where applicable. |
 | `job_id` | Job scope where applicable. |
@@ -37,14 +37,21 @@ Audit events are stored in `audit_logs` through `services/auditLog.service.js` a
 
 ## Current Coverage Observed
 
-Audit writes were found in company jobs/applications, company members, support, message templates, question library, subscriptions, campus verification/opportunities, trust, AI, translations, Career Passport, and account-context switching.
+Audit writes were found in dashboard admin login success/failure, dashboard admin creation, company jobs/applications, company members, support, message templates, question library, subscriptions, campus verification/opportunities, trust, AI, translations, Career Passport, and account-context switching.
+
+Runtime evidence:
+
+```bash
+npm run test:audit-logging
+```
+
+This seeded integration test proves dashboard admin login failures are audited with stable reason keys, successful dashboard admin login is audited, dashboard admin creation is audited, and passwords are not stored in audit metadata.
 
 ## Gaps
 
 - Route-by-route audit coverage is not yet proven for every admin generic resource route.
-- Admin login failure logging needs explicit verification.
 - File download/export logging must be verified for every sensitive CV/document export.
-- Tests should assert audit-log records for sensitive actions, not only HTTP status.
+- Additional tests should assert audit-log records for sensitive company/campus/file/export actions, not only HTTP status.
 
 ## Rule
 

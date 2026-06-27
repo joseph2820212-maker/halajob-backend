@@ -28,6 +28,7 @@
     "test:security-http": "node scripts/verifySecurityHttpContracts.js",
     "test:integration:auth-context": "node scripts/verifyAuthContextIntegration.js",
     "test:integration:trust-documents": "node scripts/verifyTrustDocumentWorkflowIntegration.js",
+    "test:audit-logging": "node scripts/verifyAuditLoggingIntegration.js",
     "test:ai-safety": "node scripts/verifyAiSafetyContract.js && node scripts/verifyAiRouteMounts.js",
     "test:global-launch-contract": "node scripts/verifyGlobalLaunchContract.js",
     "test:trust-routes": "node scripts/verifyTrustRouteMounts.js",

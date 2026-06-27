@@ -1,6 +1,6 @@
 # Database Models
 
-Generated: 2026-06-27T00:09:48.397Z
+Generated: 2026-06-27T00:32:42.150Z
 Source: live Mongoose schemas loaded from `models/index.js`.
 
 This is a generated schema inventory. It documents collections, fields, required/default/enum/ref metadata, and declared indexes. Business meaning, migration history, and data-retention rules still need owner/developer review.
@@ -339,7 +339,7 @@ This is a generated schema inventory. It documents collections, fields, required
 | `actor_user_id` | ObjectID |  | null |  | users |
 | `actor_type` | String |  | system | system, admin, company_owner, company_member, employee, university_admin |  |
 | `action` | String | yes |  |  |  |
-| `entity_type` | String |  | other | job, application, interview, company, company_member, question_library, message_template, support_ticket, subscription, verification, notification, translation, other |  |
+| `entity_type` | String |  | other | job, application, interview, company, company_member, question_library, message_template, support_ticket, subscription, verification, notification, translation, user, admin, other |  |
 | `entity_id` | ObjectID |  | null |  |  |
 | `job_id` | ObjectID |  | null |  | jobs |
 | `application_id` | ObjectID |  | null |  | user_applying_job |

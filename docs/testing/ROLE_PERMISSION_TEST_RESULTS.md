@@ -3,6 +3,7 @@
 Date: 2026-06-27
 Branch: `flutter-seeker-campus`
 Commit tested: `71570c7d3b9912a8b9ed0c3866fb10949a54fed1`
+Latest update: audit logging integration coverage added on 2026-06-27.
 
 ## Passed Coverage
 
@@ -14,6 +15,7 @@ Commit tested: `71570c7d3b9912a8b9ed0c3866fb10949a54fed1`
 | Approved company context required for company dashboard routes | `npm run test:integration:auth-context` |
 | University admin context required for university routes | `npm run test:integration:auth-context` |
 | Dashboard admin routes require admin token/session | `npm run test:integration:auth-context` and `npm run test:security-http` |
+| Dashboard admin login failures/success and admin creation are audited | `npm run test:audit-logging` |
 | Campus/mobile route guards mounted | `npm run test:mobile-routes` |
 | Company permission route contracts mounted | `npm run test:mobile-routes` |
 

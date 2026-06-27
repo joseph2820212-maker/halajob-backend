@@ -1,6 +1,7 @@
 import bcryptjs from 'bcryptjs';
 import ReturnAppData from '../../helper/ReturnAppData/index.js';
 import { RoleModel, UserModel } from '../../models/index.js';
+import { writeAuditLog } from '../../services/auditLog.service.js';
 import {
   clearRefreshToken,
   generateAccessTokenFromRefreshTokenPayload,
@@ -13,6 +14,7 @@ const msg = (lan, ar, en) => (lan === 'ar' ? ar : en);
 const normEmail = (email) => String(email || '').trim().toLowerCase();
 const safeStr = (value) => String(value || '').trim();
 const onlyDigits = (value) => String(value || '').replace(/\D+/g, '');
+const identifierType = (identifier) => (String(identifier || '').includes('@') ? 'email' : 'phone');
 
 function stripSensitive(user) {
   if (!user) return user;
@@ -65,6 +67,23 @@ function buildPublicUrl(base, rel) {
   return base.endsWith('/') ? base + cleaned : `${base}/${cleaned}`;
 }
 
+async function auditAdminAuth(req, { action, user = null, identifier = '', reason = '', metadata = {} }) {
+  await writeAuditLog({
+    req,
+    actorUserId: user?._id || null,
+    actorType: 'admin',
+    action,
+    entityType: 'user',
+    entityId: user?._id || null,
+    note: reason,
+    metadata: {
+      identifier_type: identifier ? identifierType(identifier) : null,
+      reason,
+      ...metadata,
+    },
+  });
+}
+
 async function buildAuthPayload(user, device) {
   const tokens = await generateAuthTokens(user, device);
 
@@ -110,6 +129,11 @@ const login = async (req, res) => {
     const { email, password } = req.body || {};
 
     if (!email || !password) {
+      await auditAdminAuth(req, {
+        action: 'admin_login_failed',
+        identifier: email,
+        reason: 'missing_credentials',
+      });
       return ReturnAppData.createError({
         res,
         status: 400,
@@ -133,6 +157,11 @@ const login = async (req, res) => {
           .populate('permissions');
 
     if (!user) {
+      await auditAdminAuth(req, {
+        action: 'admin_login_failed',
+        identifier,
+        reason: 'user_not_found',
+      });
       return ReturnAppData.createError({
         res,
         status: 400,
@@ -142,6 +171,12 @@ const login = async (req, res) => {
 
     const passwordOk = await bcryptjs.compare(String(password), user.password || '');
     if (!passwordOk) {
+      await auditAdminAuth(req, {
+        action: 'admin_login_failed',
+        user,
+        identifier,
+        reason: 'invalid_password',
+      });
       return ReturnAppData.createError({
         res,
         status: 400,
@@ -151,6 +186,16 @@ const login = async (req, res) => {
 
     const role = user.role_id;
     if (role?.log_to !== 'dash') {
+      await auditAdminAuth(req, {
+        action: 'admin_login_failed',
+        user,
+        identifier,
+        reason: 'wrong_role',
+        metadata: {
+          role_id: role?._id || null,
+          role_log_to: role?.log_to || null,
+        },
+      });
       return ReturnAppData.createError({
         res,
         status: 403,
@@ -159,6 +204,16 @@ const login = async (req, res) => {
     }
 
     if (!user.status || role?.status === false) {
+      await auditAdminAuth(req, {
+        action: 'admin_login_failed',
+        user,
+        identifier,
+        reason: !user.status ? 'inactive_user' : 'inactive_role',
+        metadata: {
+          role_id: role?._id || null,
+          role_status: role?.status,
+        },
+      });
       return ReturnAppData.createError({
         res,
         status: 403,
@@ -188,6 +243,16 @@ const login = async (req, res) => {
     await user.save();
 
     const authPayload = await buildAuthPayload(user, authDevice);
+    await auditAdminAuth(req, {
+      action: 'admin_login_succeeded',
+      user,
+      identifier,
+      reason: 'success',
+      metadata: {
+        role_id: role?._id || null,
+        device_default: Boolean(authDevice?.is_default),
+      },
+    });
 
     return ReturnAppData.createData({
       res,
@@ -357,6 +422,24 @@ const createDashboardUser = async (req, res) => {
       phone_code: normalizedPhoneCode,
       phone_national: national,
       device: [],
+    });
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.admin?._id || req.user?._id || null,
+      actorType: 'admin',
+      action: 'admin_user_created',
+      entityType: 'user',
+      entityId: user._id,
+      newValue: {
+        email: user.email,
+        role_id: role._id,
+        status: user.status,
+        permissions,
+      },
+      metadata: {
+        created_by_route: req.originalUrl,
+      },
     });
 
     return ReturnAppData.createData({

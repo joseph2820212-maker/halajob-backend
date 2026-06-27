@@ -15,6 +15,7 @@ npm run check:imports
 
 ```bash
 npm run test:security-http
+npm run test:audit-logging
 npm run test:mobile-routes
 npm run test:ai-safety
 npm run test:global-launch-contract
@@ -72,4 +73,4 @@ The project still needs:
 - live smoke tests with approved seeker/company/campus/admin accounts
 - route-by-route request/response contract tests
 - OpenAPI/Postman validation
-- audit-log coverage tests for sensitive admin/company/campus actions
+- audit-log coverage tests for sensitive company/campus/file/export actions
