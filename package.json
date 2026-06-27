@@ -31,6 +31,7 @@
     "test:object-authorization": "node scripts/verifyObjectAuthorizationIntegration.js",
     "test:audit-logging": "node scripts/verifyAuditLoggingIntegration.js",
     "test:file-export-audit": "node scripts/verifyFileExportAuditIntegration.js",
+    "test:integration:profile-uploads": "node scripts/verifyProfileUploadValidationIntegration.js",
     "test:integration:ai-runtime": "node scripts/verifyAiRuntimeIntegration.js",
     "test:integration:notifications": "node scripts/verifyNotificationRuntimeIntegration.js",
     "test:integration:analytics": "node scripts/verifyAnalyticsRuntimeIntegration.js",

@@ -42,12 +42,15 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 ```bash
 npm run test:security-http
 npm run test:integration:student-verification-documents
+npm run test:integration:profile-uploads
 npm run check:secrets
 ```
 
 `npm run test:security-http` creates temporary upload fixtures and proves direct `/uploads/files/*` access returns 404 with `no-store`/`nosniff`, generated CV downloads are PDF attachments with `no-store`/`nosniff`, and root HTML uploads are served as attachments with restrictive CSP.
 
 `npm run test:integration:student-verification-documents` proves student verification document uploads reject MIME mismatches and oversize files with clean 4xx responses, move valid documents to private storage, deny direct public access, scope student-owner and university-admin downloads, send attachment/no-store/nosniff headers, and write upload/download audit rows.
+
+`npm run test:integration:profile-uploads` proves seeker and company profile image uploads reject MIME mismatches and oversize files with clean 4xx responses and do not mutate user image fields when uploads are rejected.
 
 `npm run test:file-export-audit` proves company request file uploads reject MIME mismatches and oversize files with clean 4xx responses, company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user, and company bulk export endpoints reject invalid explicit application IDs or unsupported formats without writing successful export audit rows.
 
@@ -57,7 +60,7 @@ npm run check:secrets
 
 ## Gaps
 
-- MIME/size policies should be documented for remaining upload endpoints not covered by the company request, student verification, and CV upload integration tests.
+- MIME/size policies should be documented for remaining upload endpoints not covered by the company request, student verification, CV, and profile image upload integration tests.
 - Generated CV public-link TTL can be tuned with `GENERATED_CV_PUBLIC_URL_TTL_MINUTES`; default is 60 minutes.
 - Sensitive download audit/ownership coverage must continue to be tested route by route.
 - Object storage migration should be planned before high-volume launch.
