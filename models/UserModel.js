@@ -170,6 +170,27 @@ const userSchema = new mongoose.Schema(
       type: [DeviceSchema],
       default: [],
     },
+
+    // GDPR account-deletion request. Reversible by design: the request sets a
+    // timestamp and a status; an admin/cron performs the actual erasure after the
+    // grace period. Never a blind hard-delete (no cascade exists for related data).
+    account_deletion_requested_at: {
+      type: Date,
+      default: null,
+    },
+
+    account_deletion_status: {
+      type: String,
+      enum: ["none", "requested", "cancelled", "processed"],
+      default: "none",
+      index: true,
+    },
+
+    account_deletion_reason: {
+      type: String,
+      trim: true,
+      default: null,
+    },
   },
   {
     collection: "users",

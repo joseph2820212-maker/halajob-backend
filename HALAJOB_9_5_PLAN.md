@@ -46,7 +46,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 16 | Observability & Operations | [x]* |
 | 17 | DevOps & Deployment | [x]* |
 | 18 | Documentation & Repo Cleanup | [x]* |
-| 19 | Privacy, Compliance, Data Safety | [ ] |
+| 19 | Privacy, Compliance, Data Safety | [x]* |
 | 20 | Final QA & Launch Gate | [ ] |
 
 ---
@@ -481,3 +481,28 @@ Goal: professional, maintainable repo.
 **Result: PASS by inspection** — repo is clean; subsystem docs + module map present; no dead lockfiles/uploads/junk tracked.
 
 **Score movement:** Docs/hygiene 6 → ~9 (Codex cleanup + architecture docs).
+
+## Phase 19 — Privacy, Compliance & Data Safety  [x]*
+Goal: GDPR-aligned self-service data controls; no PII leakage.
+
+**Audit findings:**
+- [x] **No PII in logs** — verified: audit-log writer (`services/auditLog.service.js`) redacts password/passcode/token/secret/otp/api-key/cookie keys and truncates long strings before persisting; analytics/logger paths carry no raw credentials.
+- [x] Gap found & closed: **account-deletion request** and **self-service data export** were missing (matched the settings-screen audit).
+
+**Implemented this phase:**
+- [x] `models/UserModel.js` — added `account_deletion_requested_at` (Date), `account_deletion_status` (`none|requested|cancelled|processed`, indexed), `account_deletion_reason`. **Reversible by design** — request sets a flag/timestamp; actual erasure is performed out-of-band by admin/cron after a grace period (no blind hard-delete, since no cascade exists for related collections).
+- [x] `controllers/app/Me/AccountPrivacyController.js` (new):
+  - `requestAccountDeletion` — sets status `requested` + timestamp + optional reason, audit-logged (`account_deletion_requested`); idempotent if already requested.
+  - `cancelAccountDeletion` — reverses a pending request before processing, audit-logged (`account_deletion_cancelled`).
+  - `exportMyData` — read-only GDPR export strictly scoped to `req.user._id`: profile (credentials/device-secret fields excluded) + applications + saved jobs + resumes; audit-logged (`account_data_exported`).
+- [x] `routesUser/AccountRote.js` (new) mounted at `/user/v1/account` — `POST /delete-request`, `POST /delete-request/cancel`, `GET /export`; all behind `authUser`.
+
+**Commands run:** `npm run check:syntax` ✅, `npm run check:imports` ✅, `npm run smoke:import` ✅ (app boots with new routes mounted).
+
+**Remaining risks / follow-ups:**
+- Admin/cron worker to *process* `requested` accounts (anonymise + cascade cleanup) is the operational counterpart — should be built with DB integration tests before it runs destructively in prod. Documented, not auto-run.
+- Export currently covers core seeker data (profile/applications/saved/resumes); extend to ratings/reviews/campus records if legal scope requires.
+
+**Result: PASS** — self-service deletion-request + cancel + data-export shipped behind auth, audit-logged, PII-safe. Destructive processing intentionally left to a tested admin/cron step.
+
+**Score movement:** Privacy/compliance ~5 → ~8.5 (self-service GDPR controls present; erasure-execution worker pending).

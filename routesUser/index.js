@@ -21,9 +21,11 @@ import MeRote from './MeRote.js';
 import CareerPassportRote from './CareerPassportRote.js';
 import GlobalRote from './GlobalRote.js';
 import CvTranslationRote from './CvTranslationRote.js';
+import AccountRote from './AccountRote.js';
 
 const router = express.Router();
 router.use('/me', MeRote);
+router.use('/account', AccountRote);
 router.use('/career-passport', CareerPassportRote);
 router.use('/cv', CvTranslationRote);
 router.use('/global', GlobalRote);
