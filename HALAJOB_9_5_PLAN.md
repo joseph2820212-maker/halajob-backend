@@ -38,7 +38,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 8 | Admin Panel | [~] |
 | 9 | Search, Matching, Recommendations | [x]* |
 | 10 | Notifications & Email | [x]* |
-| 11 | Payments & Subscriptions | [ ] |
+| 11 | Payments & Subscriptions | [~] |
 | 12 | Mobile App Quality | [ ] |
 | 13 | Web Frontend Quality | [ ] |
 | 14 | Testing Strategy | [~] |
@@ -363,3 +363,24 @@ Goal: reliable, safe communication.
 **Result: PASS** — key events notify, prefs exist, push is safe, email failures now logged.
 
 **Score movement:** Notifications/email ~8 → ~8.5 (email failures observable).
+
+## Phase 11 — Payments & Subscriptions  [~] (blocked on provider decision)
+Goal: real, reliable monetization.
+
+**Verified present (works today):**
+- [x] Subscription model + service: plan assign, status (active/trialing/cancelled), cancel-previous-on-assign, admin override (`assignPlanToCompany`)
+- [x] **Invoice model**: status enum draft/pending/paid/cancelled/refunded/failed/overdue + amount/tax/discount/total/currency/due_at
+- [x] Endpoints: subscription current, billing-summary, invoices list/detail, upgrade **request**
+- [x] **Plan-limit enforcement** (Phase 6): active_jobs/questions/features, server-side, 403
+- [x] Flow today = **manual admin-assign** (company requests → admin reviews → admin assigns)
+
+**Missing (real gap — requires a decision + credentials):**
+- [ ] **No payment gateway** (no Stripe/PayPal/PayTabs/Tap/HyperPay/webhooks/checkout/charge anywhere)
+- [ ] Self-service checkout, webhook handling, auto invoice→paid + auto subscription activation
+- [ ] Failed-payment handling, renewal, upgrade/downgrade self-service, payment audit logs
+
+**Decision needed from owner:** (a) pick a provider (regional matters — e.g. PayTabs/Tap/HyperPay for MENA, or Stripe) + supply API keys, then I integrate checkout+webhooks; OR (b) launch with **manual admin-assigned** subscriptions (valid for B2B) and defer online payments post-launch.
+
+**Result: PARTIAL/BLOCKED** — subscription + invoicing + limits work; online payment intentionally not built (needs provider + keys = external blocker per the launch gate).
+
+**Score movement:** Subscriptions ~7 (state/limits) — confirmed; payments require the provider decision to progress.
