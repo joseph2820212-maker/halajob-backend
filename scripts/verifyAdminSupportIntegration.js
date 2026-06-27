@@ -278,6 +278,27 @@ async function main() {
   );
   assert.equal(detailPayload.data.subject, ticket.subject);
 
+  const managerListPayload = await expectStatus(
+    request(baseUrl, "GET", `/dash/v1/operations/support-tickets?status=open&q=${ticket.ticket_no}`, {
+      token: supportManageTokens.accessToken,
+    }),
+    200,
+    "support.manage admin should list support tickets"
+  );
+  assert.ok(
+    (managerListPayload.data || []).some((item) => String(item._id) === String(ticket._id)),
+    "support.manage list should include seeded ticket"
+  );
+
+  const managerDetailPayload = await expectStatus(
+    request(baseUrl, "GET", `/dash/v1/support-tickets/${ticket._id}`, {
+      token: supportManageTokens.accessToken,
+    }),
+    200,
+    "support.manage admin should read support ticket details"
+  );
+  assert.equal(managerDetailPayload.data.subject, ticket.subject);
+
   const viewCannotUpdate = await expectStatus(
     request(baseUrl, "PATCH", `/dash/v1/support-tickets/${ticket._id}/status`, {
       token: supportViewTokens.accessToken,

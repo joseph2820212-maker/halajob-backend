@@ -83,7 +83,7 @@ Runtime verifier: `npm run test:integration:university-members` proves role-base
 | `notifications.manage` | Dashboard admin notification sending. |
 | `files.read` | Protected dashboard file downloads under `/dash/v1/file/:name`. |
 | `support.view` | Dashboard support ticket queue/detail reads. |
-| `support.manage` | Dashboard support ticket status updates, assignment, closure, and admin replies. |
+| `support.manage` | Dashboard support ticket queue/detail reads, status updates, assignment, closure, and admin replies. |
 | `companies.moderate` | Company request queues and approve/reject actions. |
 | `jobs.moderate` | Job moderation queues and approve/reject actions. |
 | `trust.view` | Trust review queue reads. |
@@ -102,6 +102,6 @@ Runtime verifier: `npm run test:integration:admin-permissions` proves role-numbe
 | Gap | Required next step |
 |---|---|
 | Product role names are not fully canonical in code. | Keep compatibility aliases, then gradually migrate docs/API responses to `seeker`, `campus_student`, `company_owner`, `company_member`, `university_admin`, `platform_admin`, `super_admin`, `support`. |
-| Support role staffing is not finalized. | Create production support roles/users with only `support.view` and, for supervisors, `support.manage`. |
+| Support role staffing is not finalized. | Create production support roles/users with only `support.view` for read-only agents and `support.manage` for supervisors who need queue/detail reads plus status, assignment, closure, and reply actions. |
 | Route-by-route role table is not complete. | Expand this matrix using `docs/api/HALAJOB_ROUTE_INVENTORY.json`. |
 | Audit logging is not proven for every sensitive route. | Add route/action coverage tests for admin, company, campus verification, trust, exports, AI usage, and files. |

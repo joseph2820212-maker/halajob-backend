@@ -114,10 +114,10 @@ router.post('/notifications/send', can('notifications.manage'), upload.none(), a
 router.post('/notification/send', can('notifications.manage'), upload.none(), adminNotificationController.sendNotification);
 router.post('/operations/notifications/send', can('notifications.manage'), upload.none(), adminNotificationController.sendNotification);
 
-router.get('/support-tickets', can('support.view'), adminSupportController.listTickets);
-router.get('/operations/support-tickets', can('support.view'), adminSupportController.listTickets);
-router.get('/support-tickets/:ticketId', can('support.view'), adminSupportController.getTicketDetails);
-router.get('/operations/support-tickets/:ticketId', can('support.view'), adminSupportController.getTicketDetails);
+router.get('/support-tickets', can(['support.view', 'support.manage']), adminSupportController.listTickets);
+router.get('/operations/support-tickets', can(['support.view', 'support.manage']), adminSupportController.listTickets);
+router.get('/support-tickets/:ticketId', can(['support.view', 'support.manage']), adminSupportController.getTicketDetails);
+router.get('/operations/support-tickets/:ticketId', can(['support.view', 'support.manage']), adminSupportController.getTicketDetails);
 router.patch('/support-tickets/:ticketId/status', can('support.manage'), upload.none(), adminSupportController.updateTicketStatus);
 router.patch('/operations/support-tickets/:ticketId/status', can('support.manage'), upload.none(), adminSupportController.updateTicketStatus);
 router.post('/support-tickets/:ticketId/messages', can('support.manage'), upload.none(), adminSupportController.addAdminMessage);
