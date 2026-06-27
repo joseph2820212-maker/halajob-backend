@@ -141,6 +141,7 @@ async function main() {
   const {
     AccountContextModel,
     AuditLogModel,
+    CampusEventRegistrationModel,
     CompanyModel,
     EmployeeModel,
     RoleModel,
@@ -314,7 +315,8 @@ async function main() {
     },
   ]);
 
-  const [companyContextA, companyContextB, universityContextA, universityContextB] = await AccountContextModel.create([
+  const [companyContextA, companyContextB, universityContextA, universityContextB, studentContextA, studentContextB] =
+    await AccountContextModel.create([
     {
       user_id: companyUserA._id,
       context_key: `company_admin:${companyA._id}`,
@@ -359,6 +361,28 @@ async function main() {
       permissions: ["campus.verifications.manage", "campus.dashboard.view"],
       is_default: true,
     },
+    {
+      user_id: studentUserA._id,
+      context_key: `student:${studentEmployeeA._id}`,
+      context_type: "student",
+      entity_id: studentEmployeeA._id,
+      entity_model: "employees",
+      display_name: "Alpha student",
+      status: "active",
+      permissions: ["campus.profile.manage", "campus.opportunities.apply", "campus.events.register"],
+      is_default: true,
+    },
+    {
+      user_id: studentUserB._id,
+      context_key: `student:${studentEmployeeB._id}`,
+      context_type: "student",
+      entity_id: studentEmployeeB._id,
+      entity_model: "employees",
+      display_name: "Beta student",
+      status: "active",
+      permissions: ["campus.profile.manage", "campus.opportunities.apply", "campus.events.register"],
+      is_default: true,
+    },
   ]);
 
   await Promise.all([
@@ -366,6 +390,8 @@ async function main() {
     UserModel.updateOne({ _id: companyUserB._id }, { $set: { default_context_id: companyContextB._id } }),
     UserModel.updateOne({ _id: universityUserA._id }, { $set: { default_context_id: universityContextA._id } }),
     UserModel.updateOne({ _id: universityUserB._id }, { $set: { default_context_id: universityContextB._id } }),
+    UserModel.updateOne({ _id: studentUserA._id }, { $set: { default_context_id: studentContextA._id } }),
+    UserModel.updateOne({ _id: studentUserB._id }, { $set: { default_context_id: studentContextB._id } }),
   ]);
 
   const [jobA, jobB] = await jobsModel.create([
@@ -377,6 +403,54 @@ async function main() {
   const [applicationA, applicationB] = await UserApplyingJobModel.create([
     applicationSeed({ seekerUser, seekerEmployee, job: jobA, company: companyA, countryId, suffix: `${suffix}a` }),
     applicationSeed({ seekerUser, seekerEmployee, job: jobB, company: companyB, countryId, suffix: `${suffix}b` }),
+  ]);
+
+  const [campusApplicationA, campusApplicationB] = await UserApplyingJobModel.create([
+    applicationSeed({
+      seekerUser: studentUserA,
+      seekerEmployee: studentEmployeeA,
+      job: jobA,
+      company: companyA,
+      countryId,
+      suffix: `${suffix}campusa`,
+    }),
+    applicationSeed({
+      seekerUser: studentUserB,
+      seekerEmployee: studentEmployeeB,
+      job: jobB,
+      company: companyB,
+      countryId,
+      suffix: `${suffix}campusb`,
+    }),
+  ]);
+
+  const eventIdA = `campus-event-alpha-${suffix}`;
+  const eventIdB = `campus-event-beta-${suffix}`;
+  await CampusEventRegistrationModel.create([
+    {
+      user_id: studentUserA._id,
+      employee_id: studentEmployeeA._id,
+      event_id: eventIdA,
+      title: "Alpha campus event",
+      organizer: "Alpha career center",
+      kind: "workshop",
+      date_label: "Today",
+      start_at: new Date(Date.now() + 60 * 60 * 1000),
+      mode: "online",
+      status: "registered",
+    },
+    {
+      user_id: studentUserB._id,
+      employee_id: studentEmployeeB._id,
+      event_id: eventIdB,
+      title: "Beta campus event",
+      organizer: "Beta career center",
+      kind: "workshop",
+      date_label: "Tomorrow",
+      start_at: new Date(Date.now() + 2 * 60 * 60 * 1000),
+      mode: "online",
+      status: "registered",
+    },
   ]);
 
   const [verificationA, verificationB] = await StudentVerificationModel.create([
@@ -405,16 +479,159 @@ async function main() {
   ]);
 
   const device = { brand: "test", model_name: "node", is_device: false };
-  const [companyTokensA, companyTokensB, universityTokensA] = await Promise.all([
+  const [companyTokensA, companyTokensB, universityTokensA, studentTokensA] = await Promise.all([
     generateAuthTokens(companyUserA, device),
     generateAuthTokens(companyUserB, device),
     generateAuthTokens(universityUserA, device),
+    generateAuthTokens(studentUserA, device),
   ]);
 
   server = app.listen(0);
   await new Promise((resolve) => server.once("listening", resolve));
   const { port } = server.address();
   const baseUrl = `http://127.0.0.1:${port}`;
+
+  const studentAHeaders = { "X-Active-Context-Id": String(studentContextA._id) };
+
+  const campusApplicationsA = await expectStatus(
+    request(baseUrl, "GET", "/user/v1/campus/applications", {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+    }),
+    200,
+    "student A should list own campus applications"
+  );
+  const campusApplicationIds = (campusApplicationsA.data || []).map((item) => String(item.id || item._id || ""));
+  assert.ok(
+    campusApplicationIds.includes(String(campusApplicationA._id)),
+    "student A application list should include student A application"
+  );
+  assert.ok(
+    !campusApplicationIds.includes(String(campusApplicationB._id)),
+    "student A application list must not include student B application"
+  );
+
+  await expectStatus(
+    request(baseUrl, "GET", `/user/v1/campus/applications/${campusApplicationA._id}`, {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+    }),
+    200,
+    "student A should read own campus application"
+  );
+
+  await expectStatus(
+    request(baseUrl, "GET", `/user/v1/campus/applications/${campusApplicationB._id}`, {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+    }),
+    404,
+    "student A should not read student B campus application"
+  );
+
+  await expectStatus(
+    request(baseUrl, "POST", `/user/v1/campus/applications/${campusApplicationB._id}/messages`, {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+      body: { message: "This must not reach another student application." },
+    }),
+    404,
+    "student A should not message student B campus application"
+  );
+
+  await expectStatus(
+    request(baseUrl, "PATCH", `/user/v1/campus/applications/${campusApplicationB._id}/cancel`, {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+      body: { note: "This must not cancel another student application." },
+    }),
+    404,
+    "student A should not cancel student B campus application"
+  );
+
+  const campusApplicationBAfterDenied = await UserApplyingJobModel.findById(campusApplicationB._id).lean();
+  assert.equal(
+    campusApplicationBAfterDenied.status,
+    "new",
+    "cross-student campus cancellation attempt must not mutate the target application"
+  );
+  assert.equal(
+    (campusApplicationBAfterDenied.communication_log || []).length,
+    0,
+    "cross-student campus message attempt must not add target messages"
+  );
+
+  await expectStatus(
+    request(baseUrl, "POST", `/user/v1/campus/applications/${campusApplicationA._id}/messages`, {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+      body: { message: "Can I share an updated portfolio before interview?" },
+    }),
+    200,
+    "student A should message own campus application"
+  );
+
+  await expectStatus(
+    request(baseUrl, "PATCH", `/user/v1/campus/applications/${campusApplicationA._id}/cancel`, {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+      body: { note: "Student A withdrew intentionally." },
+    }),
+    200,
+    "student A should cancel own campus application"
+  );
+
+  const campusApplicationAAfterAllowed = await UserApplyingJobModel.findById(campusApplicationA._id).lean();
+  assert.equal(campusApplicationAAfterAllowed.status, "withdrawn", "own campus application cancellation should persist");
+  assert.equal(
+    (campusApplicationAAfterAllowed.communication_log || []).length,
+    1,
+    "own campus application message should persist"
+  );
+
+  const campusEventsA = await expectStatus(
+    request(baseUrl, "GET", "/user/v1/campus/events", {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+    }),
+    200,
+    "student A should list own campus event registrations"
+  );
+  const registeredEventIds = campusEventsA.data?.registered_event_ids || [];
+  assert.ok(registeredEventIds.includes(eventIdA), "student A events should include own registration");
+  assert.ok(!registeredEventIds.includes(eventIdB), "student A events must not include student B registration");
+
+  await expectStatus(
+    request(baseUrl, "PATCH", `/user/v1/campus/events/${eventIdB}/cancel`, {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+      body: {},
+    }),
+    404,
+    "student A should not cancel student B campus event registration"
+  );
+
+  const eventBAfterDenied = await CampusEventRegistrationModel.findOne({
+    user_id: studentUserB._id,
+    event_id: eventIdB,
+  }).lean();
+  assert.equal(eventBAfterDenied.status, "registered", "cross-student event cancellation must not mutate target event");
+
+  await expectStatus(
+    request(baseUrl, "PATCH", `/user/v1/campus/events/${eventIdA}/cancel`, {
+      token: studentTokensA.accessToken,
+      headers: studentAHeaders,
+      body: {},
+    }),
+    200,
+    "student A should cancel own campus event registration"
+  );
+
+  const eventAAfterAllowed = await CampusEventRegistrationModel.findOne({
+    user_id: studentUserA._id,
+    event_id: eventIdA,
+  }).lean();
+  assert.equal(eventAAfterAllowed.status, "cancelled", "own campus event cancellation should persist");
 
   await expectStatus(
     request(baseUrl, "GET", `/company/v1/global/jobs/${jobA._id}`, {
@@ -566,7 +783,7 @@ async function main() {
     "company B should not read company A job either"
   );
 
-  console.log("Object authorization integration verified for company and university scoped records.");
+  console.log("Object authorization integration verified for company, university, and campus student scoped records.");
 }
 
 main()

@@ -28,6 +28,7 @@ let campusContentCache = null;
 const cleanText = (value = "") => String(value || "").trim();
 const toObjectId = (value) =>
   mongoose.isValidObjectId(String(value || "")) ? new Types.ObjectId(String(value)) : null;
+const APPLICATION_MESSAGE_CHANNELS = new Set(["email", "sms", "notification", "phone", "whatsapp", "internal"]);
 
 function readCampusContent() {
   if (!campusContentCache) {
@@ -71,6 +72,11 @@ function isCampusJob(job = {}) {
 
 function campusExternalLink(job = {}) {
   return cleanText(job.out_link || job.outside_link || job.external_link || job.external_url);
+}
+
+function normalizeApplicationMessageChannel(value = "") {
+  const channel = cleanText(value).toLowerCase();
+  return APPLICATION_MESSAGE_CHANNELS.has(channel) ? channel : "internal";
 }
 
 function isCampusExternalOpportunity(job = {}) {
@@ -575,7 +581,7 @@ const sendApplicationMessage = async (req, res, next) => {
     const message = cleanText(req.body?.message || req.body?.body || req.body?.note);
     if (!message) return ReturnAppData.getError({ res, status: 422, message: "message_required" });
 
-    const channel = cleanText(req.body?.channel || "app") || "app";
+    const channel = normalizeApplicationMessageChannel(req.body?.channel || "internal");
     const oldStatus = application.status;
     application.communication_log = application.communication_log || [];
     application.communication_log.push({ channel, message, created_by: userId, created_at: new Date() });

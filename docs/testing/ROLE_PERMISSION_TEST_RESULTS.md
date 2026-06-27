@@ -17,7 +17,7 @@ Latest update: object authorization, audit logging, and file/export audit integr
 | Dashboard admin routes require admin token/session | `npm run test:integration:auth-context` and `npm run test:security-http` |
 | Dashboard admin login failures/success and admin creation are audited | `npm run test:audit-logging` |
 | Company file/download/export actions require company context and write audit logs | `npm run test:file-export-audit` |
-| Company job/application records and university verification records are object-scoped | `npm run test:object-authorization` |
+| Company job/application records, university verification records, and campus student application/event records are object-scoped | `npm run test:object-authorization` |
 | Campus/mobile route guards mounted | `npm run test:mobile-routes` |
 | Company permission route contracts mounted | `npm run test:mobile-routes` |
 
