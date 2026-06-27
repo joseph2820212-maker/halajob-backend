@@ -55,11 +55,14 @@ async function expectErrorMessage(responsePromise, expected, messagePattern, lab
   return payload;
 }
 
-const appendFakeImage = (form, { size = 28, type = "text/html", name = "avatar.png" } = {}) => {
+const appendFakeImage = (
+  form,
+  { field = "image", size = 28, type = "text/html", name = "avatar.png" } = {}
+) => {
   const bytes = type.startsWith("image/")
     ? Buffer.alloc(size, 137)
     : Buffer.from("<html>not really an image</html>");
-  form.append("image", new Blob([bytes], { type }), name);
+  form.append(field, new Blob([bytes], { type }), name);
   return form;
 };
 
@@ -223,15 +226,45 @@ async function main() {
     "company user profile image upload rejects oversize image"
   );
 
+  await expectErrorMessage(
+    multipartRequest(baseUrl, "PUT", "/company/v1/global/profile/media", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+      form: appendFakeImage(new FormData(), { field: "logo", name: "logo.png" }),
+    }),
+    400,
+    /unsupported_file_type/,
+    "company logo upload rejects MIME mismatch"
+  );
+
+  await expectErrorMessage(
+    multipartRequest(baseUrl, "PUT", "/company/v1/global/profile/media", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+      form: appendFakeImage(new FormData(), {
+        field: "cover_image",
+        size: 4 * 1024 * 1024 + 1,
+        type: "image/png",
+        name: "too-large-cover.png",
+      }),
+    }),
+    413,
+    /file_too_large/,
+    "company cover image upload rejects oversize image"
+  );
+
   const [seekerAfterRejectedUploads, companyUserAfterRejectedUploads] = await Promise.all([
     UserModel.findById(seekerUser._id).lean(),
     UserModel.findById(companyUser._id).lean(),
   ]);
+  const companyAfterRejectedUploads = await CompanyModel.findById(company._id).lean();
 
   assert.ok(!seekerAfterRejectedUploads.image, "rejected seeker image uploads should not mutate user image");
   assert.ok(!companyUserAfterRejectedUploads.image, "rejected company image uploads should not mutate owner image");
+  assert.ok(!companyAfterRejectedUploads.logo, "rejected company logo uploads should not mutate company logo");
+  assert.ok(!companyAfterRejectedUploads.cover_image, "rejected company cover uploads should not mutate company cover image");
 
-  console.log("Profile image upload validation verified for seeker and company MIME/size rejection.");
+  console.log("Profile and company media upload validation verified for MIME/size rejection.");
 }
 
 try {
