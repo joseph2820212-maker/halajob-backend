@@ -1,9 +1,19 @@
 import { CompanyMemberModel, UserModel } from "../../../models/index.js";
 import { getCompanyUserIdOrFail, success, fail, paginate, isValidObjectId } from "../../../helper/companyDash/companyDashHelpers.js";
+import { syncAccountContextsForUser } from "../../../services/accountContext.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
 
 const cleanText = (value = "") => String(value ?? "").trim();
-const toArray = (value) => Array.isArray(value) ? value : value ? String(value).split(/[,;\n]+/).map((x) => x.trim()).filter(Boolean) : [];
+const idOf = (value) => value?._id || value || null;
+const toArray = (value) => {
+  const items = Array.isArray(value)
+    ? value
+    : value
+    ? String(value).split(/[,;\n]+/)
+    : [];
+  return [...new Set(items.map((x) => String(x || "").trim()).filter(Boolean))];
+};
+const companyActorType = (req) => (req.companyAccess?.role === "owner" ? "company_owner" : "company_member");
 const MEMBER_ROLES = new Set(["admin", "hr_manager", "recruiter", "viewer"]);
 const MEMBER_STATUSES = new Set(["active", "invited", "suspended", "removed"]);
 const DEFAULT_PERMISSIONS_BY_ROLE = {
@@ -36,6 +46,9 @@ export const upsertMember = async (req, res, next) => {
     if (!companyData) return;
     const userId = req.body.user_id || req.params.userId;
     if (!isValidObjectId(userId)) return fail(res, "invalid_user_id", 400);
+    if (String(userId) === String(idOf(companyData.company.owner_user_id || companyData.company.user_id))) {
+      return fail(res, "company_owner_cannot_be_added_as_member", 422);
+    }
     const user = await UserModel.findById(userId).select("_id email").lean();
     if (!user) return fail(res, "user_not_found", 404);
     const memberRole = MEMBER_ROLES.has(req.body.member_role) ? req.body.member_role : "recruiter";
@@ -55,7 +68,17 @@ export const upsertMember = async (req, res, next) => {
       { $set: payload },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     ).populate({ path: "user_id", select: "first_name mid_name last_name email image" });
-    await writeAuditLog({ req, companyId: companyData.company._id, actorUserId: companyData.userId, actorType: "company_owner", action: "company_member_upserted", entityType: "company_member", entityId: member._id, newValue: payload });
+    await syncAccountContextsForUser(userId);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: "company_member_upserted",
+      entityType: "company_member",
+      entityId: member._id,
+      newValue: payload,
+    });
     return success(res, member, "company_member_saved", 201);
   } catch (error) { next(error); }
 };
@@ -76,9 +99,31 @@ export const updateMember = async (req, res, next) => {
       patch.status = req.body.status;
     }
     if (req.body.role_id !== undefined) patch.role_id = isValidObjectId(req.body.role_id) ? req.body.role_id : null;
-    const member = await CompanyMemberModel.findOneAndUpdate({ _id: req.params.memberId, company_id: companyData.company._id }, { $set: patch }, { new: true, runValidators: true });
+    const existing = await CompanyMemberModel.findOne({ _id: req.params.memberId, company_id: companyData.company._id }).lean();
+    if (!existing) return fail(res, "company_member_not_found", 404);
+    const member = await CompanyMemberModel.findOneAndUpdate(
+      { _id: req.params.memberId, company_id: companyData.company._id },
+      { $set: patch },
+      { new: true, runValidators: true }
+    );
     if (!member) return fail(res, "company_member_not_found", 404);
-    await writeAuditLog({ req, companyId: companyData.company._id, actorUserId: companyData.userId, actorType: "company_owner", action: "company_member_updated", entityType: "company_member", entityId: member._id, newValue: patch });
+    await syncAccountContextsForUser(member.user_id);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: "company_member_updated",
+      entityType: "company_member",
+      entityId: member._id,
+      oldValue: {
+        member_role: existing.member_role,
+        permissions: existing.permissions || [],
+        status: existing.status,
+        role_id: existing.role_id || null,
+      },
+      newValue: patch,
+    });
     return success(res, member, "company_member_updated");
   } catch (error) { next(error); }
 };
@@ -88,9 +133,26 @@ export const removeMember = async (req, res, next) => {
     const companyData = await getCompanyUserIdOrFail(req, res);
     if (!companyData) return;
     if (!isValidObjectId(req.params.memberId)) return fail(res, "invalid_member_id", 400);
-    const member = await CompanyMemberModel.findOneAndUpdate({ _id: req.params.memberId, company_id: companyData.company._id }, { $set: { status: "removed" } }, { new: true });
+    const existing = await CompanyMemberModel.findOne({ _id: req.params.memberId, company_id: companyData.company._id }).lean();
+    if (!existing) return fail(res, "company_member_not_found", 404);
+    const member = await CompanyMemberModel.findOneAndUpdate(
+      { _id: req.params.memberId, company_id: companyData.company._id },
+      { $set: { status: "removed" } },
+      { new: true }
+    );
     if (!member) return fail(res, "company_member_not_found", 404);
-    await writeAuditLog({ req, companyId: companyData.company._id, actorUserId: companyData.userId, actorType: "company_owner", action: "company_member_removed", entityType: "company_member", entityId: member._id });
+    await syncAccountContextsForUser(member.user_id);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: "company_member_removed",
+      entityType: "company_member",
+      entityId: member._id,
+      oldValue: { status: existing.status },
+      newValue: { status: "removed" },
+    });
     return success(res, member, "company_member_removed");
   } catch (error) { next(error); }
 };

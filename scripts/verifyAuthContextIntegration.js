@@ -103,7 +103,7 @@ async function main() {
     {
       log_to: "dash",
       name: `integration-admin-${suffix}`,
-      role_number: 910003,
+      role_number: 1,
       title_ar: "Admin",
       title_en: "Admin",
       status: true,

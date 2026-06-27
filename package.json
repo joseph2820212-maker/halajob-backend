@@ -38,6 +38,7 @@
     "test:integration:hiring-workflows": "node scripts/verifyHiringWorkflowIntegration.js",
     "test:integration:subscriptions": "node scripts/verifySubscriptionBillingIntegration.js",
     "test:integration:company-permissions": "node scripts/verifyCompanyPermissionIntegration.js",
+    "test:integration:company-members": "node scripts/verifyCompanyMemberWorkflowIntegration.js",
     "test:integration:admin-permissions": "node scripts/verifyAdminPermissionIntegration.js",
     "test:integration:admin-support": "node scripts/verifyAdminSupportIntegration.js",
     "test:integration:admin-resources": "node scripts/verifyAdminResourceRedactionIntegration.js",
