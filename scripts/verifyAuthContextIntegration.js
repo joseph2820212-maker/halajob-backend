@@ -24,9 +24,16 @@ function authHeaders(token, extra = {}) {
 
 async function request(baseUrl, method, path, { token, headers, body } = {}) {
   const hasBody = !["GET", "HEAD"].includes(method);
+  const requestHeaders = token
+    ? authHeaders(token, headers)
+    : {
+        Accept: "application/json",
+        ...(hasBody ? { "Content-Type": "application/json" } : {}),
+        ...headers,
+      };
   return fetch(`${baseUrl}${path}`, {
     method,
-    headers: token ? authHeaders(token, headers) : { Accept: "application/json", ...headers },
+    headers: requestHeaders,
     ...(hasBody ? { body: JSON.stringify(body || {}) } : {}),
   });
 }
@@ -45,6 +52,11 @@ async function expectStatus(responsePromise, expected, label) {
   const payload = await readJson(response);
   assert.equal(response.status, expected, `${label} should return ${expected}; got ${response.status}`);
   return payload;
+}
+
+async function expectRefreshTokenCleared(RefreshTokenModel, token, label) {
+  const exists = await RefreshTokenModel.exists({ token });
+  assert.equal(exists, null, `${label} should delete the refresh token record`);
 }
 
 async function main() {
@@ -598,6 +610,89 @@ async function main() {
     "dash role should access admin dashboard"
   );
   assert.equal(adminDashboard.status, true, "admin dashboard response should be successful");
+
+  const appLogoutTokens = await generateAuthTokens(seekerUser, {
+    brand: "logout-app",
+    model_name: "node",
+    is_device: false,
+  });
+  await expectStatus(
+    request(baseUrl, "POST", "/user/v1/auth/logout", {
+      body: { refreshToken: appLogoutTokens.refreshToken },
+    }),
+    200,
+    "app logout should accept a valid refresh token"
+  );
+  await expectRefreshTokenCleared(
+    RefreshTokenModel,
+    appLogoutTokens.refreshToken,
+    "app logout"
+  );
+  await expectStatus(
+    request(baseUrl, "GET", "/employee/v1/global/jobs", { token: appLogoutTokens.accessToken }),
+    403,
+    "app logout should invalidate the old access token"
+  );
+  await expectStatus(
+    request(baseUrl, "POST", "/user/v1/auth/refresh-token", {
+      body: { refreshToken: appLogoutTokens.refreshToken },
+    }),
+    403,
+    "app logout should reject reuse of the logged-out refresh token"
+  );
+
+  const companyLogoutTokens = await generateAuthTokens(companyUser, {
+    brand: "logout-company",
+    model_name: "node",
+    is_device: false,
+  });
+  await expectStatus(
+    request(baseUrl, "POST", "/company/v1/auth/logout", {
+      body: { refreshToken: companyLogoutTokens.refreshToken },
+    }),
+    200,
+    "company logout should accept a valid refresh token"
+  );
+  await expectRefreshTokenCleared(
+    RefreshTokenModel,
+    companyLogoutTokens.refreshToken,
+    "company logout"
+  );
+  await expectStatus(
+    request(baseUrl, "GET", "/company/v1/global", { token: companyLogoutTokens.accessToken }),
+    403,
+    "company logout should invalidate the old access token"
+  );
+
+  const adminLogoutTokens = await generateAuthTokens(adminUser, {
+    brand: "logout-admin",
+    model_name: "node",
+    is_device: false,
+  });
+  await expectStatus(
+    request(baseUrl, "POST", "/dash/v1/auth/logout", {
+      body: { refreshToken: adminLogoutTokens.refreshToken },
+    }),
+    200,
+    "admin logout should accept a valid refresh token"
+  );
+  await expectRefreshTokenCleared(
+    RefreshTokenModel,
+    adminLogoutTokens.refreshToken,
+    "admin logout"
+  );
+  await expectStatus(
+    request(baseUrl, "GET", "/dash/v1/dashboard", { token: adminLogoutTokens.accessToken }),
+    403,
+    "admin logout should invalidate the old access token"
+  );
+  await expectStatus(
+    request(baseUrl, "POST", "/dash/v1/auth/refresh", {
+      body: { refreshToken: adminLogoutTokens.refreshToken },
+    }),
+    403,
+    "admin logout should reject reuse of the logged-out refresh token"
+  );
 
   await UserModel.updateOne({ _id: seekerUser._id }, { $set: { status: false } });
   await expectStatus(
