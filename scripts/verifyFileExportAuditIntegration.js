@@ -72,6 +72,17 @@ async function expectStatus(responsePromise, expected, label, { binary = false }
   return response;
 }
 
+async function expectJsonStatus(responsePromise, expected, label) {
+  const response = await responsePromise;
+  const payload = await readJson(response);
+  assert.equal(
+    response.status,
+    expected,
+    `${label} should return ${expected}; got ${response.status}; body=${JSON.stringify(payload)}`
+  );
+  return payload;
+}
+
 async function expectErrorMessage(responsePromise, expected, messagePattern, label) {
   const response = await responsePromise;
   const payload = await readJson(response);
@@ -317,6 +328,103 @@ async function main() {
       companyAfterRejectedUploads.files,
       [companyFileName],
       "rejected company file uploads should not mutate company files"
+    );
+
+    const invalidProfileFileForm = new FormData();
+    invalidProfileFileForm.append(
+      "file",
+      new Blob([Buffer.from("<html>not a pdf</html>")], { type: "text/html" }),
+      "dashboard-proof.pdf"
+    );
+    await expectErrorMessage(
+      multipartRequest(baseUrl, "/company/v1/global/profile/files", {
+        token: tokens.accessToken,
+        contextId: companyContext._id,
+        form: invalidProfileFileForm,
+      }),
+      400,
+      /unsupported_file_type/,
+      "company profile file upload rejects MIME mismatch"
+    );
+
+    const oversizedProfileFileForm = new FormData();
+    oversizedProfileFileForm.append(
+      "file",
+      new Blob([Buffer.alloc(4 * 1024 * 1024 + 1, 68)], { type: "application/pdf" }),
+      "too-large-dashboard-proof.pdf"
+    );
+    await expectErrorMessage(
+      multipartRequest(baseUrl, "/company/v1/global/profile/files", {
+        token: tokens.accessToken,
+        contextId: companyContext._id,
+        form: oversizedProfileFileForm,
+      }),
+      413,
+      /file_too_large/,
+      "company profile file upload rejects oversize file"
+    );
+
+    const companyAfterRejectedProfileUploads = await CompanyModel.findById(company._id).lean();
+    assert.deepEqual(
+      companyAfterRejectedProfileUploads.files,
+      [companyFileName],
+      "rejected company profile file uploads should not mutate company files"
+    );
+
+    const validProfileFileForm = new FormData();
+    validProfileFileForm.append(
+      "file",
+      new Blob([Buffer.from("%PDF-1.4\n% dashboard profile proof\n", "utf8")], {
+        type: "application/pdf",
+      }),
+      "dashboard-proof.pdf"
+    );
+    await expectJsonStatus(
+      multipartRequest(baseUrl, "/company/v1/global/profile/files", {
+        token: tokens.accessToken,
+        contextId: companyContext._id,
+        form: validProfileFileForm,
+      }),
+      201,
+      "company profile file upload accepts a valid PDF"
+    );
+
+    const companyAfterProfileUpload = await CompanyModel.findById(company._id).lean();
+    const uploadedProfileFileName = (companyAfterProfileUpload.files || []).find(
+      (filename) => filename !== companyFileName
+    );
+    assert.ok(uploadedProfileFileName, "valid company profile file upload should add a file");
+    const uploadedProfileFilePath = path.resolve(
+      process.cwd(),
+      "uploads",
+      "files",
+      uploadedProfileFileName
+    );
+    await fs.access(uploadedProfileFilePath);
+
+    await expectJsonStatus(
+      request(
+        baseUrl,
+        "DELETE",
+        `/company/v1/global/profile/files/${encodeURIComponent(uploadedProfileFileName)}`,
+        {
+          token: tokens.accessToken,
+          contextId: companyContext._id,
+        }
+      ),
+      200,
+      "company profile file delete removes an owned file"
+    );
+
+    const companyAfterProfileDelete = await CompanyModel.findById(company._id).lean();
+    assert.deepEqual(
+      companyAfterProfileDelete.files,
+      [companyFileName],
+      "company profile file delete should remove only the selected file"
+    );
+    await assert.rejects(
+      fs.access(uploadedProfileFilePath),
+      "company profile file delete should remove the stored file"
     );
 
     await expectStatus(

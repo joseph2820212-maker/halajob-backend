@@ -52,7 +52,7 @@ npm run check:secrets
 
 `npm run test:integration:profile-uploads` proves seeker/company user profile image uploads plus company logo/cover media uploads reject MIME mismatches and oversize files with clean 4xx responses and do not mutate user/company image fields when uploads are rejected.
 
-`npm run test:file-export-audit` proves company request file uploads reject MIME mismatches and oversize files with clean 4xx responses, company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user, and company bulk export endpoints reject invalid explicit application IDs or unsupported formats without writing successful export audit rows.
+`npm run test:file-export-audit` proves company request file uploads and company dashboard profile file uploads reject MIME mismatches and oversize files with clean 4xx responses, rejected uploads do not mutate company file lists, valid dashboard profile file uploads can be deleted with the stored file removed, company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user, and company bulk export endpoints reject invalid explicit application IDs or unsupported formats without writing successful export audit rows.
 
 `npm run test:integration:employee-cv-downloads` proves CV uploads reject unsupported file types and oversize files with clean 4xx responses, saved employee CV downloads require auth, are scoped to the owning employee, reject invalid IDs, reject unsafe stored paths, return a clear 404 for missing files, and enforce generated-CV public token/expiry checks for database-backed CV records.
 
@@ -60,7 +60,7 @@ npm run check:secrets
 
 ## Gaps
 
-- MIME/size policies should be documented for remaining upload endpoints not covered by the company request, student verification, CV, profile image, and company media upload integration tests.
+- MIME/size policies should be documented for remaining upload endpoints not covered by the company request, company dashboard profile file, student verification, CV, profile image, and company media upload integration tests.
 - Generated CV public-link TTL can be tuned with `GENERATED_CV_PUBLIC_URL_TTL_MINUTES`; default is 60 minutes.
 - Sensitive download audit/ownership coverage must continue to be tested route by route.
 - Object storage migration should be planned before high-volume launch.
