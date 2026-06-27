@@ -9,7 +9,7 @@ Repository: `joseph2820212-maker/halajobe`
 
 The backend is broadly mounted, the main web API client is wired to existing backend routes, and the current source-level route contract checks pass. The project is no longer in a state where the main problem is "missing route files" for the core product areas.
 
-However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is now narrower than the original audit: route mounting, guard classification, mobile fallback aliases, core auth/context, object authorization, file-export, AI, notification, analytics, subscription/billing, admin-resource lifecycle, audit redaction, and employee-CV download paths have seeded or contract coverage. The remaining risk is deeper per-feature behavior: exact request/response schemas, per-route validators, admin permission boundaries, live deployed smoke testing, remaining private download/upload edge cases, and full web/mobile user journeys.
+However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is now narrower than the original audit: route mounting, guard classification, mobile fallback aliases, core auth/context, object authorization, file-export, AI, notification, analytics, subscription/billing, company member permissions, admin-resource lifecycle, audit redaction, and employee-CV download paths have seeded or contract coverage. The remaining risk is deeper per-feature behavior: exact request/response schemas, per-route validators, admin permission boundaries, live deployed smoke testing, remaining private download/upload edge cases, and full web/mobile user journeys.
 
 ## 1.1 Current 2026-06-27 Endpoint Inventory Update
 
@@ -212,7 +212,7 @@ Current checks are useful and now include multiple seeded runtime integration ha
 | Missing test type | Examples |
 |---|---|
 | Full journey API integration suite | Real HTTP tests now exist for several core areas, but not for every product journey from login to completion. |
-| Negative authorization tests | Baseline exists for wrong role, context borrowing, expired access tokens, inactive app users, company/university/student IDOR, and revoked refresh sessions; remaining gaps include fine admin permissions, missing-permission cases, and some inactive-context permutations. |
+| Negative authorization tests | Baseline exists for wrong role, context borrowing, expired access tokens, inactive app users, company member missing-permission cases, company/university/student IDOR, and revoked refresh sessions; remaining gaps include fine admin permissions and some inactive-context permutations. |
 | Mutation side-effect tests | Coverage exists for several object-scope and admin-resource mutations; still needed for apply/save/report, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
 | Upload/download security tests | Company files, saved employee CV downloads, and generated-CV safety headers are covered; still needed for trust evidence files, generated CV public-link expiry/ownership policy, export files, MIME rejection, size rejection, and all remaining private file routes. |
 | Web API contract tests | Ensure `web/src/shared/api.ts` paths, headers, auth scopes, and error handling stay aligned with backend. |
@@ -235,6 +235,7 @@ npm run test:integration:ai-runtime
 npm run test:integration:notifications
 npm run test:integration:analytics
 npm run test:integration:subscriptions
+npm run test:integration:company-permissions
 npm run test:integration:admin-resources
 npm run test:integration:employee-cv-downloads
 npm run test:object-authorization
@@ -267,7 +268,7 @@ The following were not run as part of this pass:
 | Priority | Action |
 |---|---|
 | P0 | Expand seeded backend integration from current core harnesses into remaining business journeys and admin permission boundaries. |
-| P0 | Add missing-permission, inactive-context edge-case, and fine-grained admin permission tests. |
+| P0 | Add remaining inactive-context edge-case and fine-grained admin permission tests. |
 | P0 | Keep mobile fallback aliases until the mobile app no longer uses them, then remove the aliases and update `npm run test:mobile-routes`. |
 | P1 | Add mutation tests for applications, job save/apply/review/report, campus verification edge cases, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
 | P1 | Add upload/download security tests for trust evidence files, exports, generated CV expiry/ownership policy, MIME rejection, size rejection, and remaining private file routes. |

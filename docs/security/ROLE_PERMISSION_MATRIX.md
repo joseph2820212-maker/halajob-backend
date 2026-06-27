@@ -25,7 +25,7 @@ The backend currently contains legacy role/account names. These are the product-
 | `seeker` | Job search, profile, CV, saved jobs, applications, Career Passport, seeker AI, notifications. | Company owner/member routes, university admin routes, dashboard admin routes. | User + employee profile + active account context. | Applications, profile/CV changes, AI requests, notifications should be logged where implemented. |
 | `campus_student` | Campus dashboard/profile, opportunities, campus applications, events/resources, student verification. | University admin verification queue, company routes, dashboard admin routes. | Employee/student profile, campus verification record, active `student` context. | Verification submit/resubmit, event registration, opportunity applications. |
 | `company_owner` | Company profile, jobs, ATS, interviews, members, billing, analytics, support, audit logs, campus company features. | Other companies, university admin routes, platform admin routes. | Company `owner_user_id`, active `company_admin` context, company access helper. | Job/application/interview/member/billing/audit-sensitive actions. |
-| `company_member` | Company routes according to member permission list. | Owner-only or missing-permission actions, other companies, university/platform admin routes. | `company_members` record with `status: active` and permission list. | Same company audit rules as owner, with member ID. |
+| `company_member` | Company routes according to member permission list. | Owner-only or missing-permission actions, suspended member records, other companies, university/platform admin routes. | `company_members` record with `status: active` and permission list. | Same company audit rules as owner, with member ID. |
 | `university_admin` | University dashboard, student verification queue, analytics, outcomes, partners, opportunities. | Other universities, company dashboard, platform admin routes. | `university_memberships` record or university career-center email match, active `university_admin` context. | Student verification decisions, reports, opportunity/partner actions. |
 | `platform_admin` | Dashboard APIs, trust/admin review routes, admin resource management. | Mobile app role switching unless a context grants it. | Dashboard role where `role.log_to === "dash"` and active refresh-token session. | Admin login, role/permission changes, trust decisions, sensitive exports. |
 | `super_admin` | Platform-wide context where explicitly allowed. | Must still be blocked from routes that require a concrete company/university record unless the code explicitly allows override. | Admin role-derived `super_admin` account context. | Same as platform admin plus any cross-tenant override. |
@@ -50,6 +50,8 @@ The backend currently contains legacy role/account names. These are the product-
 | `support.manage` | Company support tickets. |
 | `company.members.manage` | Company team/member management. |
 | `analytics.view` | Company analytics. |
+
+Runtime verifier: `npm run test:integration:company-permissions` proves owner wildcard access, member `ats.view` allow, missing `jobs.manage`/`billing.manage` denial, and suspended member denial.
 
 ## Launch Gaps
 
