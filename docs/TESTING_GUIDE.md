@@ -17,6 +17,7 @@ npm run check:imports
 npm run test:security-http
 npm run test:audit-logging
 npm run test:file-export-audit
+npm run test:object-authorization
 npm run test:mobile-routes
 npm run test:ai-safety
 npm run test:global-launch-contract
@@ -70,7 +71,7 @@ Requires `CONNECTION_URL`. Do not run it against production unless you are autho
 
 The project still needs:
 
-- full role permission negative tests
+- full role permission negative tests beyond the seeded object authorization baseline
 - live smoke tests with approved seeker/company/campus/admin accounts
 - route-by-route request/response contract tests
 - OpenAPI/Postman validation

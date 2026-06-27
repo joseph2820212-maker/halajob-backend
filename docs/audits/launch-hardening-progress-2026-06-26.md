@@ -17,6 +17,7 @@ Branch: `flutter-seeker-campus`
 | Seeded auth/context integration coverage | Runtime MongoDB integration coverage now includes missing/malformed token, seeker, student/campus, approved company, pending company, university admin, dashboard admin, cross-role denial, cross-company context denial, suspended context denial, invalid context id, and refresh-token revocation. | `scripts/verifyAuthContextIntegration.js` |
 | Dashboard admin audit logging | Dashboard admin login failure, login success, and admin creation now write audit logs, with a seeded runtime test proving stable failure reason keys and no password storage in audit metadata. | `npm run test:audit-logging`, `controllers/dash/authController.js`, `scripts/verifyAuditLoggingIntegration.js` |
 | Company file/export audit logging | Company profile file downloads, single application CV downloads, bulk CV ZIP exports, and application exports now write audit logs, with a seeded runtime test also proving company file path traversal is rejected safely. | `npm run test:file-export-audit`, `controllers/companyDash/companyWithJobs/companyJobHiringController.js`, `controllers/companyDash/information/companyInformationController.js` |
+| Object-level authorization coverage | Seeded runtime coverage now proves company A cannot read or mutate company B jobs/applications, university admin A cannot list or approve university B verifications, denied attempts do not mutate target records, and allowed owner actions still write audit logs. | `npm run test:object-authorization`, `scripts/verifyObjectAuthorizationIntegration.js` |
 
 ## Checks Run
 
@@ -24,6 +25,7 @@ Branch: `flutter-seeker-campus`
 npm run test:security-http
 npm run test:audit-logging
 npm run test:file-export-audit
+npm run test:object-authorization
 npm run test:integration:auth-context
 npm run test:mobile-routes
 npm run check:syntax
@@ -34,4 +36,4 @@ npm --prefix web run build
 
 ## Remaining From Backend/API Audit
 
-The project still needs the larger runtime integration suite from the backend audit: AI, trust, analytics, notifications, applications, jobs, payments/subscriptions, broader mutation side effects, remaining sensitive campus/university/admin audit-log assertions, and full web/mobile end-to-end API flow coverage.
+The project still needs the larger runtime integration suite from the backend audit: AI, trust, analytics, notifications, payments/subscriptions, broader mutation side effects, remaining student-owned campus/admin-boundary object checks, remaining sensitive campus/university/admin audit-log assertions, and full web/mobile end-to-end API flow coverage.
