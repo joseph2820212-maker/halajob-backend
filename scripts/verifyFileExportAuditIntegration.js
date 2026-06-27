@@ -14,13 +14,14 @@ const nowToken = () => new Date().toISOString().replace(/[-:.TZ]/g, "");
 const objectId = () => new mongoose.Types.ObjectId();
 
 function authHeaders(token, contextId, extra = {}) {
-  return {
+  const headers = {
     Accept: "application/json",
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
-    "X-Active-Context-Id": String(contextId),
     ...extra,
   };
+  if (contextId) headers["X-Active-Context-Id"] = String(contextId);
+  return headers;
 }
 
 async function request(baseUrl, method, pathName, { token, contextId, body, headers } = {}) {
@@ -43,12 +44,17 @@ async function readJson(response) {
 
 async function expectStatus(responsePromise, expected, label, { binary = false } = {}) {
   const response = await responsePromise;
-  if (binary) {
+  let responseBody = "";
+  if (binary && response.status === expected) {
     await response.arrayBuffer();
   } else {
-    await readJson(response);
+    responseBody = await response.text();
   }
-  assert.equal(response.status, expected, `${label} should return ${expected}; got ${response.status}`);
+  assert.equal(
+    response.status,
+    expected,
+    `${label} should return ${expected}; got ${response.status}; body=${responseBody}`
+  );
   return response;
 }
 
@@ -113,7 +119,7 @@ async function main() {
     is_system: true,
   });
 
-  const [companyUser, seekerUser] = await UserModel.create([
+  const [companyUser, seekerUser, otherCompanyUser] = await UserModel.create([
     {
       first_name: "File",
       last_name: "Company",
@@ -142,6 +148,20 @@ async function main() {
       phone_code: "+1",
       phone_national: `555${phoneSeed}02`,
     },
+    {
+      first_name: "Other",
+      last_name: "Company",
+      email: `file.other.company.${suffix}@example.com`,
+      gender: "female",
+      role_id: companyRole._id,
+      password: "not-used",
+      status: true,
+      phone: `+1555${phoneSeed}03`,
+      phone_e164: `+1555${phoneSeed}03`,
+      phone_country: "US",
+      phone_code: "+1",
+      phone_national: `555${phoneSeed}03`,
+    },
   ]);
 
   const company = await CompanyModel.create({
@@ -154,6 +174,19 @@ async function main() {
     is_verified: true,
     can_upload: true,
     files: [companyFileName],
+    profile_completion: 80,
+  });
+
+  await CompanyModel.create({
+    company_name: `Other File Audit Company ${suffix}`,
+    company_email: `file.audit.other.${suffix}@company.example.com`,
+    owner_user_id: otherCompanyUser._id,
+    role_id: companyRole._id,
+    status: true,
+    accepted: true,
+    is_verified: true,
+    can_upload: true,
+    files: [],
     profile_completion: 80,
   });
 
@@ -205,11 +238,18 @@ async function main() {
     status: "new",
   });
 
-  const tokens = await generateAuthTokens(companyUser, {
-    brand: "File Audit Browser",
-    model_name: "Integration",
-    is_device: false,
-  });
+  const [tokens, otherCompanyTokens] = await Promise.all([
+    generateAuthTokens(companyUser, {
+      brand: "File Audit Browser",
+      model_name: "Integration",
+      is_device: false,
+    }),
+    generateAuthTokens(otherCompanyUser, {
+      brand: "File Audit Other Browser",
+      model_name: "Integration",
+      is_device: false,
+    }),
+  ]);
 
   const server = app.listen(0);
 
@@ -237,6 +277,49 @@ async function main() {
         "metadata.filename": companyFileName,
       },
       "company file download"
+    );
+
+    await expectStatus(
+      request(baseUrl, "GET", `/user/v1/company/download-file?filename=${encodeURIComponent(companyFileName)}`, {
+        token: tokens.accessToken,
+      }),
+      200,
+      "app company request file download",
+      { binary: true }
+    );
+
+    await waitForAudit(
+      AuditLogModel,
+      {
+        action: "company_request_file_downloaded",
+        company_id: company._id,
+        entity_id: company._id,
+        "metadata.filename": companyFileName,
+        "metadata.source": "app_company_request",
+      },
+      "app company request file download"
+    );
+
+    const appTraversalResponse = await request(
+      baseUrl,
+      "GET",
+      "/user/v1/company/download-file?filename=%2e%2e%2fsecret.pdf",
+      {
+        token: tokens.accessToken,
+      }
+    );
+    await appTraversalResponse.text();
+    assert.ok(
+      [400, 404].includes(appTraversalResponse.status),
+      `app company file traversal should fail safely; got ${appTraversalResponse.status}`
+    );
+
+    await expectStatus(
+      request(baseUrl, "GET", `/user/v1/company/download-file?filename=${encodeURIComponent(companyFileName)}`, {
+        token: otherCompanyTokens.accessToken,
+      }),
+      404,
+      "other company app file download"
     );
 
     const traversalResponse = await request(
@@ -329,6 +412,7 @@ async function main() {
     const auditActions = await AuditLogModel.distinct("action", { company_id: company._id });
     for (const expectedAction of [
       "company_file_downloaded",
+      "company_request_file_downloaded",
       "application_cv_downloaded",
       "application_cvs_bulk_exported",
       "applications_exported",

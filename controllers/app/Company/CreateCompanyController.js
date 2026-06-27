@@ -3,6 +3,8 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import path from "path";
 import fs from "fs/promises";
 import { existsSync } from "fs";
+import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
+import { writeAuditLog } from "../../../services/auditLog.service.js";
 
 const UPLOADS_ROOT = path.resolve(process.cwd(), "uploads");
 const DOCS_DIR = "files";
@@ -542,7 +544,22 @@ const downloadFile = async (req, res, next) => {
     }
 
     return res.download(filePath, filename, (err) => {
-      if (err) next(err);
+      if (err) return next(err);
+      writeAuditLog({
+        req,
+        companyId: company._id,
+        actorUserId: user._id,
+        actorType: "company_owner",
+        action: "company_request_file_downloaded",
+        entityType: "company",
+        entityId: company._id,
+        metadata: {
+          filename,
+          extension: path.extname(filename).toLowerCase(),
+          source: "app_company_request",
+        },
+      }).catch(() => null);
+      return undefined;
     });
   } catch (err) {
     next(err);

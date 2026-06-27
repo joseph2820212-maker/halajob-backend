@@ -19,6 +19,7 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 - Send `X-Content-Type-Options: nosniff` on served files.
 - Sensitive CV/document downloads must require auth and correct company/admin context.
 - Bulk exports must be audited and permission-checked.
+- Company file downloads must be audited for both dashboard (`/company/v1/...`) and app (`/user/v1/company/...`) routes.
 
 ## File Types
 
@@ -39,6 +40,8 @@ npm run check:secrets
 ```
 
 `npm run test:security-http` creates temporary upload fixtures and proves direct `/uploads/files/*` access returns 404 with `no-store`/`nosniff`, while root HTML uploads are served as attachments with restrictive CSP.
+
+`npm run test:file-export-audit` proves company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user.
 
 ## Gaps
 
