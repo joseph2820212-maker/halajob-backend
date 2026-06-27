@@ -25,6 +25,7 @@ Branch: `flutter-seeker-campus`
 | Subscription/billing runtime integration coverage | Seeded runtime coverage now proves billing permission checks, own-company invoice list/detail, cross-company invoice denial, plan-change ticket audit logging, dashboard-admin subscription reads, free-plan seeding, plan reassignment, and missing-plan failure behavior. | `npm run test:integration:subscriptions`, `scripts/verifySubscriptionBillingIntegration.js` |
 | Admin resource redaction coverage | Generic dashboard resource responses now redact user secret/device fields, raw FCM token/device identifiers, and populated user secrets after list/get/create/update paths. | `npm run test:integration:admin-resources`, `scripts/verifyAdminResourceRedactionIntegration.js` |
 | Employee saved-CV download coverage | Seeded runtime coverage now proves saved CV downloads require auth, are scoped to the owning employee, reject invalid IDs, reject unsafe stored paths, and return clear missing-file errors. | `npm run test:integration:employee-cv-downloads`, `scripts/verifyEmployeeCvDownloadIntegration.js` |
+| Audit-log privacy redaction | Audit writes now centrally redact secret-bearing fields from old/new values and metadata, truncate oversized note/string content, preserve ObjectIds, and avoid raw binary storage. | `npm run test:audit-logging`, `services/auditLog.service.js` |
 
 ## Checks Run
 
@@ -38,6 +39,7 @@ npm run test:integration:analytics
 npm run test:integration:subscriptions
 npm run test:integration:admin-resources
 npm run test:integration:employee-cv-downloads
+npm run test:audit-logging
 npm run test:object-authorization
 npm run test:integration:auth-context
 npm run test:mobile-routes
@@ -49,4 +51,4 @@ npm --prefix web run build
 
 ## Remaining From Backend/API Audit
 
-The project still needs the larger runtime integration suite from the backend audit: broader mutation side effects, remaining admin-boundary object checks, remaining sensitive campus/university/admin audit-log assertions, protected download coverage for every private file route, any future external payment-provider callbacks, and full web/mobile end-to-end API flow coverage. AI, notifications, analytics, subscription/billing, admin resource redaction, and employee saved-CV downloads now have seeded runtime coverage for their core request/report paths.
+The project still needs the larger runtime integration suite from the backend audit: broader mutation side effects, remaining admin-boundary object checks, remaining campus/university/admin audit-log assertions, protected download coverage for every private file route, any future external payment-provider callbacks, and full web/mobile end-to-end API flow coverage. AI, notifications, analytics, subscription/billing, admin resource redaction, employee saved-CV downloads, and audit-log secret redaction now have seeded runtime coverage for their core request/report paths.

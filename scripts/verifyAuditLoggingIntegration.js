@@ -56,14 +56,16 @@ async function main() {
 
   process.env.CONNECTION_URL = mongo.getUri();
 
-  const [{ default: app }, models, tokenService] = await Promise.all([
+  const [{ default: app }, models, tokenService, auditLogService] = await Promise.all([
     import("../app.js"),
     import("../models/index.js"),
     import("../services/tokenService.js"),
+    import("../services/auditLog.service.js"),
   ]);
 
   const { AuditLogModel, RoleModel, UserModel } = models;
   const { generateAuthTokens } = tokenService;
+  const { writeAuditLog } = auditLogService;
 
   await mongoose.connect(process.env.CONNECTION_URL, {
     serverSelectionTimeoutMS: 10000,
@@ -308,7 +310,73 @@ async function main() {
     assert.equal(createAudit.new_value?.email, createdEmail, "admin creation audit should store safe user metadata");
     assert.equal(createAudit.new_value?.password, undefined, "admin creation audit must never store password");
 
-    console.log("Audit logging integration verified for admin auth and admin creation.");
+    const circular = { safe: "visible" };
+    circular.self = circular;
+    const longNote = "x".repeat(2100);
+    const preservedObjectId = new mongoose.Types.ObjectId();
+    await writeAuditLog({
+      req: {
+        ip: "127.0.0.1",
+        headers: {
+          "user-agent": "audit-redaction-integration",
+          authorization: "Bearer should-not-be-stored",
+        },
+      },
+      actorUserId: adminUser._id,
+      actorType: "admin",
+      action: "audit_redaction_probe",
+      entityType: "other",
+      oldValue: {
+        password: "old-password",
+        nested: {
+          accessToken: "old-access-token",
+          safe_status: "before",
+        },
+      },
+      newValue: {
+        passcode: "123456",
+        another_device_code: "654321",
+        safe_status: "after",
+      },
+      metadata: {
+        apiKey: "api-key-secret",
+        refresh_token: "refresh-token-secret",
+        cookie: "session=secret",
+        privateKey: "private-key-secret",
+        binary_blob: Buffer.from("secret bytes", "utf8"),
+        circular,
+        preserved_object_id: preservedObjectId,
+        nested_array: [
+          { password: "array-password", visible: "kept" },
+          { otp: "999999" },
+        ],
+      },
+      note: longNote,
+    });
+
+    const redactionAudit = await AuditLogModel.findOne({ action: "audit_redaction_probe" }).lean();
+    assert.ok(redactionAudit, "direct audit redaction probe should be written");
+    assert.equal(redactionAudit.old_value.password, "[REDACTED]");
+    assert.equal(redactionAudit.old_value.nested.accessToken, "[REDACTED]");
+    assert.equal(redactionAudit.old_value.nested.safe_status, "before");
+    assert.equal(redactionAudit.new_value.passcode, "[REDACTED]");
+    assert.equal(redactionAudit.new_value.another_device_code, "[REDACTED]");
+    assert.equal(redactionAudit.new_value.safe_status, "after");
+    assert.equal(redactionAudit.metadata.apiKey, "[REDACTED]");
+    assert.equal(redactionAudit.metadata.refresh_token, "[REDACTED]");
+    assert.equal(redactionAudit.metadata.cookie, "[REDACTED]");
+    assert.equal(redactionAudit.metadata.privateKey, "[REDACTED]");
+    assert.equal(redactionAudit.metadata.binary_blob, "[binary:12]");
+    assert.equal(redactionAudit.metadata.circular.safe, "visible");
+    assert.equal(redactionAudit.metadata.circular.self, "[Circular]");
+    assert.equal(redactionAudit.metadata.nested_array[0].password, "[REDACTED]");
+    assert.equal(redactionAudit.metadata.nested_array[0].visible, "kept");
+    assert.equal(redactionAudit.metadata.nested_array[1].otp, "[REDACTED]");
+    assert.equal(String(redactionAudit.metadata.preserved_object_id), String(preservedObjectId));
+    assert.match(redactionAudit.note, /\.\.\.\[truncated\]$/);
+    assert.ok(redactionAudit.note.length < longNote.length, "long audit notes should be truncated");
+
+    console.log("Audit logging integration verified for admin auth, admin creation, and audit secret redaction.");
   } finally {
     await new Promise((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));

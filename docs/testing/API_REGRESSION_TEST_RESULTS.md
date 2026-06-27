@@ -4,7 +4,7 @@ Date: 2026-06-27
 Branch: `flutter-seeker-campus`
 Commit tested: current `flutter-seeker-campus` branch state as of the latest update below.
 Environment: local Codex workspace
-Latest update: object authorization, private upload static-serving, audit logging, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime integration coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, and admin resource redaction coverage added on 2026-06-27.
+Latest update: object authorization, private upload static-serving, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime integration coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, and admin resource redaction coverage added on 2026-06-27.
 
 ## Passed Commands
 
@@ -18,7 +18,7 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `npm run smoke:http` | Passed |
 | `npm run smoke:cors` | Passed |
 | `npm run test:security-http` | Passed, including private `/uploads/files/*` static denial |
-| `npm run test:audit-logging` | Passed |
+| `npm run test:audit-logging` | Passed, including admin auth audit rows, admin creation audit rows, and central audit redaction of password/passcode/token/secret/cookie/OTP/API-key/private-key/device-code fields |
 | `npm run test:file-export-audit` | Passed, including dashboard company file download, app company request file download, traversal rejection, other-company denial, and export audit logs |
 | `npm run test:integration:ai-runtime` | Passed, including disabled, completed, cached, daily-limited, employee, company, analytics, audit-log, and wrong-role AI request paths |
 | `npm run test:integration:notifications` | Passed, including notification list/read ownership and device-token create/update/conflict/revoke ownership |
