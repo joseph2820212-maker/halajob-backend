@@ -45,7 +45,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 15 | Performance & Scalability | [x]* |
 | 16 | Observability & Operations | [x]* |
 | 17 | DevOps & Deployment | [x]* |
-| 18 | Documentation & Repo Cleanup | [ ] |
+| 18 | Documentation & Repo Cleanup | [x]* |
 | 19 | Privacy, Compliance, Data Safety | [ ] |
 | 20 | Final QA & Launch Gate | [ ] |
 
@@ -466,3 +466,18 @@ Goal: repeatable, safe deployment.
 **Result: PASS** — CI now blocks secret leaks + auth-contract regressions; Node pinned; deploy docs exist.
 
 **Score movement:** DevOps ~6.5 → ~8 (secret scan + security contract gating CI).
+
+## Phase 18 — Documentation & Repo Cleanup  [x]*
+Goal: professional, maintainable repo.
+
+**Verified done on trunk (Codex "Clean up legacy repo artifacts" + docs):**
+- [x] Duplicate `yarn.lock` removed (single `package-lock.json`)
+- [x] `uploads/` untracked (0 tracked files; ignored in `.gitignore`)
+- [x] Empty `nigix.txt` removed; `jops/` duplicate dir removed (0 tracked, unimported)
+- [x] READMEs: root / `mobile/README.md` / `web/README.md`
+- [x] **Architecture docs**: `docs/architecture/` (BACKEND_MODULE_MAP, AI/ANALYTICS/FILES/NOTIFICATIONS/TRANSLATION/TRUST contracts, SOURCE_OF_TRUTH_RULES) + `docs/api/`
+- [x] Added this effort: `REVIEW.md`, `LAUNCH_PLAN.md`, `HALAJOB_9_5_PLAN.md`, `HANDOVER.md`
+
+**Result: PASS by inspection** — repo is clean; subsystem docs + module map present; no dead lockfiles/uploads/junk tracked.
+
+**Score movement:** Docs/hygiene 6 → ~9 (Codex cleanup + architecture docs).
