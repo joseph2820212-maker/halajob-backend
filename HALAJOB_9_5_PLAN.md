@@ -43,7 +43,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 13 | Web Frontend Quality | [~] |
 | 14 | Testing Strategy | [~] |
 | 15 | Performance & Scalability | [x]* |
-| 16 | Observability & Operations | [ ] |
+| 16 | Observability & Operations | [x]* |
 | 17 | DevOps & Deployment | [ ] |
 | 18 | Documentation & Repo Cleanup | [ ] |
 | 19 | Privacy, Compliance, Data Safety | [ ] |
@@ -432,3 +432,21 @@ Goal: fast and scalable enough for launch.
 **Result: PASS by inspection** — compression on, well-indexed, paginated, background work offloaded.
 
 **Score movement:** Performance ~8.5 — confirmed.
+
+## Phase 16 — Observability & Operations  [x]*
+Goal: make production issues visible and manageable.
+
+**Verified (present on trunk):**
+- [x] Structured logging (winston, level by env, error-stack enumeration) — `config/logger.js`
+- [x] **Audit logging** with **sensitive-value redaction** (`services/auditLog.service.js` `writeAuditLog` + `redactAuditValue`); admin/security actions logged
+- [x] Error handler logs non-ApiError with a uuid (Phase 2)
+- [x] Secret-protected health/route-inspection page (`/health`); health query-secret rejected (Codex)
+
+**Added this phase (implemented + verified):**
+- [x] **Liveness** `GET /health/live` (200, uptime) and **Readiness** `GET /health/ready` (checks `mongoose.connection.readyState`; 503 when DB down) — unauthenticated for load balancers/uptime monitors. `routesHealth/index.js`. Verified: syntax/imports + `smoke:http` PASS.
+
+**Remaining (enhancement):** per-request correlation/request-id middleware threaded into logs (currently only error-level uuid); external error tracking (Sentry) hook.
+
+**Result: PASS** — logging + audit + redaction in place; real liveness/readiness probes added.
+
+**Score movement:** Observability ~7 → ~8 (DB-aware readiness/liveness).
