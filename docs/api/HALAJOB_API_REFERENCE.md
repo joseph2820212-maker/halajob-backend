@@ -1,6 +1,6 @@
 # HalaJob API Reference
 
-Generated: 2026-06-27T03:02:35.775Z
+Generated: 2026-06-27T03:12:03.313Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -1027,7 +1027,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | PATCH | `/dash/v1/FcmToken/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | POST | `/dash/v1/FcmToken/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | PUT | `/dash/v1/FcmToken/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
-| GET | `/dash/v1/file/:name` | Bearer token | inferred-parent-mount | inferred:isAdmin, anonymous |
+| GET | `/dash/v1/file/:name` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, anonymous |
 | GET | `/dash/v1/Font` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, anonymous |
 | POST | `/dash/v1/Font` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, anonymous |
 | DELETE | `/dash/v1/Font/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, anonymous |

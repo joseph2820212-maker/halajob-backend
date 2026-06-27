@@ -4,7 +4,7 @@ Date: 2026-06-27
 Branch: `flutter-seeker-campus`
 Commit tested: current `flutter-seeker-campus` branch state as of the latest update below.
 Environment: local Codex workspace
-Latest update: object authorization, private upload static-serving, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime integration coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, company permission-boundary coverage, admin permission-boundary coverage, admin resource redaction/lifecycle audit coverage, and auth/context negative coverage added on 2026-06-27.
+Latest update: object authorization, private upload static-serving, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime integration coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, company permission-boundary coverage, admin permission-boundary coverage, admin support workflow coverage, admin resource redaction/lifecycle audit coverage, and auth/context negative coverage added on 2026-06-27.
 
 ## Passed Commands
 
@@ -26,6 +26,7 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `npm run test:integration:subscriptions` | Passed, including billing permission checks, own-company invoice list/detail, cross-company invoice denial, plan-change ticket audit logging, dashboard-admin subscription reads, free-plan seeding, plan reassignment, and missing-plan failure behavior |
 | `npm run test:integration:company-permissions` | Passed, including company owner wildcard access, member `ats.view` allow, missing `jobs.manage`/`billing.manage` denial, and suspended member denial |
 | `npm run test:integration:admin-permissions` | Passed, including super-admin role-number-1 bypass, audit-only admin allow/deny, users.read read-only behavior, users.manage create behavior, companies.moderate queue access, blocked cross-permission audit access, `files.read` protected dashboard PDF downloads, attachment/no-store/nosniff headers, and blocked unsafe file extensions |
+| `npm run test:integration:admin-support` | Passed, including support.view/support.manage boundaries, support queue/detail operations aliases, status validation, assignment, admin replies, close behavior, and audit logs |
 | `npm run test:integration:admin-resources` | Passed, including generic admin-resource auth denial, unknown-resource denial, user secret/device redaction, FCM token/device redaction, populated-user redaction, sanitized create/update responses, generic bulk-update routing, and create/update/delete/bulk/approve/reject mutation audit rows |
 | `npm run test:integration:employee-cv-downloads` | Passed, including saved-CV auth, owner-only download, cross-user denial, invalid-ID rejection, unsafe-path rejection, and missing-file handling |
 | `npm run test:object-authorization` | Passed |

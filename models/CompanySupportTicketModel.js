@@ -24,6 +24,11 @@ const CompanySupportTicketSchema = new Schema(
     priority: { type: String, enum: ["low", "medium", "high", "urgent"], default: "medium", index: true },
     attachments: { type: [String], default: [] },
     messages: { type: [TicketMessageSchema], default: [] },
+    assigned_to: { type: Schema.Types.ObjectId, ref: "users", default: null, index: true },
+    assigned_at: { type: Date, default: null },
+    admin_note: { type: String, default: "", trim: true },
+    last_admin_response_at: { type: Date, default: null },
+    closed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
     closed_at: { type: Date, default: null },
   },
   { collection: "company_support_tickets", timestamps: true }
@@ -46,6 +51,7 @@ CompanySupportTicketSchema.pre("validate", async function (next) {
 });
 
 CompanySupportTicketSchema.index({ company_id: 1, status: 1, createdAt: -1 });
+CompanySupportTicketSchema.index({ status: 1, priority: 1, updatedAt: -1 });
 
 const CompanySupportTicketModel = mongoose.model("company_support_tickets", CompanySupportTicketSchema);
 export default CompanySupportTicketModel;

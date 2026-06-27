@@ -16,7 +16,7 @@ The backend currently contains legacy role/account names. These are the product-
 | `university_admin` | `university_admin` account context | `authUser`, `requireUniversityAdminContext` |
 | `platform_admin` | dashboard role with `log_to: "dash"` | `isAdmin` |
 | `super_admin` | `super_admin` account context derived from admin role | `isAdmin`, `requireUniversityAdminContext` where allowed |
-| `support` | not fully separated yet | Dashboard role/permissions need expansion |
+| `support` | dashboard role with support permissions | `isAdmin`, `support.view`, `support.manage` |
 
 ## Current Access Baseline
 
@@ -29,7 +29,7 @@ The backend currently contains legacy role/account names. These are the product-
 | `university_admin` | University dashboard, student verification queue, analytics, outcomes, partners, opportunities. | Other universities, company dashboard, platform admin routes. | `university_memberships` record or university career-center email match, active `university_admin` context. | Student verification decisions, reports, opportunity/partner actions. |
 | `platform_admin` | Dashboard APIs, trust/admin review routes, admin resource management. | Mobile app role switching unless a context grants it. | Dashboard role where `role.log_to === "dash"` and active refresh-token session. | Admin login, role/permission changes, trust decisions, sensitive exports. |
 | `super_admin` | Platform-wide context where explicitly allowed. | Must still be blocked from routes that require a concrete company/university record unless the code explicitly allows override. | Admin role-derived `super_admin` account context. | Same as platform admin plus any cross-tenant override. |
-| `support` | To be defined. | To be defined. | Permission-scoped dashboard role should be created. | Support actions and account access must be audited. |
+| `support` | Dashboard support queue/detail reads and, where assigned, status/reply actions. | Non-support dashboard resources, company/member routes, university routes, and platform-wide admin settings. | Dashboard role with `support.view` and optional `support.manage`. | Support status/replies must be audited. |
 
 ## Company Permission Keys Seen In Routes
 
@@ -47,7 +47,7 @@ The backend currently contains legacy role/account names. These are the product-
 | `audit.view` | Company audit log reads. |
 | `question_library.manage` | Question library CRUD. |
 | `message_templates.manage` | Message template CRUD. |
-| `support.manage` | Company support tickets. |
+| `support.manage` | Company support tickets from the company dashboard. |
 | `company.members.manage` | Company team/member management. |
 | `analytics.view` | Company analytics. |
 
@@ -65,6 +65,8 @@ Runtime verifier: `npm run test:integration:company-permissions` proves owner wi
 | `translations.view` | Content translation/translation-log reads. |
 | `notifications.view` | Notification log reads. |
 | `files.read` | Protected dashboard file downloads under `/dash/v1/file/:name`. |
+| `support.view` | Dashboard support ticket queue/detail reads. |
+| `support.manage` | Dashboard support ticket status updates, assignment, closure, and admin replies. |
 | `companies.moderate` | Company request queues and approve/reject actions. |
 | `jobs.moderate` | Job moderation queues and approve/reject actions. |
 | `trust.view` | Trust review queue reads. |
@@ -83,6 +85,6 @@ Runtime verifier: `npm run test:integration:admin-permissions` proves role-numbe
 | Gap | Required next step |
 |---|---|
 | Product role names are not fully canonical in code. | Keep compatibility aliases, then gradually migrate docs/API responses to `seeker`, `campus_student`, `company_owner`, `company_member`, `university_admin`, `platform_admin`, `super_admin`, `support`. |
-| Support role is not separately modelled. | Add explicit support role/permissions and assign only the dashboard permission keys it needs. |
+| Support role staffing is not finalized. | Create production support roles/users with only `support.view` and, for supervisors, `support.manage`. |
 | Route-by-route role table is not complete. | Expand this matrix using `docs/api/HALAJOB_ROUTE_INVENTORY.json`. |
 | Audit logging is not proven for every sensitive route. | Add route/action coverage tests for admin, company, campus verification, trust, exports, AI usage, and files. |

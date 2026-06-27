@@ -27,7 +27,7 @@ Audit events are stored in `audit_logs` through `services/auditLog.service.js` a
 
 | Area | Required audit actions |
 |---|---|
-| Admin | login failures, role/permission changes, admin creation/deactivation, moderation decisions, trust decisions, subscription overrides. |
+| Admin | login failures, role/permission changes, admin creation/deactivation, moderation decisions, trust decisions, support ticket status/replies, subscription overrides. |
 | Company | job create/update/delete/status, application status, interview scheduling, member changes, billing/subscription requests, support tickets. |
 | Campus/university | verification submit/resubmit, approve/reject/request-info, university opportunity changes. |
 | AI | request allowed/blocked/fallback, admin usage-limit changes, provider/model override. |
@@ -37,16 +37,17 @@ Audit events are stored in `audit_logs` through `services/auditLog.service.js` a
 
 ## Current Coverage Observed
 
-Audit writes were found in dashboard admin login success/failure, dashboard admin creation, company jobs/applications, company members, support, message templates, question library, subscriptions, campus verification/opportunities, company profile file downloads, single CV downloads, bulk CV exports, application exports, trust, AI, translations, Career Passport, and account-context switching.
+Audit writes were found in dashboard admin login success/failure, dashboard admin creation, dashboard support status/replies, company jobs/applications, company members, support, message templates, question library, subscriptions, campus verification/opportunities, company profile file downloads, single CV downloads, bulk CV exports, application exports, trust, AI, translations, Career Passport, and account-context switching.
 
 Runtime evidence:
 
 ```bash
 npm run test:audit-logging
 npm run test:file-export-audit
+npm run test:integration:admin-support
 ```
 
-These seeded integration tests prove dashboard admin login failures are audited with stable reason keys, successful dashboard admin login is audited, dashboard admin creation is audited, passwords are not stored in audit metadata, company profile file downloads are audited, single CV downloads are audited, bulk CV ZIP exports are audited, application exports are audited, and company file path traversal is rejected safely.
+These seeded integration tests prove dashboard admin login failures are audited with stable reason keys, successful dashboard admin login is audited, dashboard admin creation is audited, passwords are not stored in audit metadata, dashboard support status/reply actions are audited, company profile file downloads are audited, single CV downloads are audited, bulk CV ZIP exports are audited, application exports are audited, and company file path traversal is rejected safely.
 
 ## Gaps
 

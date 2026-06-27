@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-27T03:02:38.173Z",
+  "generatedAt": "2026-06-27T03:12:05.450Z",
   "records": [
     {
       "method": "PATCH",
@@ -26494,6 +26494,68 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/operations/support-tickets",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "listTickets"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/operations/support-tickets/:ticketId",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "getTicketDetails"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/operations/support-tickets/:ticketId/messages",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "addAdminMessage"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/operations/support-tickets/:ticketId/status",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "updateTicketStatus"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/dash/v1/operations/talent-requests",
       "module": "Admin",
       "middlewares": [
@@ -38387,6 +38449,68 @@
         "checkPermissionMiddleware",
         "multerMiddleware",
         "seedFreePlan"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-tickets",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "listTickets"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-tickets/:ticketId",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "getTicketDetails"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/support-tickets/:ticketId/messages",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "addAdminMessage"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/support-tickets/:ticketId/status",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "updateTicketStatus"
       ],
       "inferredGuards": [
         "inferred:isAdmin"

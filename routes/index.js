@@ -10,6 +10,7 @@ import dashboardController from '../controllers/dash/adminDashboardController.js
 import adminModerationController from '../controllers/dash/adminModerationController.js';
 import adminOperationsController from '../controllers/dash/adminOperationsController.js';
 import adminSearchController from '../controllers/dash/adminSearchController.js';
+import adminSupportController from '../controllers/dash/adminSupportController.js';
 import resourceController from '../controllers/dash/adminResourceController.js';
 import TrustAdminController from '../controllers/trust/TrustAdminController.js';
 import AiAdminController from '../controllers/ai/AiAdminController.js';
@@ -108,6 +109,15 @@ router.get('/translations', can('translations.view'), adminOperationsController.
 router.get('/translation-logs', can('translations.view'), adminOperationsController.listTranslations);
 router.get('/notifications/logs', can('notifications.view'), adminOperationsController.listNotificationLogs);
 router.get('/notification-logs', can('notifications.view'), adminOperationsController.listNotificationLogs);
+
+router.get('/support-tickets', can('support.view'), adminSupportController.listTickets);
+router.get('/operations/support-tickets', can('support.view'), adminSupportController.listTickets);
+router.get('/support-tickets/:ticketId', can('support.view'), adminSupportController.getTicketDetails);
+router.get('/operations/support-tickets/:ticketId', can('support.view'), adminSupportController.getTicketDetails);
+router.patch('/support-tickets/:ticketId/status', can('support.manage'), upload.none(), adminSupportController.updateTicketStatus);
+router.patch('/operations/support-tickets/:ticketId/status', can('support.manage'), upload.none(), adminSupportController.updateTicketStatus);
+router.post('/support-tickets/:ticketId/messages', can('support.manage'), upload.none(), adminSupportController.addAdminMessage);
+router.post('/operations/support-tickets/:ticketId/messages', can('support.manage'), upload.none(), adminSupportController.addAdminMessage);
 
 /* ----------------------------- Moderation / operations queues ----------------------------- */
 router.get('/moderation/company-requests', can('companies.moderate'), adminModerationController.listCompanyRequests);

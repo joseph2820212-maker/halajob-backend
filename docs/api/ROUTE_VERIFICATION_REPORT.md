@@ -1,15 +1,15 @@
 # Route Verification Report
 
-Generated: 2026-06-27T03:02:38.173Z
+Generated: 2026-06-27T03:12:05.450Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 2127 |
-| Unique method/path endpoints | 3362 |
-| Endpoints with detected auth/role guard | 3273 |
+| Raw Express endpoint entries | 2135 |
+| Unique method/path endpoints | 3370 |
+| Endpoints with detected auth/role guard | 3281 |
 | Known public/system endpoints | 89 |
 | Unguarded endpoints needing manual classification | 0 |
 
@@ -23,7 +23,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 
 | Module | Total | Protected | Known public | Needs classification |
 | --- | --- | --- | --- | --- |
-| Admin | 2878 | 2873 | 5 | 0 |
+| Admin | 2886 | 2881 | 5 | 0 |
 | AI | 12 | 12 | 0 | 0 |
 | Analytics | 5 | 5 | 0 | 0 |
 | Campus | 12 | 10 | 2 | 0 |
@@ -58,6 +58,7 @@ Middleware names observed in the live app:
 ```text
 SendInterView
 activeContextGuard
+addAdminMessage
 addApplicationMessage
 addApplicationNote
 addTicketMessage
@@ -333,6 +334,7 @@ updateQuestion
 updateSectionItem
 updateTalentRequestStatus
 updateTemplate
+updateTicketStatus
 updateToken
 updateUniversityStatus
 updateWorkPreferences
