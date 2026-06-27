@@ -58,6 +58,20 @@ import {
 } from '../../models/index.js';
 
 const normalizeKey = (value = '') => String(value).toLowerCase().replace(/[\s_\-\/]+/g, '');
+const SAFE_USER_SELECT =
+  '-password -passcode -another_device_code -passcode_expires_at -another_device_expires_at -otp_last_sent_at -pending_device -device';
+const SAFE_USER_HIDDEN_FIELDS = SAFE_USER_SELECT.split(' ');
+const USER_REFERENCE_POPULATE_PATHS = new Set([
+  'user',
+  'user_id',
+  'owner_user_id',
+  'changed_by',
+  'employee_user_id',
+  'scheduled_by',
+  'reviewed_by',
+  'requested_by_user_id',
+  'assigned_by',
+]);
 
 const baseSearch = [
   'name',
@@ -92,14 +106,14 @@ const resources = {
     searchFields: ['first_name', 'mid_name', 'last_name', 'email', 'phone_e164', 'phone_national'],
     defaultSort: '-createdAt',
     populate: [{ path: 'role_id' }, { path: 'permissions' }],
-    hiddenFields: ['-password', '-passcode', '-another_device_code'],
+    hiddenFields: SAFE_USER_HIDDEN_FIELDS,
   },
   admins: {
     model: UserModel,
     searchFields: ['first_name', 'mid_name', 'last_name', 'email', 'phone_e164', 'phone_national'],
     defaultSort: '-createdAt',
     populate: [{ path: 'role_id' }, { path: 'permissions' }],
-    hiddenFields: ['-password', '-passcode', '-another_device_code'],
+    hiddenFields: SAFE_USER_HIDDEN_FIELDS,
     preFilter: async () => {
       const dashRoles = await RoleModel.find({ log_to: 'dash' }).select('_id').lean();
       return { role_id: { $in: dashRoles.map((role) => role._id) } };
@@ -164,7 +178,13 @@ const resources = {
   pages: { model: PageModel, searchFields: ['key', 'title_ar', 'title_en', 'description_ar', 'description_en'], defaultSort: '-createdAt' },
   keywords: { model: KeywordModel, searchFields: ['type'], defaultSort: '-createdAt' },
   notifications: { model: NotificationModel, searchFields: ['title', 'screen', 'order_id'], defaultSort: '-createdAt', populate: [{ path: 'user_id' }] },
-  fcmtokens: { model: FcmTokenModel, searchFields: ['token', 'platform', 'device_id', 'brand', 'model_name'], defaultSort: '-createdAt', populate: [{ path: 'user' }] },
+  fcmtokens: {
+    model: FcmTokenModel,
+    searchFields: ['platform', 'brand', 'model_name'],
+    defaultSort: '-createdAt',
+    populate: [{ path: 'user' }],
+    hiddenFields: ['-token', '-device_id', '-model_id', '-build_id'],
+  },
   searchhistory: { model: SearchHistoryModel, searchFields: ['query', 'type'], defaultSort: '-createdAt', populate: [{ path: 'user_id' }] },
   settings: { model: AppSettingsModel, searchFields: ['key'], defaultSort: '-createdAt' },
   subscriptionplans: {
@@ -567,15 +587,26 @@ const buildFilter = async (req, config) => {
   return filter;
 };
 
+const normalizePopulate = (populate) => {
+  if (!populate || typeof populate !== 'object') return populate;
+  if (!USER_REFERENCE_POPULATE_PATHS.has(populate.path) || populate.select) return populate;
+  return { ...populate, select: SAFE_USER_SELECT };
+};
+
 const applyPopulate = (query, config) => {
   const populates = config.populate || [];
-  populates.forEach((populate) => query.populate(populate));
+  populates.forEach((populate) => query.populate(normalizePopulate(populate)));
   return query;
 };
 
 const selectHiddenFields = (query, config) => {
   if (config.hiddenFields?.length) query.select(config.hiddenFields.join(' '));
   return query;
+};
+
+const loadResponseDoc = async (config, doc) => {
+  if (!doc?._id || !config.hiddenFields?.length) return doc;
+  return selectHiddenFields(applyPopulate(config.model.findById(doc._id), config), config).lean();
 };
 
 const sendNotFound = (res, resource) =>
@@ -651,8 +682,9 @@ const create = (resourceName) => async (req, res) => {
 
     const payload = await normalizePayload(req, config);
     const doc = await config.model.create(payload);
+    const responseDoc = await loadResponseDoc(config, doc);
 
-    return ReturnDashData.createData({ res, data: doc, other: { resource: config.key } });
+    return ReturnDashData.createData({ res, data: responseDoc, other: { resource: config.key } });
   } catch (err) {
     return ReturnDashData.createError({
       res,
@@ -711,8 +743,9 @@ const update = (resourceName) => async (req, res) => {
     if (config.model === jobsModel && doc.publish_status === 'published') {
       await rebuildJobIntegration(doc._id, { rebuildMatches: true }).catch(() => null);
     }
+    const responseDoc = await loadResponseDoc(config, doc);
 
-    return ReturnDashData.updateData({ res, data: doc, other: { resource: config.key } });
+    return ReturnDashData.updateData({ res, data: responseDoc, other: { resource: config.key } });
   } catch (err) {
     return ReturnDashData.updateError({
       res,

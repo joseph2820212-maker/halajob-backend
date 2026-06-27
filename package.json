@@ -35,6 +35,7 @@
     "test:integration:notifications": "node scripts/verifyNotificationRuntimeIntegration.js",
     "test:integration:analytics": "node scripts/verifyAnalyticsRuntimeIntegration.js",
     "test:integration:subscriptions": "node scripts/verifySubscriptionBillingIntegration.js",
+    "test:integration:admin-resources": "node scripts/verifyAdminResourceRedactionIntegration.js",
     "test:ai-safety": "node scripts/verifyAiSafetyContract.js && node scripts/verifyAiRouteMounts.js",
     "test:global-launch-contract": "node scripts/verifyGlobalLaunchContract.js",
     "test:trust-routes": "node scripts/verifyTrustRouteMounts.js",

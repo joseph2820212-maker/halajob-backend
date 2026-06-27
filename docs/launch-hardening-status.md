@@ -27,6 +27,7 @@ This file tracks concrete progress toward the launch-hardening goal. It does not
 | Notification runtime integration coverage | Added seeded runtime coverage for notification list/unread/read-all ownership and notification device-token create/update/conflict/revoke ownership. | `scripts/verifyNotificationRuntimeIntegration.js`, `npm run test:integration:notifications` |
 | Analytics runtime integration coverage | Added seeded runtime coverage for analytics tracking, own-event listing, group mismatch rejection, super-admin platform reports, university-scoped reports, cohorts, and borrowed-context denial. | `scripts/verifyAnalyticsRuntimeIntegration.js`, `npm run test:integration:analytics` |
 | Subscription/billing runtime integration coverage | Added seeded runtime coverage for company billing permissions, own-company invoice list/detail, cross-company invoice denial, billing plan-change support requests with audit logs, dashboard-admin subscription reads, free-plan seeding, plan assignment, missing-plan failure, and subscription snapshot updates. | `scripts/verifySubscriptionBillingIntegration.js`, `npm run test:integration:subscriptions` |
+| Admin resource redaction coverage | Generic dashboard resource responses now re-read sanitized documents after create/update, redact user secret/device fields, redact raw FCM token/device identifiers, and apply safe user selects to populated user references. | `controllers/dash/adminResourceController.js`, `scripts/verifyAdminResourceRedactionIntegration.js`, `npm run test:integration:admin-resources` |
 | Web sanity | Confirmed production web build still passes. | `npm --prefix web run build` |
 | APK tester build | Rebuilt latest local tester APK from current branch with `https://jobzain.com` and remote-backend campus auth. | `mobile/dist/android/halajob-mobile-1.0.2+16-release-local.apk` |
 
@@ -44,6 +45,7 @@ npm run test:integration:ai-runtime
 npm run test:integration:notifications
 npm run test:integration:analytics
 npm run test:integration:subscriptions
+npm run test:integration:admin-resources
 npm run test:object-authorization
 npm run test:ai-safety
 npm run test:global-launch-contract
@@ -68,16 +70,16 @@ These are working scores, not final launch certification scores.
 | Area | Previous | Current | Why |
 |---|---:|---:|---|
 | Backend correctness and feature completeness | 7.0 | 8.3 | Known mobile fallback 404 family is covered, auth/context integration passes, trust document response workflow now has a company completion route, core company/university/student object-scope checks are runtime-proven, AI request lifecycle paths have seeded runtime coverage, and subscription/billing flows are now runtime-proven. Partial workflows still remain. |
-| Backend/API structure and maintainability | 6.5 | 7.2 | Compatibility aliases and trust workflow logic are isolated in route/controller/model layers with focused verifier scripts. Larger structure cleanup remains. |
+| Backend/API structure and maintainability | 6.5 | 7.3 | Compatibility aliases and trust workflow logic are isolated in route/controller/model layers with focused verifier scripts, and generic admin resource sanitization is centralized in the resource controller. Larger structure cleanup remains. |
 | Web/mobile API wiring and flow coverage | 7.0 | 8.6 | Mobile route contract covers legacy fallbacks, web build passes, authenticated role/context flows are tested, trust document response has a web API client method plus seeded backend integration, AI/notification/analytics/subscription runtime paths are tested with real tokens, and company/university/student object authorization is runtime-proven. |
 | UI/UX completeness | 7.0 | 7.0 | No UI/UX corrections were made in this backend/security slice. |
-| Security/privacy/permissions | 6.0 | 8.4 | Health query secret removed, protected-route HTTP checks added, employee APIs require employee context, cross-role context borrowing is tested, revoked refresh sessions are tested, trust document responses block wrong-role/wrong-company access, company/university/student object-scope IDOR checks are runtime-proven, private `uploads/files` documents are no longer public static files, both dashboard/app company file downloads now have seeded audit/denial coverage, AI wrong-role/rate-limit/block behavior is runtime-proven, notification/device-token ownership is runtime-proven, analytics admin report scoping is runtime-proven, and billing permissions plus invoice ownership are runtime-proven. Broader protected download/admin tests still remain. |
+| Security/privacy/permissions | 6.0 | 8.5 | Health query secret removed, protected-route HTTP checks added, employee APIs require employee context, cross-role context borrowing is tested, revoked refresh sessions are tested, trust document responses block wrong-role/wrong-company access, company/university/student object-scope IDOR checks are runtime-proven, private `uploads/files` documents are no longer public static files, both dashboard/app company file downloads now have seeded audit/denial coverage, AI wrong-role/rate-limit/block behavior is runtime-proven, notification/device-token ownership is runtime-proven, analytics admin report scoping is runtime-proven, billing permissions plus invoice ownership are runtime-proven, and generic admin resources now redact user/FCM secrets. Broader protected download/admin tests still remain. |
 
 ## Still Required Before 9/10+
 
 | Priority | Remaining work |
 |---|---|
-| P0 | Extend seeded database-backed integration tests beyond the current auth/context, trust, object-authorization, audit, file-export, AI, notification, analytics, and subscription/billing harnesses to cover remaining admin/resource mutation boundaries and any future external payment-provider callbacks. |
+| P0 | Extend seeded database-backed integration tests beyond the current auth/context, trust, object-authorization, audit, file-export, AI, notification, analytics, subscription/billing, and admin-resource redaction harnesses to cover remaining admin/resource mutation boundaries and any future external payment-provider callbacks. |
 | P0 | Expand negative authorization cases with real tokens: missing permission, inactive context, expired access tokens, and admin permission boundaries. Company job/application, university verification, and campus student application/event object-scope coverage now has a seeded baseline. |
 | P0 | Complete or explicitly defer partial backend workflows from the audit: translation publishing, campus admin management, support/admin handling, notification preferences/admin sending, and admin coverage for newer models. AI persistence and core notification runtime paths now have seeded lifecycle coverage; trust document responses now support HTTPS evidence links. |
 | P1 | Audit all Flutter and web screens for navigation, back arrows, empty/loading/error states, disabled buttons, role switching, logout, profile completion, and dashboard flows. |
@@ -88,4 +90,4 @@ These are working scores, not final launch certification scores.
 
 ## Current Position
 
-The branch is safer than the initial backend audit state, but it is not yet launch-hardened. The next best backend step is to extend the seeded integration harness from company/university/student object-level IDOR coverage, company file download coverage, and subscription/billing coverage into remaining admin-only resources and the remaining protected private download routes.
+The branch is safer than the initial backend audit state, but it is not yet launch-hardened. The next best backend step is to extend the seeded integration harness from company/university/student object-level IDOR coverage, company file download coverage, subscription/billing coverage, and admin resource redaction into remaining admin-only resources and the remaining protected private download routes.
