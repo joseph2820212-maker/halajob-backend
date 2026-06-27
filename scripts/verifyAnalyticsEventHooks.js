@@ -42,6 +42,14 @@ const requiredHooks = [
     ],
   },
   {
+    file: "controllers/app/campus/campusMobileController.js",
+    snippets: [
+      "recordAnalyticsEvent",
+      'event: "job_applied"',
+      'source: "campus_external_application"',
+    ],
+  },
+  {
     file: "controllers/companyDash/companyWithJobs/companyWithJobsController.js",
     snippets: [
       "recordCompanyJobAnalytics",

@@ -48,6 +48,7 @@
     "test:analytics-routes": "node scripts/verifyAnalyticsRouteMounts.js && node scripts/verifyAnalyticsEventHooks.js",
     "test:translation-routes": "node scripts/verifyTranslationRouteMounts.js",
     "test:integration:translations": "node scripts/verifyTranslationWorkflowIntegration.js",
+    "test:integration:campus-workflows": "node scripts/verifyCampusWorkflowIntegration.js",
     "test:admin-operations-routes": "node scripts/verifyAdminOperationsRouteMounts.js",
     "test:career-passport": "node scripts/verifyCareerPassportContract.js",
     "test:mobile-routes": "node scripts/verifyCampusMobileRoutes.js && node scripts/verifyMobileRouteMounts.js",

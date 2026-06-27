@@ -13,6 +13,8 @@ import {
   jobsModel,
 } from "../../../models/index.js";
 import { resolveAppAccount } from "../../../services/appAccount.service.js";
+import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import { buildCampusApplicationPage } from "../../../services/campusApplicationPaging.service.js";
 import {
   applicationPopulateForEmployee,
@@ -297,6 +299,19 @@ const cancelEventRegistration = async (req, res, next) => {
     const eventId = cleanText(req.params.eventId || req.body?.event_id);
     if (!eventId) return ReturnAppData.getError({ res, status: 422, message: "event_id_required" });
 
+    const existingRegistration = await CampusEventRegistrationModel.findOne({
+      user_id: req.user._id,
+      event_id: eventId,
+    }).lean();
+    if (existingRegistration?.status === "cancelled") {
+      return ReturnAppData.createData({
+        res,
+        data: existingRegistration,
+        message: "Campus event registration already cancelled.",
+        status: 200,
+      });
+    }
+
     const registration = await CampusEventRegistrationModel.findOneAndUpdate(
       { user_id: req.user._id, event_id: eventId },
       { $set: { status: "cancelled" } },
@@ -306,6 +321,19 @@ const cancelEventRegistration = async (req, res, next) => {
     if (!registration) {
       return ReturnAppData.getError({ res, status: 404, message: "Campus event registration not found." });
     }
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: "employee",
+      action: "campus_event_cancelled",
+      entityType: "other",
+      entityId: registration._id,
+      newValue: {
+        event_id: eventId,
+        status: "cancelled",
+      },
+    });
 
     return ReturnAppData.createData({
       res,
@@ -380,8 +408,25 @@ const opportunityDetails = async (req, res, next) => {
 };
 
 async function updateSaveCounter(jobId, delta) {
-  if (delta >= 0) return jobsModel.updateOne({ _id: jobId }, { $inc: { user_saved: delta } });
-  return jobsModel.updateOne({ _id: jobId, user_saved: { $gt: 0 } }, { $inc: { user_saved: delta } });
+  if (delta >= 0) {
+    return jobsModel.updateOne(
+      { _id: jobId },
+      { $inc: { user_saved: delta, "search_index.score_signals.saves": delta } }
+    );
+  }
+  return jobsModel.updateOne(
+    { _id: jobId },
+    [
+      {
+        $set: {
+          user_saved: { $max: [0, { $add: [{ $ifNull: ["$user_saved", 0] }, delta] }] },
+          "search_index.score_signals.saves": {
+            $max: [0, { $add: [{ $ifNull: ["$search_index.score_signals.saves", 0] }, delta] }],
+          },
+        },
+      },
+    ]
+  );
 }
 
 const saveOpportunity = async (req, res, next) => {
@@ -410,6 +455,9 @@ const unsaveOpportunity = async (req, res, next) => {
   try {
     const userId = toObjectId(req.user?._id);
     const jobId = toObjectId(req.params.id);
+    const job = await findCampusOpportunity(jobId);
+    if (!job) return ReturnAppData.getError({ res, status: 404, message: "Opportunity not found." });
+
     const deleted = await UserSavedJobModel.findOneAndDelete({ user_id: userId, job_id: jobId });
     if (deleted) await updateSaveCounter(jobId, -1);
     return ReturnAppData.createData({ res, data: { is_saved: false, job_id: jobId }, message: "Opportunity removed from saved." });
@@ -450,7 +498,22 @@ const applyExternalOpportunity = async (req, res, next) => {
     }
 
     const application = await UserOutSideApplyingJobModel.create({ user_id: userId, job_id: jobId });
-    await jobsModel.updateOne({ _id: jobId }, { $inc: { out_side_applying: 1 } });
+    await jobsModel.updateOne(
+      { _id: jobId },
+      { $inc: { out_side_applying: 1, "search_index.score_signals.applies": 1 } }
+    );
+    await recordAnalyticsEvent({
+      req,
+      event: "job_applied",
+      entityType: "application",
+      entityId: application._id,
+      jobId,
+      companyId: job.company_id,
+      metadata: {
+        source: "campus_external_application",
+        out_link: outLink,
+      },
+    }).catch(() => null);
     return ReturnAppData.createData({ res, data: { application, out_link: outLink }, message: "External application recorded." });
   } catch (error) {
     if (error?.code === 11000) {

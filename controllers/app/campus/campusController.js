@@ -647,10 +647,28 @@ const registerEvent = async (req, res, next) => {
       status: "registered",
     };
 
+    const existingRegistration = await CampusEventRegistrationModel.findOne({
+      user_id: req.user._id,
+      event_id: eventId,
+    }).lean();
+    if (existingRegistration?.status === "registered") {
+      return ReturnAppData.createData({
+        res,
+        status: 200,
+        data: existingRegistration,
+        message: "campus_event_already_registered",
+      });
+    }
+
     const registration = await CampusEventRegistrationModel.findOneAndUpdate(
       { user_id: req.user._id, event_id: eventId },
       {
-        $setOnInsert: { ...payload, reminder_sent_at: null },
+        $setOnInsert: {
+          user_id: payload.user_id,
+          employee_id: payload.employee_id,
+          event_id: payload.event_id,
+          reminder_sent_at: null,
+        },
         $set: {
           title: payload.title,
           organizer: payload.organizer,
@@ -664,8 +682,21 @@ const registerEvent = async (req, res, next) => {
       { new: true, upsert: true, runValidators: true }
     ).lean();
 
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: "employee",
+      action: "campus_event_registered",
+      entityType: "other",
+      entityId: registration._id,
+      newValue: {
+        event_id: eventId,
+        title: registration.title || payload.title,
+        status: "registered",
+      },
+    });
     campusEventRegisteredNotification(registration).catch?.(console.error);
-    recordAnalyticsEvent({
+    await recordAnalyticsEvent({
       req,
       event: "event_joined",
       entityType: "campus",
@@ -1754,6 +1785,19 @@ const createUniversityOpportunityRequest = async (req, res, next) => {
       target,
       requested_count: Number(req.body?.requested_count || 25),
       note: String(req.body?.note || "").trim(),
+    });
+    await writeAuditLog({
+      req,
+      actorUserId: req.user._id,
+      actorType: scope.superAdmin ? "admin" : "university_admin",
+      action: "university_opportunity_request_created",
+      entityType: "other",
+      entityId: request._id,
+      newValue: {
+        university_id: university._id,
+        target,
+        requested_count: request.requested_count,
+      },
     });
     return ReturnAppData.createData({ res, status: 202, data: request, message: "campus_university_opportunity_request_created" });
   } catch (error) {
