@@ -43,8 +43,10 @@ npm run check:secrets
 
 `npm run test:file-export-audit` proves company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user.
 
+`npm run test:integration:employee-cv-downloads` proves saved employee CV downloads require auth, are scoped to the owning employee, reject invalid IDs, reject unsafe stored paths, and return a clear 404 for missing files.
+
 ## Gaps
 
 - MIME/size policies should be documented per endpoint.
-- Sensitive download audit coverage must continue to be tested route by route.
+- Sensitive download audit/ownership coverage must continue to be tested route by route.
 - Object storage migration should be planned before high-volume launch.

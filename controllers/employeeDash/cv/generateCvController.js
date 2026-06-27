@@ -1,12 +1,28 @@
 import fs from "fs";
 import path from "path";
 import { randomBytes } from "crypto";
+import mongoose from "mongoose";
 import { CvTemplateModel, EmployeeCvModel } from "../../../models/index.js";
 import { buildCvTemplateData } from "../../../services/cv/cvData.service.js";
 import { generatePdfFromHtml, renderCvHtml } from "../../../services/cv/cvPdf.service.js";
 import { fail, getEmployeeOrFail, getEmployeePlain, success } from "../../../helper/employeeDash/employeeDashHelpers.js";
 
 const CV_OUTPUT_ROOT = path.resolve("cv", "generated");
+const CV_ROOT = path.resolve("cv");
+
+const isValidObjectId = (value) => mongoose.Types.ObjectId.isValid(String(value || ""));
+
+const safeStoredCvPath = (value = "") => {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+
+  const withoutQuery = raw.split("?")[0].split("#")[0].replace(/\\/g, "/");
+  const relativePath = withoutQuery.replace(/^\/+/, "");
+  const resolved = path.resolve(path.isAbsolute(relativePath) ? relativePath : path.join(process.cwd(), relativePath));
+
+  if (resolved === CV_ROOT || !resolved.startsWith(CV_ROOT + path.sep)) return "";
+  return resolved;
+};
 
 const ensureOutputDir = async () => {
   await fs.promises.mkdir(CV_OUTPUT_ROOT, { recursive: true });
@@ -122,14 +138,25 @@ export const downloadSavedCv = async (req, res, next) => {
   try {
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
+    if (!isValidObjectId(req.params.cvId)) return fail(res, "invalid_cv_id", 400);
 
     const cv = await EmployeeCvModel.findOne({ _id: req.params.cvId, employee_id: employee._id }).lean();
     if (!cv?.pdf_file) return fail(res, "cv_not_found", 404);
 
-    const resolved = path.resolve(cv.pdf_file);
-    if (!resolved.startsWith(path.resolve("cv") + path.sep)) return fail(res, "invalid_cv_path", 400);
+    const resolved = safeStoredCvPath(cv.pdf_file);
+    if (!resolved) return fail(res, "invalid_cv_path", 400);
 
-    return res.download(resolved, `${cv.title || "cv"}.pdf`);
+    try {
+      await fs.promises.access(resolved, fs.constants.R_OK);
+    } catch (error) {
+      if (error?.code === "ENOENT") return fail(res, "cv_file_not_found", 404);
+      throw error;
+    }
+
+    return res.download(resolved, `${cv.title || "cv"}.pdf`, (error) => {
+      if (error && !res.headersSent) return next(error);
+      return undefined;
+    });
   } catch (error) {
     next(error);
   }
