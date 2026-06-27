@@ -230,6 +230,14 @@ jobs:
       - name: Run Windows mobile tester drop
         shell: pwsh
         working-directory: mobile
+        env:
+          # GitHub-hosted runners cannot reach the production backend
+          # (https://jobzain.com), so the live backend-reachability and
+          # live-API-route probes time out and fail the build. Those are
+          # deploy/release-time checks, not per-commit CI concerns. Skip them
+          # here via the preflight's own first-class switches. Set this to
+          # 'false' on a runner that can reach the backend to re-enable them.
+          HALA_CI_SKIP_LIVE_BACKEND_CHECKS: 'true'
         run: |
           $arguments = @(
             '-ExecutionPolicy',
@@ -247,6 +255,11 @@ jobs:
 
           if ($env:HALA_CI_LOCAL_CAMPUS_AUTH -eq 'true') {
             $arguments += '-LocalCampusAuth'
+          }
+
+          if ($env:HALA_CI_SKIP_LIVE_BACKEND_CHECKS -ne 'false') {
+            $arguments += '-SkipBackendReachability'
+            $arguments += '-SkipLiveApiRouteReport'
           }
 
           powershell.exe @arguments
