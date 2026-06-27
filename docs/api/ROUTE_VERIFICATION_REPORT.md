@@ -1,6 +1,6 @@
 # Route Verification Report
 
-Generated: 2026-06-26T23:48:06.594Z
+Generated: 2026-06-27T00:03:47.386Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary

@@ -1,6 +1,6 @@
 # HalaJob API Reference
 
-Generated: 2026-06-26T23:57:03.648Z
+Generated: 2026-06-27T00:04:21.345Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
