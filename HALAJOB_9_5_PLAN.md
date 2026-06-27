@@ -33,7 +33,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 3 | Permissions & Data Isolation | [x]* |
 | 4 | File Upload / CV / Document Security | [x]* |
 | 5 | Core Job Seeker Flow | [x]* |
-| 6 | Company Dashboard & ATS | [ ] |
+| 6 | Company Dashboard & ATS | [x]* |
 | 7 | University / Campus Module | [ ] |
 | 8 | Admin Panel | [ ] |
 | 9 | Search, Matching, Recommendations | [ ] |
@@ -271,3 +271,22 @@ Goal: complete, reliable job-seeker experience.
 **Result: PASS by inspection** — end-to-end seeker flow present and correct at the API layer. **\*** Certify via the seeker/job integration tests in CI.
 
 **Score movement:** Job seeker flows ~8 (Codex) — confirmed; → 9.5 after UI state polish (P12/13) + E2E (P14).
+
+## Phase 6 — Company Dashboard & ATS  [x]*
+Goal: production-ready company hiring flow.
+
+**Verified (wired on trunk; no changes needed):**
+- [x] Company journey: register/verify/login, profile + completion + logo/files, members + roles
+- [x] Jobs: create/draft/publish/edit/close (`/company/v1/jobs*`), statistics
+- [x] Applicants/ATS: `/hiring/:jobId/applicants`, applications, **pipeline**, talent-pool, reviews, applicant CV
+- [x] **ATS status enum** (new→screening→shortlisted→interview→hired/rejected) with `stage_order` + `ApplicationStatusHistoryModel` history + per-application audit logs
+- [x] Interviews (schedule/update/delete), invitations/offers, message-templates, question-library
+- [x] Analytics (jobs/applications/profile), audit logs
+- [x] **Subscription limits enforced**: `checkCompanyFeature(company,"can_post_jobs","active_jobs",1)` → 403 `subscription_limit_reached`; active_jobs counted live (uncheatable); question-count + feature gating
+- [x] Company data isolation (confirmed Phase 3); member context guards
+
+**Backend tests (CI via Mongo service):** hiring workflow + company permission integration coverage (Codex).
+
+**Result: PASS by inspection** — full hiring journey present, ATS history stored, plan limits enforced server-side. **\*** Certify via hiring/company integration tests in CI.
+
+**Score movement:** Company dashboard ~8.5 (Codex) — confirmed; → 9.5 after UI polish (P13) + E2E (P14).
