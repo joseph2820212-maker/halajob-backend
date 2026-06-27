@@ -39,12 +39,17 @@ const sendDashboardFile = ({ allowDocuments = false } = {}) => (req, res) => {
 
   const extension = path.extname(fileName).toLowerCase();
   const isDocument = DOCUMENT_EXTENSIONS.has(extension);
+  const isPublicImage = PUBLIC_IMAGE_EXTENSIONS.has(extension);
 
-  if (!allowDocuments && !PUBLIC_IMAGE_EXTENSIONS.has(extension)) {
+  if ((isDocument && !allowDocuments) || (!isDocument && !isPublicImage)) {
     return res.status(403).json({ status: false, message: 'file_access_forbidden' });
   }
 
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  if (isDocument) {
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Content-Disposition', `attachment; filename="${path.basename(fileName).replace(/["\\]/g, '_')}"`);
+  }
   if (extension === '.svg') {
     res.setHeader('Content-Security-Policy', "default-src 'none'; img-src data:; style-src 'unsafe-inline'");
   }
@@ -75,7 +80,7 @@ router.get('/image/uploads/:name', sendDashboardFile());
 /* ----------------------------- Protected dashboard area ----------------------------- */
 router.use(isAdmin);
 
-router.get('/file/:name', sendDashboardFile({ allowDocuments: true }));
+router.get('/file/:name', can('files.read'), sendDashboardFile({ allowDocuments: true }));
 
 router.use('/dashboard', can('dashboard.view'), dashboardRoute);
 router.use('/statistics', can('dashboard.view'), dashboardRoute);

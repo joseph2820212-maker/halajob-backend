@@ -21,6 +21,7 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 - Sensitive CV/document downloads must require auth and correct company/admin context.
 - Bulk exports must be audited and permission-checked.
 - Company file downloads must be audited for both dashboard (`/company/v1/...`) and app (`/user/v1/company/...`) routes.
+- Dashboard protected file downloads under `/dash/v1/file/:name` must require `files.read`, allow only image/PDF extensions, and serve PDFs as attachments with `Cache-Control: no-store`.
 
 ## File Types
 
@@ -45,6 +46,8 @@ npm run check:secrets
 `npm run test:file-export-audit` proves company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user.
 
 `npm run test:integration:employee-cv-downloads` proves saved employee CV downloads require auth, are scoped to the owning employee, reject invalid IDs, reject unsafe stored paths, and return a clear 404 for missing files.
+
+`npm run test:integration:admin-permissions` proves `/dash/v1/file/:name` blocks dashboard admins without `files.read`, allows `files.read` PDF downloads, sends attachment/no-store/nosniff headers, and rejects non-image/non-PDF extensions.
 
 ## Gaps
 

@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
@@ -10,6 +13,7 @@ process.env.HEALTH_SECRET ||= "admin-permission-health-secret";
 
 let mongo;
 let server;
+let tempFilesDir;
 
 const nowToken = () => new Date().toISOString().replace(/[-:.TZ]/g, "");
 
@@ -81,6 +85,13 @@ async function createPermission(PermissionModel, key) {
 }
 
 async function main() {
+  const fileFixtureName = `dashboard-private-${nowToken()}.pdf`;
+  const deniedFileFixtureName = `dashboard-private-${nowToken()}.exe`;
+  tempFilesDir = path.join(os.tmpdir(), `halajob-admin-permission-files-${nowToken()}`);
+  await fs.mkdir(path.join(tempFilesDir, "files"), { recursive: true });
+  await fs.writeFile(path.join(tempFilesDir, "files", fileFixtureName), "%PDF-1.4\n% test dashboard private file\n");
+  await fs.writeFile(path.join(tempFilesDir, "files", deniedFileFixtureName), "not allowed");
+
   mongo = await MongoMemoryServer.create({
     instance: {
       dbName: `halajob-admin-permission-${nowToken()}`,
@@ -88,6 +99,7 @@ async function main() {
   });
 
   process.env.CONNECTION_URL = mongo.getUri();
+  process.env.FILES_DIRECTORY = tempFilesDir;
 
   const [{ default: app }, models, tokenService] = await Promise.all([
     import("../app.js"),
@@ -110,14 +122,16 @@ async function main() {
     usersReadPermission,
     usersManagePermission,
     companiesModeratePermission,
+    filesReadPermission,
   ] = await Promise.all([
     createPermission(PermissionModel, "audit.view"),
     createPermission(PermissionModel, "users.read"),
     createPermission(PermissionModel, "users.manage"),
     createPermission(PermissionModel, "companies.moderate"),
+    createPermission(PermissionModel, "files.read"),
   ]);
 
-  const [superAdminRole, auditRole, userReadRole, userManageRole, companyModerationRole, employeeRole] = await RoleModel.create([
+  const [superAdminRole, auditRole, userReadRole, userManageRole, companyModerationRole, fileReadRole, employeeRole] = await RoleModel.create([
     {
       log_to: "dash",
       name: `admin-permission-super-${suffix}`,
@@ -169,9 +183,19 @@ async function main() {
       is_system: false,
     },
     {
+      log_to: "dash",
+      name: `admin-permission-file-reader-${suffix}`,
+      role_number: 950006,
+      title_ar: "File Reader",
+      title_en: "File Reader",
+      permissions: [filesReadPermission._id],
+      status: true,
+      is_system: false,
+    },
+    {
       log_to: "employee",
       name: `admin-permission-employee-${suffix}`,
-      role_number: 950006,
+      role_number: 950007,
       title_ar: "Employee",
       title_en: "Employee",
       status: true,
@@ -179,7 +203,7 @@ async function main() {
     },
   ]);
 
-  const [superAdminUser, auditUser, userReadUser, userManageUser, companyModerationUser, seekerUser] = await UserModel.create([
+  const [superAdminUser, auditUser, userReadUser, userManageUser, companyModerationUser, fileReadUser, seekerUser] = await UserModel.create([
     userSeed({
       firstName: "Permission",
       lastName: "Super",
@@ -217,20 +241,28 @@ async function main() {
     }),
     userSeed({
       firstName: "Permission",
+      lastName: "File",
+      email: `permission.file.${suffix}@example.com`,
+      roleId: fileReadRole._id,
+      phone: `${phoneSeed}06`,
+    }),
+    userSeed({
+      firstName: "Permission",
       lastName: "Seeker",
       email: `permission.seeker.${suffix}@example.com`,
       roleId: employeeRole._id,
-      phone: `${phoneSeed}06`,
+      phone: `${phoneSeed}07`,
     }),
   ]);
 
   const device = { brand: "Admin Permission", model_name: "Integration", is_device: false };
-  const [superAdminTokens, auditTokens, userReadTokens, userManageTokens, companyModerationTokens, seekerTokens] = await Promise.all([
+  const [superAdminTokens, auditTokens, userReadTokens, userManageTokens, companyModerationTokens, fileReadTokens, seekerTokens] = await Promise.all([
     generateAuthTokens(superAdminUser, device),
     generateAuthTokens(auditUser, device),
     generateAuthTokens(userReadUser, device),
     generateAuthTokens(userManageUser, device),
     generateAuthTokens(companyModerationUser, device),
+    generateAuthTokens(fileReadUser, device),
     generateAuthTokens(seekerUser, device),
   ]);
 
@@ -332,7 +364,30 @@ async function main() {
   );
   assert.equal(companyModeratorMissingAudit.requiredPermission, "audit.view");
 
-  console.log("Admin permission integration verified for super-admin bypass, limited admin allow/deny, static operations, and generic resource routes.");
+  const auditMissingFiles = await expectStatus(
+    request(baseUrl, "GET", `/dash/v1/file/${fileFixtureName}`, { token: auditTokens.accessToken }),
+    403,
+    "audit-only role cannot download protected dashboard files"
+  );
+  assert.equal(auditMissingFiles.requiredPermission, "files.read");
+
+  const fileResponse = await request(baseUrl, "GET", `/dash/v1/file/${fileFixtureName}`, {
+    token: fileReadTokens.accessToken,
+  });
+  assert.equal(fileResponse.status, 200, "files.read role should download protected dashboard PDF files");
+  assert.match(fileResponse.headers.get("content-disposition") || "", /attachment/i);
+  assert.equal(fileResponse.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(fileResponse.headers.get("cache-control"), "no-store");
+  await fileResponse.arrayBuffer();
+
+  const deniedExtension = await expectStatus(
+    request(baseUrl, "GET", `/dash/v1/file/${deniedFileFixtureName}`, { token: fileReadTokens.accessToken }),
+    403,
+    "protected dashboard file route should reject non-image/non-PDF extensions"
+  );
+  assert.equal(deniedExtension.message, "file_access_forbidden");
+
+  console.log("Admin permission integration verified for super-admin bypass, limited admin allow/deny, static operations, generic resource routes, and protected dashboard file downloads.");
 }
 
 main()
@@ -346,4 +401,5 @@ main()
     }
     await mongoose.disconnect().catch(() => null);
     if (mongo) await mongo.stop();
+    if (tempFilesDir) await fs.rm(tempFilesDir, { recursive: true, force: true });
   });

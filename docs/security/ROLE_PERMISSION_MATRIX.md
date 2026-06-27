@@ -64,6 +64,7 @@ Runtime verifier: `npm run test:integration:company-permissions` proves owner wi
 | `audit.view` | Admin audit-log reads. |
 | `translations.view` | Content translation/translation-log reads. |
 | `notifications.view` | Notification log reads. |
+| `files.read` | Protected dashboard file downloads under `/dash/v1/file/:name`. |
 | `companies.moderate` | Company request queues and approve/reject actions. |
 | `jobs.moderate` | Job moderation queues and approve/reject actions. |
 | `trust.view` | Trust review queue reads. |
@@ -75,7 +76,7 @@ Runtime verifier: `npm run test:integration:company-permissions` proves owner wi
 | `<resource>.read/create/update/delete/approve/reject/manage` | Legacy dashboard resource aliases and generic `/dash/v1/resources/:resource` routes. `<resource>.manage`, `<resource>.*`, `resources.*`, and `resources.manage` can be used for grouped access. |
 | `*` / `admin.*` | Full dashboard permission wildcard. |
 
-Runtime verifier: `npm run test:integration:admin-permissions` proves role-number-1 super-admin bypass, audit-only allow/deny, read-only resource denial for writes, resource-manager create access, company moderation access, and blocked cross-permission audit access.
+Runtime verifier: `npm run test:integration:admin-permissions` proves role-number-1 super-admin bypass, audit-only allow/deny, read-only resource denial for writes, resource-manager create access, company moderation access, blocked cross-permission audit access, `files.read` protected dashboard file downloads, attachment/no-store/nosniff headers, and non-image/non-PDF file denial.
 
 ## Launch Gaps
 

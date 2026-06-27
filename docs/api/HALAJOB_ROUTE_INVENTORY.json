@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-27T02:57:42.761Z",
+  "generatedAt": "2026-06-27T03:02:38.173Z",
   "records": [
     {
       "method": "PATCH",
@@ -14980,6 +14980,7 @@
       "path": "/dash/v1/file/:name",
       "module": "Admin",
       "middlewares": [
+        "checkPermissionMiddleware",
         "anonymous"
       ],
       "inferredGuards": [
