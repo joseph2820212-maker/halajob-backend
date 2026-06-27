@@ -20,6 +20,7 @@ Branch: `flutter-seeker-campus`
 | Object-level authorization coverage | Seeded runtime coverage now proves company A cannot read or mutate company B jobs/applications, university admin A cannot list or approve university B verifications, student A cannot read/message/cancel student B campus applications or event registrations, denied attempts do not mutate target records, and allowed owner/student/admin actions still work. | `npm run test:object-authorization`, `scripts/verifyObjectAuthorizationIntegration.js` |
 | Private upload static serving | Direct public access to `uploads/files/*` is blocked, non-image public uploads are served as attachments, and company file serializers now point to authenticated download endpoints instead of public file URLs. | `npm run test:security-http`, `app.js`, `docs/architecture/FILES_CONTRACT.md` |
 | AI runtime integration coverage | Seeded runtime coverage now proves disabled AI requests are persisted/audited as blocked, enabled mock AI requests complete for employee and company contexts, cached results are reused, daily limits fail closed, analytics are written, and wrong-role company AI attempts do not create AI records. | `npm run test:integration:ai-runtime`, `scripts/verifyAiRuntimeIntegration.js` |
+| Notification runtime integration coverage | Seeded runtime coverage now proves notification list/unread/read flows are scoped to the authenticated user and device-token create/update/conflict/revoke paths enforce ownership. | `npm run test:integration:notifications`, `scripts/verifyNotificationRuntimeIntegration.js` |
 
 ## Checks Run
 
@@ -28,6 +29,7 @@ npm run test:security-http
 npm run test:audit-logging
 npm run test:file-export-audit
 npm run test:integration:ai-runtime
+npm run test:integration:notifications
 npm run test:object-authorization
 npm run test:integration:auth-context
 npm run test:mobile-routes
@@ -39,4 +41,4 @@ npm --prefix web run build
 
 ## Remaining From Backend/API Audit
 
-The project still needs the larger runtime integration suite from the backend audit: notifications, payments/subscriptions, broader mutation side effects, remaining admin-boundary object checks, remaining sensitive campus/university/admin audit-log assertions, protected download coverage for every private file route, and full web/mobile end-to-end API flow coverage. AI now has seeded runtime coverage for blocked/completed/cached/limited/wrong-role request paths.
+The project still needs the larger runtime integration suite from the backend audit: payments/subscriptions, broader mutation side effects, remaining admin-boundary object checks, remaining sensitive campus/university/admin audit-log assertions, protected download coverage for every private file route, and full web/mobile end-to-end API flow coverage. AI and notifications now have seeded runtime coverage for their core request paths.
