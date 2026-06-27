@@ -336,6 +336,90 @@ async function main() {
   assert.equal(updateAudit.new_value.passcode, "[REDACTED]");
   assert.equal(updateAudit.new_value.another_device_code, "[REDACTED]");
 
+  const [bulkUserOne, bulkUserTwo] = await UserModel.create([
+    userSeed({
+      firstName: "Bulk",
+      lastName: "One",
+      email: `redaction.bulk.one.${suffix}@example.com`,
+      roleId: employeeRole._id,
+      phone: `${phoneSeed}04`,
+    }),
+    userSeed({
+      firstName: "Bulk",
+      lastName: "Two",
+      email: `redaction.bulk.two.${suffix}@example.com`,
+      roleId: employeeRole._id,
+      phone: `${phoneSeed}05`,
+    }),
+  ]);
+
+  await expectStatus(
+    request(baseUrl, "POST", "/dash/v1/resources/users/bulk-update", {
+      token: adminTokens.accessToken,
+      body: {
+        ids: [bulkUserOne._id, bulkUserTwo._id],
+        status: false,
+        passcode: "444444",
+        another_device_code: "555555",
+      },
+    }),
+    202,
+    "admin bulk-updates users through generic resources"
+  );
+  const bulkUpdatedUsers = await UserModel.find({ _id: { $in: [bulkUserOne._id, bulkUserTwo._id] } }).lean();
+  assert.equal(bulkUpdatedUsers.length, 2, "bulk users should still exist");
+  bulkUpdatedUsers.forEach((user) => assert.equal(user.status, false, "generic bulk update should apply status"));
+  const bulkAudit = await AuditLogModel.findOne({
+    action: "admin_resource_bulk_updated",
+    "metadata.resource": "users",
+  }).sort({ createdAt: -1 }).lean();
+  assert.ok(bulkAudit, "generic admin resource bulk update should be audited");
+  assert.equal(bulkAudit.entity_type, "user");
+  assert.equal(bulkAudit.new_value.passcode, "[REDACTED]");
+  assert.equal(bulkAudit.new_value.another_device_code, "[REDACTED]");
+  assert.equal(bulkAudit.metadata.matched, 2);
+  assert.equal(bulkAudit.metadata.modified, 2);
+  assert.deepEqual(
+    bulkAudit.metadata.ids.map((id) => String(id)).sort(),
+    [String(bulkUserOne._id), String(bulkUserTwo._id)].sort()
+  );
+
+  await expectStatus(
+    request(baseUrl, "POST", `/dash/v1/resources/users/${bulkUserOne._id}/approve`, {
+      token: adminTokens.accessToken,
+    }),
+    202,
+    "admin approves a user through generic resources"
+  );
+  const approvedUser = await UserModel.findById(bulkUserOne._id).lean();
+  assert.equal(approvedUser.status, true, "generic approve should activate the user");
+  const approveAudit = await AuditLogModel.findOne({
+    action: "admin_resource_approved",
+    entity_id: bulkUserOne._id,
+    "metadata.resource": "users",
+  }).lean();
+  assert.ok(approveAudit, "generic admin resource approve should be audited");
+  assert.equal(approveAudit.entity_type, "user");
+  assert.equal(approveAudit.new_value.status, true);
+
+  await expectStatus(
+    request(baseUrl, "POST", `/dash/v1/resources/users/${bulkUserTwo._id}/reject`, {
+      token: adminTokens.accessToken,
+    }),
+    202,
+    "admin rejects a user through generic resources"
+  );
+  const rejectedUser = await UserModel.findById(bulkUserTwo._id).lean();
+  assert.equal(rejectedUser.status, false, "generic reject should deactivate the user");
+  const rejectAudit = await AuditLogModel.findOne({
+    action: "admin_resource_rejected",
+    entity_id: bulkUserTwo._id,
+    "metadata.resource": "users",
+  }).lean();
+  assert.ok(rejectAudit, "generic admin resource reject should be audited");
+  assert.equal(rejectAudit.entity_type, "user");
+  assert.equal(rejectAudit.new_value.status, false);
+
   await expectStatus(
     request(baseUrl, "DELETE", `/dash/v1/resources/users/${createdUserPayload.data._id}`, {
       token: adminTokens.accessToken,
@@ -383,7 +467,7 @@ async function main() {
   );
   assertSafeFcmToken(legacyTokenDetails.data, "legacy FCM token details");
 
-  console.log("Admin resource redaction integration verified for user secrets, populated users, FCM tokens, and mutation audits.");
+  console.log("Admin resource redaction integration verified for user secrets, populated users, FCM tokens, and create/update/delete/bulk/approve/reject mutation audits.");
 }
 
 main()

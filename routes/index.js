@@ -273,6 +273,8 @@ router.use('/settings', createDashResourceRouter('settings'));
 /* ----------------------------- Generic API for new dashboard screens ----------------------------- */
 router.get('/resources/:resource', resourceController.list());
 router.get('/resources/:resource/:id', resourceController.getOne());
+router.post('/resources/:resource/bulk-update', upload.none(), resourceController.bulkUpdate());
+router.patch('/resources/:resource/bulk-update', upload.none(), resourceController.bulkUpdate());
 router.post('/resources/:resource', upload.any(), resourceController.create());
 router.put('/resources/:resource/:id', upload.any(), resourceController.update());
 router.patch('/resources/:resource/:id', upload.any(), resourceController.update());

@@ -4,7 +4,7 @@ Date: 2026-06-27
 Branch: `flutter-seeker-campus`
 Commit tested: current `flutter-seeker-campus` branch state as of the latest update below.
 Environment: local Codex workspace
-Latest update: object authorization, private upload static-serving, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime integration coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, and admin resource redaction coverage added on 2026-06-27.
+Latest update: object authorization, private upload static-serving, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime integration coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, and admin resource redaction/lifecycle audit coverage added on 2026-06-27.
 
 ## Passed Commands
 
@@ -24,7 +24,7 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `npm run test:integration:notifications` | Passed, including notification list/read ownership and device-token create/update/conflict/revoke ownership |
 | `npm run test:integration:analytics` | Passed, including event tracking, own-event listing, group mismatch rejection, super-admin reports, university-scoped reports, cohorts, and borrowed-context denial |
 | `npm run test:integration:subscriptions` | Passed, including billing permission checks, own-company invoice list/detail, cross-company invoice denial, plan-change ticket audit logging, dashboard-admin subscription reads, free-plan seeding, plan reassignment, and missing-plan failure behavior |
-| `npm run test:integration:admin-resources` | Passed, including generic admin-resource auth denial, unknown-resource denial, user secret/device redaction, FCM token/device redaction, populated-user redaction, sanitized create/update responses, and create/update/delete mutation audit rows |
+| `npm run test:integration:admin-resources` | Passed, including generic admin-resource auth denial, unknown-resource denial, user secret/device redaction, FCM token/device redaction, populated-user redaction, sanitized create/update responses, generic bulk-update routing, and create/update/delete/bulk/approve/reject mutation audit rows |
 | `npm run test:integration:employee-cv-downloads` | Passed, including saved-CV auth, owner-only download, cross-user denial, invalid-ID rejection, unsafe-path rejection, and missing-file handling |
 | `npm run test:object-authorization` | Passed |
 | `npm run test:mobile-routes` | Passed |
