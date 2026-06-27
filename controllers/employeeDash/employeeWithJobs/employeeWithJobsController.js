@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import {
   jobsModel,
   UserApplyingJobModel,
@@ -40,6 +41,7 @@ import {
 
 import { calculateAtsApplicationResult } from "../../../services/matching/atsScoring.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import {
   assertSupportedLaunchCurrencyCode,
   isLaunchContractError,
@@ -66,6 +68,19 @@ const publicJobFilter = {
   status: true,
   is_accepted: true,
   publish_status: { $in: ["published", null] },
+};
+
+const recomputeJobRating = async (jobId) => {
+  const agg = await UserRatingJobModel.aggregate([
+    { $match: { job_id: new mongoose.Types.ObjectId(jobId) } },
+    { $group: { _id: "$job_id", avg: { $avg: "$rating" }, total: { $sum: 1 } } },
+  ]);
+  const avg = Number((agg[0]?.avg || 0).toFixed(1));
+  await jobsModel.updateOne(
+    { _id: jobId },
+    { $set: { rating: avg, "search_index.score_signals.rating": avg } }
+  );
+  return { avg, total: agg[0]?.total || 0 };
 };
 
 const toBool = (value) => {
@@ -312,6 +327,15 @@ export const saveJob = async (req, res, next) => {
         employee_id: employeeData.employee?._id,
         dedupeKey: `job:${jobId}:saved:${employeeData.userId}`,
       }).catch?.(console.error);
+      await recordAnalyticsEvent({
+        req,
+        event: "job_saved",
+        entityType: "job",
+        entityId: jobId,
+        jobId,
+        companyId: job.company_id,
+        metadata: { source: "employee_dashboard" },
+      }).catch(() => null);
     }
 
     return success(res, { job_id: jobId }, "job_saved");
@@ -332,8 +356,17 @@ export const unsaveJob = async (req, res, next) => {
     const deleted = await UserSavedJobModel.deleteOne({ user_id: employeeData.userId, job_id: jobId });
     if (deleted.deletedCount) {
       await jobsModel.updateOne(
-        { _id: jobId, user_saved: { $gt: 0 } },
-        { $inc: { user_saved: -1, "search_index.score_signals.saves": -1 } }
+        { _id: jobId },
+        [
+          {
+            $set: {
+              user_saved: { $max: [0, { $add: [{ $ifNull: ["$user_saved", 0] }, -1] }] },
+              "search_index.score_signals.saves": {
+                $max: [0, { $add: [{ $ifNull: ["$search_index.score_signals.saves", 0] }, -1] }],
+              },
+            },
+          },
+        ]
       );
     }
 
@@ -384,7 +417,29 @@ export const applyToJob = async (req, res, next) => {
       );
 
       if (outsideResult.upsertedCount || outsideResult.upsertedId) {
-        await jobsModel.updateOne({ _id: jobId }, { $inc: { out_side_applying: 1 } });
+        await jobsModel.updateOne(
+          { _id: jobId },
+          { $inc: { out_side_applying: 1, "search_index.score_signals.applies": 1 } }
+        );
+        job_applied_notification(job, {
+          user_id: employeeData.userId,
+          employee_id: employeeData.employee?._id,
+          job_id: jobId,
+          company_id: job.company_id?._id || job.company_id,
+          source: "external",
+        }).catch?.(console.error);
+        await recordAnalyticsEvent({
+          req,
+          event: "job_applied",
+          entityType: "job",
+          entityId: jobId,
+          jobId,
+          companyId: job.company_id?._id || job.company_id,
+          metadata: {
+            source: "employee_dashboard_external_application",
+            out_link: job.out_link || "",
+          },
+        }).catch(() => null);
       }
 
       return success(res, { out_link: job.out_link }, "outside_job_apply_registered");
@@ -431,6 +486,12 @@ export const applyToJob = async (req, res, next) => {
     const missing = requiredFields.filter((field) => !payload[field]);
     if (missing.length) return fail(res, "missing_application_fields", 422, missing);
 
+    const existingApplication = await UserApplyingJobModel.findOne({
+      user_id: employeeData.userId,
+      job_id: jobId,
+    }).select("_id");
+    if (existingApplication) return fail(res, "already_applied_to_job", 409);
+
     const application = await UserApplyingJobModel.create(payload);
 
     await Promise.all([
@@ -466,6 +527,21 @@ export const applyToJob = async (req, res, next) => {
       applicationId: application._id,
       newValue: { status: initialStatus, ats_score: atsResult.score, knockout: atsResult.questions.knockout },
     });
+    await recordAnalyticsEvent({
+      req,
+      event: "job_applied",
+      entityType: "application",
+      entityId: application._id,
+      jobId,
+      companyId: payload.company_id,
+      applicationId: application._id,
+      metadata: {
+        source: "employee_dashboard_internal_application",
+        status: initialStatus,
+        ats_score: atsResult.score,
+        has_knockout_failure: Boolean(atsResult.questions.knockout.has_failed),
+      },
+    }).catch(() => null);
 
     return success(res, application, "job_application_created", 201);
   } catch (error) {
@@ -887,16 +963,19 @@ export const rateJob = async (req, res, next) => {
     if (!isValidObjectId(jobId)) return fail(res, "invalid_job_id", 400);
     if (!Number.isFinite(rating) || rating < 1 || rating > 5) return fail(res, "invalid_rating", 422);
 
+    const job = await jobsModel.findOne({ _id: jobId, ...publicJobFilter }).select("_id job_name user_id company_id").lean();
+    if (!job) return fail(res, "job_not_found", 404);
+
     const result = await UserRatingJobModel.findOneAndUpdate(
       { user_id: employeeData.userId, job_id: jobId },
-      { user_id: employeeData.userId, job_id: jobId, rating },
+      { $set: { user_id: employeeData.userId, job_id: jobId, rating } },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
+    const ratingInfo = await recomputeJobRating(jobId);
 
-    const job = await jobsModel.findById(jobId).select("_id job_name user_id company_id").lean().catch(() => null);
-    if (job) job_rated_notification(job, { candidate_user_id: employeeData.userId, data: { rating } }).catch?.(console.error);
+    job_rated_notification(job, { candidate_user_id: employeeData.userId, data: { rating } }).catch?.(console.error);
 
-    return success(res, result, "job_rated");
+    return success(res, { rating: result, job_rating: ratingInfo.avg, total: ratingInfo.total }, "job_rated");
   } catch (error) {
     next(error);
   }
@@ -913,19 +992,24 @@ export const reviewJob = async (req, res, next) => {
     if (!isValidObjectId(jobId)) return fail(res, "invalid_job_id", 400);
     if (!message) return fail(res, "review_message_required", 422);
 
+    const job = await jobsModel.findOne({ _id: jobId, ...publicJobFilter }).select("_id job_name user_id company_id").lean();
+    if (!job) return fail(res, "job_not_found", 404);
+
+    const old = await UserReviewJobModel.findOne({ user_id: employeeData.userId, job_id: jobId });
     const result = await UserReviewJobModel.findOneAndUpdate(
       { user_id: employeeData.userId, job_id: jobId },
-      { user_id: employeeData.userId, job_id: jobId, message },
+      { $set: { user_id: employeeData.userId, job_id: jobId, message } },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    await jobsModel.updateOne(
-      { _id: jobId },
-      { $inc: { user_review: 1, "search_index.score_signals.reviews": 1 } }
-    );
+    if (!old) {
+      await jobsModel.updateOne(
+        { _id: jobId },
+        { $inc: { user_review: 1, "search_index.score_signals.reviews": 1 } }
+      );
+    }
 
-    const job = await jobsModel.findById(jobId).select("_id job_name user_id company_id").lean().catch(() => null);
-    if (job) job_reviewed_notification(job, { candidate_user_id: employeeData.userId }).catch?.(console.error);
+    job_reviewed_notification(job, { candidate_user_id: employeeData.userId }).catch?.(console.error);
 
     return success(res, result, "job_review_saved");
   } catch (error) {

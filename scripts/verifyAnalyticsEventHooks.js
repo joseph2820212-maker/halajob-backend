@@ -19,6 +19,7 @@ const requiredHooks = [
       "recordAnalyticsEvent",
       'event: "job_saved"',
       'event: "job_applied"',
+      'event: "job_reported"',
       'source: "external_application"',
     ],
   },

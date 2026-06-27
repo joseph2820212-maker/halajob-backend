@@ -15,6 +15,11 @@ import {
   job_seeker_saved_notification,
 } from "../../../notification/JobCompanyNotifications.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
+import { writeAuditLog } from "../../../services/auditLog.service.js";
+import {
+  TRUST_REPORT_REASONS,
+  recomputeAndSaveJobTrust,
+} from "../../../services/trust/jobTrust.service.js";
 
 const { Types } = mongoose;
 const toObjectId = (value) => (mongoose.isValidObjectId(String(value || "")) ? new Types.ObjectId(String(value)) : null);
@@ -40,8 +45,20 @@ const publicJobFilter = () => {
 };
 
 const clampInc = (jobId, field, value) => {
-  if (value >= 0) return jobsModel.updateOne({ _id: jobId }, { $inc: { [field]: value, [`search_index.score_signals.${field === "user_saved" ? "saves" : field === "user_review" ? "reviews" : "views"}`]: value } });
-  return jobsModel.updateOne({ _id: jobId }, [{ $set: { [field]: { $max: [0, { $add: [`$${field}`, value] }] } } }]);
+  const signal = field === "user_saved" ? "saves" : field === "user_review" ? "reviews" : "views";
+  const signalPath = `search_index.score_signals.${signal}`;
+  if (value >= 0) return jobsModel.updateOne({ _id: jobId }, { $inc: { [field]: value, [signalPath]: value } });
+  return jobsModel.updateOne(
+    { _id: jobId },
+    [
+      {
+        $set: {
+          [field]: { $max: [0, { $add: [{ $ifNull: [`$${field}`, 0] }, value] }] },
+          [signalPath]: { $max: [0, { $add: [{ $ifNull: [`$${signalPath}`, 0] }, value] }] },
+        },
+      },
+    ]
+  );
 };
 
 const recomputeJobRating = async (jobId) => {
@@ -211,6 +228,7 @@ const listJobSavers = async (req, res, next) => {
 const reportJob = async (req, res, next) => {
   try {
     const jobId = toObjectId(req.params.id);
+    const reason = String(req.body.reason || "other").trim() || "other";
     const messageText = String(req.body.message || "").trim();
 
     if (!jobId || !messageText) {
@@ -218,6 +236,15 @@ const reportJob = async (req, res, next) => {
         res,
         status: 400,
         message: msg(req, "رسالة البلاغ مطلوبة.", "Report message is required."),
+      });
+    }
+
+    if (!TRUST_REPORT_REASONS.includes(reason)) {
+      return ReturnAppData.getError({
+        res,
+        status: 422,
+        message: "invalid_report_reason",
+        other: { supported: TRUST_REPORT_REASONS },
       });
     }
 
@@ -241,7 +268,7 @@ const reportJob = async (req, res, next) => {
       },
       {
         $set: {
-          reason: "other",
+          reason,
           message: messageText,
           company_id: job.company_id || null,
           status: "pending",
@@ -255,10 +282,31 @@ const reportJob = async (req, res, next) => {
         setDefaultsOnInsert: true,
       }
     );
+    const trust = await recomputeAndSaveJobTrust(jobId);
+    await writeAuditLog({
+      req,
+      companyId: job.company_id,
+      actorUserId: req.user._id,
+      actorType: "employee",
+      action: "job_reported",
+      entityType: "job",
+      entityId: jobId,
+      jobId,
+      newValue: { reason, report_id: doc._id, trust },
+    });
+    await recordAnalyticsEvent({
+      req,
+      event: "job_reported",
+      entityType: "job",
+      entityId: jobId,
+      jobId,
+      companyId: job.company_id,
+      metadata: { reason, report_id: doc._id, source: "job_information" },
+    }).catch(() => null);
 
     return ReturnAppData.createData({
       res,
-      data: doc,
+      data: { report: doc, trust },
       message: msg(req, "تم إرسال البلاغ بنجاح.", "Job report submitted successfully."),
     });
   } catch (error) {

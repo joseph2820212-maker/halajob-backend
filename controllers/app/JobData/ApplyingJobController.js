@@ -536,6 +536,21 @@ const applyJob = async (req, res, next) => {
     }
 
     const coverLetter = cleanText(req.body.cover_letter);
+    const existingApplication = await UserApplyingJobModel.findOne({
+      user_id: user._id,
+      job_id: job._id,
+    }).select("_id");
+    if (existingApplication) {
+      return ReturnAppData.getError({
+        res,
+        status: 409,
+        message: msg(
+          req,
+          "Ù„Ù‚Ø¯ Ù‚Ø¯Ù…Øª Ø¹Ù„Ù‰ Ù‡Ø°Ù‡ Ø§Ù„ÙˆØ¸ÙŠÙØ© Ù…Ø³Ø¨Ù‚Ø§Ù‹.",
+          "You already applied for this job."
+        ),
+      });
+    }
 
     const matchResult = calculateJobEmployeeMatch(job, employee);
     const atsResult = calculateAtsApplicationResult({ job, employee, answers });

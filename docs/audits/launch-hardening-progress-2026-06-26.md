@@ -29,6 +29,7 @@ Branch: `flutter-seeker-campus`
 | Translation read workflow coverage | Job and CV translation save/read/approval routes now have seeded runtime coverage for draft review, approved `published_translation` output, unsupported-language rejection, owning-context access, cross-company denial, audit logging, and analytics. | `npm run test:integration:translations`, `scripts/verifyTranslationWorkflowIntegration.js` |
 | Admin resource redaction and mutation audit coverage | Generic dashboard resource responses now redact user secret/device fields, raw FCM token/device identifiers, and populated user secrets after list/get/create/update paths. Generic bulk-update is wired for new dashboard screens, and create/update/delete/bulk/approve/reject mutations now write central audit rows. | `npm run test:integration:admin-resources`, `scripts/verifyAdminResourceRedactionIntegration.js` |
 | Employee saved-CV download coverage | Seeded runtime coverage now proves saved CV downloads require auth, are scoped to the owning employee, reject invalid IDs, reject unsafe stored paths, and return clear missing-file errors. | `npm run test:integration:employee-cv-downloads`, `scripts/verifyEmployeeCvDownloadIntegration.js` |
+| Job seeker mutation workflow coverage | Seeded runtime coverage now proves save/unsave, modern toggle save, rate, review, internal apply, duplicate apply denial, external apply, duplicate external apply handling, job reports, counters, search score signals, audit rows, analytics rows, and trust report recomputation. Duplicate internal application checks now exist in the controllers, not only in database indexes. | `npm run test:integration:job-mutations`, `scripts/verifyJobMutationWorkflowIntegration.js` |
 | Audit-log privacy redaction | Audit writes now centrally redact secret-bearing fields from old/new values and metadata, truncate oversized note/string content, preserve ObjectIds, and avoid raw binary storage. | `npm run test:audit-logging`, `services/auditLog.service.js` |
 | Backend route ownership documentation | Current route ownership, compatibility alias policy, controller/service/model boundaries, and admin resource policy are documented for future cleanup. | `docs/architecture/BACKEND_MODULE_MAP.md` |
 
@@ -48,6 +49,7 @@ npm run test:integration:admin-support
 npm run test:integration:translations
 npm run test:integration:admin-resources
 npm run test:integration:employee-cv-downloads
+npm run test:integration:job-mutations
 npm run test:audit-logging
 npm run test:object-authorization
 npm run test:integration:auth-context
@@ -60,4 +62,4 @@ npm --prefix web run build
 
 ## Remaining From Backend/API Audit
 
-The project still needs the larger runtime integration suite from the backend audit: broader non-admin mutation side effects, remaining campus/university/admin audit-log assertions, protected download coverage for every private file route, any future external payment-provider callbacks, route-by-route schemas/validators, and full web/mobile end-to-end API flow coverage. AI, notifications including preferences/admin-send, analytics, subscription/billing, company member permissions, admin permission boundaries, admin support workflows, translation save/read/approval, admin resource redaction/mutation audits, employee saved-CV downloads, and audit-log secret redaction now have seeded runtime coverage for their core request/report paths.
+The project still needs the larger runtime integration suite from the backend audit: remaining non-admin mutation side effects, remaining campus/university/admin audit-log assertions, protected download coverage for every private file route, any future external payment-provider callbacks, route-by-route schemas/validators, and full web/mobile end-to-end API flow coverage. AI, notifications including preferences/admin-send, analytics, subscription/billing, company member permissions, admin permission boundaries, admin support workflows, translation save/read/approval, admin resource redaction/mutation audits, employee saved-CV downloads, job seeker mutation workflows, and audit-log secret redaction now have seeded runtime coverage for their core request/report paths.
