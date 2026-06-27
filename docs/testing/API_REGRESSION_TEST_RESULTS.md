@@ -4,7 +4,7 @@ Date: 2026-06-27
 Branch: `flutter-seeker-campus`
 Commit tested: current `flutter-seeker-campus` branch state as of the latest update below.
 Environment: local Codex workspace
-Latest update: object authorization, private upload static-serving, audit logging, expanded company file/export audit integration coverage, AI runtime integration coverage, and notification runtime integration coverage added on 2026-06-27.
+Latest update: object authorization, private upload static-serving, audit logging, expanded company file/export audit integration coverage, AI runtime integration coverage, notification runtime integration coverage, and analytics runtime integration coverage added on 2026-06-27.
 
 ## Passed Commands
 
@@ -22,6 +22,7 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `npm run test:file-export-audit` | Passed, including dashboard company file download, app company request file download, traversal rejection, other-company denial, and export audit logs |
 | `npm run test:integration:ai-runtime` | Passed, including disabled, completed, cached, daily-limited, employee, company, analytics, audit-log, and wrong-role AI request paths |
 | `npm run test:integration:notifications` | Passed, including notification list/read ownership and device-token create/update/conflict/revoke ownership |
+| `npm run test:integration:analytics` | Passed, including event tracking, own-event listing, group mismatch rejection, super-admin reports, university-scoped reports, cohorts, and borrowed-context denial |
 | `npm run test:object-authorization` | Passed |
 | `npm run test:mobile-routes` | Passed |
 | `npm run test:ai-safety` | Passed |
