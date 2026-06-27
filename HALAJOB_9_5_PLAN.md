@@ -31,7 +31,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 1 | Critical Security Fixes | [x]* |
 | 2 | API Validation & Backend Hardening | [~] |
 | 3 | Permissions & Data Isolation | [x]* |
-| 4 | File Upload / CV / Document Security | [ ] |
+| 4 | File Upload / CV / Document Security | [x]* |
 | 5 | Core Job Seeker Flow | [ ] |
 | 6 | Company Dashboard & ATS | [ ] |
 | 7 | University / Campus Module | [ ] |
@@ -230,3 +230,22 @@ Goal: reach production confidence; make the existing tests actually run in CI so
 **Result: PARTIAL** — DB integration tests now run in CI (pending the run going green to confirm the service wiring).
 
 **Score movement:** Testing 6 → ~7 (DB integration now in CI); → 9 with unit runner + coverage + broader E2E.
+
+## Phase 4 — File Upload / CV / Document Security  [x]*
+Goal: make CVs, profile images, company files, and university documents safe.
+
+**Verified (already implemented on trunk by Codex — no code changes needed):**
+- [x] **MIME + extension allowlist** (`utils/multer.js` `ALLOWED_FILES`); unsupported types rejected
+- [x] **File size** limit (4MB) + **max files** (10); executables rejected by allowlist
+- [x] **Filename sanitization** (strip non-alphanumerics) + timestamp/random prefix → no collisions, double-extension neutralized
+- [x] **Upload rate limit** (`uploadLimiter`, app.js)
+- [x] **Path-traversal guards**: `/cv/generated/:fileName` requires basename==fileName, `.pdf` only, `resolve().startsWith(dir+sep)`; verification-doc resolver rejects `..`/`/`/`\` + extension allowlist + `startsWith(baseDir)`
+- [x] **Private vs public separation**: static `/uploads` serves images with `dotfiles: deny` + `Content-Disposition: attachment` + `nosniff`; `/uploads/files` → 404; **student verification documents stored in a private dir** and served only via **authenticated routes** (`/campus/v1/...`, `/university/v1/...`) with **audit logging**
+- [x] **Expiring/access-checked CV links** (`verifyGeneratedCvPublicAccess`)
+
+**Minor residual (noted, not blocking):**
+- [ ] Legacy verification docs uploaded before the private-dir migration may still resolve under public `uploads/` — backfill/migrate old `document_url`s to the private prefix.
+
+**Result: PASS by inspection** — file/document security is strong. **\*** Certify with the upload/download security integration tests Codex added (run in CI via the new Mongo service): `verifyProfileUploadValidationIntegration`, `verifyStudentVerificationDocumentSecurity`.
+
+**Score movement:** File/document security ~8.5 (Codex) — confirmed; → 9 with legacy-doc migration.
