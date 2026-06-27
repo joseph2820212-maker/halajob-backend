@@ -36,7 +36,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 6 | Company Dashboard & ATS | [x]* |
 | 7 | University / Campus Module | [x]* |
 | 8 | Admin Panel | [~] |
-| 9 | Search, Matching, Recommendations | [ ] |
+| 9 | Search, Matching, Recommendations | [x]* |
 | 10 | Notifications & Email | [ ] |
 | 11 | Payments & Subscriptions | [ ] |
 | 12 | Mobile App Quality | [ ] |
@@ -329,3 +329,19 @@ Goal: powerful but safe admin tools. (First phase with real frontend code change
 **Result: PARTIAL** — the audit's top admin safety gap (destructive-action confirmation) is closed; error-state visibility added. Larger admin features remain.
 
 **Score movement:** Admin panel 6 → ~6.5 (safety rail added); → 9.5 needs user-management + pagination + bulk/search + modal.
+
+## Phase 9 — Search, Matching & Recommendations  [x]*
+Goal: useful, explainable search/matching with no private-data leakage.
+
+**Verified (wired on trunk; no changes needed):**
+- [x] **Weighted, explainable matching** (`services/matching/atsScoring.service.js`): skills 35 / experience 20 / education 10 / languages 10 / location 10 / salary 5 / questions 10, configurable per job via `ats_settings.weights`
+- [x] **Search projections** (`services/search/build{Job,Company,Employee}Projection.js`) + index rebuild; local search service (`search-local/` docker)
+- [x] **Arabic+English normalization** (`normalizeSearch.js`): NFKD, strips combining + Arabic tashkeel diacritics, normalizes alef variants (أإآ→ا), yaa (ى→ي), removes tatweel, keeps `؀-ۿ`
+- [x] Filters present: work mode (remote/hybrid), location/country, salary range, experience/seniority, skills, languages, job types
+- [x] **No PII leakage in search**: employee projection exposes only skills/titles/languages/preferences/tokens/salary-range/flags — no email/phone/national-id/CV-url/address
+
+**Possible enhancement (not blocking):** explicit freshness/recency ranking weight; saved-search.
+
+**Result: PASS by inspection** — matching explainable + configurable, bilingual search, PII-safe index.
+
+**Score movement:** Search/matching ~8.5 — confirmed.
