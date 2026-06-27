@@ -39,7 +39,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 9 | Search, Matching, Recommendations | [x]* |
 | 10 | Notifications & Email | [x]* |
 | 11 | Payments & Subscriptions | [~] |
-| 12 | Mobile App Quality | [ ] |
+| 12 | Mobile App Quality | [~] |
 | 13 | Web Frontend Quality | [ ] |
 | 14 | Testing Strategy | [~] |
 | 15 | Performance & Scalability | [ ] |
@@ -384,3 +384,19 @@ Goal: real, reliable monetization.
 **Result: PARTIAL/BLOCKED** — subscription + invoicing + limits work; online payment intentionally not built (needs provider + keys = external blocker per the launch gate).
 
 **Score movement:** Subscriptions ~7 (state/limits) — confirmed; payments require the provider decision to progress.
+
+## Phase 12 — Mobile App Quality  [~]
+Goal: polished, reliable Flutter app.
+
+**Verified good:** `flutter analyze` clean; 412 tests pass; loading states (45+ indicators) + empty/error widgets (`HalaEmptyStateCard`/`HalaErrorStateCard`/`HalaStateNotice`) present and used; 401/403 → graceful sign-out with clear session-expired message; refresh token captured + persisted.
+
+**Fixed this phase (concrete failing check):**
+- [x] `check:i18n` was FAILING — generated `lib/l10n/app_localizations_ar.dart` was **gitignored** so it never existed in a fresh checkout. Generated via `flutter gen-l10n` from the `.arb` files and **committed** them (un-ignored). `check:i18n` now PASSES. `flutter analyze` still clean.
+
+**Deferred (need arch work + device QA — not done blind):**
+- [-] **Silent token refresh** on 401 (refresh token is stored but only used for logout; app signs out on access-token expiry). Proper fix needs token-propagation refactor across the 4 dashboard screens + device QA. Graceful sign-out works today.
+- [-] **Certificate pinning** — security hardening, risky to do blind (cert rotation can brick the app); schedule with device QA.
+
+**Result: PARTIAL** — analyze/tests green, states present, i18n check fixed; token-refresh + cert-pinning deferred (documented).
+
+**Score movement:** Mobile ~8 → ~8.3 (i18n check green); → 9 with silent refresh + cert pinning.
