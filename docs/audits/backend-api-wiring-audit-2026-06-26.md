@@ -41,7 +41,7 @@ Current generated artifacts:
 | Web API wiring | 8 | No obvious hard 404s found in the centralized web API client against mounted backend route families; browser click-through remains separate. |
 | Mobile API wiring | 8.5 | Legacy mobile fallback aliases are now covered by `npm run test:mobile-routes`, including older `/employee/v1/...` compatibility paths. |
 | Feature API coverage | 8 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notifications, analytics, subscriptions, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
-| Auth and account-context safety | 8.5 | Seeded auth/context integration now covers missing/malformed tokens, role/context denial, cross-role borrowing, suspended context, invalid context, and refresh-token revocation. |
+| Auth and account-context safety | 8.7 | Seeded auth/context integration now covers missing/malformed/expired app and admin tokens, inactive app-user denial, role/context denial, cross-role borrowing, suspended context, invalid context, and refresh-token revocation. |
 | Admin operational coverage | 7.5 | Admin resources are broad, redacted, and lifecycle-audited; remaining risk is fine-grained admin permission boundaries and newer workflow-specific admin handling. |
 | Automated backend test depth | 7.5 | Static checks plus multiple seeded runtime integration harnesses exist; still short of route-by-route validator/schema and full journey coverage. |
 | Launch confidence from backend/API only | 8 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
@@ -183,7 +183,7 @@ Current status: explicit backend compatibility aliases have since been added and
 | Public generated CV PDF route | `/cv/generated/:fileName` is public with filename validation, but generated names should be unguessable and expiry/access rules should be reviewed. |
 | Public uploads route | `/uploads/files/*` is now blocked from public static serving, and non-image root uploads are forced to attachment. Remaining work is route-by-route MIME/size/private download coverage. |
 | Health secret query string | Fixed: health secrets must use the `x-health-secret` header. |
-| Cross-account access | Seeded object-authorization coverage now exists for company, university, and campus student object-scope cases. Remaining work is broader admin permission and expired-token coverage. |
+| Cross-account access | Seeded object-authorization coverage now exists for company, university, and campus student object-scope cases. Expired app/admin token denial and inactive app-user denial are covered. Remaining work is broader fine-grained admin permission coverage. |
 | Logout/session invalidation | Improved: user, company, and admin logout behavior now has backend handling and security-contract checks; web logout calls backend before clearing local state. |
 
 ## 8. Backend/Test Coverage Assessment
@@ -211,7 +211,7 @@ Current checks are useful and now include multiple seeded runtime integration ha
 | Missing test type | Examples |
 |---|---|
 | Full journey API integration suite | Real HTTP tests now exist for several core areas, but not for every product journey from login to completion. |
-| Negative authorization tests | Baseline exists for wrong role, context borrowing, company/university/student IDOR, and revoked refresh sessions; remaining gaps include expired access tokens, fine admin permissions, and some inactive-context permutations. |
+| Negative authorization tests | Baseline exists for wrong role, context borrowing, expired access tokens, inactive app users, company/university/student IDOR, and revoked refresh sessions; remaining gaps include fine admin permissions, missing-permission cases, and some inactive-context permutations. |
 | Mutation side-effect tests | Coverage exists for several object-scope and admin-resource mutations; still needed for apply/save/report, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
 | Upload/download security tests | Company files and saved employee CV downloads are covered; still needed for trust evidence files, generated CV public-link expiry/guessability, export files, MIME rejection, size rejection, and all remaining private file routes. |
 | Web API contract tests | Ensure `web/src/shared/api.ts` paths, headers, auth scopes, and error handling stay aligned with backend. |
@@ -266,7 +266,7 @@ The following were not run as part of this pass:
 | Priority | Action |
 |---|---|
 | P0 | Expand seeded backend integration from current core harnesses into remaining business journeys and admin permission boundaries. |
-| P0 | Add expired-token, missing-permission, inactive-context, and fine-grained admin permission tests. |
+| P0 | Add missing-permission, inactive-context edge-case, and fine-grained admin permission tests. |
 | P0 | Keep mobile fallback aliases until the mobile app no longer uses them, then remove the aliases and update `npm run test:mobile-routes`. |
 | P1 | Add mutation tests for applications, job save/apply/review/report, campus verification edge cases, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
 | P1 | Add upload/download security tests for trust evidence files, exports, generated PDFs/public links, MIME rejection, size rejection, and remaining private file routes. |

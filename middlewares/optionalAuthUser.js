@@ -59,6 +59,11 @@ const optionalAuthUser = async (req, res, next) => {
       return next();
     }
 
+    if (!user.status) {
+      req.user = null;
+      return next();
+    }
+
     // =========================
     // CHECK SESSION
     // =========================

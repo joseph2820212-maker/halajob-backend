@@ -4,7 +4,7 @@ Date: 2026-06-27
 Branch: `flutter-seeker-campus`
 Commit tested: current `flutter-seeker-campus` branch state as of the latest update below.
 Environment: local Codex workspace
-Latest update: object authorization, private upload static-serving, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime integration coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, and admin resource redaction/lifecycle audit coverage added on 2026-06-27.
+Latest update: object authorization, private upload static-serving, audit logging with central secret redaction, expanded company file/export audit integration coverage, employee saved-CV download coverage, AI runtime integration coverage, notification runtime integration coverage, analytics runtime integration coverage, subscription/billing runtime integration coverage, admin resource redaction/lifecycle audit coverage, and auth/context negative coverage added on 2026-06-27.
 
 ## Passed Commands
 
@@ -36,7 +36,7 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `npm run test:translation-routes` | Passed |
 | `npm run test:admin-operations-routes` | Passed |
 | `npm run test:career-passport` | Passed |
-| `npm run test:integration:auth-context` | Passed |
+| `npm run test:integration:auth-context` | Passed, including missing/malformed/expired app tokens, expired admin tokens, inactive app-user denial, role/context denial, borrowed-context denial, suspended-context denial, invalid-context rejection, pending-company denial, and revoked refresh-session denial |
 | `npm run test:integration:trust-documents` | Passed |
 | `npm run docs:route-report` | Passed |
 | `npm run docs:api-artifacts` | Passed |

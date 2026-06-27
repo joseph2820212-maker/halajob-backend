@@ -37,6 +37,10 @@ const authUser = async (req, res, next) => {
     if (!user) {
       throw new ApiError(httpStatus.FORBIDDEN, 'User not found. Please log in again.');
     }
+
+    if (!user.status) {
+      throw new ApiError(httpStatus.FORBIDDEN, 'This account is inactive.');
+    }
  
     // Validate the refresh token exists for the user and login time
     const refreshTokenExists = await RefreshTokenModel.exists({

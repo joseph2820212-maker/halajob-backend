@@ -56,10 +56,11 @@ async function main() {
 
   process.env.CONNECTION_URL = mongo.getUri();
 
-  const [{ default: app }, models, tokenService] = await Promise.all([
+  const [{ default: app }, models, tokenService, jwtHelpers] = await Promise.all([
     import("../app.js"),
     import("../models/index.js"),
     import("../services/tokenService.js"),
+    import("../utils/jwtHelpers.js"),
   ]);
 
   const {
@@ -73,6 +74,7 @@ async function main() {
     UserModel,
   } = models;
   const { generateAuthTokens } = tokenService;
+  const { sign: signJwt } = jwtHelpers;
 
   await mongoose.connect(process.env.CONNECTION_URL, {
     serverSelectionTimeoutMS: 10000,
@@ -359,6 +361,30 @@ async function main() {
     generateAuthTokens(adminUser, device),
   ]);
 
+  const expiredAt = Math.floor(Date.now() / 1000) - 60;
+  const [expiredSeekerAccessToken, expiredAdminAccessToken] = await Promise.all([
+    signJwt(
+      {
+        userId: seekerUser._id,
+        loginTime: new Date(),
+        exp: expiredAt,
+        type: "access",
+        jti: `expired-seeker-${suffix}`,
+      },
+      process.env.JWT_SECRET
+    ),
+    signJwt(
+      {
+        userId: adminUser._id,
+        loginTime: new Date(),
+        exp: expiredAt,
+        type: "access",
+        jti: `expired-admin-${suffix}`,
+      },
+      process.env.JWT_SECRET
+    ),
+  ]);
+
   server = app.listen(0);
   await new Promise((resolve) => server.once("listening", resolve));
   const { port } = server.address();
@@ -374,6 +400,12 @@ async function main() {
     request(baseUrl, "GET", "/employee/v1/global/jobs", { token: "not-a-valid-jwt" }),
     401,
     "malformed bearer token should not access employee jobs"
+  );
+
+  await expectStatus(
+    request(baseUrl, "GET", "/employee/v1/global/jobs", { token: expiredSeekerAccessToken }),
+    401,
+    "expired bearer token should not access employee jobs"
   );
 
   const seekerJobs = await expectStatus(
@@ -512,12 +544,26 @@ async function main() {
     "seeker role should not access admin dashboard"
   );
 
+  await expectStatus(
+    request(baseUrl, "GET", "/dash/v1/dashboard", { token: expiredAdminAccessToken }),
+    401,
+    "expired admin bearer token should not access admin dashboard"
+  );
+
   const adminDashboard = await expectStatus(
     request(baseUrl, "GET", "/dash/v1/dashboard", { token: adminTokens.accessToken }),
     200,
     "dash role should access admin dashboard"
   );
   assert.equal(adminDashboard.status, true, "admin dashboard response should be successful");
+
+  await UserModel.updateOne({ _id: seekerUser._id }, { $set: { status: false } });
+  await expectStatus(
+    request(baseUrl, "GET", "/employee/v1/global/jobs", { token: seekerTokens.accessToken }),
+    403,
+    "inactive app user should not access employee jobs"
+  );
+  await UserModel.updateOne({ _id: seekerUser._id }, { $set: { status: true } });
 
   await RefreshTokenModel.deleteMany({ userRef: String(seekerUser._id) });
 
