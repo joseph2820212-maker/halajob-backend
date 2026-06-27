@@ -235,6 +235,20 @@ const parseArrayBody = (value) => {
   return [value];
 };
 
+const parsePlainObjectBody = (value, fallback = {}) => {
+  if (value === undefined || value === null || value === "") return fallback;
+  if (typeof value === "object" && !Array.isArray(value)) return value;
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+  return fallback;
+};
+
 const applicationCvFiles = (application) => sanitizeCvEntries(collectApplicationCvEntries(application));
 
 const normalizeApplicationWithCvMeta = (application) => {
@@ -637,6 +651,7 @@ export const updateInterview = async (req, res, next) => {
     const { payload, error } = buildInterviewPayload({ body: req.body, companyData, application, oldInterview: interview });
     if (error) return fail(res, error, 422);
 
+    const oldInterview = interview.toObject?.() || { ...interview };
     const willReschedule = payload.start_at && String(payload.start_at) !== String(interview.start_at);
     Object.assign(interview, payload);
     if (willReschedule) {
@@ -645,6 +660,56 @@ export const updateInterview = async (req, res, next) => {
     }
 
     await interview.save();
+
+    if (willReschedule) {
+      await createStatusHistory({
+        application,
+        oldStatus: application.status,
+        newStatus: application.status,
+        companyData,
+        note: cleanText(req.body.company_note || req.body.note || "interview_rescheduled"),
+        action: "interview_rescheduled",
+        metadata: { interview_id: interview._id, start_at: interview.start_at },
+      });
+    }
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: willReschedule ? "interview_rescheduled" : "interview_updated",
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      oldValue: {
+        status: oldInterview.status,
+        start_at: oldInterview.start_at,
+        end_at: oldInterview.end_at,
+        type: oldInterview.type,
+      },
+      newValue: {
+        status: interview.status,
+        start_at: interview.start_at,
+        end_at: interview.end_at,
+        type: interview.type,
+      },
+      note: cleanText(req.body.company_note || req.body.note || ""),
+    });
+    recordCompanyHiringAnalytics({
+      req,
+      event: "interview_updated",
+      companyData,
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      metadata: {
+        rescheduled: Boolean(willReschedule),
+        status: interview.status,
+        start_at: interview.start_at,
+      },
+    });
 
     const job = await jobsModel.findById(interview.job_id).select("_id job_name").lean().catch(() => null);
     SendInterviewUpdatedNotification({
@@ -716,6 +781,20 @@ export const changeInterviewStatus = async (req, res, next) => {
       newValue: { status, rating: interview.rating || null, scorecard: interview.scorecard || null },
       note: cleanText(req.body.result_note || req.body.note || req.body.cancelled_reason || ""),
     });
+    recordCompanyHiringAnalytics({
+      req,
+      event: "interview_status_changed",
+      companyData,
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      metadata: {
+        old_status: oldInterviewStatus,
+        new_status: status,
+        rating: interview.rating || null,
+      },
+    });
 
     const job = await jobsModel.findById(interview.job_id).select("_id job_name").lean().catch(() => null);
     if (status === "cancelled") {
@@ -763,6 +842,10 @@ export const sendJobInvitation = async (req, res, next) => {
     if (!userId) return fail(res, "employee_user_not_found", 422);
 
     const expiresAt = toDateOrNull(req.body.expires_at || req.body.expiresAt);
+    const existingInvitation = await JobInvitationModel.findOne({ job_id: job._id, employee_id: employee._id })
+      .select("_id status")
+      .lean();
+    const shouldCountInvitationUsage = !existingInvitation || !["sent", "seen"].includes(existingInvitation.status);
 
     const invitation = await JobInvitationModel.findOneAndUpdate(
       { job_id: job._id, employee_id: employee._id },
@@ -787,7 +870,39 @@ export const sendJobInvitation = async (req, res, next) => {
       .populate({ path: "employee_id", select: "user_id profile_headline current_job_title experience_years" })
       .populate({ path: "user_id", select: "first_name mid_name last_name email image" });
 
-    await recordCompanyUsage(companyData.company._id, "invitations", 1);
+    if (shouldCountInvitationUsage) {
+      await recordCompanyUsage(companyData.company._id, "invitations", 1);
+    }
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: existingInvitation ? "job_invitation_updated" : "job_invitation_sent",
+      entityType: "job_invitation",
+      entityId: invitation._id,
+      jobId: job._id,
+      oldValue: existingInvitation ? { status: existingInvitation.status } : null,
+      newValue: { status: invitation.status, employee_id: employee._id, user_id: userId },
+      note: cleanText(req.body.message || ""),
+      metadata: {
+        counted_usage: shouldCountInvitationUsage,
+      },
+    });
+    recordCompanyHiringAnalytics({
+      req,
+      event: "job_invitation_sent",
+      companyData,
+      entityType: "job_invitation",
+      entityId: invitation._id,
+      jobId: job._id,
+      metadata: {
+        employee_id: employee._id,
+        user_id: userId,
+        existing: Boolean(existingInvitation),
+        counted_usage: shouldCountInvitationUsage,
+      },
+    });
     SendJobInvitationNotification({
       ...(invitation.toObject?.() || invitation),
       company: companyData.company,
@@ -865,6 +980,31 @@ export const cancelJobInvitation = async (req, res, next) => {
     invitation.status = "cancelled";
     invitation.responded_at = new Date();
     await invitation.save();
+
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: "job_invitation_cancelled",
+      entityType: "job_invitation",
+      entityId: invitation._id,
+      jobId: invitation.job_id,
+      oldValue: { status: "sent_or_seen" },
+      newValue: { status: invitation.status },
+      note: cleanText(req.body.note || req.body.reason || ""),
+    });
+    recordCompanyHiringAnalytics({
+      req,
+      event: "job_invitation_cancelled",
+      companyData,
+      entityType: "job_invitation",
+      entityId: invitation._id,
+      jobId: invitation.job_id,
+      metadata: {
+        reason: cleanText(req.body.note || req.body.reason || ""),
+      },
+    });
 
     const job = await jobsModel.findById(invitation.job_id).select("_id job_name").lean().catch(() => null);
     SendJobInvitationCancelledNotification({

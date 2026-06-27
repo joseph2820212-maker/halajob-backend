@@ -331,30 +331,37 @@ export const buildOfferFilter = (employeeData, query = {}) => {
   return filter;
 };
 
+const jobPopulateForEmployee = [
+  { path: "company_id", select: "company_name logo image cover_image company_country company_city company_type industry_name is_verified rating_avg rating_count" },
+  { path: "work_mode_id" },
+  { path: "job_type_id" },
+  { path: "job_time_id" },
+  { path: "job_salary_id" },
+  { path: "experience_level_id" },
+  { path: "education_level_id" },
+  { path: "salary.currency_id" },
+  { path: "skills_required.skill_id" },
+  { path: "skills_optional.skill_id" },
+  { path: "languages.language_id" },
+];
+
 export const applicationPopulateForEmployee = [
-  { path: "job_id", populate: [
-    { path: "company_id", select: "company_name logo image cover_image company_country company_city company_type industry_name is_verified rating_avg rating_count" },
-    { path: "work_mode_id" },
-    { path: "job_type_id" },
-    { path: "job_time_id" },
-    { path: "job_salary_id" },
-    { path: "experience_level_id" },
-    { path: "education_level_id" },
-    { path: "salary.currency_id" },
-    { path: "skills_required.skill_id" },
-    { path: "skills_optional.skill_id" },
-    { path: "languages.language_id" },
-  ] },
+  { path: "job_id", populate: jobPopulateForEmployee },
   { path: "company_id", select: "company_name logo image cover_image company_country company_city company_type industry_name is_verified rating_avg rating_count" },
   { path: "communication_log.created_by", select: "first_name mid_name last_name email image" },
 ];
 
 export const interviewPopulateForEmployee = [
-  { path: "application_id" },
-  ...applicationPopulateForEmployee,
+  { path: "job_id", populate: jobPopulateForEmployee },
+  { path: "company_id", select: "company_name logo image cover_image company_country company_city company_type industry_name is_verified rating_avg rating_count" },
+  { path: "application_id", populate: applicationPopulateForEmployee },
+  { path: "employee_user_id", select: "first_name mid_name last_name email image phone_code phone_national" },
 ];
 
 export const offerPopulateForEmployee = [
-  ...applicationPopulateForEmployee,
+  { path: "job_id", populate: jobPopulateForEmployee },
+  { path: "company_id", select: "company_name logo image cover_image company_country company_city company_type industry_name is_verified rating_avg rating_count" },
+  { path: "employee_id", select: "user_id profile_headline current_job_title experience_years" },
+  { path: "user_id", select: "first_name mid_name last_name email image phone_code phone_national" },
   { path: "sent_by", select: "first_name mid_name last_name email image" },
 ];

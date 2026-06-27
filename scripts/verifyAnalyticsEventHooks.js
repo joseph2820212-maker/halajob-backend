@@ -71,7 +71,20 @@ const requiredHooks = [
       "recordCompanyHiringAnalytics",
       'event: "candidate_shortlisted"',
       'event: "interview_scheduled"',
+      'event: "interview_updated"',
+      'event: "interview_status_changed"',
+      'event: "job_invitation_sent"',
+      'event: "job_invitation_cancelled"',
       'event: "cv_exported"',
+    ],
+  },
+  {
+    file: "controllers/employeeDash/employeeWithJobs/employeeWithJobsController.js",
+    snippets: [
+      "recordAnalyticsEvent",
+      'event: "interview_response_saved"',
+      'event: "job_invitation_response_saved"',
+      'source: "job_invitation_acceptance"',
     ],
   },
   {

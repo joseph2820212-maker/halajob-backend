@@ -35,6 +35,7 @@
     "test:integration:notifications": "node scripts/verifyNotificationRuntimeIntegration.js",
     "test:integration:analytics": "node scripts/verifyAnalyticsRuntimeIntegration.js",
     "test:integration:job-mutations": "node scripts/verifyJobMutationWorkflowIntegration.js",
+    "test:integration:hiring-workflows": "node scripts/verifyHiringWorkflowIntegration.js",
     "test:integration:subscriptions": "node scripts/verifySubscriptionBillingIntegration.js",
     "test:integration:company-permissions": "node scripts/verifyCompanyPermissionIntegration.js",
     "test:integration:admin-permissions": "node scripts/verifyAdminPermissionIntegration.js",

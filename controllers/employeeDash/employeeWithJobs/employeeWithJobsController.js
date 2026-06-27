@@ -611,9 +611,17 @@ const createApplicationFromInvitationIfPossible = async ({ employeeData, invitat
 
   if (existing) return { application: existing, created: false, reason: "already_applied" };
 
-  const job = invitation.job_id && typeof invitation.job_id === "object"
-    ? invitation.job_id
-    : await jobsModel.findById(invitation.job_id).lean();
+  const invitationJob = invitation.job_id;
+  const isPopulatedJob =
+    invitationJob &&
+    typeof invitationJob === "object" &&
+    !invitationJob._bsontype &&
+    (Array.isArray(invitationJob.countries) || invitationJob.job_name || invitationJob.company_id);
+  const job = isPopulatedJob ? invitationJob : await jobsModel.findById(invitationJob).lean();
+
+  if (!job) {
+    return { application: null, created: false, reason: "job_not_found" };
+  }
 
   const employee = employeeData.employee;
   const user = employee.user_id || {};
@@ -840,6 +848,7 @@ export const respondToInterview = async (req, res, next) => {
       return fail(res, "interview_cannot_be_changed", 422);
     }
 
+    const oldInterviewStatus = interview.status;
     interview.status = status;
     if (req.body.candidate_note !== undefined || req.body.note !== undefined) {
       interview.candidate_note = cleanText(req.body.candidate_note || req.body.note);
@@ -848,6 +857,47 @@ export const respondToInterview = async (req, res, next) => {
 
     const populated = await InterviewModel.findById(interview._id).populate(interviewPopulateForEmployee).lean();
     const job = await jobsModel.findById(interview.job_id).select("_id job_name user_id company_id").lean().catch(() => null);
+    const application = await UserApplyingJobModel.findOne({ _id: interview.application_id, user_id: employeeData.userId });
+    if (application) {
+      await createEmployeeStatusHistory({
+        application,
+        oldStatus: application.status,
+        newStatus: application.status,
+        employeeData,
+        note: cleanText(req.body.candidate_note || req.body.note || `interview_${status}`),
+        action: `interview_${status}_by_candidate`,
+        visibleToCandidate: true,
+        metadata: { interview_id: interview._id },
+      });
+    }
+    await writeAuditLog({
+      req,
+      companyId: interview.company_id || job?.company_id || null,
+      actorUserId: employeeData.userId,
+      actorType: "employee",
+      action: `interview_${status}_by_candidate`,
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      oldValue: { status: oldInterviewStatus },
+      newValue: { status },
+      note: cleanText(req.body.candidate_note || req.body.note || ""),
+    });
+    await recordAnalyticsEvent({
+      req,
+      event: "interview_response_saved",
+      userId: employeeData.userId,
+      companyId: interview.company_id || job?.company_id || null,
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      metadata: {
+        old_status: oldInterviewStatus,
+        new_status: status,
+      },
+    }).catch(() => null);
     if (job) {
       interview_response_company_notification({
         interview,
@@ -922,6 +972,7 @@ export const respondToJobInvitation = async (req, res, next) => {
       return fail(res, "job_invitation_cannot_be_changed", 422);
     }
 
+    const oldInvitationStatus = invitation.status;
     invitation.status = status;
     invitation.responded_at = new Date();
     await invitation.save();
@@ -933,6 +984,65 @@ export const respondToJobInvitation = async (req, res, next) => {
 
     const populated = await JobInvitationModel.findById(invitation._id).populate(offerPopulateForEmployee).lean();
     const job = await jobsModel.findById(invitation.job_id).select("_id job_name user_id company_id").lean().catch(() => null);
+    await writeAuditLog({
+      req,
+      companyId: invitation.company_id || job?.company_id || null,
+      actorUserId: employeeData.userId,
+      actorType: "employee",
+      action: `job_invitation_${status}_by_candidate`,
+      entityType: "job_invitation",
+      entityId: invitation._id,
+      jobId: invitation.job_id,
+      oldValue: { status: oldInvitationStatus },
+      newValue: { status },
+      note: cleanText(req.body.note || ""),
+      metadata: {
+        application_created: Boolean(applicationResult?.created),
+        application_id: applicationResult?.application?._id || null,
+      },
+    });
+    await recordAnalyticsEvent({
+      req,
+      event: "job_invitation_response_saved",
+      userId: employeeData.userId,
+      companyId: invitation.company_id || job?.company_id || null,
+      entityType: "job_invitation",
+      entityId: invitation._id,
+      jobId: invitation.job_id,
+      metadata: {
+        old_status: oldInvitationStatus,
+        new_status: status,
+        application_created: Boolean(applicationResult?.created),
+      },
+    }).catch(() => null);
+    if (applicationResult?.created && applicationResult?.application) {
+      await writeAuditLog({
+        req,
+        companyId: invitation.company_id || job?.company_id || null,
+        actorUserId: employeeData.userId,
+        actorType: "employee",
+        action: "application_created_from_job_invitation",
+        entityType: "application",
+        entityId: applicationResult.application._id,
+        jobId: invitation.job_id,
+        applicationId: applicationResult.application._id,
+        newValue: { status: applicationResult.application.status },
+      });
+      await recordAnalyticsEvent({
+        req,
+        event: "job_applied",
+        userId: employeeData.userId,
+        companyId: invitation.company_id || job?.company_id || null,
+        entityType: "application",
+        entityId: applicationResult.application._id,
+        jobId: invitation.job_id,
+        applicationId: applicationResult.application._id,
+        metadata: {
+          source: "job_invitation_acceptance",
+          status: applicationResult.application.status,
+        },
+      }).catch(() => null);
+    }
     if (job) {
       job_invitation_response_company_notification({
         invitation,

@@ -43,6 +43,12 @@ export const ANALYTICS_EVENT_GROUPS = Object.freeze({
     "job_published",
     "candidate_shortlisted",
     "interview_scheduled",
+    "interview_updated",
+    "interview_status_changed",
+    "interview_response_saved",
+    "job_invitation_sent",
+    "job_invitation_cancelled",
+    "job_invitation_response_saved",
     "cv_exported",
   ],
   campus: [
