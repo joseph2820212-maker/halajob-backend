@@ -22,7 +22,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 ---
 
 ## Execution log (live status)
-- Branch: `claude/launch-plan-ux`
+- Branch: `claude/harden-trunk` (PR #1 → `flutter-seeker-campus`); layered on current trunk, no mobile/lib changes
 - Legend: [ ] todo · [~] in progress · [x] done · [-] not applicable / deferred with reason
 
 | Phase | Title | Status |
@@ -32,7 +32,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 2 | API Validation & Backend Hardening | [~] |
 | 3 | Permissions & Data Isolation | [x]* |
 | 4 | File Upload / CV / Document Security | [x]* |
-| 5 | Core Job Seeker Flow | [ ] |
+| 5 | Core Job Seeker Flow | [x]* |
 | 6 | Company Dashboard & ATS | [ ] |
 | 7 | University / Campus Module | [ ] |
 | 8 | Admin Panel | [ ] |
@@ -249,3 +249,25 @@ Goal: make CVs, profile images, company files, and university documents safe.
 **Result: PASS by inspection** — file/document security is strong. **\*** Certify with the upload/download security integration tests Codex added (run in CI via the new Mongo service): `verifyProfileUploadValidationIntegration`, `verifyStudentVerificationDocumentSecurity`.
 
 **Score movement:** File/document security ~8.5 (Codex) — confirmed; → 9 with legacy-doc migration.
+
+## Phase 5 — Core Job Seeker Flow  [x]*
+Goal: complete, reliable job-seeker experience.
+
+**Verified (wired on trunk; no backend changes needed):**
+- [x] Auth journey: register / verify (OTP) / login / forgot+reset / logout(+all)
+- [x] Profile: sections CRUD, completion %, basic-profile (`/employee/v1/profile*`)
+- [x] CV: list/generate/download templates, active CV (`/employee/v1/...cv`, `/download/:cvId`)
+- [x] Jobs: list, detail, recommended, saved, save/unsave (`/employee/v1/jobs*`, `/jobs/saved`)
+- [x] Search/filter reference data: cities, currencies, education/experience, industry, work-mode/time, job-name, salaries
+- [x] Apply: `POST /user/v1/applying-job/insert/:id` (+ employee + campus apply routes) → all funnel through `applyJob`
+- [x] **Duplicate-application prevention**: 409 on existing `{user_id, job_id}` (ApplyingJobController.js:539) before create
+- [x] Track: applications (applied/rejected/status), interviews (accept/decline), offers/invitations
+- [x] Companies: directory, applied, viewed, activity, saved-jobs
+
+**Backend tests (CI via Mongo service):** job mutation workflow + hiring workflow integration coverage (Codex).
+
+**Deferred to UI phases:** explicit loading/empty/error states and app/web API wiring polish → Phase 12 (mobile) / Phase 13 (web). Account deletion/data-export → Phase 19.
+
+**Result: PASS by inspection** — end-to-end seeker flow present and correct at the API layer. **\*** Certify via the seeker/job integration tests in CI.
+
+**Score movement:** Job seeker flows ~8 (Codex) — confirmed; → 9.5 after UI state polish (P12/13) + E2E (P14).
