@@ -37,7 +37,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 7 | University / Campus Module | [x]* |
 | 8 | Admin Panel | [~] |
 | 9 | Search, Matching, Recommendations | [x]* |
-| 10 | Notifications & Email | [ ] |
+| 10 | Notifications & Email | [x]* |
 | 11 | Payments & Subscriptions | [ ] |
 | 12 | Mobile App Quality | [ ] |
 | 13 | Web Frontend Quality | [ ] |
@@ -345,3 +345,21 @@ Goal: useful, explainable search/matching with no private-data leakage.
 **Result: PASS by inspection** — matching explainable + configurable, bilingual search, PII-safe index.
 
 **Score movement:** Search/matching ~8.5 — confirmed.
+
+## Phase 10 — Notifications & Email  [x]*
+Goal: reliable, safe communication.
+
+**Verified (wired on trunk):**
+- [x] Notification catalog (bilingual ar/en) for key events (application, saved job, review, interview, etc.); `notificationService.js`, FCM `SendNotification.js`
+- [x] **Notification preferences** service (`services/notifications/notificationPreference.service.js`) — channels in_app/push/email/sms, per-event defaults (Codex added)
+- [x] FCM token registration + removal endpoint (`/user/.../delete-tokens`)
+- [x] **Push payload safety**: generic event titles/bodies, no OTP/passwords in push (OTP goes via email only)
+
+**Fixed this phase (audit-flagged bug):**
+- [x] `services/email/email.service.js`: wrap `sendMail` in try/catch, **log SMTP failures** via logger, throw stable `email_send_failed` (was raw, unlogged) — verified syntax/imports/smoke pass
+
+**Remaining (enhancements):** enforce per-user channel prefs at every send site; wire a production email provider (SES/SendGrid); de-dup guard for repeat notifications.
+
+**Result: PASS** — key events notify, prefs exist, push is safe, email failures now logged.
+
+**Score movement:** Notifications/email ~8 → ~8.5 (email failures observable).

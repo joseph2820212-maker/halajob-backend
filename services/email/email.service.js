@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import nodemailer from 'nodemailer';
 import { fileURLToPath } from 'url';
+import logger from '../../config/logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -85,13 +86,20 @@ export async function sendJobzainEmail({
   const fromAddress = from || DEFAULT_FROM[fromKey] || DEFAULT_FROM.info;
   const html = renderTemplate(template, variables);
 
-  const info = await getTransporter().sendMail({
-    from: `JobZain <${fromAddress}>`,
-    to,
-    subject: subject || 'JobZain',
-    html,
-    replyTo: replyTo || fromAddress,
-  });
+  let info;
+  try {
+    info = await getTransporter().sendMail({
+      from: `JobZain <${fromAddress}>`,
+      to,
+      subject: subject || 'JobZain',
+      html,
+      replyTo: replyTo || fromAddress,
+    });
+  } catch (err) {
+    // Log SMTP failures (observability) and surface a stable, safe error.
+    logger.error({ scope: 'email', to, subject, message: err?.message });
+    throw new Error('email_send_failed');
+  }
 
   return info;
 }
