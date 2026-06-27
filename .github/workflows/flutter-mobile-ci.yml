@@ -72,6 +72,15 @@ jobs:
           CONNECTION_URL: mongodb://localhost:27017/halajob_ci_test
         run: npm run test:integration:auth-context
 
+      - name: Secret scan
+        run: npm run check:secrets
+
+      - name: i18n resources check
+        run: npm run check:i18n
+
+      - name: Security HTTP contract
+        run: npm run test:security-http
+
       - name: Guard approved mobile palette
         run: |
           if git grep -n -E '10C26A|0xFF10C26A|0xff10c26a|#10C26A|#10c26a|4C6A4F|0xFF4C6A4F|0xff4c6a4f|#4C6A4F|#4c6a4f|Colors\.green' -- mobile/lib mobile/test mobile/mockups ':!mobile/docs/brand'; then

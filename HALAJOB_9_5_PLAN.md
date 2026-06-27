@@ -44,7 +44,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 14 | Testing Strategy | [~] |
 | 15 | Performance & Scalability | [x]* |
 | 16 | Observability & Operations | [x]* |
-| 17 | DevOps & Deployment | [ ] |
+| 17 | DevOps & Deployment | [x]* |
 | 18 | Documentation & Repo Cleanup | [ ] |
 | 19 | Privacy, Compliance, Data Safety | [ ] |
 | 20 | Final QA & Launch Gate | [ ] |
@@ -450,3 +450,19 @@ Goal: make production issues visible and manageable.
 **Result: PASS** — logging + audit + redaction in place; real liveness/readiness probes added.
 
 **Score movement:** Observability ~7 → ~8 (DB-aware readiness/liveness).
+
+## Phase 17 — DevOps & Deployment  [x]*
+Goal: repeatable, safe deployment.
+
+**Verified present:** `start: node index.js`; `vercel.json`; `DEPLOYMENT.md`; `.env.example` (59 vars).
+
+**Fixed/added this phase (verified):**
+- [x] **CI gates added** to `verify-linux`: **secret scan** (`check:secrets`), **i18n check** (`check:i18n`), **HTTP security contract** (`test:security-http`) — the plan required secret-scan-in-CI; was missing
+- [x] **Pinned Node engine** `>=20` in `package.json` (deploy reproducibility)
+- Verified locally: all three new gates pass; YAML + package.json valid
+
+**Remaining (enhancement):** Dockerfile for the backend; backup/restore + rollback runbook sections; mark `.env.example` vars REQUIRED/OPTIONAL/FEATURE-GATED.
+
+**Result: PASS** — CI now blocks secret leaks + auth-contract regressions; Node pinned; deploy docs exist.
+
+**Score movement:** DevOps ~6.5 → ~8 (secret scan + security contract gating CI).
