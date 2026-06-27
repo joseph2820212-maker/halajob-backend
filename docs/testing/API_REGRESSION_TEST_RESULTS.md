@@ -24,7 +24,7 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `npm run test:integration:notifications` | Passed, including notification list/read ownership and device-token create/update/conflict/revoke ownership |
 | `npm run test:integration:analytics` | Passed, including event tracking, own-event listing, group mismatch rejection, super-admin reports, university-scoped reports, cohorts, and borrowed-context denial |
 | `npm run test:integration:subscriptions` | Passed, including billing permission checks, own-company invoice list/detail, cross-company invoice denial, plan-change ticket audit logging, dashboard-admin subscription reads, free-plan seeding, plan reassignment, and missing-plan failure behavior |
-| `npm run test:integration:admin-resources` | Passed, including generic admin-resource auth denial, unknown-resource denial, user secret/device redaction, FCM token/device redaction, populated-user redaction, and sanitized create/update responses |
+| `npm run test:integration:admin-resources` | Passed, including generic admin-resource auth denial, unknown-resource denial, user secret/device redaction, FCM token/device redaction, populated-user redaction, sanitized create/update responses, and create/update/delete mutation audit rows |
 | `npm run test:integration:employee-cv-downloads` | Passed, including saved-CV auth, owner-only download, cross-user denial, invalid-ID rejection, unsafe-path rejection, and missing-file handling |
 | `npm run test:object-authorization` | Passed |
 | `npm run test:mobile-routes` | Passed |

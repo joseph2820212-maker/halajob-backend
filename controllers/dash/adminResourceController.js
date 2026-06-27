@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcryptjs from 'bcryptjs';
 import ReturnDashData from '../../helper/ReturnDashData/index.js';
+import { writeAuditLog } from '../../services/auditLog.service.js';
 import { ensureCompanySubscription } from '../../services/subscriptions/companySubscription.service.js';
 import { rebuildJobIntegration } from '../../services/search/rebuildSearchData.js';
 import {
@@ -462,6 +463,47 @@ const stripControlFields = (payload = {}) => {
   return payload;
 };
 
+const auditActorId = (req) => req.admin?._id || req.user?._id || null;
+
+const auditEntityType = (config) => {
+  if (config.model === UserModel) return 'user';
+  if (config.model === CompanyModel) return 'company';
+  if (config.model === jobsModel) return 'job';
+  if (config.model === UserApplyingJobModel) return 'application';
+  if (config.model === InterviewModel) return 'interview';
+  if (config.model === CompanyMemberModel) return 'company_member';
+  if (config.model === CompanyReviewModel || config.model === UserReviewJobModel) return 'other';
+  if (config.model === JobReportModel) return 'other';
+  if (config.model === CompanySubscriptionModel || config.model === SubscriptionPlanModel) return 'subscription';
+  if (config.model === NotificationModel) return 'notification';
+  return 'other';
+};
+
+const auditCompanyId = (config, doc = {}) => {
+  if (!doc) return null;
+  if (config.model === CompanyModel) return doc._id || null;
+  return doc.company_id?._id || doc.company_id || null;
+};
+
+const writeAdminResourceAudit = async ({ req, config, action, doc = null, entityId = null, oldValue = null, newValue = null, metadata = {} }) => {
+  await writeAuditLog({
+    req,
+    companyId: auditCompanyId(config, doc),
+    actorUserId: auditActorId(req),
+    actorType: 'admin',
+    action,
+    entityType: auditEntityType(config),
+    entityId: entityId || doc?._id || null,
+    oldValue,
+    newValue,
+    metadata: {
+      resource: config.key,
+      model: config.model?.modelName || '',
+      ...metadata,
+    },
+  });
+};
+
 const isSortableSchemaPath = (field, config) => field === '_id' || Boolean(config.model.schema.path(field));
 
 const buildSort = (requestedSort, config) => {
@@ -683,6 +725,13 @@ const create = (resourceName) => async (req, res) => {
     const payload = await normalizePayload(req, config);
     const doc = await config.model.create(payload);
     const responseDoc = await loadResponseDoc(config, doc);
+    await writeAdminResourceAudit({
+      req,
+      config,
+      action: 'admin_resource_created',
+      doc,
+      newValue: payload,
+    });
 
     return ReturnDashData.createData({ res, data: responseDoc, other: { resource: config.key } });
   } catch (err) {
@@ -744,6 +793,13 @@ const update = (resourceName) => async (req, res) => {
       await rebuildJobIntegration(doc._id, { rebuildMatches: true }).catch(() => null);
     }
     const responseDoc = await loadResponseDoc(config, doc);
+    await writeAdminResourceAudit({
+      req,
+      config,
+      action: req.auditActionOverride || 'admin_resource_updated',
+      doc,
+      newValue: updatePayload,
+    });
 
     return ReturnDashData.updateData({ res, data: responseDoc, other: { resource: config.key } });
   } catch (err) {
@@ -772,6 +828,16 @@ const remove = (resourceName) => async (req, res) => {
       : await config.model.findByIdAndDelete(id);
 
     if (!doc) return ReturnDashData.deleteError({ res, status: 404, message: `${config.key}_not_found` });
+    await writeAdminResourceAudit({
+      req,
+      config,
+      action: forceDelete ? 'admin_resource_deleted' : 'admin_resource_disabled',
+      doc,
+      entityId: id,
+      metadata: {
+        soft_deleted: Boolean(canSoftDelete && !forceDelete),
+      },
+    });
 
     return ReturnDashData.deleteData({
       res,
@@ -802,6 +868,17 @@ const bulkUpdate = (resourceName) => async (req, res) => {
     }
 
     const result = await config.model.updateMany({ _id: { $in: ids } }, { $set: updatePayload }, { runValidators: true });
+    await writeAdminResourceAudit({
+      req,
+      config,
+      action: 'admin_resource_bulk_updated',
+      newValue: updatePayload,
+      metadata: {
+        ids,
+        matched: result.matchedCount || result.n || 0,
+        modified: result.modifiedCount || result.nModified || 0,
+      },
+    });
 
     return ReturnDashData.updateData({
       res,
@@ -833,6 +910,7 @@ const approve = (resourceName) => async (req, res) => {
     req.body.reviewed_at = new Date();
   }
   if (config.model === CompanyReviewModel || config.model === UserReviewJobModel) req.body.status = 'published';
+  req.auditActionOverride = 'admin_resource_approved';
 
   return update(resourceName)(req, res);
 };
@@ -857,6 +935,7 @@ const reject = (resourceName) => async (req, res) => {
     req.body.reviewed_at = new Date();
   }
   if (config.model === CompanyReviewModel || config.model === UserReviewJobModel) req.body.status = 'rejected';
+  req.auditActionOverride = 'admin_resource_rejected';
 
   return update(resourceName)(req, res);
 };

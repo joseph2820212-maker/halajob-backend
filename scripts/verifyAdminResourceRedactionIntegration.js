@@ -119,7 +119,7 @@ async function main() {
     import("../services/tokenService.js"),
   ]);
 
-  const { FcmTokenModel, RoleModel, UserModel } = models;
+  const { AuditLogModel, FcmTokenModel, RoleModel, UserModel } = models;
   const { generateAuthTokens } = tokenService;
 
   await mongoose.connect(process.env.CONNECTION_URL, {
@@ -294,6 +294,17 @@ async function main() {
     "created user password should be hashed before storage"
   );
 
+  const createAudit = await AuditLogModel.findOne({
+    action: "admin_resource_created",
+    entity_id: createdUserPayload.data._id,
+    "metadata.resource": "users",
+  }).lean();
+  assert.ok(createAudit, "generic admin resource create should be audited");
+  assert.equal(createAudit.entity_type, "user");
+  assert.equal(createAudit.new_value.password, "[REDACTED]");
+  assert.equal(createAudit.new_value.passcode, "[REDACTED]");
+  assert.equal(createAudit.new_value.another_device_code, "[REDACTED]");
+
   const updatedUserPayload = await expectStatus(
     request(baseUrl, "PATCH", `/dash/v1/resources/users/${sensitiveUser._id}`, {
       token: adminTokens.accessToken,
@@ -313,6 +324,35 @@ async function main() {
     "admin updates user through generic resources"
   );
   assertSafeUser(updatedUserPayload.data, "updated user response");
+
+  const updateAudit = await AuditLogModel.findOne({
+    action: "admin_resource_updated",
+    entity_id: sensitiveUser._id,
+    "metadata.resource": "users",
+  }).lean();
+  assert.ok(updateAudit, "generic admin resource update should be audited");
+  assert.equal(updateAudit.entity_type, "user");
+  assert.equal(updateAudit.new_value.password, "[REDACTED]");
+  assert.equal(updateAudit.new_value.passcode, "[REDACTED]");
+  assert.equal(updateAudit.new_value.another_device_code, "[REDACTED]");
+
+  await expectStatus(
+    request(baseUrl, "DELETE", `/dash/v1/resources/users/${createdUserPayload.data._id}`, {
+      token: adminTokens.accessToken,
+    }),
+    203,
+    "admin disables user through generic resources"
+  );
+  const disabledUser = await UserModel.findById(createdUserPayload.data._id).lean();
+  assert.equal(disabledUser.status, false, "generic user delete should soft-disable users by default");
+  const deleteAudit = await AuditLogModel.findOne({
+    action: "admin_resource_disabled",
+    entity_id: createdUserPayload.data._id,
+    "metadata.resource": "users",
+  }).lean();
+  assert.ok(deleteAudit, "generic admin resource soft-delete should be audited");
+  assert.equal(deleteAudit.entity_type, "user");
+  assert.equal(deleteAudit.metadata.soft_deleted, true);
 
   const tokenList = await expectStatus(
     request(baseUrl, "GET", "/dash/v1/resources/fcmtokens?limit=50", {
@@ -343,7 +383,7 @@ async function main() {
   );
   assertSafeFcmToken(legacyTokenDetails.data, "legacy FCM token details");
 
-  console.log("Admin resource redaction integration verified for user secrets, populated users, and FCM tokens.");
+  console.log("Admin resource redaction integration verified for user secrets, populated users, FCM tokens, and mutation audits.");
 }
 
 main()
