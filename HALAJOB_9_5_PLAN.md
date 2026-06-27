@@ -34,7 +34,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 4 | File Upload / CV / Document Security | [x]* |
 | 5 | Core Job Seeker Flow | [x]* |
 | 6 | Company Dashboard & ATS | [x]* |
-| 7 | University / Campus Module | [ ] |
+| 7 | University / Campus Module | [x]* |
 | 8 | Admin Panel | [ ] |
 | 9 | Search, Matching, Recommendations | [ ] |
 | 10 | Notifications & Email | [ ] |
@@ -290,3 +290,20 @@ Goal: production-ready company hiring flow.
 **Result: PASS by inspection** — full hiring journey present, ATS history stored, plan limits enforced server-side. **\*** Certify via hiring/company integration tests in CI.
 
 **Score movement:** Company dashboard ~8.5 (Codex) — confirmed; → 9.5 after UI polish (P13) + E2E (P14).
+
+## Phase 7 — University / Campus Module  [x]*
+Goal: real, safe university product (not just a data field).
+
+**Verified (wired on trunk; no changes needed):**
+- [x] University login/context (`requireUniversityAdminContext`), dashboard/overview
+- [x] **Staff roles** (`owner/admin/career_center/advisor/viewer`) with **granular per-endpoint permissions** (`requireUniversityPermission("campus.members.view/manage")`)
+- [x] Members CRUD; opportunities; employer-partners; employability analytics; outcomes reports
+- [x] Students list + **career-passport view**; verification list + document (authed)
+- [x] **Student verification workflow**: statuses `pending/verified/rejected/expired/needs_more_information`; actions approve / reject / request-info; audit fields `reviewed_by` + `rejection_reason` (+ audit logs)
+- [x] University-scoped data (Phase 3); private verification documents (Phase 4)
+
+**Backend tests (CI via Mongo service):** university member workflow + campus workflow + object-authorization integration coverage (Codex).
+
+**Result: PASS by inspection** — university can manage students safely, data is private + scoped, verification is auditable. **\*** Certify via university/campus integration tests in CI.
+
+**Score movement:** University/campus ~8.5 (Codex) — confirmed; → 9.5 after UI polish (P12/13) + E2E (P14).
