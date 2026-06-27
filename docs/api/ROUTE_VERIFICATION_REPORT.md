@@ -1,15 +1,15 @@
 # Route Verification Report
 
-Generated: 2026-06-27T00:03:47.386Z
+Generated: 2026-06-27T02:24:37.703Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 2126 |
-| Unique method/path endpoints | 3360 |
-| Endpoints with detected auth/role guard | 3271 |
+| Raw Express endpoint entries | 2127 |
+| Unique method/path endpoints | 3362 |
+| Endpoints with detected auth/role guard | 3273 |
 | Known public/system endpoints | 89 |
 | Unguarded endpoints needing manual classification | 0 |
 
@@ -23,7 +23,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 
 | Module | Total | Protected | Known public | Needs classification |
 | --- | --- | --- | --- | --- |
-| Admin | 2876 | 2871 | 5 | 0 |
+| Admin | 2878 | 2873 | 5 | 0 |
 | AI | 12 | 12 | 0 | 0 |
 | Analytics | 5 | 5 | 0 | 0 |
 | Campus | 12 | 10 | 2 | 0 |
@@ -385,9 +385,9 @@ None found.
 
 | Gap | Status |
 |---|---|
-| Full endpoint request/response API reference | Not complete. This report inventories routes only. |
-| OpenAPI file | Not generated yet. |
-| Postman collection | Not generated yet. |
+| Full endpoint request/response API reference | Route and auth inventory exists in `docs/api/HALAJOB_API_REFERENCE.md`; exact request/response schemas are still not complete. |
+| OpenAPI file | Generated skeleton exists at `docs/api/HALAJOB_OPENAPI.yaml`; operation paths, methods, tags, auth, and generic responses are present, but exact schemas still need route-by-route expansion. |
+| Postman collection | Generated collection exists at `docs/api/HALAJOB_POSTMAN_COLLECTION.json` with local/dev environments; endpoint-specific example bodies still need route-by-route expansion. |
 | Per-route validator coverage | Not mechanically complete because validators/multer/controller validation are not consistently named. |
 | Per-route role matrix | Baseline exists in `docs/security/ROLE_PERMISSION_MATRIX.md`; route-by-route expansion still required. |
 | Live smoke results | Requires deployed API and approved test accounts. |

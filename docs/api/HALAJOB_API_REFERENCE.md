@@ -1,6 +1,6 @@
 # HalaJob API Reference
 
-Generated: 2026-06-27T00:04:21.345Z
+Generated: 2026-06-27T02:24:45.497Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -23,7 +23,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Module | Endpoints |
 | --- | --- |
 | AI | 12 |
-| Admin | 2876 |
+| Admin | 2878 |
 | Analytics | 5 |
 | Campus | 12 |
 | Campus Student | 43 |
@@ -2073,6 +2073,8 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | PUT | `/dash/v1/resources/:resource/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, anonymous |
 | POST | `/dash/v1/resources/:resource/:id/approve` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, anonymous |
 | POST | `/dash/v1/resources/:resource/:id/reject` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, anonymous |
+| PATCH | `/dash/v1/resources/:resource/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, anonymous |
+| POST | `/dash/v1/resources/:resource/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, anonymous |
 | GET | `/dash/v1/Resume` | Bearer token | inferred-parent-mount | inferred:isAdmin, anonymous |
 | POST | `/dash/v1/Resume` | Bearer token | inferred-parent-mount | inferred:isAdmin, anonymous |
 | DELETE | `/dash/v1/Resume/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, anonymous |

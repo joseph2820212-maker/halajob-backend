@@ -67764,6 +67764,74 @@
           }
         },
         {
+          "name": "PATCH /dash/v1/resources/:resource/bulk-update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/resources/:resource/bulk-update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "resources",
+                ":resource",
+                "bulk-update"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/resources/:resource/bulk-update",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/resources/:resource/bulk-update",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "resources",
+                ":resource",
+                "bulk-update"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "GET /dash/v1/Resume",
           "request": {
             "method": "GET",

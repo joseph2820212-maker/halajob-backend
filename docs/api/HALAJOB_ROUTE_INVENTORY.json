@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-27T00:03:47.386Z",
+  "generatedAt": "2026-06-27T02:24:37.703Z",
   "records": [
     {
       "method": "PATCH",
@@ -29191,6 +29191,36 @@
     {
       "method": "POST",
       "path": "/dash/v1/resources/:resource/:id/reject",
+      "module": "Admin",
+      "middlewares": [
+        "multerMiddleware",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/resources/:resource/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "multerMiddleware",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/resources/:resource/bulk-update",
       "module": "Admin",
       "middlewares": [
         "multerMiddleware",

@@ -280,9 +280,9 @@ ${unclassifiedUnguarded.length > unclassifiedRows.length ? `\nShowing first ${un
 
 | Gap | Status |
 |---|---|
-| Full endpoint request/response API reference | Not complete. This report inventories routes only. |
-| OpenAPI file | Not generated yet. |
-| Postman collection | Not generated yet. |
+| Full endpoint request/response API reference | Route and auth inventory exists in \`docs/api/HALAJOB_API_REFERENCE.md\`; exact request/response schemas are still not complete. |
+| OpenAPI file | Generated skeleton exists at \`docs/api/HALAJOB_OPENAPI.yaml\`; operation paths, methods, tags, auth, and generic responses are present, but exact schemas still need route-by-route expansion. |
+| Postman collection | Generated collection exists at \`docs/api/HALAJOB_POSTMAN_COLLECTION.json\` with local/dev environments; endpoint-specific example bodies still need route-by-route expansion. |
 | Per-route validator coverage | Not mechanically complete because validators/multer/controller validation are not consistently named. |
 | Per-route role matrix | Baseline exists in \`docs/security/ROLE_PERMISSION_MATRIX.md\`; route-by-route expansion still required. |
 | Live smoke results | Requires deployed API and approved test accounts. |

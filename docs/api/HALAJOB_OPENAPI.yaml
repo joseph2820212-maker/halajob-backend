@@ -51992,6 +51992,63 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/dash/v1/resources/{resource}/bulk-update":
+    patch:
+      tags: ["Admin"]
+      summary: "PATCH /dash/v1/resources/:resource/bulk-update"
+      operationId: "admin_patch_dash_v1_resources_resource_bulk_update"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "resource"
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/resources/:resource/bulk-update"
+      operationId: "admin_post_dash_v1_resources_resource_bulk_update"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "resource"
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/dash/v1/Resume":
     get:
       tags: ["Admin"]

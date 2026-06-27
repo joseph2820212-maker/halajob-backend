@@ -1,6 +1,7 @@
 # Hala Job Backend and API Wiring Audit
 
 Date: 2026-06-26
+Last updated: 2026-06-27
 Branch audited: `flutter-seeker-campus`
 Repository: `joseph2820212-maker/halajobe`
 
@@ -8,20 +9,42 @@ Repository: `joseph2820212-maker/halajobe`
 
 The backend is broadly mounted, the main web API client is wired to existing backend routes, and the current source-level route contract checks pass. The project is no longer in a state where the main problem is "missing route files" for the core product areas.
 
-However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is runtime integration testing: many routes are present and connected, but there is not enough seeded database/API test coverage proving role permissions, cross-account blocking, mutation side effects, upload/download safety, and full user journeys.
+However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is now narrower than the original audit: route mounting, guard classification, mobile fallback aliases, core auth/context, object authorization, file-export, AI, notification, analytics, subscription/billing, admin-resource lifecycle, audit redaction, and employee-CV download paths have seeded or contract coverage. The remaining risk is deeper per-feature behavior: exact request/response schemas, per-route validators, admin permission boundaries, live deployed smoke testing, remaining private download/upload edge cases, and full web/mobile user journeys.
+
+## 1.1 Current 2026-06-27 Endpoint Inventory Update
+
+The live Express route inventory was regenerated after the generic dashboard bulk-update route was wired.
+
+| Metric | Current evidence |
+|---|---:|
+| Raw Express endpoint entries | 2127 |
+| Unique method/path endpoints | 3362 |
+| Endpoints with detected auth/role guard | 3273 |
+| Known public/system endpoints | 89 |
+| Unguarded endpoints needing manual classification | 0 |
+
+Current generated artifacts:
+
+| Artifact | Status |
+|---|---|
+| `docs/api/HALAJOB_ROUTE_INVENTORY.json` | Regenerated from the live Express app. |
+| `docs/api/ROUTE_VERIFICATION_REPORT.md` | Regenerated; zero unclassified unguarded endpoints. |
+| `docs/api/HALAJOB_API_REFERENCE.md` | Route/auth skeleton regenerated. |
+| `docs/api/HALAJOB_OPENAPI.yaml` | Generated skeleton exists; exact schemas still need expansion. |
+| `docs/api/HALAJOB_POSTMAN_COLLECTION.json` | Generated collection exists; endpoint-specific request bodies still need expansion. |
 
 ## 2. Readiness Scores
 
 | Area | Score / 10 | Meaning |
 |---|---:|---|
-| Backend route mounting | 8 | Core route groups are mounted and organized across seeker, company, admin, campus, university, AI, trust, analytics, notifications, and jobs. |
-| Web API wiring | 8 | No obvious hard 404s found in the centralized web API client against mounted backend route families. |
-| Mobile API wiring | 7 | Primary mobile routes are mostly wired, but several old `/employee/v1/...` fallback paths can 404 after newer valid paths fail. |
-| Feature API coverage | 7 | Most major product areas have APIs, but several workflows are partial or missing management/completion endpoints. |
-| Auth and account-context safety | 6 | Guards exist, but active context is server-mutated and not passed per request; this needs stronger testing and possibly a header-based context model. |
-| Admin operational coverage | 6 | Admin covers many areas, but newer operational records are not all surfaced as admin resources or workflows. |
-| Automated backend test depth | 4 | Current checks are strong for static route contracts, but thin for real HTTP + database behavior. |
-| Launch confidence from backend/API only | 6.5 | Good foundation, but needs integration tests and a few API decisions before treating it as launch-hard. |
+| Backend route mounting | 9 | Core route groups are mounted across seeker, company, admin, campus, university, AI, trust, analytics, notifications, jobs, and health; current route report has zero unclassified unguarded endpoints. |
+| Web API wiring | 8 | No obvious hard 404s found in the centralized web API client against mounted backend route families; browser click-through remains separate. |
+| Mobile API wiring | 8.5 | Legacy mobile fallback aliases are now covered by `npm run test:mobile-routes`, including older `/employee/v1/...` compatibility paths. |
+| Feature API coverage | 8 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notifications, analytics, subscriptions, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
+| Auth and account-context safety | 8.5 | Seeded auth/context integration now covers missing/malformed tokens, role/context denial, cross-role borrowing, suspended context, invalid context, and refresh-token revocation. |
+| Admin operational coverage | 7.5 | Admin resources are broad, redacted, and lifecycle-audited; remaining risk is fine-grained admin permission boundaries and newer workflow-specific admin handling. |
+| Automated backend test depth | 7.5 | Static checks plus multiple seeded runtime integration harnesses exist; still short of route-by-route validator/schema and full journey coverage. |
+| Launch confidence from backend/API only | 8 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
 
 ## 3. Audit Method
 
@@ -60,7 +83,7 @@ Generated inventory summary:
 
 | Namespace | Method count |
 |---|---:|
-| `/dash/v1` | 2869 |
+| `/dash/v1` | 2871 |
 | `/user/v1` | 191 |
 | `/company/v1` | 133 |
 | `/employee/v1` | 71 |
@@ -70,12 +93,12 @@ Generated inventory summary:
 | `/ai/v1` | 12 |
 | `/admin/v1` | 7 |
 | `/analytics/v1` | 5 |
-| `/trust/v1` | 2 |
+| `/trust/v1` | 4 |
 | `/jobs/v1` | 1 |
 | `/health` | 1 |
 | `/cv/generated` | 1 |
 
-The high `/dash/v1` count is mainly from broad generic dashboard CRUD aliases.
+The high `/dash/v1` count is mainly from broad generic dashboard CRUD aliases. The current module-level route report counts `2878` Admin endpoints because it also includes admin-mounted trust routes.
 
 ## 5. Feature Coverage Findings
 
@@ -107,7 +130,7 @@ The high `/dash/v1` count is mainly from broad generic dashboard CRUD aliases.
 | Translation lifecycle is incomplete | Translation persistence exists, but approved translations are not clearly consumed by all job/CV read endpoints. |
 | Campus event/content management is thin | Mobile reads and registration exist, but admin-style CRUD for campus events/content/resources is limited or static/code-backed. |
 | University team/member management is missing | University context exists, but there is no clear university equivalent of company member invite/management APIs. |
-| Trust document request workflow is incomplete | Admin can request documents, but a company-facing response/upload route was not found. |
+| Trust document request workflow was originally incomplete | This has since been improved with company-facing trust document response routes and seeded integration coverage. Remaining work is edge-case file/evidence coverage and full UI flow QA. |
 | Support handling is company-facing only | Company support tickets exist, but no clear admin support assignment/status workflow stood out. |
 | Newer operational records are not all admin-manageable | Examples include career passports, student verifications, university memberships, support tickets, invoices, AI requests/limits, analytics events, and content translations. |
 
@@ -129,7 +152,7 @@ No obvious hard 404s were found in the centralized web API wiring. The web clien
 
 The only concrete path mismatch found was a set of legacy fallback paths in `mobile/lib/src/features/dashboard/seeker_dashboard_service.dart`.
 
-These paths are not mounted by the backend:
+These paths were not mounted by the backend during the original audit:
 
 | Missing fallback family |
 |---|
@@ -149,26 +172,23 @@ These paths are not mounted by the backend:
 | `/employee/v1/jobs/:id/review` |
 | `/employee/v1/jobs/:id/save` |
 
-These are usually not user-visible because valid primary paths are tried first, such as `/user/v1/applying-job/...` and `/employee/v1/global/...`. Still, they should be cleaned up before launch by either:
-
-1. Removing the dead legacy fallbacks from mobile, or
-2. Adding explicit backend aliases if backward compatibility is required.
+Current status: explicit backend compatibility aliases have since been added and are covered by `npm run test:mobile-routes`, which verifies the mobile/campus route contract. Long-term cleanup can still remove compatibility aliases once the mobile app no longer needs them.
 
 ## 7. Auth, Permission, and Security Notes
 
 | Finding | Risk |
 |---|---|
-| Dashboard authorization is broad | `/dash/v1` is protected by admin middleware, but many generic resource routes do not have fine per-route permission checks. |
-| Active context is server-mutated | Web/mobile rely on active context state instead of sending a per-request context header. This can cause confusion across sessions/devices and needs runtime testing. |
+| Dashboard authorization is broad | `/dash/v1` is protected by admin middleware and generic resources are now redacted/audited, but fine per-resource admin permission boundaries still need route-by-route policy coverage. |
+| Active context requires careful handling | Explicit context safety now fails closed for malformed, wrong-user, suspended, or removed contexts, and seeded tests cover context denial cases. Per-request context UX and multi-device behavior should still be validated through app/web journeys. |
 | Public generated CV PDF route | `/cv/generated/:fileName` is public with filename validation, but generated names should be unguessable and expiry/access rules should be reviewed. |
-| Public uploads route | `/uploads` is intentionally public; file naming, MIME validation, and private document separation should be checked. |
-| Health secret can be passed in query string | Secrets in query strings can leak through logs/referrers; prefer header-based secret checks. |
-| Cross-account access is not sufficiently tested | Guards exist, but there is not enough automated runtime testing for company/university/student scoping and IDOR protection. |
-| Web logout does not call backend logout | Client clears local state, but server refresh/session state may remain active. |
+| Public uploads route | `/uploads/files/*` is now blocked from public static serving, and non-image root uploads are forced to attachment. Remaining work is route-by-route MIME/size/private download coverage. |
+| Health secret query string | Fixed: health secrets must use the `x-health-secret` header. |
+| Cross-account access | Seeded object-authorization coverage now exists for company, university, and campus student object-scope cases. Remaining work is broader admin permission and expired-token coverage. |
+| Logout/session invalidation | Improved: user, company, and admin logout behavior now has backend handling and security-contract checks; web logout calls backend before clearing local state. |
 
 ## 8. Backend/Test Coverage Assessment
 
-Current checks are useful, but they mostly verify source structure, imports, route declarations, and contract presence. They do not fully prove live behavior.
+Current checks are useful and now include multiple seeded runtime integration harnesses. They still do not fully prove every live business journey or every request/response schema.
 
 ### Covered Well
 
@@ -177,8 +197,12 @@ Current checks are useful, but they mostly verify source structure, imports, rou
 | Secrets/imports/syntax | Scripted checks |
 | Express smoke import/HTTP/CORS | Smoke scripts |
 | AI route contracts/safety outputs | Source and behavior-level scripts |
-| Trust/analytics/notifications/translations/admin operations/Career Passport | Route/source contract scripts |
-| Mobile/backend route inventory | Static route reference checks |
+| Trust/analytics/notifications/translations/admin operations/Career Passport | Route/source contract scripts plus selected runtime coverage for trust, analytics, and notifications |
+| Mobile/backend route inventory | Static route reference checks plus compatibility aliases for older mobile fallbacks |
+| Auth/context/object authorization | Seeded runtime MongoDB integration |
+| File export/private employee CV downloads | Seeded runtime MongoDB integration |
+| Admin resource redaction/lifecycle audit | Seeded runtime MongoDB integration |
+| Subscription/billing lifecycle | Seeded runtime MongoDB integration |
 | Flutter service tests | Client path/header/body behavior |
 | Web build | Production build passes |
 
@@ -186,10 +210,10 @@ Current checks are useful, but they mostly verify source structure, imports, rou
 
 | Missing test type | Examples |
 |---|---|
-| Supertest/API integration suite | Real HTTP tests against seeded users, roles, companies, universities, and students. |
-| Negative authorization tests | Wrong role, missing permission, inactive context, cross-company, cross-university, cross-student access. |
-| Mutation side-effect tests | Apply/save/report, campus verification, event registration, trust moderation, ATS/interviews/invitations, subscriptions, support, members. |
-| Upload/download security tests | MIME, size, path traversal, private file leakage, generated CV access. |
+| Full journey API integration suite | Real HTTP tests now exist for several core areas, but not for every product journey from login to completion. |
+| Negative authorization tests | Baseline exists for wrong role, context borrowing, company/university/student IDOR, and revoked refresh sessions; remaining gaps include expired access tokens, fine admin permissions, and some inactive-context permutations. |
+| Mutation side-effect tests | Coverage exists for several object-scope and admin-resource mutations; still needed for apply/save/report, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
+| Upload/download security tests | Company files and saved employee CV downloads are covered; still needed for trust evidence files, generated CV public-link expiry/guessability, export files, MIME rejection, size rejection, and all remaining private file routes. |
 | Web API contract tests | Ensure `web/src/shared/api.ts` paths, headers, auth scopes, and error handling stay aligned with backend. |
 | Browser click-through QA | Needed for the web portals, especially admin/company/campus dashboards. |
 
@@ -200,6 +224,19 @@ The following checks passed locally during this audit:
 ```bash
 npm run check:syntax
 npm run check:imports
+npm run smoke:http
+npm run test:security-http
+npm run test:audit-logging
+npm run test:file-export-audit
+npm run test:integration:auth-context
+npm run test:integration:trust-documents
+npm run test:integration:ai-runtime
+npm run test:integration:notifications
+npm run test:integration:analytics
+npm run test:integration:subscriptions
+npm run test:integration:admin-resources
+npm run test:integration:employee-cv-downloads
+npm run test:object-authorization
 npm run test:ai-safety
 npm run test:global-launch-contract
 npm run test:trust-routes
@@ -209,6 +246,9 @@ npm run test:translation-routes
 npm run test:career-passport
 npm run test:mobile-routes
 npm run test:admin-operations-routes
+npm run check:secrets
+npm run docs:route-report
+npm run docs:api-artifacts
 npm --prefix web run build
 ```
 
@@ -219,25 +259,24 @@ The following were not run as part of this pass:
 | Full live deployment probes | Requires a live configured deployment and credentials. |
 | Full authenticated browser click-through | Previous local browser automation had Windows process/sandbox issues. |
 | Flutter full test suite/build | This audit focused on backend/API wiring, not mobile release packaging. |
-| Real database mutation integration tests | A dedicated seeded integration harness is still needed. |
+| Full route-by-route schema/validator tests | Route inventory exists, but exact request/response schema validation is not complete. |
 
 ## 10. Recommended Next Actions Before Next Feature Implementation
 
 | Priority | Action |
 |---|---|
-| P0 | Add a seeded backend integration test harness using Supertest or equivalent. |
-| P0 | Test auth and account isolation: seeker/company/university/admin roles, active context, cross-company, cross-university, cross-student access. |
-| P0 | Decide what to do with the 15 legacy mobile fallback routes: remove them from mobile or add backend aliases. |
-| P1 | Add mutation tests for applications, job save/apply/review, campus verification, event registration, trust moderation, company ATS/interviews, support, members, and subscriptions. |
-| P1 | Add upload/download security tests for CVs, company files, exports, and generated PDFs. |
+| P0 | Expand seeded backend integration from current core harnesses into remaining business journeys and admin permission boundaries. |
+| P0 | Add expired-token, missing-permission, inactive-context, and fine-grained admin permission tests. |
+| P0 | Keep mobile fallback aliases until the mobile app no longer uses them, then remove the aliases and update `npm run test:mobile-routes`. |
+| P1 | Add mutation tests for applications, job save/apply/review/report, campus verification edge cases, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
+| P1 | Add upload/download security tests for trust evidence files, exports, generated PDFs/public links, MIME rejection, size rejection, and remaining private file routes. |
 | P1 | Add admin APIs or admin UI coverage for newer records: student verifications, university memberships, career passports, support tickets, invoices, AI requests/limits, analytics events, content translations. |
 | P1 | Complete AI persistence workflows where product expects generated content to become real saved records. |
 | P1 | Complete translation publish/read workflow so approved translations are returned in job/CV APIs. |
-| P2 | Replace health-check query secret with header-based auth. |
-| P2 | Add backend logout/session invalidation and call it from web/mobile logout. |
+| P2 | Expand generated OpenAPI/Postman artifacts with exact request bodies, response examples, validators, audit events, and role matrices route by route. |
 
 ## 11. Final Audit Position
 
-The backend/API is substantially wired and usable as a foundation. The main route families are mounted, the web client is aligned, and the current contract/build checks pass.
+The backend/API is substantially wired and usable as a foundation. The main route families are mounted, the web client is aligned, route inventory reports zero unclassified unguarded endpoints, and the current contract/runtime/build checks pass.
 
-The project should not yet be treated as fully launch-proven until the runtime integration test layer is added and the known partial workflows are resolved. The safest next engineering step is not more UI work first; it is to lock the backend with seeded API tests so future ChatGPT/Claude/Codex implementation work cannot silently break auth, permissions, account scoping, or important mutations.
+The project should not yet be treated as fully launch-proven until the remaining seeded integration tests, live smoke checks, route-by-route schema documentation, fine-grained admin permission boundaries, and known partial workflows are resolved. The safest next engineering step is to keep tightening backend tests and endpoint documentation while UI work continues, so future ChatGPT/Claude/Codex implementation work cannot silently break auth, permissions, account scoping, or important mutations.
