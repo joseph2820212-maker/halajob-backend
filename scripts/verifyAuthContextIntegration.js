@@ -264,7 +264,16 @@ async function main() {
     accepted_at: new Date(),
   });
 
-  const [seekerContext, studentContext, companyContext, otherCompanyContext, pendingCompanyContext, suspendedCompanyContext, universityContext] = await AccountContextModel.create([
+  const [
+    seekerContext,
+    studentContext,
+    companyContext,
+    otherCompanyContext,
+    pendingCompanyContext,
+    suspendedCompanyContext,
+    removedCompanyContext,
+    universityContext,
+  ] = await AccountContextModel.create([
     {
       user_id: seekerUser._id,
       context_key: `job_seeker:${seekerEmployee._id}`,
@@ -328,6 +337,17 @@ async function main() {
       entity_model: "companies",
       display_name: `${company.company_name} suspended`,
       status: "suspended",
+      permissions: ["*"],
+      is_default: false,
+    },
+    {
+      user_id: companyUser._id,
+      context_key: `company_admin:${company._id}:removed`,
+      context_type: "company_admin",
+      entity_id: company._id,
+      entity_model: "companies",
+      display_name: `${company.company_name} removed`,
+      status: "removed",
       permissions: ["*"],
       is_default: false,
     },
@@ -519,6 +539,28 @@ async function main() {
     }),
     403,
     "suspended explicit context should fail closed instead of falling back"
+  );
+
+  await expectStatus(
+    request(baseUrl, "GET", "/company/v1/global", {
+      token: companyTokens.accessToken,
+      headers: {
+        "X-Active-Context-Id": String(removedCompanyContext._id),
+      },
+    }),
+    403,
+    "removed explicit context should fail closed instead of falling back"
+  );
+
+  await expectStatus(
+    request(baseUrl, "POST", "/user/v1/me/active-context", {
+      token: companyTokens.accessToken,
+      body: {
+        context_id: String(removedCompanyContext._id),
+      },
+    }),
+    404,
+    "removed context should not be selectable as active context"
   );
 
   await expectStatus(
