@@ -317,6 +317,11 @@ const buildBulkApplicationsFilter = async (req, res, companyData) => {
   );
   const ids = rawIds.map((id) => String(id?._id || id || "").trim()).filter((id) => mongoose.Types.ObjectId.isValid(id));
 
+  if (rawIds.length && ids.length !== rawIds.length) {
+    fail(res, "invalid_application_ids", 400);
+    return null;
+  }
+
   if (ids.length) {
     return { _id: { $in: ids }, company_id: companyData.company._id };
   }
@@ -1238,7 +1243,10 @@ export const bulkExportApplications = async (req, res, next) => {
     const applications = await populateApplicationQuery(
       UserApplyingJobModel.find(filter).sort(buildApplicationsSort({ ...req.query, ...req.body })).limit(limit)
     ).lean();
-    const exportFormat = req.query.format || req.body?.format || "xlsx";
+    const exportFormat = String(req.query.format || req.body?.format || "xlsx").trim().toLowerCase();
+    if (!["xlsx", "json"].includes(exportFormat)) {
+      return fail(res, "invalid_export_format", 400, { supported: ["xlsx", "json"] });
+    }
 
     await recordCompanyUsage(companyData.company._id, "application_exports", 1);
     await writeAuditLog({
@@ -1269,7 +1277,7 @@ export const bulkExportApplications = async (req, res, next) => {
       },
     });
 
-    if (req.query.format === "json" || req.body?.format === "json") {
+    if (exportFormat === "json") {
       return success(
         res,
         {

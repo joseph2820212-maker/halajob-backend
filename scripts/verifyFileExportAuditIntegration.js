@@ -418,6 +418,61 @@ async function main() {
       "single CV download"
     );
 
+    const exportAuditCountBeforeRejectedRequests = await AuditLogModel.countDocuments({
+      company_id: company._id,
+      action: { $in: ["application_cvs_bulk_exported", "applications_exported"] },
+    });
+
+    await expectErrorMessage(
+      request(baseUrl, "POST", "/company/v1/jobs/hiring/applications/bulk-cv", {
+        token: tokens.accessToken,
+        contextId: companyContext._id,
+        body: {
+          application_ids: [String(application._id), "not-an-application-id"],
+        },
+      }),
+      400,
+      /invalid_application_ids/,
+      "bulk application CV export rejects invalid explicit application IDs"
+    );
+
+    await expectErrorMessage(
+      request(baseUrl, "POST", "/company/v1/jobs/hiring/applications/bulk-export", {
+        token: tokens.accessToken,
+        contextId: companyContext._id,
+        body: {
+          application_ids: [String(application._id), "not-an-application-id"],
+          format: "json",
+        },
+      }),
+      400,
+      /invalid_application_ids/,
+      "applications export rejects invalid explicit application IDs"
+    );
+
+    await expectErrorMessage(
+      request(baseUrl, "POST", "/company/v1/jobs/hiring/applications/bulk-export", {
+        token: tokens.accessToken,
+        contextId: companyContext._id,
+        body: {
+          application_ids: [String(application._id)],
+          format: "csv",
+        },
+      }),
+      400,
+      /invalid_export_format/,
+      "applications export rejects unsupported formats"
+    );
+
+    assert.equal(
+      await AuditLogModel.countDocuments({
+        company_id: company._id,
+        action: { $in: ["application_cvs_bulk_exported", "applications_exported"] },
+      }),
+      exportAuditCountBeforeRejectedRequests,
+      "rejected export requests should not write successful export audit rows"
+    );
+
     await expectStatus(
       request(baseUrl, "POST", "/company/v1/jobs/hiring/applications/bulk-cv", {
         token: tokens.accessToken,

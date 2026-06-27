@@ -21,7 +21,7 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 - Newly generated public CV links must include an unguessable token and `public_download_expires_at`; authenticated owners should use `/employee/v1/cv/download/:cvId`.
 - Send `X-Content-Type-Options: nosniff` on served files.
 - Sensitive CV/document downloads must require auth and correct company/admin context.
-- Bulk exports must be audited and permission-checked.
+- Bulk exports must be permission-checked, audited on success, and reject invalid explicit application IDs or unsupported formats before writing successful export audit rows.
 - Company file downloads must be audited for both dashboard (`/company/v1/...`) and app (`/user/v1/company/...`) routes.
 - Student verification documents must be stored under private `uploads/files/student-verifications/` storage, blocked from direct public `/uploads/files/*` access, and downloaded only through authenticated student-owner or university-admin routes.
 - Dashboard protected file downloads under `/dash/v1/file/:name` must require `files.read`, allow only image/PDF extensions, and serve PDFs as attachments with `Cache-Control: no-store`.
@@ -49,7 +49,7 @@ npm run check:secrets
 
 `npm run test:integration:student-verification-documents` proves student verification document uploads reject MIME mismatches and oversize files with clean 4xx responses, move valid documents to private storage, deny direct public access, scope student-owner and university-admin downloads, send attachment/no-store/nosniff headers, and write upload/download audit rows.
 
-`npm run test:file-export-audit` proves company request file uploads reject MIME mismatches and oversize files with clean 4xx responses, and company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user.
+`npm run test:file-export-audit` proves company request file uploads reject MIME mismatches and oversize files with clean 4xx responses, company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user, and company bulk export endpoints reject invalid explicit application IDs or unsupported formats without writing successful export audit rows.
 
 `npm run test:integration:employee-cv-downloads` proves CV uploads reject unsupported file types and oversize files with clean 4xx responses, saved employee CV downloads require auth, are scoped to the owning employee, reject invalid IDs, reject unsafe stored paths, return a clear 404 for missing files, and enforce generated-CV public token/expiry checks for database-backed CV records.
 
