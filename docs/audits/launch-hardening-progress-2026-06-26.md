@@ -19,6 +19,7 @@ Branch: `flutter-seeker-campus`
 | Company file/export audit logging | Company dashboard profile file downloads, app company request file downloads, single application CV downloads, bulk CV ZIP exports, and application exports now write audit logs, with a seeded runtime test also proving path traversal and cross-company app file access are rejected safely. | `npm run test:file-export-audit`, `controllers/app/Company/CreateCompanyController.js`, `controllers/companyDash/companyWithJobs/companyJobHiringController.js`, `controllers/companyDash/information/companyInformationController.js` |
 | Object-level authorization coverage | Seeded runtime coverage now proves company A cannot read or mutate company B jobs/applications, university admin A cannot list or approve university B verifications, student A cannot read/message/cancel student B campus applications or event registrations, denied attempts do not mutate target records, and allowed owner/student/admin actions still work. | `npm run test:object-authorization`, `scripts/verifyObjectAuthorizationIntegration.js` |
 | Private upload static serving | Direct public access to `uploads/files/*` is blocked, non-image public uploads are served as attachments, and company file serializers now point to authenticated download endpoints instead of public file URLs. | `npm run test:security-http`, `app.js`, `docs/architecture/FILES_CONTRACT.md` |
+| AI runtime integration coverage | Seeded runtime coverage now proves disabled AI requests are persisted/audited as blocked, enabled mock AI requests complete for employee and company contexts, cached results are reused, daily limits fail closed, analytics are written, and wrong-role company AI attempts do not create AI records. | `npm run test:integration:ai-runtime`, `scripts/verifyAiRuntimeIntegration.js` |
 
 ## Checks Run
 
@@ -26,6 +27,7 @@ Branch: `flutter-seeker-campus`
 npm run test:security-http
 npm run test:audit-logging
 npm run test:file-export-audit
+npm run test:integration:ai-runtime
 npm run test:object-authorization
 npm run test:integration:auth-context
 npm run test:mobile-routes
@@ -37,4 +39,4 @@ npm --prefix web run build
 
 ## Remaining From Backend/API Audit
 
-The project still needs the larger runtime integration suite from the backend audit: AI, trust, analytics, notifications, payments/subscriptions, broader mutation side effects, remaining admin-boundary object checks, remaining sensitive campus/university/admin audit-log assertions, protected download coverage for every private file route, and full web/mobile end-to-end API flow coverage.
+The project still needs the larger runtime integration suite from the backend audit: notifications, payments/subscriptions, broader mutation side effects, remaining admin-boundary object checks, remaining sensitive campus/university/admin audit-log assertions, protected download coverage for every private file route, and full web/mobile end-to-end API flow coverage. AI now has seeded runtime coverage for blocked/completed/cached/limited/wrong-role request paths.

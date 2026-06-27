@@ -4,7 +4,7 @@ Date: 2026-06-27
 Branch: `flutter-seeker-campus`
 Commit tested: current `flutter-seeker-campus` branch state as of the latest update below.
 Environment: local Codex workspace
-Latest update: object authorization, private upload static-serving, audit logging, and expanded company file/export audit integration coverage added on 2026-06-27.
+Latest update: object authorization, private upload static-serving, audit logging, expanded company file/export audit integration coverage, and AI runtime integration coverage added on 2026-06-27.
 
 ## Passed Commands
 
@@ -20,6 +20,7 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `npm run test:security-http` | Passed, including private `/uploads/files/*` static denial |
 | `npm run test:audit-logging` | Passed |
 | `npm run test:file-export-audit` | Passed, including dashboard company file download, app company request file download, traversal rejection, other-company denial, and export audit logs |
+| `npm run test:integration:ai-runtime` | Passed, including disabled, completed, cached, daily-limited, employee, company, analytics, audit-log, and wrong-role AI request paths |
 | `npm run test:object-authorization` | Passed |
 | `npm run test:mobile-routes` | Passed |
 | `npm run test:ai-safety` | Passed |
