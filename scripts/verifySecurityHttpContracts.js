@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
 
 process.env.NODE_ENV ||= "test";
 process.env.JWT_SECRET ||= "security-http-contract-secret";
@@ -7,7 +9,14 @@ process.env.HEALTH_SECRET ||= "security-health-secret";
 
 const { default: app } = await import("../app.js");
 
-const server = app.listen(0);
+let server;
+const uploadRoot = path.resolve(process.cwd(), "uploads");
+const privateUploadDir = path.join(uploadRoot, "files");
+const uploadHtmlName = `security-inline-${Date.now()}.html`;
+const privatePdfName = `security-private-${Date.now()}.pdf`;
+const uploadHtmlPath = path.join(uploadRoot, uploadHtmlName);
+const privatePdfPath = path.join(privateUploadDir, privatePdfName);
+const cleanupFiles = [uploadHtmlPath, privatePdfPath];
 
 const protectedChecks = [
   ["GET", "/dash/v1/dashboard", "dashboard admin"],
@@ -75,6 +84,11 @@ async function assertJsonMessageFlexible({ response, expectedStatus, label, incl
 }
 
 try {
+  await fs.promises.mkdir(privateUploadDir, { recursive: true });
+  await fs.promises.writeFile(uploadHtmlPath, "<html><body>unsafe inline upload</body></html>");
+  await fs.promises.writeFile(privatePdfPath, "%PDF-1.4\n% private test document\n");
+
+  server = app.listen(0);
   await new Promise((resolve) => server.once("listening", resolve));
   const { port } = server.address();
   const baseUrl = `http://127.0.0.1:${port}`;
@@ -122,6 +136,45 @@ try {
     `generated CV traversal attempt should fail safely; got ${traversalCvPath.status}`
   );
 
+  const directPrivateUpload = await request(baseUrl, "GET", `/uploads/files/${privatePdfName}`);
+  await assertStatus({
+    response: directPrivateUpload,
+    expectedStatus: 404,
+    label: "direct private upload file access",
+  });
+  assert.equal(
+    directPrivateUpload.headers.get("x-content-type-options"),
+    "nosniff",
+    "direct private upload denial should include nosniff"
+  );
+  assert.equal(
+    directPrivateUpload.headers.get("cache-control"),
+    "no-store",
+    "direct private upload denial should not be cached"
+  );
+
+  const htmlUpload = await request(baseUrl, "GET", `/uploads/${uploadHtmlName}`);
+  await assertStatus({
+    response: htmlUpload,
+    expectedStatus: 200,
+    label: "root HTML upload static response",
+  });
+  assert.match(
+    String(htmlUpload.headers.get("content-disposition") || ""),
+    /attachment/i,
+    "HTML uploads should be served as attachments"
+  );
+  assert.equal(
+    htmlUpload.headers.get("x-content-type-options"),
+    "nosniff",
+    "HTML uploads should include nosniff"
+  );
+  assert.match(
+    String(htmlUpload.headers.get("content-security-policy") || ""),
+    /default-src 'none'/,
+    "HTML uploads should include restrictive CSP"
+  );
+
   for (const [path, label] of [
     ["/user/v1/auth/logout", "user logout"],
     ["/company/v1/auth/logout", "company logout"],
@@ -162,7 +215,10 @@ try {
     `Security HTTP contracts verified (${protectedChecks.length} protected route families).`
   );
 } finally {
-  await new Promise((resolve, reject) => {
-    server.close((error) => (error ? reject(error) : resolve()));
-  });
+  if (server) {
+    await new Promise((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
+  }
+  await Promise.all(cleanupFiles.map((file) => fs.promises.unlink(file).catch(() => null)));
 }

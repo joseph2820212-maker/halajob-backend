@@ -18,6 +18,7 @@ Branch: `flutter-seeker-campus`
 | Dashboard admin audit logging | Dashboard admin login failure, login success, and admin creation now write audit logs, with a seeded runtime test proving stable failure reason keys and no password storage in audit metadata. | `npm run test:audit-logging`, `controllers/dash/authController.js`, `scripts/verifyAuditLoggingIntegration.js` |
 | Company file/export audit logging | Company profile file downloads, single application CV downloads, bulk CV ZIP exports, and application exports now write audit logs, with a seeded runtime test also proving company file path traversal is rejected safely. | `npm run test:file-export-audit`, `controllers/companyDash/companyWithJobs/companyJobHiringController.js`, `controllers/companyDash/information/companyInformationController.js` |
 | Object-level authorization coverage | Seeded runtime coverage now proves company A cannot read or mutate company B jobs/applications, university admin A cannot list or approve university B verifications, student A cannot read/message/cancel student B campus applications or event registrations, denied attempts do not mutate target records, and allowed owner/student/admin actions still work. | `npm run test:object-authorization`, `scripts/verifyObjectAuthorizationIntegration.js` |
+| Private upload static serving | Direct public access to `uploads/files/*` is blocked, non-image public uploads are served as attachments, and company file serializers now point to authenticated download endpoints instead of public file URLs. | `npm run test:security-http`, `app.js`, `docs/architecture/FILES_CONTRACT.md` |
 
 ## Checks Run
 
@@ -36,4 +37,4 @@ npm --prefix web run build
 
 ## Remaining From Backend/API Audit
 
-The project still needs the larger runtime integration suite from the backend audit: AI, trust, analytics, notifications, payments/subscriptions, broader mutation side effects, remaining admin-boundary object checks, remaining sensitive campus/university/admin audit-log assertions, and full web/mobile end-to-end API flow coverage.
+The project still needs the larger runtime integration suite from the backend audit: AI, trust, analytics, notifications, payments/subscriptions, broader mutation side effects, remaining admin-boundary object checks, remaining sensitive campus/university/admin audit-log assertions, protected download coverage for every private file route, and full web/mobile end-to-end API flow coverage.

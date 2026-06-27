@@ -7,6 +7,7 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 
 - Runtime uploads use `uploads/` by default.
 - Generated CV downloads use `cv/generated/`.
+- `uploads/files/` is treated as private document storage and is not served through public static uploads.
 - `FILES_DIRECTORY` can override dashboard file base directory.
 - Runtime files are ignored and must not be tracked by Git.
 
@@ -14,6 +15,7 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 
 - Validate file names and block path traversal.
 - Serve HTML uploads as attachments with restrictive headers.
+- Serve non-image public uploads as attachments; block direct public access to private document uploads under `/uploads/files/*`.
 - Send `X-Content-Type-Options: nosniff` on served files.
 - Sensitive CV/document downloads must require auth and correct company/admin context.
 - Bulk exports must be audited and permission-checked.
@@ -36,8 +38,10 @@ npm run test:security-http
 npm run check:secrets
 ```
 
+`npm run test:security-http` creates temporary upload fixtures and proves direct `/uploads/files/*` access returns 404 with `no-store`/`nosniff`, while root HTML uploads are served as attachments with restrictive CSP.
+
 ## Gaps
 
 - MIME/size policies should be documented per endpoint.
-- Sensitive download audit coverage must be tested route by route.
+- Sensitive download audit coverage must continue to be tested route by route.
 - Object storage migration should be planned before high-volume launch.

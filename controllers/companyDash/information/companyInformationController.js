@@ -93,10 +93,7 @@ const buildCompanyFilePath = (filename = "") => {
 const buildCompanyFileUrl = (filename = "") => {
   const safe = normalizeCompanyFileName(filename);
   if (!safe) return "";
-  const dir = getCompanyFileDirForFilename(safe);
-  const relativePath = dir ? `${dir}/${safe}` : safe;
-  const base = (process.env.FILE_BASE_URL || process.env.PUBLIC_BASE_URL || "").replace(/\/+$/, "");
-  return base ? `${base}/${relativePath}` : relativePath;
+  return `/company/v1/global/profile/files/${encodeURIComponent(safe)}/download`;
 };
 
 const serializeCompanyFiles = (company = {}) => {

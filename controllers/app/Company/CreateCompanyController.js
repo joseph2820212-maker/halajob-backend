@@ -62,12 +62,10 @@ const buildFilePath = (filename) => {
   return path.join(UPLOADS_ROOT, dir, safe);
 };
 
-const buildPublicUrl = (filename) => {
+const buildProtectedDownloadPath = (filename) => {
   const safe = path.basename(filename || "");
-  const dir = getDirForFilename(safe);
-  const relativePath = dir ? `${dir}/${safe}` : safe;
-  const base = (process.env.FILE_BASE_URL || process.env.PUBLIC_BASE_URL || "").replace(/\/+$/, "");
-  return base ? `${base}/${relativePath}` : relativePath;
+  if (!safe) return "";
+  return `/user/v1/company/download-file?filename=${encodeURIComponent(safe)}`;
 };
 
 const deleteUploadedFile = async (filename) => {
@@ -186,7 +184,8 @@ const serializeCompanyRequest = (company) => ({
   files: Array.isArray(company?.files)
     ? company.files.map((filename) => ({
         filename,
-        url: buildPublicUrl(filename),
+        url: buildProtectedDownloadPath(filename),
+        download_path: buildProtectedDownloadPath(filename),
       }))
     : [],
 });

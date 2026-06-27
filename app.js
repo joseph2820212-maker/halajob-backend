@@ -203,6 +203,16 @@ app.use(
 
 const uploadsPath = path.join(process.cwd(), "uploads");
 const generatedCvPath = path.resolve(process.cwd(), "cv", "generated");
+const inlineUploadExtensions = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".ico", ".ttf", ".woff", ".woff2"]);
+const activeUploadExtensions = new Set([".svg", ".html", ".htm", ".xml"]);
+
+const safeAttachmentName = (filePath) => path.basename(filePath).replace(/["\\]/g, "_");
+
+app.use("/uploads/files", (req, res) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Cache-Control", "no-store");
+  return res.status(404).json({ status: false, message: "file_not_public" });
+});
 
 app.use(
   "/uploads",
@@ -217,12 +227,12 @@ app.use(
       res.setHeader("X-Content-Type-Options", "nosniff");
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
-      if (extension === ".svg" || extension === ".html") {
+      if (activeUploadExtensions.has(extension)) {
         res.setHeader("Content-Security-Policy", "default-src 'none'; img-src data:; style-src 'unsafe-inline'");
       }
 
-      if (extension === ".html") {
-        res.setHeader("Content-Disposition", "attachment");
+      if (!inlineUploadExtensions.has(extension)) {
+        res.setHeader("Content-Disposition", `attachment; filename="${safeAttachmentName(filePath)}"`);
       }
 
       if (!isProduction) {
