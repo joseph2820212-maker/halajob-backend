@@ -2,7 +2,7 @@ import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
-import { UserModel } from "../../../models/index.js";
+import { UserModel, RefreshTokenModel } from "../../../models/index.js";
 import {
   buildRoleDto,
   buildUserDto,
@@ -147,6 +147,7 @@ const login = async (req, res, next) => {
     user.another_device_code = passcode;
     user.another_device_expires_at = new Date(Date.now() + 10 * 60 * 1000);
     user.pending_device = incomingDevice;
+    user.passcode_attempts = 0;
 
     if (!user.status || user.passcode_active === false) {
       user.passcode = passcode;
@@ -213,6 +214,38 @@ const logout = async (req, res, next) => {
   }
 };
 
+// Revoke every refresh-token session for the authenticated user (sign out on all
+// devices). Requires authUser middleware so req.user is the current user.
+const logoutAll = async (req, res, next) => {
+  const lan = req.get("lan") || "en";
+
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return ReturnAppData.createError({
+        res,
+        status: 401,
+        message: lan === "ar" ? "غير مصرح." : "Unauthorized.",
+      });
+    }
+
+    const result = await RefreshTokenModel.deleteMany({ userRef: userId });
+
+    return ReturnAppData.createData({
+      res,
+      status: 200,
+      message:
+        lan === "ar"
+          ? "تم تسجيل الخروج من جميع الأجهزة."
+          : "Signed out from all devices.",
+      data: { revoked_sessions: result?.deletedCount || 0 },
+    });
+  } catch (err) {
+    console.error("logoutAll error:", err);
+    return next(err);
+  }
+};
+
 const refreshToken = async (req, res, next) => {
   const lan = req.get("lan") || "en";
 
@@ -243,5 +276,6 @@ const refreshToken = async (req, res, next) => {
 export default {
   login,
   logout,
+  logoutAll,
   refreshToken,
 };

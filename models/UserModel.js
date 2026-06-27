@@ -140,6 +140,12 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
+    // Failed passcode-verify attempts for the current code (brute-force lockout).
+    passcode_attempts: {
+      type: Number,
+      default: 0,
+    },
+
     otp_last_sent_at: {
       type: Date,
       default: null,

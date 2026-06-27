@@ -28,6 +28,19 @@ jobs:
   verify-linux:
     runs-on: ubuntu-latest
 
+    # MongoDB service for DB-backed integration tests (fast + reliable vs
+    # downloading an in-memory binary at runtime).
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -52,6 +65,11 @@ jobs:
 
       - name: Verify backend mobile route contract
         run: npm run test:mobile-routes
+
+      - name: Backend integration tests (auth/context isolation)
+        env:
+          CONNECTION_URL: mongodb://localhost:27017/halajob_ci_test
+        run: npm run test:integration:auth-context
 
       - name: Guard approved mobile palette
         run: |

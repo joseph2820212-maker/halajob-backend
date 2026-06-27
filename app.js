@@ -147,6 +147,12 @@ app.use(
     },
     crossOriginEmbedderPolicy: false,
     contentSecurityPolicy: false,
+    // Enforce HTTPS for 1 year (incl. subdomains) and allow preload listing.
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
   })
 );
 

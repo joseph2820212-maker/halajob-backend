@@ -134,6 +134,7 @@ const forgotPassword = async (req, res, next) => {
       user.passcode = passcode;
       user.can_update_password = false;
       user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000); // 10 دقائق
+      user.passcode_attempts = 0;
       await user.save();
 
       await sendRecoveryEmail({ to: user.email, passcode, lang: lan, type: "forgot_password" });

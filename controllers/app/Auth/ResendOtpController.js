@@ -139,6 +139,7 @@ if (
     }
 
     user.otp_last_sent_at = now;
+    user.passcode_attempts = 0;
 
     await user.save();
     await sendRecoveryEmail({ to: user.email, passcode });
