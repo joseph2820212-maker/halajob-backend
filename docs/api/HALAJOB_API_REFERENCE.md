@@ -1,6 +1,6 @@
 # HalaJob API Reference
 
-Generated: 2026-06-27T03:12:03.313Z
+Generated: 2026-06-27T03:25:17.599Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -23,7 +23,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Module | Endpoints |
 | --- | --- |
 | AI | 12 |
-| Admin | 2878 |
+| Admin | 2886 |
 | Analytics | 5 |
 | Campus | 12 |
 | Campus Student | 43 |
@@ -1771,6 +1771,10 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/dash/v1/notifications/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | PUT | `/dash/v1/notifications/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | GET | `/dash/v1/operations/audit-logs` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listAuditLogs |
+| GET | `/dash/v1/operations/support-tickets` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listTickets |
+| GET | `/dash/v1/operations/support-tickets/:ticketId` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, getTicketDetails |
+| POST | `/dash/v1/operations/support-tickets/:ticketId/messages` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, addAdminMessage |
+| PATCH | `/dash/v1/operations/support-tickets/:ticketId/status` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, updateTicketStatus |
 | GET | `/dash/v1/operations/talent-requests` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listTalentRequests |
 | GET | `/dash/v1/outside-applications` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, anonymous |
 | POST | `/dash/v1/outside-applications` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, anonymous |
@@ -2540,6 +2544,10 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/dash/v1/subscriptions/companies/:companyId` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, getCompanySubscription |
 | POST | `/dash/v1/subscriptions/companies/:companyId/assign-plan` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, assignSubscriptionPlan |
 | POST | `/dash/v1/subscriptions/seed-free` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, seedFreePlan |
+| GET | `/dash/v1/support-tickets` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listTickets |
+| GET | `/dash/v1/support-tickets/:ticketId` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, getTicketDetails |
+| POST | `/dash/v1/support-tickets/:ticketId/messages` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, addAdminMessage |
+| PATCH | `/dash/v1/support-tickets/:ticketId/status` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, updateTicketStatus |
 | GET | `/dash/v1/talent-requests` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listTalentRequests |
 | POST | `/dash/v1/talent-requests` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listTalentRequests |
 | DELETE | `/dash/v1/talent-requests/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, anonymous |

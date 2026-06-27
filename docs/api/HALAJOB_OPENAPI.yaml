@@ -44714,6 +44714,104 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/dash/v1/operations/support-tickets":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/operations/support-tickets"
+      operationId: "admin_get_dash_v1_operations_support_tickets"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/operations/support-tickets/{ticketId}":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/operations/support-tickets/:ticketId"
+      operationId: "admin_get_dash_v1_operations_support_tickets_ticketid"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "ticketId"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/operations/support-tickets/{ticketId}/messages":
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/operations/support-tickets/:ticketId/messages"
+      operationId: "admin_post_dash_v1_operations_support_tickets_ticketid_messages"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "ticketId"
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/operations/support-tickets/{ticketId}/status":
+    patch:
+      tags: ["Admin"]
+      summary: "PATCH /dash/v1/operations/support-tickets/:ticketId/status"
+      operationId: "admin_patch_dash_v1_operations_support_tickets_ticketid_status"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "ticketId"
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/dash/v1/operations/talent-requests":
     get:
       tags: ["Admin"]
@@ -63193,6 +63291,104 @@ paths:
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
       security:
         - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/support-tickets":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/support-tickets"
+      operationId: "admin_get_dash_v1_support_tickets"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/support-tickets/{ticketId}":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/support-tickets/:ticketId"
+      operationId: "admin_get_dash_v1_support_tickets_ticketid"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "ticketId"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/support-tickets/{ticketId}/messages":
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/support-tickets/:ticketId/messages"
+      operationId: "admin_post_dash_v1_support_tickets_ticketid_messages"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "ticketId"
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/support-tickets/{ticketId}/status":
+    patch:
+      tags: ["Admin"]
+      summary: "PATCH /dash/v1/support-tickets/:ticketId/status"
+      operationId: "admin_patch_dash_v1_support_tickets_ticketid_status"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "ticketId"
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: false
         content:

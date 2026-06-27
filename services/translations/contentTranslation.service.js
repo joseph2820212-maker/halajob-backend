@@ -163,9 +163,43 @@ export const upsertContentTranslation = async ({
   };
 };
 
+export const getContentTranslation = async ({
+  entityType,
+  entityId,
+  targetLanguage,
+  status = "",
+}) => {
+  const entityObjectId = objectIdOrNull(entityId);
+  if (!entityObjectId) {
+    const error = new Error("invalid_translation_entity_id");
+    error.statusCode = 400;
+    error.code = "invalid_translation_entity_id";
+    throw error;
+  }
+
+  const target = normalizeTranslationLanguage(targetLanguage);
+  const filter = {
+    entity_type: entityType,
+    entity_id: entityObjectId,
+    target_language: target,
+  };
+
+  const cleanStatus = clean(status).toLowerCase();
+  if (cleanStatus) filter.status = cleanStatus;
+
+  const translation = await ContentTranslationModel.findOne(filter).lean();
+  return {
+    translation,
+    target_language: target,
+    published_translation: translation?.status === "approved" ? translation.translated_text : null,
+    can_publish: translation?.status === "approved",
+  };
+};
+
 export default {
   normalizeTranslationLanguage,
   inferSourceLanguage,
   objectIdOrNull,
+  getContentTranslation,
   upsertContentTranslation,
 };

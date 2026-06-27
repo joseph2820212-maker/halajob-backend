@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-27T03:12:05.450Z",
+  "generatedAt": "2026-06-27T03:25:19.815Z",
   "records": [
     {
       "method": "PATCH",
@@ -47804,6 +47804,21 @@
       "knownPublic": true
     },
     {
+      "method": "GET",
+      "path": "/jobs/v1/:jobId/translations/:lang",
+      "module": "Jobs",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "multerMiddleware",
+        "saveJobTranslation"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
       "method": "PUT",
       "path": "/jobs/v1/:jobId/translations/:lang",
       "module": "Jobs",
@@ -48247,6 +48262,21 @@
         "authUser",
         "multerMiddleware",
         "uploadFile"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/cv/translations/:lang",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "multerMiddleware",
+        "saveCvTranslation"
       ],
       "inferredGuards": [],
       "hasAuthGuard": true,

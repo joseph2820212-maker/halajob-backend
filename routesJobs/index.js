@@ -17,4 +17,12 @@ router.put(
   JobTranslationController.saveJobTranslation
 );
 
+router.get(
+  "/:jobId/translations/:lang",
+  authUser,
+  requireAppAccount("company"),
+  requireCompanyPermission("jobs.manage"),
+  JobTranslationController.getJobTranslation
+);
+
 export default router;

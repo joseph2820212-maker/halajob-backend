@@ -57666,6 +57666,143 @@
           }
         },
         {
+          "name": "GET /dash/v1/operations/support-tickets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/operations/support-tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "operations",
+                "support-tickets"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/operations/support-tickets/:ticketId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/operations/support-tickets/:ticketId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "operations",
+                "support-tickets",
+                ":ticketId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/operations/support-tickets/:ticketId/messages",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/operations/support-tickets/:ticketId/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "operations",
+                "support-tickets",
+                ":ticketId",
+                "messages"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /dash/v1/operations/support-tickets/:ticketId/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/operations/support-tickets/:ticketId/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "operations",
+                "support-tickets",
+                ":ticketId",
+                "status"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "GET /dash/v1/operations/talent-requests",
           "request": {
             "method": "GET",
@@ -83363,6 +83500,139 @@
                 "v1",
                 "subscriptions",
                 "seed-free"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/support-tickets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/support-tickets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "support-tickets"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/support-tickets/:ticketId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/support-tickets/:ticketId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "support-tickets",
+                ":ticketId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/support-tickets/:ticketId/messages",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/support-tickets/:ticketId/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "support-tickets",
+                ":ticketId",
+                "messages"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /dash/v1/support-tickets/:ticketId/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/support-tickets/:ticketId/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "support-tickets",
+                ":ticketId",
+                "status"
               ]
             },
             "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."

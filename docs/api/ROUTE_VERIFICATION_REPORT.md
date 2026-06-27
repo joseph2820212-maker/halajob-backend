@@ -1,6 +1,6 @@
 # Route Verification Report
 
-Generated: 2026-06-27T03:12:05.450Z
+Generated: 2026-06-27T03:25:19.815Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
@@ -8,8 +8,8 @@ Source: live Express app via `express-list-endpoints`.
 | Metric | Count |
 |---|---:|
 | Raw Express endpoint entries | 2135 |
-| Unique method/path endpoints | 3370 |
-| Endpoints with detected auth/role guard | 3281 |
+| Unique method/path endpoints | 3372 |
+| Endpoints with detected auth/role guard | 3283 |
 | Known public/system endpoints | 89 |
 | Unguarded endpoints needing manual classification | 0 |
 
@@ -31,8 +31,8 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Company | 134 | 132 | 2 | 0 |
 | Files | 1 | 0 | 1 | 0 |
 | Health | 2 | 0 | 2 | 0 |
-| Jobs | 1 | 1 | 0 | 0 |
-| Legacy User | 148 | 74 | 74 | 0 |
+| Jobs | 2 | 2 | 0 | 0 |
+| Legacy User | 149 | 75 | 74 | 0 |
 | Notifications | 13 | 13 | 0 | 0 |
 | Seeker | 94 | 93 | 1 | 0 |
 | Trust | 4 | 4 | 0 | 0 |

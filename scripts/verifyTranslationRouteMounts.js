@@ -23,7 +23,9 @@ const cvControllerSource = readSource("controllers/translations/CvTranslationCon
 const requiredEndpoints = [
   ["POST", "/ai/v1/translate/job/:jobId"],
   ["POST", "/ai/v1/translate/cv"],
+  ["GET", "/jobs/v1/:jobId/translations/:lang"],
   ["PUT", "/jobs/v1/:jobId/translations/:lang"],
+  ["GET", "/user/v1/cv/translations/:lang"],
   ["PUT", "/user/v1/cv/translations/:lang"],
 ];
 
@@ -50,6 +52,7 @@ assert.deepEqual(
 
 assert.deepEqual(
   [
+    'router.get(',
     'router.put(',
     '"/:jobId/translations/:lang"',
     "authUser",
@@ -62,6 +65,7 @@ assert.deepEqual(
 
 assert.deepEqual(
   [
+    'router.get(',
     'router.put(',
     '"/translations/:lang"',
     "authUser",
@@ -90,28 +94,34 @@ assert.deepEqual(
 
 assert.deepEqual(
   [
+    "getContentTranslation",
     "approval_required: true",
     'status: resolvedStatus',
     'resolvedStatus === "approved"',
     "approved_by",
     "approved_at",
+    "published_translation",
   ].filter((snippet) => !serviceSource.includes(snippet)),
   [],
-  "translation service must require explicit approval before publishable status"
+  "translation service must require explicit approval before publishable status and expose approved reads"
 );
 
 assert.ok(
   jobControllerSource.includes('event: "job_translated"') &&
     jobControllerSource.includes("job_translation_approved") &&
-    jobControllerSource.includes("job_translation_saved"),
-  "job translation controller must audit and track job translations"
+    jobControllerSource.includes("job_translation_saved") &&
+    jobControllerSource.includes("getJobTranslation") &&
+    jobControllerSource.includes("published_translation"),
+  "job translation controller must audit, track, and read job translations"
 );
 
 assert.ok(
   cvControllerSource.includes('event: "cv_translated"') &&
     cvControllerSource.includes("cv_translation_approved") &&
-    cvControllerSource.includes("cv_translation_saved"),
-  "CV translation controller must audit and track CV translations"
+    cvControllerSource.includes("cv_translation_saved") &&
+    cvControllerSource.includes("getCvTranslation") &&
+    cvControllerSource.includes("published_translation"),
+  "CV translation controller must audit, track, and read CV translations"
 );
 
 assert.equal(normalizeTranslationLanguage("AR"), "ar");

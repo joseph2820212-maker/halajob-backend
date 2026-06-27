@@ -15,4 +15,11 @@ router.put(
   CvTranslationController.saveCvTranslation
 );
 
+router.get(
+  "/translations/:lang",
+  authUser,
+  requireAppAccount("employee"),
+  CvTranslationController.getCvTranslation
+);
+
 export default router;

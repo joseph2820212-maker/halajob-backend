@@ -6,6 +6,7 @@ import {
   getEmployeePlain,
 } from "../../helper/employeeDash/employeeDashHelpers.js";
 import {
+  getContentTranslation,
   normalizeTranslationLanguage,
   upsertContentTranslation,
 } from "../../services/translations/contentTranslation.service.js";
@@ -113,6 +114,49 @@ const resolveCv = async ({ req, employee }) => {
     .lean();
 };
 
+const getCvTranslation = async (req, res, next) => {
+  try {
+    const targetLanguage = normalizeTranslationLanguage(req.params.lang);
+    const employee = await getEmployeePlain(req, res);
+    if (!employee) return;
+
+    const cv = await resolveCv({ req, employee });
+    const entityType = cv?._id ? "cv" : "career_passport";
+    const entityId = cv?._id || employee._id;
+
+    const result = await getContentTranslation({
+      entityType,
+      entityId,
+      targetLanguage,
+    });
+
+    if (!result.translation) {
+      return ReturnAppData.getError({ res, status: 404, message: "translation_not_found" });
+    }
+
+    return ReturnAppData.getData({
+      res,
+      data: {
+        translation: result.translation,
+        published_translation: result.published_translation,
+        can_publish: result.can_publish,
+      },
+      message: "cv_translation",
+    });
+  } catch (error) {
+    if (error.statusCode) {
+      return ReturnAppData.getError({
+        res,
+        status: error.statusCode,
+        message: error.code || error.message,
+        other: { errors: { supported: error.supported } },
+      });
+    }
+
+    return next(error);
+  }
+};
+
 const saveCvTranslation = async (req, res, next) => {
   try {
     const targetLanguage = normalizeTranslationLanguage(req.params.lang);
@@ -193,4 +237,4 @@ const saveCvTranslation = async (req, res, next) => {
   }
 };
 
-export default { saveCvTranslation };
+export default { getCvTranslation, saveCvTranslation };

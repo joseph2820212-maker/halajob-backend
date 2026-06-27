@@ -6,6 +6,7 @@ import {
   getCompanyUserIdOrFail,
 } from "../../helper/companyDash/companyDashHelpers.js";
 import {
+  getContentTranslation,
   normalizeTranslationLanguage,
   upsertContentTranslation,
 } from "../../services/translations/contentTranslation.service.js";
@@ -65,6 +66,63 @@ const normalizeMetadata = (body = {}) => {
 
 const companyActorType = (req) =>
   req.companyAccess?.role === "owner" ? "company_owner" : "company_member";
+
+const getJobTranslation = async (req, res, next) => {
+  try {
+    const jobId = clean(req.params.jobId || req.params.id);
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+      return ReturnAppData.getError({ res, status: 400, message: "invalid_job_id" });
+    }
+
+    const targetLanguage = normalizeTranslationLanguage(req.params.lang);
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const job = await jobsModel
+      .findOne({
+        _id: jobId,
+        company_id: companyData.company._id,
+        deleted_at: null,
+      })
+      .select("_id job_name company_id")
+      .lean();
+
+    if (!job) {
+      return ReturnAppData.getError({ res, status: 404, message: "job_not_found" });
+    }
+
+    const result = await getContentTranslation({
+      entityType: "job",
+      entityId: job._id,
+      targetLanguage,
+    });
+
+    if (!result.translation) {
+      return ReturnAppData.getError({ res, status: 404, message: "translation_not_found" });
+    }
+
+    return ReturnAppData.getData({
+      res,
+      data: {
+        translation: result.translation,
+        published_translation: result.published_translation,
+        can_publish: result.can_publish,
+      },
+      message: "job_translation",
+    });
+  } catch (error) {
+    if (error.statusCode) {
+      return ReturnAppData.getError({
+        res,
+        status: error.statusCode,
+        message: error.code || error.message,
+        other: { errors: { supported: error.supported } },
+      });
+    }
+
+    return next(error);
+  }
+};
 
 const saveJobTranslation = async (req, res, next) => {
   try {
@@ -165,4 +223,4 @@ const saveJobTranslation = async (req, res, next) => {
   }
 };
 
-export default { saveJobTranslation };
+export default { getJobTranslation, saveJobTranslation };
