@@ -35,7 +35,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 5 | Core Job Seeker Flow | [x]* |
 | 6 | Company Dashboard & ATS | [x]* |
 | 7 | University / Campus Module | [x]* |
-| 8 | Admin Panel | [ ] |
+| 8 | Admin Panel | [~] |
 | 9 | Search, Matching, Recommendations | [ ] |
 | 10 | Notifications & Email | [ ] |
 | 11 | Payments & Subscriptions | [ ] |
@@ -307,3 +307,25 @@ Goal: real, safe university product (not just a data field).
 **Result: PASS by inspection** — university can manage students safely, data is private + scoped, verification is auditable. **\*** Certify via university/campus integration tests in CI.
 
 **Score movement:** University/campus ~8.5 (Codex) — confirmed; → 9.5 after UI polish (P12/13) + E2E (P14).
+
+## Phase 8 — Admin Panel  [~]
+Goal: powerful but safe admin tools. (First phase with real frontend code changes.)
+
+**Findings:** admin is a single `web/src/admin/screens.tsx` (762 lines), 14 tabs, central `act(action,id)` dispatcher. Audit gaps: no confirm on destructive actions, no pagination, no user-management UI, silent load failures.
+
+**Done this chunk (implemented + web build verified):**
+- [x] **Confirmation gate on destructive/state-changing actions** (approve/reject company+job, suspend job, request docs, verify/suspend university) in `act()` — prevents one-click accidents
+- [x] **Queue load-failure error state** — distinct toast instead of silently showing an empty queue
+
+**Verified:** `npm --prefix web run build` → PASS (typecheck clean, Vite build OK).
+
+**Remaining (next Admin chunks):**
+- [ ] Reason/note capture before reject/suspend/ban (audit trail quality)
+- [ ] Pagination on queue tables (needs backend page params)
+- [ ] User-management UI (the audit's HIGH gap) + bulk actions + global search
+- [ ] Loading skeletons; styled confirm modal (replace window.confirm)
+- [ ] Extract hardcoded admin strings to i18n
+
+**Result: PARTIAL** — the audit's top admin safety gap (destructive-action confirmation) is closed; error-state visibility added. Larger admin features remain.
+
+**Score movement:** Admin panel 6 → ~6.5 (safety rail added); → 9.5 needs user-management + pagination + bulk/search + modal.
