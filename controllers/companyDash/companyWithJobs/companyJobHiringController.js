@@ -102,6 +102,9 @@ const recordCompanyHiringAnalytics = ({
   }).catch(() => null);
 };
 
+const companyActorType = (req) =>
+  req.companyAccess?.role === "owner" ? "company_owner" : "company_member";
+
 const parseIntBounded = (value, fallback, min, max) => {
   const n = Number.parseInt(String(value ?? ""), 10);
   if (!Number.isFinite(n)) return fallback;
@@ -912,6 +915,24 @@ export const getApplicationCv = async (req, res, next) => {
       { $set: { cv_download: true, last_activity_at: new Date() } }
     );
     await recordCompanyUsage(companyData.company._id, "cv_downloads", 1);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: "application_cv_downloaded",
+      entityType: "application",
+      entityId: application._id,
+      jobId: application.job_id?._id || application.job_id,
+      applicationId: application._id,
+      metadata: {
+        source: "single_cv_download",
+        file_name: selectedCv.fileName || selectedCv.filename || "",
+        cv_id: selectedCv.id || "",
+        cv_source: selectedCv.source || "",
+        inline: req.query.inline === "true",
+      },
+    });
     recordCompanyHiringAnalytics({
       req,
       event: "cv_exported",
@@ -1023,6 +1044,21 @@ export const bulkApplicationCvs = async (req, res, next) => {
       );
     }
     await recordCompanyUsage(companyData.company._id, "cv_downloads", Math.max(zipFiles.length, 1));
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: "application_cvs_bulk_exported",
+      entityType: "company",
+      entityId: companyData.company._id,
+      metadata: {
+        source: "bulk_cv_zip",
+        applications_count: applications.length,
+        files_count: zipFiles.length,
+        application_ids: applicationIds.map((id) => String(id)),
+      },
+    });
     recordCompanyHiringAnalytics({
       req,
       event: "cv_exported",
@@ -1062,8 +1098,24 @@ export const bulkExportApplications = async (req, res, next) => {
     const applications = await populateApplicationQuery(
       UserApplyingJobModel.find(filter).sort(buildApplicationsSort({ ...req.query, ...req.body })).limit(limit)
     ).lean();
+    const exportFormat = req.query.format || req.body?.format || "xlsx";
 
     await recordCompanyUsage(companyData.company._id, "application_exports", 1);
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: "applications_exported",
+      entityType: "company",
+      entityId: companyData.company._id,
+      metadata: {
+        source: "applications_export",
+        applications_count: applications.length,
+        format: exportFormat,
+        application_ids: applications.map((application) => String(application._id)),
+      },
+    });
     recordCompanyHiringAnalytics({
       req,
       event: "cv_exported",
@@ -1073,7 +1125,7 @@ export const bulkExportApplications = async (req, res, next) => {
       metadata: {
         source: "applications_export",
         applications_count: applications.length,
-        format: req.query.format || req.body?.format || "xlsx",
+        format: exportFormat,
       },
     });
 

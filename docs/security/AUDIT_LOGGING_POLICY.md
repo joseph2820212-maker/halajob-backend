@@ -37,21 +37,21 @@ Audit events are stored in `audit_logs` through `services/auditLog.service.js` a
 
 ## Current Coverage Observed
 
-Audit writes were found in dashboard admin login success/failure, dashboard admin creation, company jobs/applications, company members, support, message templates, question library, subscriptions, campus verification/opportunities, trust, AI, translations, Career Passport, and account-context switching.
+Audit writes were found in dashboard admin login success/failure, dashboard admin creation, company jobs/applications, company members, support, message templates, question library, subscriptions, campus verification/opportunities, company profile file downloads, single CV downloads, bulk CV exports, application exports, trust, AI, translations, Career Passport, and account-context switching.
 
 Runtime evidence:
 
 ```bash
 npm run test:audit-logging
+npm run test:file-export-audit
 ```
 
-This seeded integration test proves dashboard admin login failures are audited with stable reason keys, successful dashboard admin login is audited, dashboard admin creation is audited, and passwords are not stored in audit metadata.
+These seeded integration tests prove dashboard admin login failures are audited with stable reason keys, successful dashboard admin login is audited, dashboard admin creation is audited, passwords are not stored in audit metadata, company profile file downloads are audited, single CV downloads are audited, bulk CV ZIP exports are audited, application exports are audited, and company file path traversal is rejected safely.
 
 ## Gaps
 
 - Route-by-route audit coverage is not yet proven for every admin generic resource route.
-- File download/export logging must be verified for every sensitive CV/document export.
-- Additional tests should assert audit-log records for sensitive company/campus/file/export actions, not only HTTP status.
+- Additional tests should assert audit-log records for remaining sensitive campus/university/admin generic actions, not only HTTP status.
 
 ## Rule
 

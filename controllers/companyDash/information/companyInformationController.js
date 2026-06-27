@@ -23,6 +23,7 @@ import normalizeArabicKeyword from "../../../helper/normalizeArabicKeyword.js";
 import { deleteImage, processUploadImage } from "../../../services/imageService.js";
 import { applyCompanyProjection, rebuildCompanyJobsProjection } from "../../../services/search/rebuildSearchData.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
+import { writeAuditLog } from "../../../services/auditLog.service.js";
 import tz_lookup from "tz-lookup";
 
 const SINGLE_FIELDS = new Set([
@@ -129,6 +130,9 @@ const recordCompanyProfileUpdated = ({ req, company, section = "profile", fields
     },
   }).catch(() => null);
 };
+
+const companyActorType = (req) =>
+  req.companyAccess?.role === "owner" ? "company_owner" : "company_member";
 
 const deleteCompanyUploadedFile = async (filename = "") => {
   const safe = normalizeCompanyFileName(filename);
@@ -866,7 +870,21 @@ export const downloadCompanyFile = async (req, res, next) => {
     }
 
     return res.download(filePath, filename, (error) => {
-      if (error) next(error);
+      if (error) return next(error);
+      writeAuditLog({
+        req,
+        companyId: company._id,
+        actorUserId: req.user?._id || req.auth?.userId || company.owner_user_id,
+        actorType: companyActorType(req),
+        action: "company_file_downloaded",
+        entityType: "company",
+        entityId: company._id,
+        metadata: {
+          filename,
+          extension: path.extname(filename).toLowerCase(),
+          profile_file: true,
+        },
+      }).catch(() => null);
     });
   } catch (error) {
     next(error);

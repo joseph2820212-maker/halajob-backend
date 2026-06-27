@@ -16,12 +16,14 @@ Branch: `flutter-seeker-campus`
 | Approved company route guard | Company dashboard/helper/jobs/campus APIs now require both a company context and an approved company account. Pending company accounts are blocked from approved dashboard APIs. | `routesCompany/index.js`, `npm run test:integration:auth-context` |
 | Seeded auth/context integration coverage | Runtime MongoDB integration coverage now includes missing/malformed token, seeker, student/campus, approved company, pending company, university admin, dashboard admin, cross-role denial, cross-company context denial, suspended context denial, invalid context id, and refresh-token revocation. | `scripts/verifyAuthContextIntegration.js` |
 | Dashboard admin audit logging | Dashboard admin login failure, login success, and admin creation now write audit logs, with a seeded runtime test proving stable failure reason keys and no password storage in audit metadata. | `npm run test:audit-logging`, `controllers/dash/authController.js`, `scripts/verifyAuditLoggingIntegration.js` |
+| Company file/export audit logging | Company profile file downloads, single application CV downloads, bulk CV ZIP exports, and application exports now write audit logs, with a seeded runtime test also proving company file path traversal is rejected safely. | `npm run test:file-export-audit`, `controllers/companyDash/companyWithJobs/companyJobHiringController.js`, `controllers/companyDash/information/companyInformationController.js` |
 
 ## Checks Run
 
 ```bash
 npm run test:security-http
 npm run test:audit-logging
+npm run test:file-export-audit
 npm run test:integration:auth-context
 npm run test:mobile-routes
 npm run check:syntax
@@ -32,4 +34,4 @@ npm --prefix web run build
 
 ## Remaining From Backend/API Audit
 
-The project still needs the larger runtime integration suite from the backend audit: AI, trust, analytics, notifications, applications, CV, jobs, payments/subscriptions, mutation side effects, upload/download security, and full web/mobile end-to-end API flow coverage.
+The project still needs the larger runtime integration suite from the backend audit: AI, trust, analytics, notifications, applications, jobs, payments/subscriptions, broader mutation side effects, remaining sensitive campus/university/admin audit-log assertions, and full web/mobile end-to-end API flow coverage.

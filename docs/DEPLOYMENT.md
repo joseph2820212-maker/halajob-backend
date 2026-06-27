@@ -14,6 +14,7 @@ npm run check:syntax
 npm run check:imports
 npm run test:security-http
 npm run test:audit-logging
+npm run test:file-export-audit
 npm run test:mobile-routes
 npm run test:ai-safety
 npm run test:global-launch-contract
