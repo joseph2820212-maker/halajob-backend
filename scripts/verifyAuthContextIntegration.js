@@ -471,6 +471,32 @@ async function main() {
   );
   assert.equal(campusStatus.status, true, "campus verification status response should be successful");
 
+  await UserModel.updateOne(
+    { _id: seekerUser._id },
+    { $set: { default_context_id: companyContext._id } }
+  );
+  const seekerJobsWithBorrowedStoredDefault = await expectStatus(
+    request(baseUrl, "GET", "/employee/v1/global/jobs", { token: seekerTokens.accessToken }),
+    200,
+    "tampered cross-user stored default context should not block own seeker access"
+  );
+  assert.equal(
+    seekerJobsWithBorrowedStoredDefault.success,
+    true,
+    "seeker should still resolve an owned active context after a tampered stored default"
+  );
+  const seekerAfterBorrowedStoredDefault = await UserModel.findById(seekerUser._id).lean();
+  assert.notEqual(
+    String(seekerAfterBorrowedStoredDefault.default_context_id || ""),
+    String(companyContext._id),
+    "cross-user stored default context should be replaced with an owned active context"
+  );
+  await expectStatus(
+    request(baseUrl, "GET", "/company/v1/global", { token: seekerTokens.accessToken }),
+    403,
+    "tampered cross-user stored default context should not grant company dashboard access"
+  );
+
   const companyBlockedFromEmployee = await expectStatus(
     request(baseUrl, "GET", "/employee/v1/global/jobs", { token: companyTokens.accessToken }),
     403,
@@ -500,6 +526,27 @@ async function main() {
     "company context should access company dashboard"
   );
   assert.equal(companyDashboard.success, true, "company dashboard response should be successful");
+
+  await UserModel.updateOne(
+    { _id: companyUser._id },
+    { $set: { default_context_id: removedCompanyContext._id } }
+  );
+  const companyDashboardWithRemovedStoredDefault = await expectStatus(
+    request(baseUrl, "GET", "/company/v1/global", { token: companyTokens.accessToken }),
+    200,
+    "removed stored default context should be ignored in favor of active company context"
+  );
+  assert.equal(
+    companyDashboardWithRemovedStoredDefault.success,
+    true,
+    "company should still resolve an owned active context after a removed stored default"
+  );
+  const companyAfterRemovedStoredDefault = await UserModel.findById(companyUser._id).lean();
+  assert.notEqual(
+    String(companyAfterRemovedStoredDefault.default_context_id || ""),
+    String(removedCompanyContext._id),
+    "removed stored default context should be replaced with an active context"
+  );
 
   await expectStatus(
     request(baseUrl, "GET", "/company/v1/global", { token: pendingCompanyTokens.accessToken }),
@@ -562,6 +609,17 @@ async function main() {
     }),
     403,
     "removed explicit context should fail closed instead of falling back"
+  );
+
+  await expectStatus(
+    request(baseUrl, "POST", "/user/v1/me/active-context", {
+      token: companyTokens.accessToken,
+      body: {
+        context_id: String(otherCompanyContext._id),
+      },
+    }),
+    404,
+    "another user's context should not be selectable as active context"
   );
 
   await expectStatus(
