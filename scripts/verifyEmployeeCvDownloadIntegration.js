@@ -97,14 +97,22 @@ async function main() {
   const cvDir = path.resolve(process.cwd(), "cv", "generated");
   const ownFileName = `employee-own-${suffix}.pdf`;
   const otherFileName = `employee-other-${suffix}.pdf`;
+  const expiredFileName = `employee-expired-${suffix}.pdf`;
+  const legacyFileName = `employee-legacy-${suffix}.pdf`;
   const ownPath = path.join(cvDir, ownFileName);
   const otherPath = path.join(cvDir, otherFileName);
-  const cleanupPaths = [ownPath, otherPath];
+  const expiredPath = path.join(cvDir, expiredFileName);
+  const legacyPath = path.join(cvDir, legacyFileName);
+  const cleanupPaths = [ownPath, otherPath, expiredPath, legacyPath];
+  const ownPublicToken = `public-token-${suffix}`;
+  const expiredPublicToken = `expired-token-${suffix}`;
 
   await fs.mkdir(cvDir, { recursive: true });
   await Promise.all([
     fs.writeFile(ownPath, Buffer.from("%PDF-1.4\n% own employee cv\n", "utf8")),
     fs.writeFile(otherPath, Buffer.from("%PDF-1.4\n% other employee cv\n", "utf8")),
+    fs.writeFile(expiredPath, Buffer.from("%PDF-1.4\n% expired employee cv\n", "utf8")),
+    fs.writeFile(legacyPath, Buffer.from("%PDF-1.4\n% legacy employee cv\n", "utf8")),
   ]);
 
   const employeeRole = await RoleModel.create({
@@ -199,6 +207,8 @@ async function main() {
       title: "Owner Saved CV",
       lang: "en",
       pdf_file: `cv/generated/${ownFileName}`,
+      public_download_token: ownPublicToken,
+      public_download_expires_at: new Date(Date.now() + 60 * 60 * 1000),
       is_default: true,
     },
     {
@@ -208,6 +218,8 @@ async function main() {
       title: "Other Saved CV",
       lang: "en",
       pdf_file: `cv/generated/${otherFileName}`,
+      public_download_token: `other-token-${suffix}`,
+      public_download_expires_at: new Date(Date.now() + 60 * 60 * 1000),
       is_default: true,
     },
     {
@@ -228,6 +240,26 @@ async function main() {
       pdf_file: `cv/generated/missing-${suffix}.pdf`,
       is_default: false,
     },
+    {
+      employee_id: ownerEmployee._id,
+      template_id: template._id,
+      template_key: template.key,
+      title: "Expired Public CV",
+      lang: "en",
+      pdf_file: `cv/generated/${expiredFileName}`,
+      public_download_token: expiredPublicToken,
+      public_download_expires_at: new Date(Date.now() - 60 * 1000),
+      is_default: false,
+    },
+    {
+      employee_id: ownerEmployee._id,
+      template_id: template._id,
+      template_key: template.key,
+      title: "Legacy Public CV",
+      lang: "en",
+      pdf_file: `cv/generated/${legacyFileName}`,
+      is_default: false,
+    },
   ]);
 
   const device = { brand: "Employee CV", model_name: "Integration", is_device: false };
@@ -240,6 +272,52 @@ async function main() {
   await new Promise((resolve) => server.once("listening", resolve));
   const { port } = server.address();
   const baseUrl = `http://127.0.0.1:${port}`;
+
+  await expectStatus(
+    request(baseUrl, "GET", `/cv/generated/${ownFileName}`),
+    403,
+    "public generated CV download missing token"
+  );
+
+  await expectStatus(
+    request(baseUrl, "GET", `/cv/generated/${ownFileName}?token=wrong-token`),
+    403,
+    "public generated CV download wrong token"
+  );
+
+  await expectStatus(
+    request(baseUrl, "GET", `/cv/generated/${expiredFileName}?token=${expiredPublicToken}`),
+    410,
+    "public generated CV download expired token"
+  );
+
+  await expectStatus(
+    request(baseUrl, "GET", `/cv/generated/${legacyFileName}`),
+    403,
+    "legacy generated CV record without token is not public"
+  );
+
+  const publicDownload = await expectStatus(
+    request(baseUrl, "GET", `/cv/generated/${ownFileName}?token=${ownPublicToken}`),
+    200,
+    "public generated CV download valid token",
+    { binary: true }
+  );
+  assert.match(
+    String(publicDownload.response.headers.get("content-disposition") || ""),
+    /attachment/i,
+    "public generated CV download should be an attachment"
+  );
+  assert.equal(
+    publicDownload.response.headers.get("x-content-type-options"),
+    "nosniff",
+    "public generated CV download should include nosniff"
+  );
+  assert.equal(
+    publicDownload.response.headers.get("cache-control"),
+    "no-store",
+    "public generated CV download should not be cached"
+  );
 
   await expectStatus(
     request(baseUrl, "GET", `/employee/v1/cv/download/${ownCv._id}`),
@@ -307,7 +385,7 @@ async function main() {
     "saved CV download missing file"
   );
 
-  console.log("Employee CV download integration verified for auth, ownership, invalid IDs, unsafe paths, and missing files.");
+  console.log("Employee CV download integration verified for public token policy, auth, ownership, invalid IDs, unsafe paths, and missing files.");
 
   await Promise.all(cleanupPaths.map((file) => fs.unlink(file).catch(() => null)));
 }

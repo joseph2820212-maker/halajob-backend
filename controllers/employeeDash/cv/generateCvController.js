@@ -9,6 +9,10 @@ import { fail, getEmployeeOrFail, getEmployeePlain, success } from "../../../hel
 
 const CV_OUTPUT_ROOT = path.resolve("cv", "generated");
 const CV_ROOT = path.resolve("cv");
+const PUBLIC_CV_URL_TTL_MINUTES = Math.max(
+  1,
+  Number.parseInt(process.env.GENERATED_CV_PUBLIC_URL_TTL_MINUTES || "60", 10) || 60
+);
 
 const isValidObjectId = (value) => mongoose.Types.ObjectId.isValid(String(value || ""));
 
@@ -113,6 +117,8 @@ export const createMyCvDownloadUrl = async (req, res, next) => {
     const fileName = `generated-${randomBytes(12).toString("hex")}.pdf`;
     const filePath = path.join(CV_OUTPUT_ROOT, fileName);
     const publicPath = path.posix.join("cv", "generated", fileName);
+    const publicDownloadToken = randomBytes(24).toString("hex");
+    const publicDownloadExpiresAt = new Date(Date.now() + PUBLIC_CV_URL_TTL_MINUTES * 60 * 1000);
     await fs.promises.writeFile(filePath, pdf);
 
     const cv = await EmployeeCvModel.create({
@@ -125,10 +131,27 @@ export const createMyCvDownloadUrl = async (req, res, next) => {
       font: context.font,
       sections: req.body?.sections || {},
       pdf_file: publicPath,
+      public_download_token: publicDownloadToken,
+      public_download_expires_at: publicDownloadExpiresAt,
       is_default: Boolean(req.body?.is_default),
     });
+    const publicDownloadUrl = `/${cv.pdf_file}?token=${publicDownloadToken}`;
+    const ownerDownloadUrl = `/employee/v1/cv/download/${cv._id}`;
+    const cvData = cv.toObject ? cv.toObject() : cv;
+    delete cvData.public_download_token;
 
-    return success(res, { cv, url: `/${cv.pdf_file}` }, "cv_generated", 201);
+    return success(
+      res,
+      {
+        cv: cvData,
+        url: publicDownloadUrl,
+        download_url: publicDownloadUrl,
+        owner_download_url: ownerDownloadUrl,
+        public_download_expires_at: publicDownloadExpiresAt,
+      },
+      "cv_generated",
+      201
+    );
   } catch (error) {
     next(error);
   }
@@ -153,6 +176,9 @@ export const downloadSavedCv = async (req, res, next) => {
       throw error;
     }
 
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("Cache-Control", "private, no-store, max-age=0");
+    res.setHeader("Content-Type", "application/pdf");
     return res.download(resolved, `${cv.title || "cv"}.pdf`, (error) => {
       if (error && !res.headersSent) return next(error);
       return undefined;

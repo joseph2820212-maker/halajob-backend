@@ -83,6 +83,17 @@ const EmployeeCvSchema = new Schema(
       type: String,
       default: "",
     },
+    public_download_token: {
+      type: String,
+      default: "",
+      select: false,
+      index: true,
+    },
+    public_download_expires_at: {
+      type: Date,
+      default: null,
+      index: true,
+    },
 
     is_default: {
       type: Boolean,

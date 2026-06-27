@@ -6,6 +6,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import hpp from "hpp";
+import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -25,6 +26,7 @@ import universityRoutes from "./routesUniversity/index.js";
 import routesHealth from "./routesHealth/index.js";
 import error from "./middlewares/error.js";
 import ApiError from "./utils/apiError.js";
+import { EmployeeCvModel } from "./models/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -208,6 +210,37 @@ const activeUploadExtensions = new Set([".svg", ".html", ".htm", ".xml"]);
 
 const safeAttachmentName = (filePath) => path.basename(filePath).replace(/["\\]/g, "_");
 
+const generatedCvRecordPath = (fileName) => path.posix.join("cv", "generated", fileName);
+const generatedCvTokenFromRequest = (req) =>
+  String(req.query.token || req.get("x-cv-download-token") || "").trim();
+
+const verifyGeneratedCvPublicAccess = async (req, fileName) => {
+  if (mongoose.connection.readyState !== 1) return;
+
+  const cv = await EmployeeCvModel.findOne({ pdf_file: generatedCvRecordPath(fileName) })
+    .select("+public_download_token public_download_expires_at")
+    .lean();
+
+  if (!cv) {
+    if (isProduction) throw new ApiError(404, "cv_not_found", "CV");
+    return;
+  }
+
+  const expectedToken = String(cv.public_download_token || "").trim();
+  if (!expectedToken) {
+    throw new ApiError(403, "cv_public_link_token_required", "CV");
+  }
+
+  if (generatedCvTokenFromRequest(req) !== expectedToken) {
+    throw new ApiError(403, "invalid_cv_public_link_token", "CV");
+  }
+
+  const expiresAt = cv.public_download_expires_at ? new Date(cv.public_download_expires_at).getTime() : 0;
+  if (!expiresAt || expiresAt <= Date.now()) {
+    throw new ApiError(410, "cv_public_link_expired", "CV");
+  }
+};
+
 app.use("/uploads/files", (req, res) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Cache-Control", "no-store");
@@ -257,6 +290,7 @@ app.get("/cv/generated/:fileName", async (req, res, next) => {
     }
 
     await fs.promises.access(filePath, fs.constants.R_OK);
+    await verifyGeneratedCvPublicAccess(req, fileName);
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     res.setHeader("Cache-Control", "no-store");

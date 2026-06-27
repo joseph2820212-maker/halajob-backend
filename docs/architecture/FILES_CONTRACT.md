@@ -17,6 +17,7 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 - Serve HTML uploads as attachments with restrictive headers.
 - Serve non-image public uploads as attachments; block direct public access to private document uploads under `/uploads/files/*`.
 - Serve generated CV PDFs as attachments with `Cache-Control: no-store`.
+- Newly generated public CV links must include an unguessable token and `public_download_expires_at`; authenticated owners should use `/employee/v1/cv/download/:cvId`.
 - Send `X-Content-Type-Options: nosniff` on served files.
 - Sensitive CV/document downloads must require auth and correct company/admin context.
 - Bulk exports must be audited and permission-checked.
@@ -49,13 +50,13 @@ npm run check:secrets
 
 `npm run test:file-export-audit` proves company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user.
 
-`npm run test:integration:employee-cv-downloads` proves saved employee CV downloads require auth, are scoped to the owning employee, reject invalid IDs, reject unsafe stored paths, and return a clear 404 for missing files.
+`npm run test:integration:employee-cv-downloads` proves saved employee CV downloads require auth, are scoped to the owning employee, reject invalid IDs, reject unsafe stored paths, return a clear 404 for missing files, and enforce generated-CV public token/expiry checks for database-backed CV records.
 
 `npm run test:integration:admin-permissions` proves `/dash/v1/file/:name` blocks dashboard admins without `files.read`, allows `files.read` PDF downloads, sends attachment/no-store/nosniff headers, and rejects non-image/non-PDF extensions.
 
 ## Gaps
 
 - MIME/size policies should be documented per endpoint.
-- Generated CV public-link expiry/ownership policy still needs a product decision.
+- Generated CV public-link TTL can be tuned with `GENERATED_CV_PUBLIC_URL_TTL_MINUTES`; default is 60 minutes.
 - Sensitive download audit/ownership coverage must continue to be tested route by route.
 - Object storage migration should be planned before high-volume launch.
