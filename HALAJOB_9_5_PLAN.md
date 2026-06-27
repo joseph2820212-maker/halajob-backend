@@ -40,7 +40,7 @@ Codex/Claude must **not** claim the project is 9.5/10 unless all major flows are
 | 10 | Notifications & Email | [x]* |
 | 11 | Payments & Subscriptions | [~] |
 | 12 | Mobile App Quality | [~] |
-| 13 | Web Frontend Quality | [ ] |
+| 13 | Web Frontend Quality | [~] |
 | 14 | Testing Strategy | [~] |
 | 15 | Performance & Scalability | [ ] |
 | 16 | Observability & Operations | [ ] |
@@ -400,3 +400,20 @@ Goal: polished, reliable Flutter app.
 **Result: PARTIAL** — analyze/tests green, states present, i18n check fixed; token-refresh + cert-pinning deferred (documented).
 
 **Score movement:** Mobile ~8 → ~8.3 (i18n check green); → 9 with silent refresh + cert pinning.
+
+## Phase 13 — Web Frontend Quality  [~]
+Goal: reliable, professional web dashboards.
+
+**Verified:** web builds clean (Vite + typecheck); request interceptor injects token + language; per-scope token storage (seeker/company/admin/campus).
+
+**Fixed this phase (audit HIGH gap):**
+- [x] **401 response interceptor** added (`web/src/shared/api.ts`): on 401 (non-auth endpoints) clears the scope's stored auth + generic token and redirects to sign-in (`/?session=expired`); guarded against loops + 403 (permission). Scope preserved on request config for correct clearing. Verified: `npm --prefix web run build` PASS.
+
+**Remaining (itemized):**
+- [ ] `encodeURIComponent` on ~65 dynamic URL path params (audit medium) — tedious, careful (avoid double-encoding); staged rollout
+- [ ] Token **refresh+retry** before logout (currently logout-only); loading/empty/error-state polish per panel; role-guard audit
+- [ ] Extract hardcoded strings to i18n (web)
+
+**Result: PARTIAL** — the HIGH 401-handling gap is closed + build verified; URL-encoding + state polish remain.
+
+**Score movement:** Web ~6 → ~7 (session expiry handled).
