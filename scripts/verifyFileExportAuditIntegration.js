@@ -33,6 +33,20 @@ async function request(baseUrl, method, pathName, { token, contextId, body, head
   });
 }
 
+async function multipartRequest(baseUrl, pathName, { token, contextId, form }) {
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+  if (contextId) headers["X-Active-Context-Id"] = String(contextId);
+
+  return fetch(`${baseUrl}${pathName}`, {
+    method: "POST",
+    headers,
+    body: form,
+  });
+}
+
 async function readJson(response) {
   const text = await response.text();
   try {
@@ -56,6 +70,22 @@ async function expectStatus(responsePromise, expected, label, { binary = false }
     `${label} should return ${expected}; got ${response.status}; body=${responseBody}`
   );
   return response;
+}
+
+async function expectErrorMessage(responsePromise, expected, messagePattern, label) {
+  const response = await responsePromise;
+  const payload = await readJson(response);
+  assert.equal(
+    response.status,
+    expected,
+    `${label} should return ${expected}; got ${response.status}; body=${JSON.stringify(payload)}`
+  );
+  assert.match(
+    String(payload.message || payload.error || ""),
+    messagePattern,
+    `${label} should include ${messagePattern} in its error message`
+  );
+  return payload;
 }
 
 async function waitForAudit(AuditLogModel, filter, label) {
@@ -258,6 +288,37 @@ async function main() {
     const { port } = server.address();
     const baseUrl = `http://127.0.0.1:${port}`;
 
+    const invalidCompanyFileForm = new FormData();
+    invalidCompanyFileForm.append("file", new Blob([Buffer.from("<html>not a pdf</html>")], { type: "text/html" }), "company-proof.pdf");
+    await expectErrorMessage(
+      multipartRequest(baseUrl, "/user/v1/company/upload-file", {
+        token: tokens.accessToken,
+        form: invalidCompanyFileForm,
+      }),
+      400,
+      /unsupported_file_type/,
+      "company request file upload rejects MIME mismatch"
+    );
+
+    const oversizedCompanyFileForm = new FormData();
+    oversizedCompanyFileForm.append("file", new Blob([Buffer.alloc(4 * 1024 * 1024 + 1, 67)], { type: "application/pdf" }), "too-large-company-proof.pdf");
+    await expectErrorMessage(
+      multipartRequest(baseUrl, "/user/v1/company/upload-file", {
+        token: tokens.accessToken,
+        form: oversizedCompanyFileForm,
+      }),
+      413,
+      /file_too_large/,
+      "company request file upload rejects oversize file"
+    );
+
+    const companyAfterRejectedUploads = await CompanyModel.findById(company._id).lean();
+    assert.deepEqual(
+      companyAfterRejectedUploads.files,
+      [companyFileName],
+      "rejected company file uploads should not mutate company files"
+    );
+
     await expectStatus(
       request(baseUrl, "GET", `/company/v1/global/profile/files/${encodeURIComponent(companyFileName)}/download`, {
         token: tokens.accessToken,
@@ -420,7 +481,7 @@ async function main() {
       assert.ok(auditActions.includes(expectedAction), `${expectedAction} should be audited`);
     }
 
-    console.log("File/export audit integration verified for company downloads and exports.");
+    console.log("File/export audit integration verified for company upload MIME/size rejection, downloads, and exports.");
   } finally {
     await new Promise((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));

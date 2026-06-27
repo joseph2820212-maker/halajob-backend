@@ -4,6 +4,16 @@ import { v4 as uuidv4 } from 'uuid';
 import logger from '../config/logger.js';
 import ApiError from '../utils/apiError.js';
 
+const multerErrorMessage = (err) => {
+  if (err?.message === 'unsupported_file_type') return 'unsupported_file_type';
+  if (err?.code === 'LIMIT_FILE_SIZE') return 'file_too_large';
+  if (err?.code === 'LIMIT_FILE_COUNT') return 'too_many_files';
+  if (err?.code === 'LIMIT_UNEXPECTED_FILE') return 'unexpected_file';
+  if (err?.code && String(err.code).startsWith('LIMIT_')) return 'invalid_file_upload';
+  return '';
+};
+
+const multerErrorStatus = (err) => (err?.code === 'LIMIT_FILE_SIZE' ? 413 : 400);
 
 const handler = (err, req, res, next) => {
   const response = {
@@ -24,6 +34,12 @@ const converter = (err, req, res, next) => {
       httpStatus.BAD_REQUEST,
       err?.errors?.join(', ') || 'Validations have failed',
       'Validation Error'
+    );
+  } else if (err?.name === 'MulterError' || err?.message === 'unsupported_file_type') {
+    convertedError = new ApiError(
+      multerErrorStatus(err),
+      multerErrorMessage(err) || 'invalid_file_upload',
+      'File Upload Error'
     );
   } else if (!(err instanceof ApiError)) {
     let uuid = uuidv4();

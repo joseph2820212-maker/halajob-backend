@@ -64,6 +64,16 @@ async function expectStatus(responsePromise, expected, label) {
   return payload;
 }
 
+async function expectErrorMessage(responsePromise, expected, messagePattern, label) {
+  const payload = await expectStatus(responsePromise, expected, label);
+  assert.match(
+    String(payload.message || payload.error || ""),
+    messagePattern,
+    `${label} should include ${messagePattern} in its error message`
+  );
+  return payload;
+}
+
 async function expectRawStatus(responsePromise, expected, label) {
   const response = await responsePromise;
   const body = await response.arrayBuffer();
@@ -288,6 +298,42 @@ async function main() {
     "new student verification should reject public upload-root document URLs"
   );
 
+  const invalidMimeForm = new FormData();
+  invalidMimeForm.append("university_id", String(universityA._id));
+  invalidMimeForm.append("student_email", studentUser.email);
+  invalidMimeForm.append("document", new Blob([Buffer.from("<html>not a pdf</html>")], { type: "text/html" }), "student-proof.pdf");
+  await expectErrorMessage(
+    multipartRequest(baseUrl, "/campus/v1/verification/upload-document", {
+      token: studentTokens.accessToken,
+      contextId: studentContext._id,
+      form: invalidMimeForm,
+    }),
+    400,
+    /unsupported_file_type/,
+    "student verification document upload rejects MIME mismatch"
+  );
+
+  const oversizedForm = new FormData();
+  oversizedForm.append("university_id", String(universityA._id));
+  oversizedForm.append("student_email", studentUser.email);
+  oversizedForm.append("document", new Blob([Buffer.alloc(4 * 1024 * 1024 + 1, 65)], { type: "application/pdf" }), "too-large-proof.pdf");
+  await expectErrorMessage(
+    multipartRequest(baseUrl, "/campus/v1/verification/upload-document", {
+      token: studentTokens.accessToken,
+      contextId: studentContext._id,
+      form: oversizedForm,
+    }),
+    413,
+    /file_too_large/,
+    "student verification document upload rejects oversize file"
+  );
+
+  assert.equal(
+    await StudentVerificationModel.countDocuments({ user_id: studentUser._id }),
+    0,
+    "rejected document uploads should not create student verification records"
+  );
+
   const form = new FormData();
   form.append("university_id", String(universityA._id));
   form.append("student_email", studentUser.email);
@@ -379,7 +425,7 @@ async function main() {
     "student and university admin downloads should be audited"
   );
 
-  console.log("Student verification document security verified for private storage, public denial, scoped downloads, headers, and audit logs.");
+  console.log("Student verification document security verified for upload MIME/size rejection, private storage, public denial, scoped downloads, headers, and audit logs.");
 }
 
 main()

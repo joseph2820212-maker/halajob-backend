@@ -35,6 +35,20 @@ async function request(baseUrl, method, pathName, { token, contextId, body, head
   });
 }
 
+async function multipartRequest(baseUrl, pathName, { token, contextId, form }) {
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+  if (contextId) headers["X-Active-Context-Id"] = String(contextId);
+
+  return fetch(`${baseUrl}${pathName}`, {
+    method: "POST",
+    headers,
+    body: form,
+  });
+}
+
 async function expectStatus(responsePromise, expected, label, { binary = false } = {}) {
   const response = await responsePromise;
   const body = binary && response.status === expected ? await response.arrayBuffer() : await response.text();
@@ -44,6 +58,13 @@ async function expectStatus(responsePromise, expected, label, { binary = false }
     `${label} should return ${expected}; got ${response.status}; body=${binary ? `[${body.byteLength} bytes]` : body}`
   );
   return { response, body };
+}
+
+async function expectErrorMessage(responsePromise, expected, messagePattern, label) {
+  const result = await expectStatus(responsePromise, expected, label);
+  const text = result.body instanceof ArrayBuffer ? "" : String(result.body || "");
+  assert.match(text, messagePattern, `${label} should include ${messagePattern} in the response`);
+  return result;
 }
 
 function userSeed({ firstName, lastName, email, roleId, phone }) {
@@ -325,6 +346,32 @@ async function main() {
     "saved CV download missing token"
   );
 
+  const invalidCvForm = new FormData();
+  invalidCvForm.append("cv", new Blob([Buffer.from("not a pdf")], { type: "text/plain" }), "resume.txt");
+  await expectErrorMessage(
+    multipartRequest(baseUrl, "/employee/v1/cv/upload", {
+      token: ownerTokens.accessToken,
+      contextId: ownerContext._id,
+      form: invalidCvForm,
+    }),
+    400,
+    /unsupported_file_type/,
+    "CV upload rejects unsupported extension and MIME"
+  );
+
+  const oversizedCvForm = new FormData();
+  oversizedCvForm.append("cv", new Blob([Buffer.alloc(4 * 1024 * 1024 + 1, 66)], { type: "application/pdf" }), "too-large-cv.pdf");
+  await expectErrorMessage(
+    multipartRequest(baseUrl, "/employee/v1/cv/upload", {
+      token: ownerTokens.accessToken,
+      contextId: ownerContext._id,
+      form: oversizedCvForm,
+    }),
+    413,
+    /file_too_large/,
+    "CV upload rejects oversized PDF"
+  );
+
   const ownDownload = await expectStatus(
     request(baseUrl, "GET", `/employee/v1/cv/download/${ownCv._id}`, {
       token: ownerTokens.accessToken,
@@ -338,6 +385,15 @@ async function main() {
     String(ownDownload.response.headers.get("content-disposition") || ""),
     /attachment/i,
     "saved CV download should be an attachment"
+  );
+
+  assert.equal(
+    await EmployeeCvModel.countDocuments({
+      employee_id: ownerEmployee._id,
+      title: { $in: ["resume.txt", "too-large-cv.pdf"] },
+    }),
+    0,
+    "rejected CV uploads should not create saved CV records"
   );
 
   await expectStatus(
@@ -385,7 +441,7 @@ async function main() {
     "saved CV download missing file"
   );
 
-  console.log("Employee CV download integration verified for public token policy, auth, ownership, invalid IDs, unsafe paths, and missing files.");
+  console.log("Employee CV download integration verified for upload MIME/size rejection, public token policy, auth, ownership, invalid IDs, unsafe paths, and missing files.");
 
   await Promise.all(cleanupPaths.map((file) => fs.unlink(file).catch(() => null)));
 }
