@@ -47,6 +47,36 @@ export const requireUniversityAdminContext = requireActiveContext(
   { message: "university_admin_context_required" }
 );
 
+export const requireActiveContextPermission = (permission, options = {}) => {
+  const requiredPermission = String(permission || "").trim();
+  return function activeContextPermissionGuard(req, res, next) {
+    try {
+      const permissions = Array.isArray(req.activeContext?.permissions) ? req.activeContext.permissions : [];
+      if (!requiredPermission || permissions.includes("*") || permissions.includes(requiredPermission)) {
+        return next();
+      }
+
+      return ReturnAppData.getError({
+        res,
+        status: 403,
+        message: options.message || "context_permission_denied",
+        other: {
+          data: {
+            permission: requiredPermission,
+            active_context_type: req.activeContext?.context_type || "",
+            active_context_id: req.activeContext?.id || req.activeContext?._id || "",
+          },
+        },
+      });
+    } catch (error) {
+      return next(error);
+    }
+  };
+};
+
+export const requireUniversityPermission = (permission) =>
+  requireActiveContextPermission(permission, { message: "university_permission_denied" });
+
 export const requireCompanyContext = requireActiveContext(
   ["company_admin", "company_member"],
   { message: "company_context_required", allowedStatuses: ["active", "pending"] }

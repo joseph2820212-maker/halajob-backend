@@ -1,6 +1,6 @@
 import express from "express";
 import { authUser } from "../middlewares/userAuth.js";
-import { requireUniversityAdminContext } from "../middlewares/appAccountGuard.js";
+import { requireUniversityAdminContext, requireUniversityPermission } from "../middlewares/appAccountGuard.js";
 import campusController from "../controllers/app/campus/campusController.js";
 import multer from "../utils/multer.js";
 
@@ -23,5 +23,10 @@ router.get("/admin/verifications", universityAdminGuard, campusController.adminL
 router.post("/admin/verifications/:id/approve", universityAdminGuard, upload.none(), campusController.adminApproveVerification);
 router.post("/admin/verifications/:id/reject", universityAdminGuard, upload.none(), campusController.adminRejectVerification);
 router.post("/admin/verifications/:id/request-info", universityAdminGuard, upload.none(), campusController.adminRequestVerificationInfo);
+
+router.get("/admin/members", universityAdminGuard, requireUniversityPermission("campus.members.view"), campusController.listUniversityMembers);
+router.post("/admin/members", universityAdminGuard, requireUniversityPermission("campus.members.manage"), upload.none(), campusController.upsertUniversityMember);
+router.patch("/admin/members/:memberId", universityAdminGuard, requireUniversityPermission("campus.members.manage"), upload.none(), campusController.updateUniversityMember);
+router.delete("/admin/members/:memberId", universityAdminGuard, requireUniversityPermission("campus.members.manage"), campusController.removeUniversityMember);
 
 export default router;

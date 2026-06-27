@@ -32,15 +32,52 @@ const DEFAULT_PERMISSIONS = {
   company_member: ["ats.view"],
   company_admin: ["*"],
   university_admin: [
-    "campus.verifications.manage",
     "campus.dashboard.view",
-    "campus.events.manage",
+    "campus.verifications.manage",
     "campus.students.view",
+    "campus.events.manage",
   ],
   super_admin: ["*"],
 };
 
 const norm = (value) => String(value || "").trim().toLowerCase();
+
+export const UNIVERSITY_PERMISSIONS_BY_ROLE = Object.freeze({
+  owner: ["*"],
+  admin: [
+    "campus.dashboard.view",
+    "campus.verifications.manage",
+    "campus.students.view",
+    "campus.events.manage",
+    "campus.opportunities.manage",
+    "campus.partners.manage",
+    "campus.analytics.view",
+    "campus.members.view",
+    "campus.members.manage",
+  ],
+  career_center: [
+    "campus.dashboard.view",
+    "campus.verifications.manage",
+    "campus.students.view",
+    "campus.events.manage",
+    "campus.opportunities.manage",
+    "campus.partners.manage",
+    "campus.analytics.view",
+  ],
+  advisor: [
+    "campus.dashboard.view",
+    "campus.students.view",
+    "campus.analytics.view",
+  ],
+  viewer: [
+    "campus.dashboard.view",
+    "campus.students.view",
+  ],
+});
+
+export const defaultUniversityPermissionsForRole = (role = "career_center") => [
+  ...(UNIVERSITY_PERMISSIONS_BY_ROLE[norm(role)] || UNIVERSITY_PERMISSIONS_BY_ROLE.career_center),
+];
 
 const toObjectId = (value) => {
   if (!value) return null;
@@ -272,7 +309,10 @@ export async function syncAccountContextsForUser(userInput) {
   const addUniversityContext = (university, membership = null) => {
     const universityId = idOf(university);
     if (!universityId) return;
-    const permissions = membership?.permissions?.length ? membership.permissions : DEFAULT_PERMISSIONS.university_admin;
+    const membershipRole = membership?.role || "career_center";
+    const permissions = membership?.permissions?.length
+      ? membership.permissions
+      : defaultUniversityPermissionsForRole(membershipRole);
     upserts.push(
       upsertDerivedContext({
         userId,
@@ -284,7 +324,7 @@ export async function syncAccountContextsForUser(userInput) {
         permissions,
         metadata: {
           membership_id: membership?._id || null,
-          role: membership?.role || "career_center",
+          role: membershipRole,
         },
       })
     );
@@ -295,7 +335,9 @@ export async function syncAccountContextsForUser(userInput) {
     const university = membership.university_id && typeof membership.university_id === "object" ? membership.university_id : null;
     addUniversityContext(university || { _id: membership.university_id }, membership);
   }
-  if (careerUniversity) addUniversityContext(careerUniversity);
+  if (careerUniversity && !seenKeys.has(contextKey("university_admin", idOf(careerUniversity)))) {
+    addUniversityContext(careerUniversity);
+  }
 
   if (isSuperAdminRole(user.role_id)) {
     upserts.push(

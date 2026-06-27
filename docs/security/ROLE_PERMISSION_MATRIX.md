@@ -53,6 +53,22 @@ The backend currently contains legacy role/account names. These are the product-
 
 Runtime verifier: `npm run test:integration:company-permissions` proves owner wildcard access, member `ats.view` allow, missing `jobs.manage`/`billing.manage` denial, and suspended member denial.
 
+## University Permission Keys
+
+| Permission | Current use |
+|---|---|
+| `campus.dashboard.view` | University dashboard and overview access. |
+| `campus.verifications.manage` | Student verification queue decisions. |
+| `campus.students.view` | University student list and student career passport views. |
+| `campus.events.manage` | Campus event administration. |
+| `campus.opportunities.manage` | University opportunity request workflows. |
+| `campus.partners.manage` | University employer partner workflows. |
+| `campus.analytics.view` | University employability analytics and outcomes reporting. |
+| `campus.members.view` | University team/member list access. |
+| `campus.members.manage` | University team/member create, update, and remove actions. |
+
+Runtime verifier: `npm run test:integration:university-members` proves role-based permissions, scoped university member CRUD, cross-university denial, last-owner protection, account-context sync, and audit logs.
+
 ## Dashboard Admin Permission Keys
 
 | Permission | Current use |

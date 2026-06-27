@@ -9,7 +9,7 @@ Repository: `joseph2820212-maker/halajobe`
 
 The backend is broadly mounted, the main web API client is wired to existing backend routes, and the current source-level route contract checks pass. The project is no longer in a state where the main problem is "missing route files" for the core product areas.
 
-However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is now narrower than the original audit: route mounting, guard classification, mobile fallback aliases, core auth/context, object authorization, file-export, AI, notification preferences/admin send, analytics, subscription/billing, company member permissions, company member lifecycle/context sync, dashboard admin permission boundaries, protected dashboard file downloads, admin support workflow, translation save/read/approval, admin-resource lifecycle, job seeker mutation side effects, ATS/interview/invitation workflows, campus/university workflows, audit redaction, and employee-CV download paths have seeded or contract coverage. The remaining risk is deeper per-feature behavior: exact request/response schemas, per-route validators, live deployed smoke testing, remaining private download/upload edge cases, support-role policy, and full web/mobile user journeys.
+However, it is not yet safe to say every backend function is fully proven end-to-end. The biggest remaining gap is now narrower than the original audit: route mounting, guard classification, mobile fallback aliases, core auth/context, object authorization, file-export, AI, notification preferences/admin send, analytics, subscription/billing, company member permissions, company member lifecycle/context sync, university member lifecycle/context sync, dashboard admin permission boundaries, protected dashboard file downloads, admin support workflow, translation save/read/approval, admin-resource lifecycle, job seeker mutation side effects, ATS/interview/invitation workflows, campus/university workflows, audit redaction, and employee-CV download paths have seeded or contract coverage. The remaining risk is deeper per-feature behavior: exact request/response schemas, per-route validators, live deployed smoke testing, remaining private download/upload edge cases, support-role policy, and full web/mobile user journeys.
 
 ## 1.1 Current 2026-06-27 Endpoint Inventory Update
 
@@ -41,11 +41,11 @@ Current generated artifacts:
 | Backend route mounting | 9 | Core route groups are mounted across seeker, company, admin, campus, university, AI, trust, analytics, notifications, jobs, and health; current route report has zero unclassified unguarded endpoints. |
 | Web API wiring | 8 | No obvious hard 404s found in the centralized web API client against mounted backend route families; browser click-through remains separate. |
 | Mobile API wiring | 8.5 | Legacy mobile fallback aliases are now covered by `npm run test:mobile-routes`, including older `/employee/v1/...` compatibility paths. |
-| Feature API coverage | 8.7 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notification preferences/admin send, analytics, subscriptions, company/admin permissions, company member lifecycle/context sync, translation save/read/approval, job seeker mutations, ATS/interview/invitation workflows, campus/university workflows, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
+| Feature API coverage | 8.75 | Most major product areas have APIs, and the core hardening harness now covers auth/context, object authorization, trust, AI, notification preferences/admin send, analytics, subscriptions, company/admin permissions, company member lifecycle/context sync, university member lifecycle/context sync, translation save/read/approval, job seeker mutations, ATS/interview/invitation workflows, campus/university workflows, admin resources, file exports, and employee CV downloads. Some workflows remain partial. |
 | Auth and account-context safety | 8.7 | Seeded auth/context integration now covers missing/malformed/expired app and admin tokens, inactive app-user denial, role/context denial, cross-role borrowing, suspended context, invalid context, and refresh-token revocation. |
 | Admin operational coverage | 8.4 | Admin resources are broad, redacted, lifecycle-audited, and now guarded by fine-grained permissions on generic resources plus high-risk operation/file/support/notification-send routes; remaining risk is newer workflow-specific admin handling and support-role policy. |
-| Automated backend test depth | 8.4 | Static checks plus multiple seeded runtime integration harnesses exist, including high-risk company member lifecycle/context sync, seeker job mutations, ATS/interview/invitation workflows, and campus/university workflows; still short of route-by-route validator/schema and full journey coverage. |
-| Launch confidence from backend/API only | 8.6 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
+| Automated backend test depth | 8.45 | Static checks plus multiple seeded runtime integration harnesses exist, including high-risk company/university member lifecycle/context sync, seeker job mutations, ATS/interview/invitation workflows, and campus/university workflows; still short of route-by-route validator/schema and full journey coverage. |
+| Launch confidence from backend/API only | 8.65 | Stronger than the original audit, but not yet a 9+ launch certificate until remaining edge-case and live-smoke gaps are closed. |
 
 ## 3. Audit Method
 
@@ -130,10 +130,10 @@ The high `/dash/v1` count is mainly from broad generic dashboard CRUD aliases. T
 | AI output persistence is partial | AI can generate safe suggestions, but generated job drafts, CV rewrites, shortlist results, hiring messages, and translations are not consistently persisted into the final domain records by the AI API itself. |
 | Translation consumption still needs UI/product QA | Job/CV translation save, owner-scoped read, draft review, approval, audit logging, and analytics now have seeded runtime coverage, but all consuming job/CV screens still need QA to confirm approved translations display exactly where intended. |
 | Campus event/content management is thin | Mobile reads, registration, cancellation, and lifecycle side effects now have seeded coverage, but admin-style CRUD for campus events/content/resources is limited or static/code-backed. |
-| University team/member management is missing | University context exists, but there is no clear university equivalent of company member invite/management APIs. |
+| University team/member management now has an app API baseline | `/university/v1/members` and `/campus/v1/admin/members` now support scoped list/create/update/remove with role-based university permissions, account-context sync, cross-university denial, last-owner protection, and audit logs. Remaining work is web/mobile UI consumption and richer staffing policy. |
 | Trust document request workflow was originally incomplete | This has since been improved with company-facing trust document response routes and seeded integration coverage. Remaining work is edge-case file/evidence coverage and full UI flow QA. |
 | Support handling now has an admin baseline | Company support tickets now have dashboard queue/detail/status/reply endpoints with `support.view` and `support.manage`, assignment/closure fields, and audit logs. Remaining work is admin UI click-through and support-role staffing policy. |
-| Newer operational records are not all admin-manageable | Examples include career passports, student verifications, university memberships, invoices, AI requests/limits, analytics events, and content translations. Support tickets and admin notification sending now have explicit admin workflow routes. |
+| Newer operational records are not all admin-manageable | Examples include career passports, invoices, AI requests/limits, analytics events, and content translations. Support tickets, university memberships, and admin notification sending now have explicit workflow routes. |
 
 ## 6. Web and Mobile API Wiring
 
@@ -237,6 +237,7 @@ npm run test:integration:analytics
 npm run test:integration:subscriptions
 npm run test:integration:company-permissions
 npm run test:integration:company-members
+npm run test:integration:university-members
 npm run test:integration:admin-permissions
 npm run test:integration:admin-support
 npm run test:integration:translations
@@ -277,9 +278,9 @@ The following were not run as part of this pass:
 | P0 | Expand seeded backend integration from current core harnesses into remaining business journeys, workflow side effects, and support-role boundaries. |
 | P0 | Add remaining inactive-context edge-case tests and keep new admin feature routes tied to explicit permission keys. |
 | P0 | Keep mobile fallback aliases until the mobile app no longer uses them, then remove the aliases and update `npm run test:mobile-routes`. |
-| P1 | Add mutation tests for richer campus admin content management, remaining university team workflows, translation publishing/consumption, and any application status journeys beyond the now-covered ATS interview/invitation loop. |
+| P1 | Add mutation tests for richer campus admin content management, translation publishing/consumption, and any application status journeys beyond the now-covered ATS interview/invitation loop. |
 | P1 | Add upload/download security tests for trust evidence files, exports, generated CV expiry/ownership policy, MIME rejection, size rejection, and remaining private file routes. |
-| P1 | Add admin APIs or admin UI coverage for newer records: student verifications, university memberships, career passports, invoices, AI requests/limits, analytics events, content translations. |
+| P1 | Add admin APIs or admin UI coverage for newer records: career passports, invoices, AI requests/limits, analytics events, content translations. Student verification and university membership workflows now have app/API baselines. |
 | P1 | Complete AI persistence workflows where product expects generated content to become real saved records. |
 | P1 | Complete translation publish/read workflow so approved translations are returned in job/CV APIs. |
 | P2 | Expand generated OpenAPI/Postman artifacts with exact request bodies, response examples, validators, audit events, and role matrices route by route. |

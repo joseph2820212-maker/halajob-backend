@@ -15,9 +15,14 @@ import {
   StudentVerificationModel,
   UniversityMembershipModel,
   UniversityOpportunityRequestModel,
+  UserModel,
   jobsModel,
 } from "../../../models/index.js";
 import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js";
+import {
+  defaultUniversityPermissionsForRole,
+  syncAccountContextsForUser,
+} from "../../../services/accountContext.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import { getCareerPassportSafeViewForEmployee } from "../../../services/careerPassport.service.js";
@@ -56,9 +61,27 @@ const toStringArray = (value) => {
   return [];
 };
 
+const uniqueStringArray = (value) => [...new Set(toStringArray(value))];
 const cleanText = (value) => String(value || "").trim();
 const normalizeEmail = (value) => cleanText(value).toLowerCase();
 const idOf = (value) => value?._id || value || null;
+const UNIVERSITY_MEMBER_ROLES = new Set(["owner", "admin", "career_center", "advisor", "viewer"]);
+const UNIVERSITY_MEMBER_STATUSES = new Set(["active", "invited", "suspended", "removed"]);
+
+const normalizeUniversityMemberRole = (value) => {
+  const role = cleanText(value).toLowerCase();
+  return UNIVERSITY_MEMBER_ROLES.has(role) ? role : "career_center";
+};
+
+const normalizeUniversityMemberStatus = (value, fallback = "active") => {
+  const status = cleanText(value).toLowerCase();
+  return UNIVERSITY_MEMBER_STATUSES.has(status) ? status : fallback;
+};
+
+const permissionsForUniversityRole = (role, provided = undefined) => {
+  const permissions = uniqueStringArray(provided);
+  return permissions.length ? permissions : defaultUniversityPermissionsForRole(role);
+};
 
 const parseDateOrNull = (value) => {
   if (!value) return null;
@@ -283,6 +306,274 @@ const getUniversityAdminScope = async (req) => {
   const careerCenterUniversity = await getCareerCenterUniversityForRequest(req);
   if (careerCenterUniversity) return { superAdmin: false, university: careerCenterUniversity };
   return null;
+};
+
+const serializeUniversityMember = (membership = {}) => {
+  const user = membership.user_id && typeof membership.user_id === "object" ? membership.user_id : null;
+  const university =
+    membership.university_id && typeof membership.university_id === "object" ? membership.university_id : null;
+
+  return {
+    id: String(membership._id || ""),
+    _id: membership._id,
+    university_id: idOf(membership.university_id),
+    university: university ? publicUniversity(university) : null,
+    user_id: idOf(membership.user_id),
+    user: user
+      ? {
+          _id: user._id,
+          first_name: user.first_name || "",
+          mid_name: user.mid_name || "",
+          last_name: user.last_name || "",
+          email: user.email || "",
+          image: user.image || null,
+        }
+      : null,
+    role: membership.role || "career_center",
+    permissions: membership.permissions || [],
+    status: membership.status || "active",
+    invited_by: membership.invited_by || null,
+    accepted_at: membership.accepted_at || null,
+    created_at: membership.createdAt || null,
+    updated_at: membership.updatedAt || null,
+  };
+};
+
+const universityMembershipQueryForScope = (scope, memberId = null) => {
+  const query = {};
+  if (!scope?.superAdmin) query.university_id = scope?.university?._id || null;
+  if (scope?.superAdmin && scope?.university?._id) query.university_id = scope.university._id;
+  if (memberId) query._id = memberId;
+  return query;
+};
+
+const requireScopedUniversityForMutation = async (req, scope) => {
+  if (scope?.university?._id) return scope.university;
+  if (!scope?.superAdmin) return null;
+  return getUniversityByRef(req.body?.university_id || req.query?.university_id);
+};
+
+const ensureUniversityOwnerStillExists = async ({ universityId, currentMemberId, nextRole = null, nextStatus = null }) => {
+  if (!universityId) return true;
+  const activeOwnerFilter = {
+    university_id: universityId,
+    role: "owner",
+    status: "active",
+  };
+  const activeOwnerCount = await UniversityMembershipModel.countDocuments(activeOwnerFilter);
+  if (activeOwnerCount > 1) return true;
+
+  const current = currentMemberId
+    ? await UniversityMembershipModel.findOne({ _id: currentMemberId, university_id: universityId }).lean()
+    : null;
+  if (!current || current.role !== "owner" || current.status !== "active") return true;
+  if (nextRole === "owner" && (nextStatus === null || nextStatus === "active")) return true;
+  if (nextRole === null && nextStatus === "active") return true;
+  return false;
+};
+
+const listUniversityMembers = async (req, res, next) => {
+  try {
+    const scope = await getUniversityAdminScope(req);
+    if (!scope) return ReturnAppData.getError({ res, status: 403, message: "university_admin_context_required" });
+
+    const query = universityMembershipQueryForScope(scope);
+    const status = cleanText(req.query?.status).toLowerCase();
+    if (status && status !== "all") query.status = normalizeUniversityMemberStatus(status, status);
+
+    const memberships = await UniversityMembershipModel.find(query)
+      .populate({ path: "user_id", select: "first_name mid_name last_name email image" })
+      .populate({ path: "university_id", select: "name name_en logo city country email_domain verified status campuses" })
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(normalizeLimit(req.query.limit, 50, 100))
+      .lean();
+
+    return ReturnAppData.getData({
+      res,
+      data: memberships.map(serializeUniversityMember),
+      message: "university_members",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const upsertUniversityMember = async (req, res, next) => {
+  try {
+    const scope = await getUniversityAdminScope(req);
+    if (!scope) return ReturnAppData.createError({ res, status: 403, message: "university_admin_context_required" });
+
+    const university = await requireScopedUniversityForMutation(req, scope);
+    if (!university?._id) return ReturnAppData.createError({ res, status: 422, message: "university_required" });
+
+    const userId = req.body?.user_id || req.body?.user || req.params?.userId;
+    if (!isValidObjectId(userId)) return ReturnAppData.createError({ res, status: 400, message: "invalid_user_id" });
+    const user = await UserModel.findById(userId).select("_id email first_name last_name").lean();
+    if (!user) return ReturnAppData.createError({ res, status: 404, message: "user_not_found" });
+
+    const role = normalizeUniversityMemberRole(req.body?.role || req.body?.member_role);
+    const status = normalizeUniversityMemberStatus(req.body?.status, "active");
+    const payload = {
+      university_id: university._id,
+      user_id: user._id,
+      role,
+      status,
+      permissions: permissionsForUniversityRole(role, req.body?.permissions),
+      invited_by: req.user?._id || null,
+      accepted_at: status === "active" ? new Date() : null,
+    };
+
+    const membership = await UniversityMembershipModel.findOneAndUpdate(
+      { university_id: university._id, user_id: user._id },
+      { $set: payload },
+      { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
+    )
+      .populate({ path: "user_id", select: "first_name mid_name last_name email image" })
+      .populate({ path: "university_id", select: "name name_en logo city country email_domain verified status campuses" });
+
+    await syncAccountContextsForUser(user._id);
+    await writeAuditLog({
+      req,
+      actorUserId: req.user?._id,
+      actorType: scope.superAdmin ? "admin" : "university_admin",
+      action: "university_member_upserted",
+      entityType: "other",
+      entityId: membership._id,
+      newValue: payload,
+      metadata: { university_id: String(university._id) },
+    });
+
+    return ReturnAppData.createData({
+      res,
+      data: serializeUniversityMember(membership.toObject()),
+      message: "university_member_saved",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateUniversityMember = async (req, res, next) => {
+  try {
+    const scope = await getUniversityAdminScope(req);
+    if (!scope) return ReturnAppData.updateError({ res, status: 403, message: "university_admin_context_required" });
+    if (!isValidObjectId(req.params.memberId)) {
+      return ReturnAppData.updateError({ res, status: 400, message: "invalid_member_id" });
+    }
+
+    const existing = await UniversityMembershipModel.findOne(
+      universityMembershipQueryForScope(scope, req.params.memberId)
+    ).lean();
+    if (!existing) return ReturnAppData.updateError({ res, status: 404, message: "university_member_not_found" });
+
+    const patch = {};
+    const nextRole = req.body?.role !== undefined || req.body?.member_role !== undefined
+      ? normalizeUniversityMemberRole(req.body?.role || req.body?.member_role)
+      : null;
+    const nextStatus = req.body?.status !== undefined ? normalizeUniversityMemberStatus(req.body.status, existing.status) : null;
+    if (nextRole) patch.role = nextRole;
+    if (nextStatus) {
+      patch.status = nextStatus;
+      if (nextStatus === "active" && !existing.accepted_at) patch.accepted_at = new Date();
+    }
+    if (req.body?.permissions !== undefined || nextRole) {
+      patch.permissions = permissionsForUniversityRole(nextRole || existing.role, req.body?.permissions);
+    }
+
+    const keepsOwner = await ensureUniversityOwnerStillExists({
+      universityId: existing.university_id,
+      currentMemberId: existing._id,
+      nextRole: nextRole || existing.role,
+      nextStatus: nextStatus || existing.status,
+    });
+    if (!keepsOwner) return ReturnAppData.updateError({ res, status: 422, message: "university_last_owner_required" });
+
+    const membership = await UniversityMembershipModel.findOneAndUpdate(
+      { _id: existing._id },
+      { $set: patch },
+      { new: true, runValidators: true }
+    )
+      .populate({ path: "user_id", select: "first_name mid_name last_name email image" })
+      .populate({ path: "university_id", select: "name name_en logo city country email_domain verified status campuses" });
+
+    await syncAccountContextsForUser(membership.user_id);
+    await writeAuditLog({
+      req,
+      actorUserId: req.user?._id,
+      actorType: scope.superAdmin ? "admin" : "university_admin",
+      action: "university_member_updated",
+      entityType: "other",
+      entityId: membership._id,
+      oldValue: {
+        role: existing.role,
+        permissions: existing.permissions || [],
+        status: existing.status,
+      },
+      newValue: patch,
+      metadata: { university_id: String(existing.university_id) },
+    });
+
+    return ReturnAppData.updateData({
+      res,
+      data: serializeUniversityMember(membership.toObject()),
+      message: "university_member_updated",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const removeUniversityMember = async (req, res, next) => {
+  try {
+    const scope = await getUniversityAdminScope(req);
+    if (!scope) return ReturnAppData.deleteError({ res, status: 403, message: "university_admin_context_required" });
+    if (!isValidObjectId(req.params.memberId)) {
+      return ReturnAppData.deleteError({ res, status: 400, message: "invalid_member_id" });
+    }
+
+    const existing = await UniversityMembershipModel.findOne(
+      universityMembershipQueryForScope(scope, req.params.memberId)
+    ).lean();
+    if (!existing) return ReturnAppData.deleteError({ res, status: 404, message: "university_member_not_found" });
+
+    const keepsOwner = await ensureUniversityOwnerStillExists({
+      universityId: existing.university_id,
+      currentMemberId: existing._id,
+      nextRole: existing.role,
+      nextStatus: "removed",
+    });
+    if (!keepsOwner) return ReturnAppData.deleteError({ res, status: 422, message: "university_last_owner_required" });
+
+    const membership = await UniversityMembershipModel.findOneAndUpdate(
+      { _id: existing._id },
+      { $set: { status: "removed" } },
+      { new: true, runValidators: true }
+    )
+      .populate({ path: "user_id", select: "first_name mid_name last_name email image" })
+      .populate({ path: "university_id", select: "name name_en logo city country email_domain verified status campuses" });
+
+    await syncAccountContextsForUser(membership.user_id);
+    await writeAuditLog({
+      req,
+      actorUserId: req.user?._id,
+      actorType: scope.superAdmin ? "admin" : "university_admin",
+      action: "university_member_removed",
+      entityType: "other",
+      entityId: membership._id,
+      oldValue: { status: existing.status },
+      newValue: { status: "removed" },
+      metadata: { university_id: String(existing.university_id) },
+    });
+
+    return ReturnAppData.deleteData({
+      res,
+      status: 200,
+      other: { data: serializeUniversityMember(membership.toObject()) },
+      message: "university_member_removed",
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const serializeVerification = (verification = {}) => {
@@ -2028,6 +2319,10 @@ export default {
   adminApproveVerification,
   adminRejectVerification,
   adminRequestVerificationInfo,
+  listUniversityMembers,
+  upsertUniversityMember,
+  updateUniversityMember,
+  removeUniversityMember,
   universityOverview,
   userUniversityOverview,
   userUniversityOpportunities,

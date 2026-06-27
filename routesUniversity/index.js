@@ -1,6 +1,6 @@
 import express from "express";
 import { authUser } from "../middlewares/userAuth.js";
-import { requireUniversityAdminContext } from "../middlewares/appAccountGuard.js";
+import { requireUniversityAdminContext, requireUniversityPermission } from "../middlewares/appAccountGuard.js";
 import campusController from "../controllers/app/campus/campusController.js";
 import multer from "../utils/multer.js";
 
@@ -19,6 +19,11 @@ router.get("/verifications", universityAdminGuard, campusController.adminListVer
 router.post("/verifications/:id/approve", universityAdminGuard, upload.none(), campusController.adminApproveVerification);
 router.post("/verifications/:id/reject", universityAdminGuard, upload.none(), campusController.adminRejectVerification);
 router.post("/verifications/:id/request-info", universityAdminGuard, upload.none(), campusController.adminRequestVerificationInfo);
+
+router.get("/members", universityAdminGuard, requireUniversityPermission("campus.members.view"), campusController.listUniversityMembers);
+router.post("/members", universityAdminGuard, requireUniversityPermission("campus.members.manage"), upload.none(), campusController.upsertUniversityMember);
+router.patch("/members/:memberId", universityAdminGuard, requireUniversityPermission("campus.members.manage"), upload.none(), campusController.updateUniversityMember);
+router.delete("/members/:memberId", universityAdminGuard, requireUniversityPermission("campus.members.manage"), campusController.removeUniversityMember);
 
 router.get("/analytics/employability", universityAdminGuard, campusController.userUniversityEmployabilityAnalytics);
 router.get("/reports/outcomes", universityAdminGuard, campusController.userUniversityOutcomeReport);
