@@ -259,6 +259,7 @@ app.get("/cv/generated/:fileName", async (req, res, next) => {
     await fs.promises.access(filePath, fs.constants.R_OK);
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    res.setHeader("Cache-Control", "no-store");
     res.setHeader("Content-Type", "application/pdf");
 
     if (!isProduction) {

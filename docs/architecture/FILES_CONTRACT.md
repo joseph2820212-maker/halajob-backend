@@ -16,6 +16,7 @@ Scope: uploads, generated CVs, company files, and sensitive downloads.
 - Validate file names and block path traversal.
 - Serve HTML uploads as attachments with restrictive headers.
 - Serve non-image public uploads as attachments; block direct public access to private document uploads under `/uploads/files/*`.
+- Serve generated CV PDFs as attachments with `Cache-Control: no-store`.
 - Send `X-Content-Type-Options: nosniff` on served files.
 - Sensitive CV/document downloads must require auth and correct company/admin context.
 - Bulk exports must be audited and permission-checked.
@@ -39,7 +40,7 @@ npm run test:security-http
 npm run check:secrets
 ```
 
-`npm run test:security-http` creates temporary upload fixtures and proves direct `/uploads/files/*` access returns 404 with `no-store`/`nosniff`, while root HTML uploads are served as attachments with restrictive CSP.
+`npm run test:security-http` creates temporary upload fixtures and proves direct `/uploads/files/*` access returns 404 with `no-store`/`nosniff`, generated CV downloads are PDF attachments with `no-store`/`nosniff`, and root HTML uploads are served as attachments with restrictive CSP.
 
 `npm run test:file-export-audit` proves company dashboard file downloads and app company request file downloads are authenticated, audited, and blocked for path traversal or another company user.
 
@@ -48,5 +49,6 @@ npm run check:secrets
 ## Gaps
 
 - MIME/size policies should be documented per endpoint.
+- Generated CV public-link expiry/ownership policy still needs a product decision.
 - Sensitive download audit/ownership coverage must continue to be tested route by route.
 - Object storage migration should be planned before high-volume launch.

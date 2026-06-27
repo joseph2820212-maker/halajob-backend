@@ -17,7 +17,7 @@ Latest update: object authorization, private upload static-serving, audit loggin
 | `npm run smoke:import` | Passed |
 | `npm run smoke:http` | Passed |
 | `npm run smoke:cors` | Passed |
-| `npm run test:security-http` | Passed, including private `/uploads/files/*` static denial |
+| `npm run test:security-http` | Passed, including private `/uploads/files/*` static denial, generated-CV invalid/traversal rejection, and valid generated-CV attachment/no-store headers |
 | `npm run test:audit-logging` | Passed, including admin auth audit rows, admin creation audit rows, and central audit redaction of password/passcode/token/secret/cookie/OTP/API-key/private-key/device-code fields |
 | `npm run test:file-export-audit` | Passed, including dashboard company file download, app company request file download, traversal rejection, other-company denial, and export audit logs |
 | `npm run test:integration:ai-runtime` | Passed, including disabled, completed, cached, daily-limited, employee, company, analytics, audit-log, and wrong-role AI request paths |

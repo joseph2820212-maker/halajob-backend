@@ -180,7 +180,7 @@ Current status: explicit backend compatibility aliases have since been added and
 |---|---|
 | Dashboard authorization is broad | `/dash/v1` is protected by admin middleware and generic resources are now redacted/audited, but fine per-resource admin permission boundaries still need route-by-route policy coverage. |
 | Active context requires careful handling | Explicit context safety now fails closed for malformed, wrong-user, suspended, or removed contexts, and seeded tests cover context denial cases. Per-request context UX and multi-device behavior should still be validated through app/web journeys. |
-| Public generated CV PDF route | `/cv/generated/:fileName` is public with filename validation, but generated names should be unguessable and expiry/access rules should be reviewed. |
+| Public generated CV PDF route | `/cv/generated/:fileName` is public with filename validation, traversal rejection, attachment disposition, `nosniff`, and `no-store`; generated names should remain unguessable and expiry/access rules still need product review. |
 | Public uploads route | `/uploads/files/*` is now blocked from public static serving, and non-image root uploads are forced to attachment. Remaining work is route-by-route MIME/size/private download coverage. |
 | Health secret query string | Fixed: health secrets must use the `x-health-secret` header. |
 | Cross-account access | Seeded object-authorization coverage now exists for company, university, and campus student object-scope cases. Expired app/admin token denial and inactive app-user denial are covered. Remaining work is broader fine-grained admin permission coverage. |
@@ -213,7 +213,7 @@ Current checks are useful and now include multiple seeded runtime integration ha
 | Full journey API integration suite | Real HTTP tests now exist for several core areas, but not for every product journey from login to completion. |
 | Negative authorization tests | Baseline exists for wrong role, context borrowing, expired access tokens, inactive app users, company/university/student IDOR, and revoked refresh sessions; remaining gaps include fine admin permissions, missing-permission cases, and some inactive-context permutations. |
 | Mutation side-effect tests | Coverage exists for several object-scope and admin-resource mutations; still needed for apply/save/report, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
-| Upload/download security tests | Company files and saved employee CV downloads are covered; still needed for trust evidence files, generated CV public-link expiry/guessability, export files, MIME rejection, size rejection, and all remaining private file routes. |
+| Upload/download security tests | Company files, saved employee CV downloads, and generated-CV safety headers are covered; still needed for trust evidence files, generated CV public-link expiry/ownership policy, export files, MIME rejection, size rejection, and all remaining private file routes. |
 | Web API contract tests | Ensure `web/src/shared/api.ts` paths, headers, auth scopes, and error handling stay aligned with backend. |
 | Browser click-through QA | Needed for the web portals, especially admin/company/campus dashboards. |
 
@@ -269,7 +269,7 @@ The following were not run as part of this pass:
 | P0 | Add missing-permission, inactive-context edge-case, and fine-grained admin permission tests. |
 | P0 | Keep mobile fallback aliases until the mobile app no longer uses them, then remove the aliases and update `npm run test:mobile-routes`. |
 | P1 | Add mutation tests for applications, job save/apply/review/report, campus verification edge cases, event registration edge cases, ATS/interviews/invitations, support, members, and translation publishing. |
-| P1 | Add upload/download security tests for trust evidence files, exports, generated PDFs/public links, MIME rejection, size rejection, and remaining private file routes. |
+| P1 | Add upload/download security tests for trust evidence files, exports, generated CV expiry/ownership policy, MIME rejection, size rejection, and remaining private file routes. |
 | P1 | Add admin APIs or admin UI coverage for newer records: student verifications, university memberships, career passports, support tickets, invoices, AI requests/limits, analytics events, content translations. |
 | P1 | Complete AI persistence workflows where product expects generated content to become real saved records. |
 | P1 | Complete translation publish/read workflow so approved translations are returned in job/CV APIs. |

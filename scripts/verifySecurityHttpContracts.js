@@ -11,12 +11,15 @@ const { default: app } = await import("../app.js");
 
 let server;
 const uploadRoot = path.resolve(process.cwd(), "uploads");
+const generatedCvDir = path.resolve(process.cwd(), "cv", "generated");
 const privateUploadDir = path.join(uploadRoot, "files");
 const uploadHtmlName = `security-inline-${Date.now()}.html`;
 const privatePdfName = `security-private-${Date.now()}.pdf`;
+const generatedCvName = `security-generated-${Date.now()}.pdf`;
 const uploadHtmlPath = path.join(uploadRoot, uploadHtmlName);
 const privatePdfPath = path.join(privateUploadDir, privatePdfName);
-const cleanupFiles = [uploadHtmlPath, privatePdfPath];
+const generatedCvPath = path.join(generatedCvDir, generatedCvName);
+const cleanupFiles = [uploadHtmlPath, privatePdfPath, generatedCvPath];
 
 const protectedChecks = [
   ["GET", "/dash/v1/dashboard", "dashboard admin"],
@@ -85,8 +88,10 @@ async function assertJsonMessageFlexible({ response, expectedStatus, label, incl
 
 try {
   await fs.promises.mkdir(privateUploadDir, { recursive: true });
+  await fs.promises.mkdir(generatedCvDir, { recursive: true });
   await fs.promises.writeFile(uploadHtmlPath, "<html><body>unsafe inline upload</body></html>");
   await fs.promises.writeFile(privatePdfPath, "%PDF-1.4\n% private test document\n");
+  await fs.promises.writeFile(generatedCvPath, "%PDF-1.4\n% generated CV test document\n");
 
   server = app.listen(0);
   await new Promise((resolve) => server.once("listening", resolve));
@@ -134,6 +139,28 @@ try {
   assert.ok(
     [400, 404].includes(traversalCvPath.status),
     `generated CV traversal attempt should fail safely; got ${traversalCvPath.status}`
+  );
+
+  const generatedCv = await request(baseUrl, "GET", `/cv/generated/${generatedCvName}`);
+  await assertStatus({
+    response: generatedCv,
+    expectedStatus: 200,
+    label: "generated CV valid PDF download",
+  });
+  assert.match(
+    String(generatedCv.headers.get("content-disposition") || ""),
+    /attachment/i,
+    "generated CV downloads should be attachments"
+  );
+  assert.equal(
+    generatedCv.headers.get("x-content-type-options"),
+    "nosniff",
+    "generated CV downloads should include nosniff"
+  );
+  assert.equal(
+    generatedCv.headers.get("cache-control"),
+    "no-store",
+    "generated CV downloads should not be cached"
   );
 
   const directPrivateUpload = await request(baseUrl, "GET", `/uploads/files/${privatePdfName}`);
