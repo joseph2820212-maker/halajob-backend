@@ -1,11 +1,13 @@
 # Secrets Rotation Report
 
-Date: 2026-06-27
+Date: 2026-06-28
 Scope: local repository scan for the handed-over HalaJob backend/mobile/web monorepo.
 
 ## Result
 
 The current working tree secret scan passes with only example/documentation references allowed. No live Firebase private key file, `.env`, `.pem`, `.p12`, `.jks`, or keystore file is currently tracked.
+
+Latest local verification: `npm run check:secrets` passed on `codex/gate-a-mobile-ui-lock` commit `9b17a3b`.
 
 ## Findings
 

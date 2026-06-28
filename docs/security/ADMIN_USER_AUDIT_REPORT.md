@@ -1,6 +1,6 @@
 # Admin User Audit Report
 
-Date: 2026-06-27
+Date: 2026-06-28
 Scope: database privileged-user audit procedure.
 
 ## Current Status
@@ -12,6 +12,8 @@ npm run security:audit-users
 ```
 
 The command requires `CONNECTION_URL` for the database being audited.
+
+Local source/security proof as of `codex/gate-a-mobile-ui-lock` commit `9b17a3b`: `npm run test:audit-logging`, `npm run test:integration:admin-permissions`, `npm run test:integration:admin-support`, and `npm run test:integration:admin-resources` passed. Production privileged-user inventory is still not run because production/staging database access is owner-controlled.
 
 ## What The Script Lists
 

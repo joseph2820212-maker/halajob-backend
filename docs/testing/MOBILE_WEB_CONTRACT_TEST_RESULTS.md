@@ -1,8 +1,8 @@
 # Mobile Web Contract Test Results
 
-Date: 2026-06-27
-Branch: `flutter-seeker-campus`
-Commit tested: `71570c7d3b9912a8b9ed0c3866fb10949a54fed1`
+Date: 2026-06-28
+Branch: `codex/gate-a-mobile-ui-lock`
+Commit tested: `9b17a3b`
 
 ## Passed Coverage
 
@@ -17,11 +17,14 @@ Commit tested: `71570c7d3b9912a8b9ed0c3866fb10949a54fed1`
 | Translation route mounts | `npm run test:translation-routes` |
 | Notification route/event contract | `npm run test:notification-routes` |
 | Analytics route/event contract | `npm run test:analytics-routes` |
+| Web clean install | `npm --prefix web ci --ignore-scripts` |
+| Web production build and SEO prerender | `npm --prefix web run build` |
+| Web API/auth/i18n/smoke tests | `npm --prefix web test` passed 4 test files / 9 tests, including 401 scoped logout, dynamic path encoding, i18n, and home/jobs/campus/company/seeker/admin smoke navigation |
 
 ## Remaining Required Tests
 
-- Real website flow test for job seeker, company, campus, and admin dashboards.
-- Real mobile APK flow test for seeker and campus student.
+- Real browser E2E against a deployed backend with approved seeker/company/campus/admin test accounts.
+- Fresh mobile APK flow test from the final source commit for seeker and campus student.
 - Arabic/English UI route and payload check across mobile and web.
 - File upload/download tests with production-like storage.
 - Push notification tap-routing tests on a real Android device.
