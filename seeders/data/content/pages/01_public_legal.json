@@ -1,0 +1,215 @@
+[
+  {
+    "key": "about_us",
+    "category": "public",
+    "audience": ["public"],
+    "title": { "en": "About Hala Job", "ar": "عن هلا جوب" },
+    "summary": { "en": "Hala Job connects job seekers, companies, students, and universities with career opportunities and tools.", "ar": "تربط هلا جوب الباحثين عن عمل والشركات والطلاب والجامعات بفرص العمل والأدوات المهنية." },
+    "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "Hala Job is an employment and campus platform that helps job seekers find work, helps companies hire, and helps universities support their students. We provide profiles, CVs, job search, applications, an applicant tracking system, campus opportunities, and AI-assisted career tools.", "ar": "هلا جوب منصة توظيف وحرم جامعي تساعد الباحثين عن عمل في إيجاد الوظائف، وتساعد الشركات على التوظيف، وتساعد الجامعات على دعم طلابها. نوفر الملفات الشخصية والسير الذاتية والبحث عن الوظائف والتقديم ونظام تتبع المتقدمين وفرص الحرم الجامعي وأدوات مهنية مدعومة بالذكاء الاصطناعي." }, "sortOrder": 1 },
+      { "type": "heading", "text": { "en": "Who we serve", "ar": "من نخدم" }, "sortOrder": 2 },
+      { "type": "bullet_list", "items": [
+        { "en": "Job seekers building careers", "ar": "الباحثون عن عمل الذين يبنون مسيرتهم المهنية" },
+        { "en": "Companies hiring talent", "ar": "الشركات التي توظف الكفاءات" },
+        { "en": "Campus students seeking opportunities", "ar": "طلاب الحرم الجامعي الباحثون عن الفرص" },
+        { "en": "Universities supporting student outcomes", "ar": "الجامعات التي تدعم نتائج الطلاب" }
+      ], "sortOrder": 3 },
+      { "type": "notice", "severity": "info", "text": { "en": "Hala Job is not an employer and does not guarantee hiring. Employment decisions are made by companies.", "ar": "هلا جوب ليست جهة توظيف ولا تضمن الحصول على وظيفة. قرارات التوظيف تتخذها الشركات." }, "sortOrder": 4 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "product"
+  },
+  {
+    "key": "contact_information",
+    "category": "public",
+    "audience": ["public"],
+    "title": { "en": "Contact Hala Job", "ar": "تواصل مع هلا جوب" },
+    "summary": { "en": "How to reach support, privacy, legal, billing, accessibility, and partnerships teams.", "ar": "كيفية التواصل مع فرق الدعم والخصوصية والشؤون القانونية والفوترة وإمكانية الوصول والشراكات." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "General support: {{SUPPORT_EMAIL}}", "ar": "الدعم العام: {{SUPPORT_EMAIL}}" },
+        { "en": "Privacy & data: {{PRIVACY_EMAIL}}", "ar": "الخصوصية والبيانات: {{PRIVACY_EMAIL}}" },
+        { "en": "Legal reports: {{LEGAL_EMAIL}}", "ar": "البلاغات القانونية: {{LEGAL_EMAIL}}" },
+        { "en": "Billing: {{BILLING_EMAIL}}", "ar": "الفوترة: {{BILLING_EMAIL}}" },
+        { "en": "Accessibility: {{ACCESSIBILITY_EMAIL}}", "ar": "إمكانية الوصول: {{ACCESSIBILITY_EMAIL}}" },
+        { "en": "Partnerships: {{PARTNERS_EMAIL}}", "ar": "الشراكات: {{PARTNERS_EMAIL}}" },
+        { "en": "Security: {{SECURITY_EMAIL}}", "ar": "الأمن: {{SECURITY_EMAIL}}" }
+      ], "sortOrder": 1 },
+      { "type": "warning", "severity": "warning", "text": { "en": "Do not send sensitive documents by email unless we request them through a secure upload. We respond as soon as possible based on request priority.", "ar": "لا ترسل مستندات حساسة عبر البريد الإلكتروني إلا إذا طلبنا ذلك عبر رفع آمن. نرد في أقرب وقت ممكن حسب أولوية الطلب." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "support"
+  },
+  {
+    "key": "terms_and_conditions",
+    "category": "legal",
+    "audience": ["public", "seeker", "employer", "campus_student", "university_admin"],
+    "title": { "en": "Terms and Conditions", "ar": "الشروط والأحكام" },
+    "summary": { "en": "The agreement that governs your use of Hala Job across all account types.", "ar": "الاتفاقية التي تحكم استخدامك لهلا جوب عبر جميع أنواع الحسابات." },
+    "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "By creating an account or using Hala Job, you agree to these Terms. If you do not agree, do not use the service.", "ar": "بإنشائك حساباً أو استخدامك هلا جوب، فإنك توافق على هذه الشروط. إذا لم توافق، فلا تستخدم الخدمة." }, "sortOrder": 1 },
+      { "type": "heading", "text": { "en": "Your responsibilities", "ar": "مسؤولياتك" }, "sortOrder": 2 },
+      { "type": "bullet_list", "items": [
+        { "en": "Keep your account credentials secure and provide accurate information.", "ar": "حافظ على سرية بيانات حسابك وقدّم معلومات دقيقة." },
+        { "en": "Use the platform lawfully and respect other users.", "ar": "استخدم المنصة بشكل قانوني واحترم المستخدمين الآخرين." },
+        { "en": "Company, campus, and university accounts have additional role-specific terms.", "ar": "حسابات الشركات والحرم الجامعي والجامعات لديها شروط إضافية خاصة بكل دور." }
+      ], "sortOrder": 3 },
+      { "type": "heading", "text": { "en": "Content and applications", "ar": "المحتوى والتقديمات" }, "sortOrder": 4 },
+      { "type": "paragraph", "text": { "en": "You retain ownership of content you upload (such as your CV) and grant Hala Job a limited license to host and display it to deliver the service. When you apply to a job, relevant profile and application data is shared with the company for hiring purposes.", "ar": "تحتفظ بملكية المحتوى الذي ترفعه (مثل سيرتك الذاتية) وتمنح هلا جوب ترخيصاً محدوداً لاستضافته وعرضه لتقديم الخدمة. عند تقديمك لوظيفة، تتم مشاركة بيانات الملف والتقديم ذات الصلة مع الشركة لأغراض التوظيف." }, "sortOrder": 5 },
+      { "type": "notice", "severity": "info", "text": { "en": "Hala Job does not make hiring decisions and does not guarantee employment. AI tools are assistive only.", "ar": "هلا جوب لا تتخذ قرارات التوظيف ولا تضمن الحصول على عمل. أدوات الذكاء الاصطناعي مساعدة فقط." }, "sortOrder": 6 },
+      { "type": "legal_disclaimer", "severity": "legal", "text": { "en": "We may suspend or terminate accounts that violate these Terms. Liability is limited to the extent permitted by law. Governing law and jurisdiction are to be confirmed before launch.", "ar": "يجوز لنا تعليق أو إنهاء الحسابات التي تخالف هذه الشروط. تقتصر المسؤولية بالقدر الذي يسمح به القانون. سيتم تأكيد القانون الحاكم والاختصاص القضائي قبل الإطلاق." }, "sortOrder": 7 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": true, "acknowledgementAudience": ["seeker", "employer", "campus_student", "university_admin"], "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "job_seeker_guidelines",
+    "category": "legal",
+    "audience": ["seeker", "campus_student"],
+    "title": { "en": "Job Seeker Guidelines", "ar": "إرشادات الباحث عن عمل" },
+    "summary": { "en": "How to use Hala Job responsibly and stay safe while job searching.", "ar": "كيفية استخدام هلا جوب بمسؤولية والبقاء آمناً أثناء البحث عن عمل." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Provide truthful profile and CV information and do not misrepresent your identity or qualifications.", "ar": "قدّم معلومات صحيحة في ملفك وسيرتك الذاتية ولا تنتحل هوية أو مؤهلات." },
+        { "en": "Apply responsibly and use AI tools to assist, not to deceive employers.", "ar": "قدّم بمسؤولية واستخدم أدوات الذكاء الاصطناعي للمساعدة وليس لخداع أصحاب العمل." },
+        { "en": "Application status and match scores are guidance only.", "ar": "حالة التقديم ودرجات التطابق هي إرشادية فقط." }
+      ], "sortOrder": 1 },
+      { "type": "warning", "severity": "danger", "text": { "en": "Beware of job scams. A legitimate employer will never ask you to pay money to apply or to be hired. Report suspicious jobs immediately.", "ar": "احذر من عمليات الاحتيال الوظيفي. صاحب العمل الحقيقي لن يطلب منك دفع المال للتقديم أو للتوظيف. أبلغ عن الوظائف المشبوهة فوراً." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "employer_terms",
+    "category": "legal",
+    "audience": ["employer"],
+    "title": { "en": "Employer Terms", "ar": "شروط أصحاب العمل" },
+    "summary": { "en": "Obligations for companies posting jobs and managing candidates on Hala Job.", "ar": "التزامات الشركات التي تنشر الوظائف وتدير المرشحين على هلا جوب." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "You must be an authorized representative of the company and complete company verification.", "ar": "يجب أن تكون ممثلاً مفوضاً للشركة وأن تُكمل التحقق من الشركة." },
+        { "en": "Post accurate, lawful job ads; discriminatory or prohibited posts are not allowed.", "ar": "انشر إعلانات وظائف دقيقة وقانونية؛ المنشورات التمييزية أو المحظورة غير مسموحة." },
+        { "en": "Handle candidate data only for hiring purposes and protect its confidentiality.", "ar": "تعامل مع بيانات المرشحين لأغراض التوظيف فقط واحمِ سريتها." },
+        { "en": "Do not use platform data outside the hiring relationship.", "ar": "لا تستخدم بيانات المنصة خارج علاقة التوظيف." },
+        { "en": "Subscription, team member permissions, and job removal rules apply.", "ar": "تنطبق قواعد الاشتراك وصلاحيات أعضاء الفريق وإزالة الوظائف." }
+      ], "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": true, "acknowledgementAudience": ["employer"], "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "university_partner_terms",
+    "category": "campus",
+    "audience": ["university_admin"],
+    "title": { "en": "University Partner Terms", "ar": "شروط الشريك الجامعي" },
+    "summary": { "en": "Responsibilities for university administrators managing campus access and student verification.", "ar": "مسؤوليات مشرفي الجامعات في إدارة الوصول إلى الحرم الجامعي والتحقق من الطلاب." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "University admins are responsible for student verification decisions.", "ar": "مشرفو الجامعة مسؤولون عن قرارات التحقق من الطلاب." },
+        { "en": "Manage campus resources, events, and opportunities accurately.", "ar": "أدر موارد الحرم الجامعي والفعاليات والفرص بدقة." },
+        { "en": "Student data is used within agreed boundaries; selling student data is prohibited.", "ar": "تُستخدم بيانات الطلاب ضمن الحدود المتفق عليها؛ بيع بيانات الطلاب محظور." },
+        { "en": "Employer approval and partner controls must be used responsibly.", "ar": "يجب استخدام موافقة أصحاب العمل وضوابط الشركاء بمسؤولية." }
+      ], "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": true, "acknowledgementAudience": ["university_admin"], "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "campus_student_terms",
+    "category": "campus",
+    "audience": ["campus_student"],
+    "title": { "en": "Campus Student Terms", "ar": "شروط طالب الحرم الجامعي" },
+    "summary": { "en": "Eligibility, verification, and safe-use rules for campus students.", "ar": "قواعد الأهلية والتحقق والاستخدام الآمن لطلاب الحرم الجامعي." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Campus access may require verification via student email, document, or admin approval.", "ar": "قد يتطلب الوصول إلى الحرم الجامعي التحقق عبر البريد الجامعي أو مستند أو موافقة المشرف." },
+        { "en": "Your verification documents are used only for verification and are not shown publicly.", "ar": "تُستخدم مستندات التحقق الخاصة بك للتحقق فقط ولا تُعرض علناً." },
+        { "en": "Interact respectfully with employers and report suspicious messages or opportunities.", "ar": "تفاعل باحترام مع أصحاب العمل وأبلغ عن الرسائل أو الفرص المشبوهة." }
+      ], "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "acceptable_use_content_policy",
+    "category": "legal",
+    "audience": ["public", "seeker", "employer", "campus_student", "university_admin"],
+    "title": { "en": "Acceptable Use and Content Policy", "ar": "سياسة الاستخدام المقبول والمحتوى" },
+    "summary": { "en": "What is and is not allowed on Hala Job.", "ar": "ما هو مسموح وما هو غير مسموح على هلا جوب." },
+    "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "To keep Hala Job safe and professional, the following are prohibited:", "ar": "للحفاظ على هلا جوب آمنة ومهنية، يُحظر ما يلي:" }, "sortOrder": 1 },
+      { "type": "bullet_list", "items": [
+        { "en": "Fake jobs, scams, and impersonation", "ar": "الوظائف الوهمية والاحتيال وانتحال الهوية" },
+        { "en": "Harassment, illegal, or discriminatory content", "ar": "التحرش أو المحتوى غير القانوني أو التمييزي" },
+        { "en": "Scraping, data harvesting, or spam/mass messaging", "ar": "كشط البيانات أو حصادها أو الرسائل العشوائية الجماعية" },
+        { "en": "Malicious uploads or unauthorized access", "ar": "الرفع الخبيث أو الوصول غير المصرح به" }
+      ], "sortOrder": 2 },
+      { "type": "paragraph", "text": { "en": "We moderate content and may remove violations, restrict accounts, or contact authorities. You may appeal enforcement by contacting support.", "ar": "نراقب المحتوى وقد نزيل المخالفات أو نقيّد الحسابات أو نتواصل مع الجهات المختصة. يمكنك الاعتراض على الإجراء بالتواصل مع الدعم." }, "sortOrder": 3 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "trust"
+  },
+  {
+    "key": "community_guidelines",
+    "category": "trust",
+    "audience": ["public", "seeker", "employer", "campus_student", "university_admin"],
+    "title": { "en": "Community Guidelines", "ar": "إرشادات المجتمع" },
+    "summary": { "en": "How we expect everyone to behave on Hala Job.", "ar": "كيف نتوقع أن يتصرف الجميع على هلا جوب." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Communicate professionally and respectfully.", "ar": "تواصل بمهنية واحترام." },
+        { "en": "Keep profiles and company information truthful.", "ar": "حافظ على صدق الملفات ومعلومات الشركات." },
+        { "en": "Use safe messaging and report abuse.", "ar": "استخدم المراسلة الآمنة وأبلغ عن الإساءة." }
+      ], "sortOrder": 1 },
+      { "type": "paragraph", "text": { "en": "Violations may lead to content removal, warnings, or account restrictions after review.", "ar": "قد تؤدي المخالفات إلى إزالة المحتوى أو التحذيرات أو تقييد الحساب بعد المراجعة." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "trust"
+  },
+  {
+    "key": "anti_discrimination_policy",
+    "category": "legal",
+    "audience": ["employer", "public"],
+    "title": { "en": "Anti-Discrimination Policy", "ar": "سياسة مكافحة التمييز" },
+    "summary": { "en": "Hala Job requires inclusive, lawful hiring practices.", "ar": "تشترط هلا جوب ممارسات توظيف شاملة وقانونية." },
+    "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "Job ads and hiring practices must not discriminate based on protected characteristics. Prohibited screening questions and discriminatory wording are not allowed.", "ar": "يجب ألا تميّز إعلانات الوظائف وممارسات التوظيف على أساس الخصائص المحمية. أسئلة الفرز المحظورة والصياغة التمييزية غير مسموحة." }, "sortOrder": 1 },
+      { "type": "paragraph", "text": { "en": "Job seekers and students can report discriminatory job ads, and employers can appeal enforcement decisions.", "ar": "يمكن للباحثين عن عمل والطلاب الإبلاغ عن إعلانات الوظائف التمييزية، ويمكن لأصحاب العمل الاعتراض على قرارات الإنفاذ." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "trust_safety_policy",
+    "category": "trust",
+    "audience": ["public", "seeker", "campus_student"],
+    "title": { "en": "Trust and Safety Policy", "ar": "سياسة الثقة والسلامة" },
+    "summary": { "en": "How Hala Job helps protect users from fake jobs and scams.", "ar": "كيف تساعد هلا جوب في حماية المستخدمين من الوظائف الوهمية والاحتيال." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Company verification badges and trust indicators help you assess opportunities.", "ar": "شارات التحقق من الشركات ومؤشرات الثقة تساعدك في تقييم الفرص." },
+        { "en": "Be cautious of unusually high salaries, off-platform contact, and any request for money.", "ar": "كن حذراً من الرواتب المرتفعة بشكل غير معتاد والتواصل خارج المنصة وأي طلب للمال." },
+        { "en": "We investigate reports and may suspend jobs or companies under review.", "ar": "نحقق في البلاغات وقد نعلّق الوظائف أو الشركات قيد المراجعة." }
+      ], "sortOrder": 1 },
+      { "type": "warning", "severity": "danger", "text": { "en": "Never pay to apply or be hired, and never share passwords or verification codes.", "ar": "لا تدفع أبداً للتقديم أو للتوظيف، ولا تشارك كلمات المرور أو رموز التحقق." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "trust"
+  },
+  {
+    "key": "legal_reports",
+    "category": "legal",
+    "audience": ["public", "seeker", "employer", "campus_student", "university_admin"],
+    "title": { "en": "Legal Reports", "ar": "البلاغات القانونية" },
+    "summary": { "en": "What you can report and what happens after you report it.", "ar": "ما الذي يمكنك الإبلاغ عنه وما يحدث بعد الإبلاغ." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Fake jobs, impersonation, harassment, or illegal content", "ar": "الوظائف الوهمية أو انتحال الهوية أو التحرش أو المحتوى غير القانوني" },
+        { "en": "Intellectual property / copyright complaints", "ar": "شكاوى الملكية الفكرية / حقوق النشر" },
+        { "en": "Privacy or security concerns", "ar": "مخاوف الخصوصية أو الأمن" }
+      ], "sortOrder": 1 },
+      { "type": "paragraph", "text": { "en": "Provide as much detail as possible. After you submit, our team reviews the report, may contact you for more information, and takes action where appropriate.", "ar": "قدّم أكبر قدر ممكن من التفاصيل. بعد الإرسال، يراجع فريقنا البلاغ وقد يتواصل معك لمزيد من المعلومات ويتخذ الإجراء المناسب." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "copyright_ip_policy",
+    "category": "legal",
+    "audience": ["public", "employer"],
+    "title": { "en": "Copyright and Intellectual Property Policy", "ar": "سياسة حقوق النشر والملكية الفكرية" },
+    "summary": { "en": "Ownership of content and how to file an IP complaint.", "ar": "ملكية المحتوى وكيفية تقديم شكوى ملكية فكرية." },
+    "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "You must own or have permission to upload any logos, documents, or content you provide. Rights holders can submit copyright or trademark complaints with evidence, and affected users may respond.", "ar": "يجب أن تملك أو يكون لديك إذن لرفع أي شعارات أو مستندات أو محتوى تقدمه. يمكن لأصحاب الحقوق تقديم شكاوى حقوق النشر أو العلامات التجارية مع الأدلة، ويمكن للمستخدمين المتأثرين الرد." }, "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  }
+]
