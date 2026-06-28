@@ -82,6 +82,15 @@ jobs:
       - name: Verify backend mobile route contract
         run: npm run test:mobile-routes
 
+      - name: Install web dependencies
+        run: npm --prefix web ci --ignore-scripts
+
+      - name: Web build
+        run: npm --prefix web run build
+
+      - name: Web tests
+        run: npm --prefix web test
+
       - name: Backend integration tests (auth/context isolation)
         env:
           CONNECTION_URL: mongodb://localhost:27017/halajob_ci_test
