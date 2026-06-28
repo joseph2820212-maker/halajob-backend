@@ -110,8 +110,8 @@ after `ff1c2db` without rebuilding the APK.
 ## UI/UX proof
 - Current APK artifact: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`.
 - Campus tester entry: source/widget coverage confirms the role selector, visible one-tap tester button, and local campus mode; APK metadata confirms `campusAuthMode: local-device`.
-- Screenshots/recordings: current `ff1c2db` APK proof was captured on PC emulator `HalaJob_Pixel_API35` after a fresh `adb install -r`: `halajob-1.0.2+22-auth.png`, `halajob-1.0.2+22-campus-auth.png`, `halajob-1.0.2+22-campus-home.png`, `halajob-1.0.2+22-campus-feed.png`, `halajob-1.0.2+22-seeker-input-proof.png`, and `halajob-1.0.2+22-company-input-proof.png`.
-- Owner visual approval: Pending. The owner still needs to confirm the fresh tester APK on a real Android phone and approve that the design is visibly clean, app-like, and includes the campus tester entry.
+- Screenshots/recordings: current `ff1c2db` APK proof was captured on PC emulator `HalaJob_Pixel_API35` after a fresh `adb install -r`: `halajob-1.0.2+22-auth.png`, `halajob-1.0.2+22-language-arabic.png`, `halajob-1.0.2+22-register.png`, `halajob-1.0.2+22-forgot-password.png`, `halajob-1.0.2+22-campus-auth.png`, `halajob-1.0.2+22-campus-home.png`, `halajob-1.0.2+22-campus-feed.png`, `halajob-1.0.2+22-campus-resources.png`, `halajob-1.0.2+22-campus-resource-detail.png`, `halajob-1.0.2+22-campus-events.png`, `halajob-1.0.2+22-campus-event-detail.png`, `halajob-1.0.2+22-campus-more.png`, `halajob-1.0.2+22-campus-verification.png`, `halajob-1.0.2+22-campus-career-passport.png`, `halajob-1.0.2+22-seeker-input-proof.png`, and `halajob-1.0.2+22-company-input-proof.png`.
+- Owner visual approval: Pending. The owner still needs to confirm the fresh tester APK on a real Android phone and approve that the design is visibly clean, app-like, and includes the campus tester entry. Auth and local campus proof are stronger now, but authenticated seeker/company/university visual proof still needs real test accounts or seeded access.
 
 ## External blockers
 | Blocker | Owner action needed | Code fallback completed |
