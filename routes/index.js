@@ -21,6 +21,8 @@ import { createDashResourceRouter } from './dashResourceRouteFactory.js';
 import multer from '../utils/multer.js';
 import { isAdmin } from '../middlewares/isAdmin.js';
 import { checkPermission, checkResourcePermission } from '../middlewares/checkPermission.js';
+import validate from '../middlewares/validate.js';
+import adminSchemas from '../validations/admin.validation.js';
 
 const FILES_DIRECTORY = path.resolve(process.env.FILES_DIRECTORY || './uploads');
 const router = express.Router();
@@ -292,15 +294,15 @@ router.use('/Settings', createDashResourceRouter('settings'));
 router.use('/settings', createDashResourceRouter('settings'));
 
 /* ----------------------------- Generic API for new dashboard screens ----------------------------- */
-router.get('/resources/:resource', checkResourcePermission('read'), resourceController.list());
-router.get('/resources/:resource/:id', checkResourcePermission('read'), resourceController.getOne());
-router.post('/resources/:resource/bulk-update', checkResourcePermission('update'), upload.none(), resourceController.bulkUpdate());
-router.patch('/resources/:resource/bulk-update', checkResourcePermission('update'), upload.none(), resourceController.bulkUpdate());
-router.post('/resources/:resource', checkResourcePermission('create'), upload.any(), resourceController.create());
-router.put('/resources/:resource/:id', checkResourcePermission('update'), upload.any(), resourceController.update());
-router.patch('/resources/:resource/:id', checkResourcePermission('update'), upload.any(), resourceController.update());
-router.delete('/resources/:resource/:id', checkResourcePermission('delete'), resourceController.remove());
-router.post('/resources/:resource/:id/approve', checkResourcePermission('approve'), upload.none(), resourceController.approve());
-router.post('/resources/:resource/:id/reject', checkResourcePermission('reject'), upload.none(), resourceController.reject());
+router.get('/resources/:resource', checkResourcePermission('read'), validate(adminSchemas.genericListResourceSchema), resourceController.list());
+router.get('/resources/:resource/:id', checkResourcePermission('read'), validate(adminSchemas.genericGetResourceSchema), resourceController.getOne());
+router.post('/resources/:resource/bulk-update', checkResourcePermission('update'), upload.none(), validate(adminSchemas.genericBulkUpdateResourceSchema), resourceController.bulkUpdate());
+router.patch('/resources/:resource/bulk-update', checkResourcePermission('update'), upload.none(), validate(adminSchemas.genericBulkUpdateResourceSchema), resourceController.bulkUpdate());
+router.post('/resources/:resource', checkResourcePermission('create'), upload.any(), validate(adminSchemas.genericCreateResourceSchema), resourceController.create());
+router.put('/resources/:resource/:id', checkResourcePermission('update'), upload.any(), validate(adminSchemas.genericUpdateResourceSchema), resourceController.update());
+router.patch('/resources/:resource/:id', checkResourcePermission('update'), upload.any(), validate(adminSchemas.genericUpdateResourceSchema), resourceController.update());
+router.delete('/resources/:resource/:id', checkResourcePermission('delete'), validate(adminSchemas.genericDeleteResourceSchema), resourceController.remove());
+router.post('/resources/:resource/:id/approve', checkResourcePermission('approve'), upload.none(), validate(adminSchemas.genericStatusResourceSchema), resourceController.approve());
+router.post('/resources/:resource/:id/reject', checkResourcePermission('reject'), upload.none(), validate(adminSchemas.genericStatusResourceSchema), resourceController.reject());
 
 export default router;
