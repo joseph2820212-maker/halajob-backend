@@ -2,16 +2,16 @@
 
 ## Source
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Commit: `aa65e9e` mobile Gate A local campus tester APK build commit
+- Commit: `ff1c2db` mobile Gate A handout campus UI and local campus tester APK build commit
 - Date: 2026-06-28
-- Mobile version: `1.0.2+20`
+- Mobile version: `1.0.2+22`
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Web build: `npm --prefix web run build` passed on 2026-06-28; Vite output in `web/dist`
 
 ## Final scores
 | Area | Score | Evidence |
 |---|---:|---|
-| Mobile UI/UX | 9.0 | Shared mobile header now follows the active A-to-Z handout: light cream header, navy text, subtle border, and one account menu for non-notification actions across seeker/campus, company, and university. APK `1.0.2+20` includes a visible one-tap campus tester entry, captures campus dashboard proof, and verifies seeker/company text input in the emulator. Owner real-phone approval is still pending. |
+| Mobile UI/UX | 9.0 | Auth keeps the owner-approved cream/minimal screen, while authenticated headers now follow the rendered handout navy shell with cream title/subtitle, subtle border, orange accent state, and one account menu for non-notification actions across seeker/campus, company, and university. APK `1.0.2+22` includes a visible one-tap campus tester entry, captures compact campus home/feed proof, and verifies seeker/company text input in the emulator. Owner real-phone approval is still pending. |
 | Backend/API correctness | 9.2 | 3401 endpoints inventoried; 2149/2149 write/update/delete endpoints have validation; response-code, model-integrity, Mixed-field, auth/context, object-authorization, campus, hiring, subscription, admin, trust, AI, analytics, notification, translation, and file/export suites passed locally. |
 | Security/privacy/permissions | 9.1 | OTP/hardening, route guards, fine-grained admin permissions, audit redaction, private document download tests, upload rejection tests, HSTS/Helmet, and secret scan passed. Production admin audit and secret rotation remain owner-controlled. |
 | Web frontend | 9.0 | Web build passed, 4 Vitest files/9 tests passed, and `npm --prefix web run e2e` / `npm run test:web-smoke` walked home/campus/company/seeker/admin routes through a local Vite preview. |
@@ -23,7 +23,7 @@
 ## Files changed by gate
 | Gate | Files changed | Summary |
 |---|---|---|
-| Gate A - Mobile UI/UX lock | `mobile/lib/**`, `mobile/test/**`, `mobile/scripts/**`, `mobile/docs/**`, `UI_CARD_AND_NAVIGATION_AUDIT.md` | Mobile visual polish, light shared header, unified account menu, visible one-tap campus tester entry path, text-input proof, screen inventory checks, local tester APK build/export flow, and UI proof artifacts. No mobile files changed after APK build commit `aa65e9e`. |
+| Gate A - Mobile UI/UX lock | `mobile/lib/**`, `mobile/test/**`, `mobile/scripts/**`, `mobile/docs/**`, `UI_CARD_AND_NAVIGATION_AUDIT.md` | Mobile visual polish, navy authenticated handout shell, unified account menu, visible one-tap campus tester entry path, compact post-login campus dashboard/feed, text-input proof, screen inventory checks, local tester APK build/export flow, and UI proof artifacts. APK was built from source commit `ff1c2db`; only docs changed afterward. |
 | Gate B - Backend structure | `docs/architecture/BACKEND_MODULE_MAP.md`, `controllers/**`, `routes/**`, `services/**` | Backend ownership/module map documented while preserving existing modular-monolith structure. |
 | Gate C - API validation | `middlewares/validate.js`, `validations/**`, `routes*/**`, `scripts/verifyRouteValidationCoverage.js` | All write/update/delete route surfaces are validator-covered or explicitly classified; enforced in CI. |
 | Gate D - API response codes | `scripts/verifyResponseCodeContract.js`, response helpers/routes as needed | Legacy update/delete status behavior covered by contract tests. |
@@ -67,9 +67,9 @@
 | `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat analyze` | Passed | No issues found after the local campus tester entry change. |
 | `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat test --reporter compact` | Passed | 414 tests passed, including the new one-tap local campus tester shortcut. |
 | `powershell -ExecutionPolicy Bypass -File .\mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Guard now requires the visible local campus tester entry. |
-| `powershell -ExecutionPolicy Bypass -File .\mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth` | Passed | Built tester APK `1.0.2+20` from commit `aa65e9e`. |
-| `adb install -r C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk` | Passed | Emulator reports `versionCode=20`; campus tester entry and dashboard proof captured. |
-| `git diff --name-only aa65e9e0adb2f19643c254542806e847f0a1bf43..HEAD -- mobile` | Passed | No mobile file changes after the APK build commit. |
+| `powershell -ExecutionPolicy Bypass -File .\mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth` | Passed | Built tester APK `1.0.2+22` from commit `ff1c2db`. |
+| `adb install -r C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk` | Passed | Emulator reports `versionCode=22`; campus tester entry, compact dashboard/feed, and seeker/company text-input proof captured. |
+| `git diff --name-only ff1c2db4029957c6b3f32d0662e6a49d92ef2b49..HEAD -- mobile` | Passed | No mobile source file changes after the APK build commit. |
 
 Full local proof details are recorded in `docs/testing/API_REGRESSION_TEST_RESULTS.md`,
 `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md`,
@@ -77,18 +77,18 @@ Full local proof details are recorded in `docs/testing/API_REGRESSION_TEST_RESUL
 `docs/launch-hardening-status.md`.
 
 ## APK/AAB evidence
-- File: `mobile/dist/android/halajob-mobile-1.0.2+20-release-local.apk`
-- SHA-256: `16249b1447ae9e8407936f0f241021d4c0b7105738281c70a0aaafc08071d795`
+- File: `mobile/dist/android/halajob-mobile-1.0.2+22-release-local.apk`
+- SHA-256: `e6be45e70b8d514aec1173c9020f9134ea41826bb27cf4fe2cbea83867d11403`
 - Version name: `1.0.2`
-- Version code: `20`
+- Version code: `22`
 - Base URL: `https://jobzain.com`
 - Campus auth mode: `local-device`
 - Signing mode: `debug-local`
-- Build commit: `aa65e9e0adb2f19643c254542806e847f0a1bf43`
+- Build commit: `ff1c2db4029957c6b3f32d0662e6a49d92ef2b49`
 
 Note: this is a tester APK, not a production-signed store release. The report/docs
 may move after the APK build commit, but no `mobile/` file changes are allowed
-after `aa65e9e` without rebuilding the APK.
+after `ff1c2db` without rebuilding the APK.
 
 ## Web evidence
 - Build result: Passed on 2026-06-28 via `npm --prefix web run build`.
@@ -110,7 +110,7 @@ after `aa65e9e` without rebuilding the APK.
 ## UI/UX proof
 - Current APK artifact: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`.
 - Campus tester entry: source/widget coverage confirms the role selector, visible one-tap tester button, and local campus mode; APK metadata confirms `campusAuthMode: local-device`.
-- Screenshots/recordings: current `aa65e9e` APK proof was captured on PC emulator `HalaJob_Pixel_API35` after a fresh `adb install -r`: `halajob-emulator-1.0.2+20-launch-screen.png`, `halajob-emulator-1.0.2+20-campus-tester-entry.png`, `halajob-emulator-1.0.2+20-campus-dashboard.png`, `halajob-emulator-1.0.2+20-seeker-input-proof.png`, and `halajob-emulator-1.0.2+20-company-input-proof.png`.
+- Screenshots/recordings: current `ff1c2db` APK proof was captured on PC emulator `HalaJob_Pixel_API35` after a fresh `adb install -r`: `halajob-1.0.2+22-auth.png`, `halajob-1.0.2+22-campus-auth.png`, `halajob-1.0.2+22-campus-home.png`, `halajob-1.0.2+22-campus-feed.png`, `halajob-1.0.2+22-seeker-input-proof.png`, and `halajob-1.0.2+22-company-input-proof.png`.
 - Owner visual approval: Pending. The owner still needs to confirm the fresh tester APK on a real Android phone and approve that the design is visibly clean, app-like, and includes the campus tester entry.
 
 ## External blockers
