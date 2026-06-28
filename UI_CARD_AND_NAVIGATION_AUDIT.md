@@ -2,23 +2,23 @@
 
 Date: 2026-06-28
 Branch: `codex/gate-a-mobile-ui-lock` directly on `origin/flutter-seeker-campus`
-Latest Gate A source commit audited: see `halajob-mobile-campus-tester-latest.apk.json`
+Latest Gate A source commit audited: `8c3c9e96191ad2663140b10489bcc9940e638966`
 Fresh APK handed off: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`
 APK version: `1.0.2+19`
-APK SHA-256: see `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk.sha256`
+APK SHA-256: `c370b415fa2b3b1fec8cb9da4e1cc2f9917545515d483444bd4f1f83f80d97e6`
 Base URL: `https://jobzain.com`
 Campus auth mode: `local-device`
 Signing mode: `debug-local`
 
 ## Status
 
-This audit records the current source and fresh APK metadata evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. Gate 6 now has emulator proof for the sign-in screen and Campus selector state from the same fresh APK, but the full page-by-page screenshot list remains incomplete until the owner confirms the APK on a real phone and the remaining role screens are captured.
+This audit records the current source and fresh APK metadata evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. The current APK is rebuilt from the light-header fix and is ready for owner/emulator inspection; the earlier launch/campus screenshots are retained only as prior proof and are not claimed as current `8c3c9e9` screenshot proof.
 
 Design source decision:
 
-- `HALAJOB_FINAL_A_TO_Z_9_5_CODEX_HANDOUT.md` requires Gate A proof and originally calls out a light shared header risk.
-- `Hala Job - New Design Handout (for Codex) - standalone (2).html` is the latest owner-supplied visual handout and says app header plus bottom nav stay navy, while login has a cream status bar and no app header.
-- This branch follows the latest standalone handout for the visible shell: navy app header/nav, cream body cards, compact headerless login, and compact text-only role selector.
+- `HALAJOB_FINAL_A_TO_Z_9_5_CODEX_HANDOUT.md` is the active ChatGPT handout for this branch and explicitly calls out the old dark `HalaNativeHeader` as a Gate A risk.
+- `Hala Job - New Design Handout (for Codex) - standalone (2).html` contains an older visual note saying header plus bottom nav stay navy.
+- This branch follows the active A-to-Z handout for the shared native header: light cream/surface header, navy text, subtle tan border, no dark navy rectangle, and one account menu for non-notification header actions. Bottom navigation remains navy.
 
 ## Gate Evidence
 
@@ -54,20 +54,21 @@ Fresh APK metadata:
 | Field | Value |
 |---|---|
 | Branch | `codex/gate-a-mobile-ui-lock` |
-| Build commit | See `halajob-mobile-campus-tester-latest.apk.json` |
+| Build commit | `8c3c9e96191ad2663140b10489bcc9940e638966` |
 | Version name | `1.0.2` |
 | Version code | `19` |
 | Base URL | `https://jobzain.com` |
 | Campus auth mode | `local-device` |
 | Signing mode | `debug-local` |
-| APK SHA-256 | See `halajob-mobile-campus-tester-latest.apk.sha256` |
+| APK SHA-256 | `c370b415fa2b3b1fec8cb9da4e1cc2f9917545515d483444bd4f1f83f80d97e6` |
 
 ### Gate 2: Visual System Source Lock
 
 - `mobile/lib/src/theme/app_theme.dart` uses the launch palette: lighter cream background, navy text, orange accents.
-- `HalaNativeHeader` uses the latest standalone handout shell: navy header, cream title text, subtle cream border, and no separate white icon spots.
-- `HalaHeaderIconButton` uses translucent cream-on-navy icon containers and an orange notification dot.
-- Company header source keeps company context, notifications, and one account/menu button rather than a row of icon spots.
+- `HalaNativeHeader` now uses the A-to-Z handout shell: light `halaSurface` header, navy title, muted subtitle, subtle tan border, and no dark navy rectangle.
+- `HalaHeaderIconButton` uses light surface-tint icon containers with navy icons and an orange selected/dot state.
+- `HalaHeaderMenuButton` and `HalaHeaderMenuItem` are shared header menu controls, so seeker/campus, company, and university headers use one visual language.
+- Company, seeker/campus, and university header sources keep notifications as the only standalone action and move profile/settings/switch/refresh/sign-out style actions into one account menu where applicable.
 
 Acceptance checks:
 
@@ -91,6 +92,12 @@ mobile/scripts/assert-mobile-screen-inventory.ps1:357:    'const halaCream = Col
 mobile/scripts/assert-mobile-screen-inventory.ps1:358:    'const halaCreamSoft = Color(0xFFFFFAF2);',
 mobile/scripts/assert-mobile-screen-inventory.ps1:359:    'const halaCreamDeep = Color(0xFFEBDAC2);',
 ```
+
+```powershell
+rg -n "class HalaNativeHeader|color: halaSurface|class HalaHeaderMenuButton|dashboard-account-menu|company-account-menu|university-account-menu" mobile/lib/src mobile/scripts/assert-mobile-screen-inventory.ps1
+```
+
+Result: required strings are present in `mobile/lib/src/widgets/hala_cards.dart`, the seeker/campus dashboard, company dashboard, university dashboard, and the screen-inventory guard.
 
 ### Gate 3: Navigation Source Lock
 
@@ -157,7 +164,7 @@ Result: no matches.
 | Campus | Entry/home | Local campus QA access, home, readiness cards | Same cream dashboard system | Campus home uses native dashboard/screen routes | Campus tester/demo data guidance | Remote sync/load notice | Pending Gate 6 |
 | Campus | Opportunities/events/resources | Opportunity cards, event detail, resource detail | Cream cards with clear metadata chips | Internal details native; external URLs outside app | No campus content/resources guidance | Backend route/load notice | Pending Gate 6 |
 | Campus | Verification/profile | Verification, Student Passport, profile checkpoints | Cream cards, readable status | Native screens/editors | Missing profile/verification guidance | Clear save/verification errors | Pending Gate 6 |
-| Company | Dashboard header | Company name/logo/status, notification, one account menu | Navy app header, no white icon spots, no dark chip row inside body | Menu opens account/profile/settings/refresh/sign out actions | N/A | Menu actions route to native screens | Pending Gate 6 |
+| Company | Dashboard header | Company name/logo/status, notification, one account menu | Light shared app header, no white/dark floating icon spots, no dark chip row inside body | Menu opens account/profile/settings/refresh/sign out actions | N/A | Menu actions route to native screens | Pending Gate 6 |
 | Company | Dashboard cards | Summary, stats, jobs, applicants, modules | Shared cream cards and consistent spacing | Bottom nav/native module routes | Company snapshot empty guidance | Load notice | Pending Gate 6 |
 | Company | Jobs | Jobs list, create/edit job, bulk jobs | Cream cards/forms | Native `_CompanyJobScreen` and `_CompanyJobFormScreen` routes | No jobs guidance | Action notice | Pending Gate 6 |
 | Company | Applicants/interviews | Applicant detail, status, CV, messages, interview actions | Native cards and readable chips | Native applicant screen plus allowed confirmations | No applicants/interviews guidance | Action notice | Pending Gate 6 |
@@ -174,9 +181,9 @@ Required proof from the same fresh APK:
 
 | Screen | Evidence | Status |
 |---|---|---|
-| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-fresh-apk-launch-screen.png` | Captured from installed APK |
-| Campus entry selected | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-fresh-apk-campus-selected.png` | Captured from installed APK |
-| Campus selector UI tree | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-fresh-apk-campus-window.xml` | Confirms clickable `Campus` role button |
+| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-fresh-apk-launch-screen.png` | Prior APK screenshot only; recapture still required for commit `8c3c9e9` |
+| Campus entry selected | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-fresh-apk-campus-selected.png` | Prior APK screenshot only; recapture still required for commit `8c3c9e9` |
+| Campus selector UI tree | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-fresh-apk-campus-window.xml` | Prior APK UI tree only; current source/widget tests still confirm clickable `Campus` role path |
 
 Still pending for full Gate A acceptance:
 
@@ -199,12 +206,12 @@ Still pending for full Gate A acceptance:
 17. Company settings/header/menu.
 18. University/admin dashboard if available.
 
-Emulator status on 2026-06-28:
+Local PC Android tooling status on 2026-06-28:
 
-- `adb devices` showed `emulator-5554`.
-- The fresh APK installed successfully with `adb install -r`.
-- App data was cleared before launch with `adb shell pm clear com.halajob.halajob_mobile`.
-- Screenshots and UI XML were captured from that same installed APK.
+- Android Studio is installed at `C:\Program Files\Android\Android Studio`.
+- Android SDK command-line tools, platform tools, build tools, platforms, NDK, CMake, and emulator binary were installed under `mobile\.android-sdk`.
+- `ANDROID_HOME` and `ANDROID_SDK_ROOT` were set to `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe\mobile\.android-sdk`.
+- The optional API 35 x86_64 system-image download stalled twice with an empty temporary package, so no current APK emulator screenshots were captured in this pass.
 
 ## Tests And Guards
 
@@ -218,6 +225,9 @@ Current source checks run against the `codex/gate-a-mobile-ui-lock` working tree
 Last recorded result before this audit update:
 
 - Mobile screen inventory assertion passed.
+- `flutter analyze` passed with no issues.
+- `flutter test --reporter compact` passed with 413 tests.
+- APK build passed; current SHA-256 is `c370b415fa2b3b1fec8cb9da4e1cc2f9917545515d483444bd4f1f83f80d97e6`.
 - Flutter analyze: no issues found.
 - Flutter tests: 413 tests passed.
 - APK build passed; current SHA-256 is recorded in `halajob-mobile-campus-tester-latest.apk.sha256`.

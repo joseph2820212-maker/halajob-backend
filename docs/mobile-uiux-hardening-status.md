@@ -4,9 +4,10 @@ Branch: `flutter-seeker-campus`
 
 Last verified:
 
-- `flutter analyze`: no issues found
-- `flutter test --reporter compact`: 410 tests passed
-- `powershell -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1`: passed on 2026-06-26
+- `flutter analyze`: no issues found on 2026-06-28
+- `flutter test --reporter compact`: 413 tests passed on 2026-06-28
+- `powershell -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1`: passed on 2026-06-28
+- `powershell -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth`: built `1.0.2+19` from commit `8c3c9e9`
 
 ## Completed for testing readiness
 
@@ -38,6 +39,7 @@ Last verified:
   - campus opportunity detail
   - outcomes report detail
 - Shared UI widgets are in use for cards, empty states, action tiles, notices, and language segmented controls.
+- Shared native headers now use the active A-to-Z light cream surface, navy title, muted subtitle, subtle border, and one account menu for non-notification actions across seeker/campus, company, and university screens.
 
 ## Remaining after owner visual review
 
