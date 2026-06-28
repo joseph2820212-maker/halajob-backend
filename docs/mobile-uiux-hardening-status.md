@@ -8,7 +8,7 @@ Last verified:
 - `flutter test --reporter compact`: 414 tests passed on 2026-06-28
 - `powershell -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1`: passed on 2026-06-28
 - `powershell -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth`: builds `1.0.5+26`; build commit and SHA are recorded in `outputs\halajob-mobile-campus-tester-latest.apk.json` and `.sha256`
-- `adb install -r C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`: installs the current tester APK on `emulator-5554`; fresh 5-digit verification proof is required from `1.0.5+26`
+- `adb install -r C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`: installed the current tester APK on `emulator-5554`; Android reports `versionName=1.0.5`, `versionCode=26`, `lastUpdateTime=2026-06-28 16:13:57`
 
 ## Completed for testing readiness
 
@@ -19,7 +19,9 @@ Last verified:
 - Current PC emulator proof shows the authenticated campus shell now uses the Section 3 navy handout header and bottom navigation, with `Welcome back`, `Your campus`, and `Events & resources` above the fold.
 - Current PC emulator proof shows the application-detail header has the back arrow and title aligned on one row, and the prior oversized brand-mark paint artifact is fixed.
 - Current PC emulator proof shows seeker and company login text fields accept Windows/emulator keyboard input after enabling `hw.keyboard=yes` on `HalaJob_Pixel_API35`.
-- The verification-code flow is restored to 5 digits in the mobile UI, mobile validators, backend auth generators, resend/recovery paths, campus local recovery, and visible EN/AR copy.
+- Current PC emulator proof includes a clean first-run auth screenshot from `1.0.5+26`: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.5+26-auth-clean.png`.
+- The verification-code flow is restored to 5 digits in the mobile UI, mobile validators, backend auth generators, resend/recovery paths, campus local recovery, and visible EN/AR copy. It is covered by focused auth/passcode tests and the full 414-test Flutter suite.
+- Raw `adb input tap` did not drive the Flutter surface during the `1.0.5+26` emulator proof attempt, so fresh interactive screenshots for campus tester entry and authenticated dashboards still need either owner/Android Studio interaction or a working UI automation path.
 - Older `1.0.2+22` screenshots for Arabic auth, register, password recovery, campus resources/events/details, campus More, campus verification, and Campus Career Passport are retained as historical reference only; they must be recaptured from the current `1.0.5+26` APK before full Gate A closure.
 - External web links prefer the device/browser outside the app instead of an in-app webview.
 - Major job seeker and campus flows open as native screens with back navigation:

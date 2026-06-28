@@ -214,13 +214,14 @@ Required proof from the same fresh APK:
 
 | Screen | Evidence | Status |
 |---|---|---|
-| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-auth-after-keyboard-config.png` | Captured from the current APK after clean install/data clear on `emulator-5554`; owner previously confirmed this authorization screen is the new good one |
-| Job seeker PC keyboard input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-windows-keyboard-password.png` | Windows keystrokes were sent to the emulator window, proving the same PC-keyboard path the owner uses; email and password fields accepted input |
-| Company login input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-company-fields.png` | Company role selected and both login fields accepted input on the `+25` APK |
-| Campus tester entry | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-tab.png` | Captured from the current APK after tapping `Campus`; visible `Use campus tester account` button |
-| Campus dashboard after one-tap | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-dashboard.png` | Button opened native campus dashboard for `campus.tester@halajob.test`; screenshot shows Section 3 navy authenticated shell, consistent HalaJob logo, notification/profile/settings icons, and bottom nav orange indicator under the active icon |
-| Campus application detail | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-detail.png` | Native detail route captured; back arrow and `Application` title align on the same row, and the prior oversized logo paint artifact is gone |
-| APK ZIP export | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\HalaJob-UI-Lock-Fresh-APK.zip` | Script validated APK SHA/build metadata against `mobile/pubspec.yaml`; ZIP SHA-256 `4b77125df0ebfebceb62f75786dd2d42231cfebacb00714559364e4c288e8b08` |
+| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.5+26-auth-clean.png` | Captured after clean app data on the installed `1.0.5+26` APK; owner previously confirmed this authorization screen is the new good one |
+| 5-digit OTP source/test proof | `mobile/lib/src/features/auth/auth_screen.dart`, `mobile/test/widget_test.dart`, `mobile/test/auth_service_test.dart`, `mobile/test/campus_local_auth_service_test.dart` | Source scan found no 6-digit auth UI/generator/copy patterns; focused passcode/recovery widget tests passed; full Flutter suite passed with 414 tests |
+| Job seeker PC keyboard input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-windows-keyboard-password.png` | Prior Windows/emulator proof: keystrokes were sent to the emulator window and seeker email/password fields accepted input. Must be recaptured from `1.0.5+26` before full Gate A closure |
+| Company login input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-company-fields.png` | Prior `+25` proof: Company role selected and both login fields accepted input. Must be recaptured from `1.0.5+26` before full Gate A closure |
+| Campus tester entry | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-tab.png` | Prior `+25` proof: visible `Use campus tester account` button. Must be recaptured from `1.0.5+26` before full Gate A closure |
+| Campus dashboard after one-tap | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-dashboard.png` | Prior `+25` proof: button opened native campus dashboard for `campus.tester@halajob.test`, Section 3 navy authenticated shell, consistent HalaJob logo, notification/profile/settings icons, and bottom nav orange indicator under the active icon |
+| Campus application detail | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-detail.png` | Prior `+25` proof: native detail route, back arrow and `Application` title aligned, prior oversized logo paint artifact fixed |
+| APK ZIP export | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\HalaJob-UI-Lock-Fresh-APK.zip` | Script validated APK SHA/build metadata against `mobile/pubspec.yaml`; ZIP SHA-256 `3edbff72742b045a3f48859f2670743933b2b0dbd46f594b50b411ecfb39885f` |
 
 Still pending for full Gate A acceptance:
 
@@ -251,7 +252,7 @@ Local PC Android tooling status on 2026-06-28:
 - Android SDK command-line tools, platform tools, build tools, platforms, NDK, CMake, system image, and emulator binary are available under `mobile\.android-sdk`.
 - `ANDROID_HOME` and `ANDROID_SDK_ROOT` were set to `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe\mobile\.android-sdk`.
 - AVD `HalaJob_Pixel_API35` is available and connected as `emulator-5554`.
-- The latest tester APK is expected to report package `com.halajob.halajob_mobile`, `versionName=1.0.5`, and `versionCode=26` after the final rebuild/install for this OTP fix.
+- The latest tester APK was installed on the emulator; package `com.halajob.halajob_mobile` reports `versionName=1.0.5`, `versionCode=26`, and `lastUpdateTime=2026-06-28 16:13:57`.
 
 ## Tests And Guards
 
@@ -272,7 +273,7 @@ Last recorded result before this audit update:
 - Flutter analyze: no issues found.
 - Flutter tests: 414 tests passed.
 - APK build passed; current SHA-256 is recorded in `halajob-mobile-campus-tester-latest.apk.sha256`.
-- PC emulator install proof will be refreshed from `1.0.5+26` after the final rebuild. The `1.0.4+25` screenshots remain prior visual proof for the Section 3 shell, keyboard input, and campus tester entry, but must not be treated as the final fresh-APK acceptance proof for the 5-digit verification fix.
+- PC emulator install proof was refreshed from `1.0.5+26`; the clean auth screenshot is current. Raw `adb input tap` did not drive the Flutter surface in this emulator session, so the `1.0.4+25` screenshots remain prior visual proof for the Section 3 shell, keyboard input, and campus tester entry, but must not be treated as final fresh-APK acceptance proof for owner approval. The 5-digit verification fix is proven by source scan, generated localization output, focused auth tests, and the full Flutter suite.
 
 ## Remaining UI Lock Blocker
 
