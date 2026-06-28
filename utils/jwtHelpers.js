@@ -14,7 +14,8 @@ const sign = async (payload, secret) => {
 
 const verify = async (token, secret) => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, secret, (error, payload) => {
+    // Pin the algorithm to HS256 (our signing alg) to block algorithm-confusion attacks.
+    jwt.verify(token, secret, { algorithms: ['HS256'] }, (error, payload) => {
       if (error) {
         resolve(null);
       } else {

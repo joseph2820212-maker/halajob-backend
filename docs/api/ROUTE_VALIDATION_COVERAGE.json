@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-06-28T09:04:24.822Z",
+  "generatedAt": "2026-06-28T09:24:07.994Z",
   "totals": {
     "totalEndpoints": 3831,
     "publicSystemEndpoints": 5,
-    "readOnlyEndpointsAllowedWithoutBodyValidator": 299,
+    "readOnlyEndpointsAllowedWithoutBodyValidator": 297,
     "writeUpdateDeleteEndpoints": 2430,
-    "writeUpdateDeleteEndpointsWithValidator": 2421,
-    "writeUpdateDeleteEndpointsMissingValidator": 9,
-    "writeValidationCoveragePercent": 99.6,
+    "writeUpdateDeleteEndpointsWithValidator": 2429,
+    "writeUpdateDeleteEndpointsMissingValidator": 1,
+    "writeValidationCoveragePercent": 100,
     "coreAuthAccountMissingValidators": 0
   },
   "modules": [
@@ -71,8 +71,8 @@
       "module": "legacy-user",
       "total": 154,
       "writes": 51,
-      "writesWithValidator": 42,
-      "writesMissingValidator": 9
+      "writesWithValidator": 50,
+      "writesMissingValidator": 1
     },
     {
       "module": "notifications",
@@ -114,89 +114,11 @@
   "writeMissingValidator": [
     {
       "method": "POST",
-      "path": "/user/v1/legal-reports",
-      "module": "legacy-user",
-      "middlewares": [
-        "optionalAuthUser",
-        "jsonParser",
-        "createReport"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/user/v1/privacy/accessibility",
-      "module": "legacy-user",
-      "middlewares": [
-        "optionalAuthUser",
-        "jsonParser",
-        "createAccessibilityRequest"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/user/v1/privacy/consents/:pageKey/acknowledge",
-      "module": "legacy-user",
-      "middlewares": [
-        "authUser",
-        "jsonParser",
-        "acknowledgePolicy"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/user/v1/privacy/consents/:purpose",
-      "module": "legacy-user",
-      "middlewares": [
-        "authUser",
-        "jsonParser",
-        "setConsent"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/user/v1/privacy/requests",
-      "module": "legacy-user",
-      "middlewares": [
-        "authUser",
-        "jsonParser",
-        "createPrivacyRequest"
-      ]
-    },
-    {
-      "method": "POST",
       "path": "/user/v1/support/tickets",
       "module": "legacy-user",
       "middlewares": [
         "authUser",
         "listMyTickets"
-      ]
-    },
-    {
-      "method": "PATCH",
-      "path": "/user/v1/support/tickets/:id/close",
-      "module": "legacy-user",
-      "middlewares": [
-        "authUser",
-        "closeTicket"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/user/v1/support/tickets/:id/close",
-      "module": "legacy-user",
-      "middlewares": [
-        "authUser",
-        "closeTicket"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/user/v1/support/tickets/:id/messages",
-      "module": "legacy-user",
-      "middlewares": [
-        "authUser",
-        "jsonParser",
-        "addMessage"
       ]
     }
   ]

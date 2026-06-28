@@ -443,6 +443,10 @@ const normalizePayload = async (req, config) => {
     if (!payload.gender) payload.gender = 'male';
   }
 
+  // Never accept server-managed credential/OTP fields via admin CRUD (mass-assignment guard).
+  delete payload.passcode;
+  delete payload.another_device_code;
+
   return payload;
 };
 

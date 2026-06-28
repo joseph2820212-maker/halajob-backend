@@ -230,7 +230,7 @@ const SearchFiltersSchema = new Schema(
     },
 
     job_names: {
-      ids: [{ type: Schema.Types.ObjectId, ref: "Job_name", index: true }],
+      ids: [{ type: Schema.Types.ObjectId, ref: "job_name", index: true }],
       titles_ar: { type: [String], default: [] },
       titles_en: { type: [String], default: [] },
       keywords: { type: [String], default: [] },

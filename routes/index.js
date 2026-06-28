@@ -159,9 +159,9 @@ router.get('/subscriptions/companies/:companyId', can('subscriptions.manage'), a
 router.post('/subscriptions/companies/:companyId/assign-plan', can('subscriptions.manage'), upload.none(), validate(adminSchemas.assignSubscriptionPlanSchema), adminModerationController.assignSubscriptionPlan);
 
 /* ----------------------------- Legacy upload/import routes ----------------------------- */
-router.use('/exsel', exselRoute);
-router.use('/excel', exselRoute);
-router.use('/import', exselRoute);
+router.use('/exsel', can('jobs.moderate'), exselRoute);
+router.use('/excel', can('jobs.moderate'), exselRoute);
+router.use('/import', can('jobs.moderate'), exselRoute);
 
 /* ----------------------------- Special routes ----------------------------- */
 router.use('/Keyword', keywordRoute);
