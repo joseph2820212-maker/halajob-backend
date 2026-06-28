@@ -2,16 +2,16 @@
 
 ## Source
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Commit: `8c3c9e9` mobile Gate A header/menu APK build commit before this report refresh
+- Commit: `aa65e9e` mobile Gate A local campus tester APK build commit
 - Date: 2026-06-28
-- Mobile version: `1.0.2+19`
+- Mobile version: `1.0.2+20`
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Web build: `npm --prefix web run build` passed on 2026-06-28; Vite output in `web/dist`
 
 ## Final scores
 | Area | Score | Evidence |
 |---|---:|---|
-| Mobile UI/UX | 8.8 | Shared mobile header now follows the active A-to-Z handout: light cream header, navy text, subtle border, and one account menu for non-notification actions across seeker/campus, company, and university. APK `1.0.2+19` includes campus local-device tester entry. Owner visual approval is still pending. |
+| Mobile UI/UX | 9.0 | Shared mobile header now follows the active A-to-Z handout: light cream header, navy text, subtle border, and one account menu for non-notification actions across seeker/campus, company, and university. APK `1.0.2+20` includes a visible one-tap campus tester entry, captures campus dashboard proof, and verifies seeker/company text input in the emulator. Owner real-phone approval is still pending. |
 | Backend/API correctness | 9.2 | 3401 endpoints inventoried; 2149/2149 write/update/delete endpoints have validation; response-code, model-integrity, Mixed-field, auth/context, object-authorization, campus, hiring, subscription, admin, trust, AI, analytics, notification, translation, and file/export suites passed locally. |
 | Security/privacy/permissions | 9.1 | OTP/hardening, route guards, fine-grained admin permissions, audit redaction, private document download tests, upload rejection tests, HSTS/Helmet, and secret scan passed. Production admin audit and secret rotation remain owner-controlled. |
 | Web frontend | 9.0 | Web build passed, 4 Vitest files/9 tests passed, and `npm --prefix web run e2e` / `npm run test:web-smoke` walked home/campus/company/seeker/admin routes through a local Vite preview. |
@@ -23,7 +23,7 @@
 ## Files changed by gate
 | Gate | Files changed | Summary |
 |---|---|---|
-| Gate A - Mobile UI/UX lock | `mobile/lib/**`, `mobile/test/**`, `mobile/scripts/**`, `mobile/docs/**`, `UI_CARD_AND_NAVIGATION_AUDIT.md` | Mobile visual polish, light shared header, unified account menu, campus tester entry path, screen inventory checks, local tester APK build/export flow, and UI proof artifacts. No mobile files changed after APK build commit `8c3c9e9`. |
+| Gate A - Mobile UI/UX lock | `mobile/lib/**`, `mobile/test/**`, `mobile/scripts/**`, `mobile/docs/**`, `UI_CARD_AND_NAVIGATION_AUDIT.md` | Mobile visual polish, light shared header, unified account menu, visible one-tap campus tester entry path, text-input proof, screen inventory checks, local tester APK build/export flow, and UI proof artifacts. No mobile files changed after APK build commit `aa65e9e`. |
 | Gate B - Backend structure | `docs/architecture/BACKEND_MODULE_MAP.md`, `controllers/**`, `routes/**`, `services/**` | Backend ownership/module map documented while preserving existing modular-monolith structure. |
 | Gate C - API validation | `middlewares/validate.js`, `validations/**`, `routes*/**`, `scripts/verifyRouteValidationCoverage.js` | All write/update/delete route surfaces are validator-covered or explicitly classified; enforced in CI. |
 | Gate D - API response codes | `scripts/verifyResponseCodeContract.js`, response helpers/routes as needed | Legacy update/delete status behavior covered by contract tests. |
@@ -64,7 +64,12 @@
 | `npm run test:web-smoke` | Passed | Root shortcut for the same web portal smoke. |
 | `git diff --check` | Passed | Whitespace diff check passed after final trimming. |
 | Required handover package check | Passed | `README.md`, `CLAUDE.md`, `CODEX.md`, `CONTRIBUTING.md`, required docs, API docs, security docs, and live-smoke doc all exist. |
-| `git diff --name-only 8c3c9e96191ad2663140b10489bcc9940e638966..HEAD -- mobile` | Passed | No mobile file changes after the APK build commit. |
+| `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat analyze` | Passed | No issues found after the local campus tester entry change. |
+| `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat test --reporter compact` | Passed | 414 tests passed, including the new one-tap local campus tester shortcut. |
+| `powershell -ExecutionPolicy Bypass -File .\mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Guard now requires the visible local campus tester entry. |
+| `powershell -ExecutionPolicy Bypass -File .\mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth` | Passed | Built tester APK `1.0.2+20` from commit `aa65e9e`. |
+| `adb install -r C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk` | Passed | Emulator reports `versionCode=20`; campus tester entry and dashboard proof captured. |
+| `git diff --name-only aa65e9e0adb2f19643c254542806e847f0a1bf43..HEAD -- mobile` | Passed | No mobile file changes after the APK build commit. |
 
 Full local proof details are recorded in `docs/testing/API_REGRESSION_TEST_RESULTS.md`,
 `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md`,
@@ -72,18 +77,18 @@ Full local proof details are recorded in `docs/testing/API_REGRESSION_TEST_RESUL
 `docs/launch-hardening-status.md`.
 
 ## APK/AAB evidence
-- File: `mobile/dist/android/halajob-mobile-1.0.2+19-release-local.apk`
-- SHA-256: `c370b415fa2b3b1fec8cb9da4e1cc2f9917545515d483444bd4f1f83f80d97e6`
+- File: `mobile/dist/android/halajob-mobile-1.0.2+20-release-local.apk`
+- SHA-256: `16249b1447ae9e8407936f0f241021d4c0b7105738281c70a0aaafc08071d795`
 - Version name: `1.0.2`
-- Version code: `19`
+- Version code: `20`
 - Base URL: `https://jobzain.com`
 - Campus auth mode: `local-device`
 - Signing mode: `debug-local`
-- Build commit: `8c3c9e96191ad2663140b10489bcc9940e638966`
+- Build commit: `aa65e9e0adb2f19643c254542806e847f0a1bf43`
 
 Note: this is a tester APK, not a production-signed store release. The report/docs
 may move after the APK build commit, but no `mobile/` file changes are allowed
-after `8c3c9e9` without rebuilding the APK.
+after `aa65e9e` without rebuilding the APK.
 
 ## Web evidence
 - Build result: Passed on 2026-06-28 via `npm --prefix web run build`.
@@ -104,8 +109,8 @@ after `8c3c9e9` without rebuilding the APK.
 
 ## UI/UX proof
 - Current APK artifact: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`.
-- Campus tester entry: source/widget coverage confirms the role selector and local campus mode; APK metadata confirms `campusAuthMode: local-device`.
-- Screenshots/recordings: current `8c3c9e9` APK proof was captured on PC emulator `HalaJob_Pixel_API35` after a fresh `adb install -r -d`: `halajob-emulator-launch-screen.png`, `halajob-emulator-campus-selected.png`, and the campus selector UI tree `halajob-emulator-campus-selected-ui.xml`.
+- Campus tester entry: source/widget coverage confirms the role selector, visible one-tap tester button, and local campus mode; APK metadata confirms `campusAuthMode: local-device`.
+- Screenshots/recordings: current `aa65e9e` APK proof was captured on PC emulator `HalaJob_Pixel_API35` after a fresh `adb install -r`: `halajob-emulator-1.0.2+20-launch-screen.png`, `halajob-emulator-1.0.2+20-campus-tester-entry.png`, `halajob-emulator-1.0.2+20-campus-dashboard.png`, `halajob-emulator-1.0.2+20-seeker-input-proof.png`, and `halajob-emulator-1.0.2+20-company-input-proof.png`.
 - Owner visual approval: Pending. The owner still needs to confirm the fresh tester APK on a real Android phone and approve that the design is visibly clean, app-like, and includes the campus tester entry.
 
 ## External blockers
@@ -122,7 +127,7 @@ after `8c3c9e9` without rebuilding the APK.
 | Backup/restore | Prove managed backup and restore into a non-production database. | Backup/restore policy is documented. |
 | Payments | Accept manual/admin subscriptions for launch or select an online payment provider and provide merchant/webhook setup. | Manual/admin subscriptions are implemented, tested, and documented. |
 | Production Android release | Decide package ID/update path, production signing key, version strategy, and distribution channel. | Tester APK build/export flow exists; current APK is debug-local signed. |
-| Owner UI approval | Confirm the APK UI on a real Android phone. | Tester APK exists, current PC emulator screenshots exist, and mobile source has not changed after APK build. |
+| Owner UI approval | Confirm the APK UI on a real Android phone. | Tester APK exists, current PC emulator screenshots exist, one-tap campus entry works, seeker/company fields accept input, and mobile source has not changed after APK build. |
 
 ## Remaining known issues
 - Public launch cannot be certified until owner-controlled production checks are completed.

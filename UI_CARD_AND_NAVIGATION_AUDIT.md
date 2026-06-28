@@ -2,17 +2,17 @@
 
 Date: 2026-06-28
 Branch: `codex/gate-a-mobile-ui-lock` directly on `origin/flutter-seeker-campus`
-Latest Gate A source commit audited: `8c3c9e96191ad2663140b10489bcc9940e638966`
+Latest Gate A source commit audited: `aa65e9e0adb2f19643c254542806e847f0a1bf43`
 Fresh APK handed off: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`
-APK version: `1.0.2+19`
-APK SHA-256: `c370b415fa2b3b1fec8cb9da4e1cc2f9917545515d483444bd4f1f83f80d97e6`
+APK version: `1.0.2+20`
+APK SHA-256: `16249b1447ae9e8407936f0f241021d4c0b7105738281c70a0aaafc08071d795`
 Base URL: `https://jobzain.com`
 Campus auth mode: `local-device`
 Signing mode: `debug-local`
 
 ## Status
 
-This audit records the current source, fresh APK metadata, and PC emulator screenshot evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. The current APK was rebuilt from the light-header fix, freshly installed on `HalaJob_Pixel_API35`, and captured from the same `8c3c9e9` build artifact.
+This audit records the current source, fresh APK metadata, and PC emulator screenshot evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. The current APK was rebuilt from the light-header and local campus tester-entry fixes, freshly installed on `HalaJob_Pixel_API35`, and captured from the same `aa65e9e` build artifact.
 
 Design source decision:
 
@@ -54,13 +54,13 @@ Fresh APK metadata:
 | Field | Value |
 |---|---|
 | Branch | `codex/gate-a-mobile-ui-lock` |
-| Build commit | `8c3c9e96191ad2663140b10489bcc9940e638966` |
+| Build commit | `aa65e9e0adb2f19643c254542806e847f0a1bf43` |
 | Version name | `1.0.2` |
-| Version code | `19` |
+| Version code | `20` |
 | Base URL | `https://jobzain.com` |
 | Campus auth mode | `local-device` |
 | Signing mode | `debug-local` |
-| APK SHA-256 | `c370b415fa2b3b1fec8cb9da4e1cc2f9917545515d483444bd4f1f83f80d97e6` |
+| APK SHA-256 | `16249b1447ae9e8407936f0f241021d4c0b7105738281c70a0aaafc08071d795` |
 
 ### Gate 2: Visual System Source Lock
 
@@ -69,6 +69,7 @@ Fresh APK metadata:
 - `HalaHeaderIconButton` uses light surface-tint icon containers with navy icons and an orange selected/dot state.
 - `HalaHeaderMenuButton` and `HalaHeaderMenuItem` are shared header menu controls, so seeker/campus, company, and university headers use one visual language.
 - Company, seeker/campus, and university header sources keep notifications as the only standalone action and move profile/settings/switch/refresh/sign-out style actions into one account menu where applicable.
+- Local campus tester APKs now expose a visible `Use campus tester account` button only when Campus is selected and remote campus auth is disabled.
 
 Acceptance checks:
 
@@ -150,9 +151,10 @@ Result: no matches.
 
 | Role | Page | Card / action | Required visual style | Required tap behaviour | Empty state | Error state | Screenshot proof |
 |---|---|---|---|---|---|---|---|
-| Auth | Sign-in role selection | Hala logo, language switch, job seeker, campus, company cards | Cream background, navy selected role, navy/orange brand, readable English/Arabic | Expands inline on the native auth screen | N/A | Clean status/error notice | `halajob-emulator-launch-screen.png` |
-| Auth | Job seeker sign in | Email/phone, password, save password, forgot password, create account | Cream form fields with visible dark text | Native auth/passcode flow | N/A | Validation/status notice | Pending Gate 6 |
-| Auth | Campus sign in | Campus login and local-device tester mode | Cream screen; Campus selector visible and selected in local-campus APK | Native campus auth flow; local-device mode can enter without university email | N/A | Validation/status notice | `halajob-emulator-campus-selected.png` |
+| Auth | Sign-in role selection | Hala logo, language switch, job seeker, campus, company cards | Cream background, navy selected role, navy/orange brand, readable English/Arabic | Expands inline on the native auth screen | N/A | Clean status/error notice | `halajob-emulator-1.0.2+20-launch-screen.png` |
+| Auth | Job seeker sign in | Email/phone, password, save password, forgot password, create account | Cream form fields with visible dark text | Native auth/passcode flow | N/A | Validation/status notice | `halajob-emulator-1.0.2+20-seeker-input-proof.png` |
+| Auth | Campus sign in | Campus login and local-device tester mode | Cream screen; Campus selector visible and selected in local-campus APK | Native campus auth flow; local-device tester button enters without university email | N/A | Validation/status notice | `halajob-emulator-1.0.2+20-campus-tester-entry.png` |
+| Auth | Company sign in | Company email/phone, password, managed registration notice | Cream form fields with visible dark text | Native auth flow | N/A | Validation/status notice | `halajob-emulator-1.0.2+20-company-input-proof.png` |
 | Auth | Register | Name, email, date of birth, password | Short launch form, no heavy profile fields | Native registration/passcode flow | N/A | Field validation/status notice | Pending Gate 6 |
 | Seeker | Home | Welcome/profile score, search, quick actions, recommendations | Shared cream card system | Native tabs or `MaterialPageRoute` screens | Approved empty cards/notices where data missing | `HalaStateNotice` style load errors | Pending Gate 6 |
 | Seeker | Jobs | Search bar, filters, job cards, chips | Cream cards, navy labels, orange active states | Filters/detail/apply use native screens; external apply URL opens outside app | Clear no-jobs/no-results wording | Clear load/action notice | Pending Gate 6 |
@@ -161,7 +163,7 @@ Result: no matches.
 | Seeker | Applications | Application list, status chips, detail, messages, interviews | Cream cards and readable status chips | Application detail native screen | "No applications yet" style guidance | Failed action/load notice | Pending Gate 6 |
 | Seeker | Career Passport | Score, completeness, missing skills, share/edit | Cream cards and orange highlights | Passport and editors are native screens | Missing-section cards | AI/backend fallback notice | Pending Gate 6 |
 | Seeker | AI tools | CV rewrite, interview, match, cover letter | Native card sections | AI tools open native screens | Provider unavailable fallback card | AI result/error notice | Pending Gate 6 |
-| Campus | Entry/home | Local campus QA access, home, readiness cards | Same cream dashboard system | Campus home uses native dashboard/screen routes | Campus tester/demo data guidance | Remote sync/load notice | Pending Gate 6 |
+| Campus | Entry/home | Local campus QA access, home, readiness cards | Same cream dashboard system | Campus tester button opens native dashboard without typing | Campus tester/demo data guidance | Remote sync/load notice | `halajob-emulator-1.0.2+20-campus-dashboard.png` |
 | Campus | Opportunities/events/resources | Opportunity cards, event detail, resource detail | Cream cards with clear metadata chips | Internal details native; external URLs outside app | No campus content/resources guidance | Backend route/load notice | Pending Gate 6 |
 | Campus | Verification/profile | Verification, Student Passport, profile checkpoints | Cream cards, readable status | Native screens/editors | Missing profile/verification guidance | Clear save/verification errors | Pending Gate 6 |
 | Company | Dashboard header | Company name/logo/status, notification, one account menu | Light shared app header, no white/dark floating icon spots, no dark chip row inside body | Menu opens account/profile/settings/refresh/sign out actions | N/A | Menu actions route to native screens | Pending Gate 6 |
@@ -181,9 +183,12 @@ Required proof from the same fresh APK:
 
 | Screen | Evidence | Status |
 |---|---|---|
-| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-launch-screen.png` | Captured from current `8c3c9e9` APK after fresh install on `emulator-5554` |
-| Campus entry selected | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-campus-selected.png` | Captured from current `8c3c9e9` APK after tapping the visible `Campus` selector |
-| Campus selector UI tree | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-campus-selected-ui.xml` | Current APK UI tree exposes clickable `Campus` role control with bounds `[384,498][696,566]` |
+| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-1.0.2+20-launch-screen.png` | Captured from current `aa65e9e` APK after clean install/data clear on `emulator-5554` |
+| Campus tester entry | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-1.0.2+20-campus-tester-entry.png` | Captured from current `aa65e9e` APK after tapping `Campus`; visible `Use campus tester account` button |
+| Campus tester UI tree | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-1.0.2+20-campus-tester-entry-ui.xml` | Current APK UI tree exposes clickable `Use campus tester account` control with bounds `[92,952][988,1094]` |
+| Campus dashboard after one-tap | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-1.0.2+20-campus-dashboard.png` | Button opened native campus dashboard for `campus.tester@halajob.test`; UI tree includes `Campus mode ready` |
+| Job seeker text input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-1.0.2+20-seeker-input-proof.png` | Android input path entered `5551234567` plus masked password into seeker login fields |
+| Company text input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-1.0.2+20-company-input-proof.png` | Android input path entered `5557778888` plus masked password into company login fields |
 
 Still pending for full Gate A acceptance:
 
@@ -196,15 +201,14 @@ Still pending for full Gate A acceptance:
 7. Company detail.
 8. Applications.
 9. Career Passport / AI tools.
-10. Campus home.
-11. Campus resource detail.
-12. Company dashboard.
-13. Company jobs.
-14. Create/edit job.
-15. Applicants.
-16. Application detail.
-17. Company settings/header/menu.
-18. University/admin dashboard if available.
+10. Campus resource detail.
+11. Company dashboard.
+12. Company jobs.
+13. Create/edit job.
+14. Applicants.
+15. Application detail.
+16. Company settings/header/menu.
+17. University/admin dashboard if available.
 
 Local PC Android tooling status on 2026-06-28:
 
@@ -212,7 +216,7 @@ Local PC Android tooling status on 2026-06-28:
 - Android SDK command-line tools, platform tools, build tools, platforms, NDK, CMake, system image, and emulator binary are available under `mobile\.android-sdk`.
 - `ANDROID_HOME` and `ANDROID_SDK_ROOT` were set to `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe\mobile\.android-sdk`.
 - AVD `HalaJob_Pixel_API35` is available and connected as `emulator-5554`.
-- The latest tester APK was freshly installed on the emulator; package `com.halajob.halajob_mobile` reports `versionName=1.0.2`, `versionCode=19`, and `lastUpdateTime=2026-06-28 10:42:51`.
+- The latest tester APK was freshly installed on the emulator; package `com.halajob.halajob_mobile` reports `versionName=1.0.2`, `versionCode=20`, and `lastUpdateTime=2026-06-28 12:12:47`.
 
 ## Tests And Guards
 
@@ -227,13 +231,13 @@ Last recorded result before this audit update:
 
 - Mobile screen inventory assertion passed.
 - `flutter analyze` passed with no issues.
-- `flutter test --reporter compact` passed with 413 tests.
-- APK build passed; current SHA-256 is `c370b415fa2b3b1fec8cb9da4e1cc2f9917545515d483444bd4f1f83f80d97e6`.
+- `flutter test --reporter compact` passed with 414 tests.
+- APK build passed; current SHA-256 is `16249b1447ae9e8407936f0f241021d4c0b7105738281c70a0aaafc08071d795`.
 - Flutter analyze: no issues found.
-- Flutter tests: 413 tests passed.
+- Flutter tests: 414 tests passed.
 - APK build passed; current SHA-256 is recorded in `halajob-mobile-campus-tester-latest.apk.sha256`.
-- PC emulator install passed via `adb install -r -d`; launch/campus selector screenshots were captured from the current APK.
+- PC emulator install passed via `adb install -r`; launch, campus tester entry, one-tap campus dashboard, seeker input, and company input screenshots were captured from the current APK.
 
 ## Remaining UI Lock Blocker
 
-Gate 6 is not complete until the remaining page-by-page visual proof is captured and the owner confirms the same APK on a real Android phone. The sign-in and campus selector proof is now current for the PC emulator, but the project must not be described as launch-ready from source checks or emulator screenshots alone.
+Gate 6 is not complete until the remaining page-by-page visual proof is captured and the owner confirms the same APK on a real Android phone. Sign-in, campus tester entry, campus dashboard, and seeker/company text input proof are now current for the PC emulator, but the project must not be described as launch-ready from source checks or emulator screenshots alone.
