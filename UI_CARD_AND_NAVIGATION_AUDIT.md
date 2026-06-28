@@ -12,7 +12,7 @@ Signing mode: `debug-local`
 
 ## Status
 
-This audit records the current source and fresh APK metadata evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. The current APK is rebuilt from the light-header fix and is ready for owner/emulator inspection; the earlier launch/campus screenshots are retained only as prior proof and are not claimed as current `8c3c9e9` screenshot proof.
+This audit records the current source, fresh APK metadata, and PC emulator screenshot evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. The current APK was rebuilt from the light-header fix, freshly installed on `HalaJob_Pixel_API35`, and captured from the same `8c3c9e9` build artifact.
 
 Design source decision:
 
@@ -150,9 +150,9 @@ Result: no matches.
 
 | Role | Page | Card / action | Required visual style | Required tap behaviour | Empty state | Error state | Screenshot proof |
 |---|---|---|---|---|---|---|---|
-| Auth | Sign-in role selection | Hala logo, language switch, job seeker, campus, company cards | Cream background, navy selected role, navy/orange brand, readable English/Arabic | Expands inline on the native auth screen | N/A | Clean status/error notice | `halajob-fresh-apk-launch-screen.png` |
+| Auth | Sign-in role selection | Hala logo, language switch, job seeker, campus, company cards | Cream background, navy selected role, navy/orange brand, readable English/Arabic | Expands inline on the native auth screen | N/A | Clean status/error notice | `halajob-emulator-launch-screen.png` |
 | Auth | Job seeker sign in | Email/phone, password, save password, forgot password, create account | Cream form fields with visible dark text | Native auth/passcode flow | N/A | Validation/status notice | Pending Gate 6 |
-| Auth | Campus sign in | Campus login and local-device tester mode | Cream screen; Campus selector visible and selected in local-campus APK | Native campus auth flow; local-device mode can enter without university email | N/A | Validation/status notice | `halajob-fresh-apk-campus-selected.png` |
+| Auth | Campus sign in | Campus login and local-device tester mode | Cream screen; Campus selector visible and selected in local-campus APK | Native campus auth flow; local-device mode can enter without university email | N/A | Validation/status notice | `halajob-emulator-campus-selected.png` |
 | Auth | Register | Name, email, date of birth, password | Short launch form, no heavy profile fields | Native registration/passcode flow | N/A | Field validation/status notice | Pending Gate 6 |
 | Seeker | Home | Welcome/profile score, search, quick actions, recommendations | Shared cream card system | Native tabs or `MaterialPageRoute` screens | Approved empty cards/notices where data missing | `HalaStateNotice` style load errors | Pending Gate 6 |
 | Seeker | Jobs | Search bar, filters, job cards, chips | Cream cards, navy labels, orange active states | Filters/detail/apply use native screens; external apply URL opens outside app | Clear no-jobs/no-results wording | Clear load/action notice | Pending Gate 6 |
@@ -181,9 +181,9 @@ Required proof from the same fresh APK:
 
 | Screen | Evidence | Status |
 |---|---|---|
-| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-fresh-apk-launch-screen.png` | Prior APK screenshot only; recapture still required for commit `8c3c9e9` |
-| Campus entry selected | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-fresh-apk-campus-selected.png` | Prior APK screenshot only; recapture still required for commit `8c3c9e9` |
-| Campus selector UI tree | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-fresh-apk-campus-window.xml` | Prior APK UI tree only; current source/widget tests still confirm clickable `Campus` role path |
+| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-launch-screen.png` | Captured from current `8c3c9e9` APK after fresh install on `emulator-5554` |
+| Campus entry selected | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-campus-selected.png` | Captured from current `8c3c9e9` APK after tapping the visible `Campus` selector |
+| Campus selector UI tree | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-emulator-campus-selected-ui.xml` | Current APK UI tree exposes clickable `Campus` role control with bounds `[384,498][696,566]` |
 
 Still pending for full Gate A acceptance:
 
@@ -209,9 +209,10 @@ Still pending for full Gate A acceptance:
 Local PC Android tooling status on 2026-06-28:
 
 - Android Studio is installed at `C:\Program Files\Android\Android Studio`.
-- Android SDK command-line tools, platform tools, build tools, platforms, NDK, CMake, and emulator binary were installed under `mobile\.android-sdk`.
+- Android SDK command-line tools, platform tools, build tools, platforms, NDK, CMake, system image, and emulator binary are available under `mobile\.android-sdk`.
 - `ANDROID_HOME` and `ANDROID_SDK_ROOT` were set to `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe\mobile\.android-sdk`.
-- The optional API 35 x86_64 system-image download stalled twice with an empty temporary package, so no current APK emulator screenshots were captured in this pass.
+- AVD `HalaJob_Pixel_API35` is available and connected as `emulator-5554`.
+- The latest tester APK was freshly installed on the emulator; package `com.halajob.halajob_mobile` reports `versionName=1.0.2`, `versionCode=19`, and `lastUpdateTime=2026-06-28 10:42:51`.
 
 ## Tests And Guards
 
@@ -231,7 +232,8 @@ Last recorded result before this audit update:
 - Flutter analyze: no issues found.
 - Flutter tests: 413 tests passed.
 - APK build passed; current SHA-256 is recorded in `halajob-mobile-campus-tester-latest.apk.sha256`.
+- PC emulator install passed via `adb install -r -d`; launch/campus selector screenshots were captured from the current APK.
 
 ## Remaining UI Lock Blocker
 
-Gate 6 is not complete until the remaining page-by-page visual proof is captured and the owner confirms the same APK on a real Android phone. The project must not be described as launch-ready from source checks alone.
+Gate 6 is not complete until the remaining page-by-page visual proof is captured and the owner confirms the same APK on a real Android phone. The sign-in and campus selector proof is now current for the PC emulator, but the project must not be described as launch-ready from source checks or emulator screenshots alone.

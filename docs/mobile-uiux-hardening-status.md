@@ -1,6 +1,6 @@
 # Mobile UI/UX Hardening Status
 
-Branch: `flutter-seeker-campus`
+Branch: `codex/gate-a-mobile-ui-lock` directly on `flutter-seeker-campus`
 
 Last verified:
 
@@ -8,12 +8,14 @@ Last verified:
 - `flutter test --reporter compact`: 413 tests passed on 2026-06-28
 - `powershell -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1`: passed on 2026-06-28
 - `powershell -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth`: built `1.0.2+19` from commit `8c3c9e9`
+- `adb install -r -d C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`: installed the current tester APK on `emulator-5554`; sign-in and Campus-selected screenshots captured on 2026-06-28
 
 ## Completed for testing readiness
 
 - Sign-in uses the navy/orange/cream mobile theme with readable language switching.
 - Job seeker, campus student, company, and university/admin entry paths have tested dashboard coverage.
 - Local campus tester access is available for APK testing without a university email.
+- Current PC emulator proof shows the Campus role selector visible and selected in the fresh tester APK.
 - External web links prefer the device/browser outside the app instead of an in-app webview.
 - Major job seeker and campus flows open as native screens with back navigation:
   - job/opportunity detail

@@ -105,8 +105,8 @@ after `8c3c9e9` without rebuilding the APK.
 ## UI/UX proof
 - Current APK artifact: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`.
 - Campus tester entry: source/widget coverage confirms the role selector and local campus mode; APK metadata confirms `campusAuthMode: local-device`.
-- Screenshots/recordings: earlier screenshots exist for a prior APK, but current `8c3c9e9` screenshots were not recaptured because the optional Android API 35 system image download stalled twice on this PC.
-- Owner visual approval: Pending. The owner still needs to install the fresh tester APK on a real device/PC emulator and confirm the design is visibly clean, app-like, and includes the campus tester entry.
+- Screenshots/recordings: current `8c3c9e9` APK proof was captured on PC emulator `HalaJob_Pixel_API35` after a fresh `adb install -r -d`: `halajob-emulator-launch-screen.png`, `halajob-emulator-campus-selected.png`, and the campus selector UI tree `halajob-emulator-campus-selected-ui.xml`.
+- Owner visual approval: Pending. The owner still needs to confirm the fresh tester APK on a real Android phone and approve that the design is visibly clean, app-like, and includes the campus tester entry.
 
 ## External blockers
 | Blocker | Owner action needed | Code fallback completed |
@@ -122,7 +122,7 @@ after `8c3c9e9` without rebuilding the APK.
 | Backup/restore | Prove managed backup and restore into a non-production database. | Backup/restore policy is documented. |
 | Payments | Accept manual/admin subscriptions for launch or select an online payment provider and provide merchant/webhook setup. | Manual/admin subscriptions are implemented, tested, and documented. |
 | Production Android release | Decide package ID/update path, production signing key, version strategy, and distribution channel. | Tester APK build/export flow exists; current APK is debug-local signed. |
-| Owner UI approval | Confirm the APK UI on a real phone or PC emulator. | Tester APK and screenshots exist; mobile source has not changed after APK build. |
+| Owner UI approval | Confirm the APK UI on a real Android phone. | Tester APK exists, current PC emulator screenshots exist, and mobile source has not changed after APK build. |
 
 ## Remaining known issues
 - Public launch cannot be certified until owner-controlled production checks are completed.
@@ -130,7 +130,7 @@ after `8c3c9e9` without rebuilding the APK.
 - Real AI provider output is not claimed without provider credentials and live QA.
 - Production-signed APK/AAB is not produced yet.
 - Full authenticated browser e2e coverage is not present; current web proof is build, unit/smoke tests, and unauthenticated Puppeteer portal smoke/e2e.
-- Owner real-device UI approval remains pending.
+- Owner real-device UI approval remains pending, even though PC emulator sign-in/campus proof is now captured.
 
 ## Launch recommendation
 - Ready / not ready: Handover-ready and locally hardened; not ready for public launch certification.
