@@ -1,6 +1,6 @@
 # Route Verification Report
 
-Generated: 2026-06-28T07:32:42.194Z
+Generated: 2026-06-28T08:56:26.127Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
@@ -10,8 +10,8 @@ Source: live Express app via `express-list-endpoints`.
 | Raw Express endpoint entries | 2410 |
 | Unique method/path endpoints | 3831 |
 | Endpoints with detected auth/role guard | 3730 |
-| Known public/system endpoints | 92 |
-| Unguarded endpoints needing manual classification | 9 |
+| Known public/system endpoints | 94 |
+| Unguarded endpoints needing manual classification | 7 |
 
 Full machine-readable inventory:
 
@@ -30,7 +30,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Campus Student | 43 | 41 | 2 | 0 |
 | Company | 134 | 132 | 2 | 0 |
 | Files | 1 | 0 | 1 | 0 |
-| Health | 4 | 0 | 2 | 2 |
+| Health | 4 | 0 | 4 | 0 |
 | Jobs | 2 | 2 | 0 | 0 |
 | Legacy User | 174 | 97 | 77 | 0 |
 | Notifications | 16 | 16 | 0 | 0 |
@@ -83,6 +83,7 @@ applyToJob
 approveCompanyRequest
 approveJob
 assignSubscriptionPlan
+auditMissingDashboardLoginCredentials
 authUser
 blockApplicationApplicant
 browseCompanies
@@ -378,6 +379,7 @@ userUniversityOverview
 userUniversityPartners
 userUniversityStudentCareerPassport
 userUniversityStudents
+validateRequest
 whatIsMyRole
 workMode
 workModes
@@ -402,8 +404,6 @@ These endpoints do not expose one of the known guard middleware names, do not ma
 
 | Method | Path | Module | Middlewares |
 | --- | --- | --- | --- |
-| GET | /health/live | Health | anonymous |
-| GET | /health/ready | Health | anonymous |
 | GET | /public/v1/content/pages | Other | listPages |
 | GET | /public/v1/content/pages/:key | Other | getPage |
 | GET | /public/v1/faq | Other | listFaq |

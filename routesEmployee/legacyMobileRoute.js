@@ -3,6 +3,8 @@ import jobsController from "../controllers/employeeDash/employeeWithJobs/employe
 import companiesController from "../controllers/employeeDash/employeeWithCompanies/employeeWithCompaniesController.js";
 import { authUser } from "../middlewares/userAuth.js";
 import { requireAppAccount } from "../middlewares/appAccountGuard.js";
+import validate from "../middlewares/validate.js";
+import seekerSchemas from "../validations/seeker.validation.js";
 import multer from "../utils/multer.js";
 
 const upload = multer;
@@ -13,11 +15,11 @@ const employeeAccountGuard = [authUser, requireAppAccount("employee")];
 // under /employee/v1/global/* and /user/v1/*.
 
 /* Jobs */
-router.post("/jobs/:jobId/apply", employeeAccountGuard, upload.none(), jobsController.applyToJob);
-router.post("/jobs/:jobId/save", employeeAccountGuard, upload.none(), jobsController.saveJob);
-router.delete("/jobs/:jobId/save", employeeAccountGuard, upload.none(), jobsController.unsaveJob);
-router.post("/jobs/:jobId/rate", employeeAccountGuard, upload.none(), jobsController.rateJob);
-router.post("/jobs/:jobId/review", employeeAccountGuard, upload.none(), jobsController.reviewJob);
+router.post("/jobs/:jobId/apply", employeeAccountGuard, upload.none(), validate(seekerSchemas.jobApplySchema), jobsController.applyToJob);
+router.post("/jobs/:jobId/save", employeeAccountGuard, upload.none(), validate(seekerSchemas.jobBodySchema), jobsController.saveJob);
+router.delete("/jobs/:jobId/save", employeeAccountGuard, upload.none(), validate(seekerSchemas.jobBodySchema), jobsController.unsaveJob);
+router.post("/jobs/:jobId/rate", employeeAccountGuard, upload.none(), validate(seekerSchemas.jobRateSchema), jobsController.rateJob);
+router.post("/jobs/:jobId/review", employeeAccountGuard, upload.none(), validate(seekerSchemas.jobReviewSchema), jobsController.reviewJob);
 
 /* Applications */
 router.get("/applications", employeeAccountGuard, jobsController.myApplications);
@@ -26,12 +28,14 @@ router.patch(
   "/applications/interviews/:interviewId/respond",
   employeeAccountGuard,
   upload.none(),
+  validate(seekerSchemas.interviewResponseSchema),
   jobsController.respondToInterview
 );
 router.post(
   "/applications/interviews/:interviewId/respond",
   employeeAccountGuard,
   upload.none(),
+  validate(seekerSchemas.interviewResponseSchema),
   jobsController.respondToInterview
 );
 router.get("/applications/offers", employeeAccountGuard, jobsController.myJobInvitations);
@@ -39,12 +43,14 @@ router.patch(
   "/applications/offers/:invitationId/respond",
   employeeAccountGuard,
   upload.none(),
+  validate(seekerSchemas.invitationResponseSchema),
   jobsController.respondToJobInvitation
 );
 router.post(
   "/applications/offers/:invitationId/respond",
   employeeAccountGuard,
   upload.none(),
+  validate(seekerSchemas.invitationResponseSchema),
   jobsController.respondToJobInvitation
 );
 router.get("/applications/:applicationId", employeeAccountGuard, jobsController.getMyApplicationDetails);
@@ -52,18 +58,21 @@ router.post(
   "/applications/:applicationId/messages",
   employeeAccountGuard,
   upload.none(),
+  validate(seekerSchemas.applicationMessageSchema),
   jobsController.addApplicationMessage
 );
 router.patch(
   "/applications/:applicationId/cancel",
   employeeAccountGuard,
   upload.none(),
+  validate(seekerSchemas.applicationCancelSchema),
   jobsController.cancelMyApplication
 );
 router.post(
   "/applications/:applicationId/cancel",
   employeeAccountGuard,
   upload.none(),
+  validate(seekerSchemas.applicationCancelSchema),
   jobsController.cancelMyApplication
 );
 
@@ -78,6 +87,7 @@ router.post(
   "/companies/:companyId/review",
   employeeAccountGuard,
   upload.none(),
+  validate(seekerSchemas.companyReviewSchema),
   companiesController.reviewCompany
 );
 

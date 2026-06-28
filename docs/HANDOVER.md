@@ -1,7 +1,7 @@
 # HalaJob Backend Handover
 
-Date: 2026-06-27
-Branch: `flutter-seeker-campus`
+Date: 2026-06-28
+Branch: `codex/gate-a-mobile-ui-lock`
 Scope: backend API, database, security baseline, deployment, and mobile/web integration reference.
 
 This document is the operational handover for running, verifying, deploying, and maintaining the HalaJob backend. It does not contain secrets. Keep all real credentials in the hosting provider, local `.env`, or a secret manager only.
@@ -9,6 +9,12 @@ This document is the operational handover for running, verifying, deploying, and
 ## Project Overview
 
 The backend is a Node.js/Express API using MongoDB through Mongoose. It supports job seeker, company, campus/student, university/admin, AI, analytics, trust, notification, translation, file, and admin operations modules.
+
+Current branch status: the 2026-06-28 hardening pass has route validation
+coverage, response-code contracts, model reference checks, Mixed-field
+classification, web build/tests, regenerated API/database artifacts, and the
+major seeded backend integration suites wired into CI. Live production provider
+checks still require the owner's real deployment accounts and credentials.
 
 Core runtime files:
 
@@ -45,6 +51,8 @@ Use these generated files as the current backend source of truth:
 | Role and permission matrix | `docs/security/ROLE_PERMISSION_MATRIX.md` |
 | Security baseline report | `docs/security/SECURITY_AUDIT_REPORT.md` |
 | Deployment access audit | `docs/security/DEPLOYMENT_ACCESS_AUDIT.md` |
+| Payments/subscriptions launch decision | `docs/PAYMENTS_AND_SUBSCRIPTIONS.md` |
+| Final launch-readiness report | `docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md` |
 
 Regenerate source-of-truth artifacts after route, model, auth, or contract changes.
 
@@ -135,9 +143,14 @@ npm run smoke:import
 npm run smoke:http
 npm run smoke:cors
 npm run test:security-http
+npm run test:response-codes
+npm run test:model-integrity
+npm run test:mixed-fields
+npm run test:route-validation
 npm run test:audit-logging
 npm run test:file-export-audit
 npm run test:object-authorization
+npm run test:integration:profile-uploads
 npm run test:mobile-routes
 npm run test:ai-safety
 npm run test:global-launch-contract
@@ -149,6 +162,26 @@ npm run test:admin-operations-routes
 npm run test:career-passport
 npm run test:integration:auth-context
 npm run test:integration:trust-documents
+npm run test:integration:ai-runtime
+npm run test:integration:notifications
+npm run test:integration:analytics
+npm run test:integration:subscriptions
+npm run test:integration:company-permissions
+npm run test:integration:company-members
+npm run test:integration:university-members
+npm run test:integration:admin-permissions
+npm run test:integration:admin-support
+npm run test:integration:admin-resources
+npm run test:integration:translations
+npm run test:integration:campus-workflows
+npm run test:integration:student-verification-documents
+npm run test:integration:employee-cv-downloads
+npm run test:integration:job-mutations
+npm run test:integration:hiring-workflows
+npm --prefix web run build
+npm --prefix web test
+npm --prefix web run e2e
+npm run test:web-smoke
 ```
 
 Then regenerate docs:
@@ -165,6 +198,9 @@ If `npm run docs:api-pdf` cannot find Python, run the generator directly with an
 ```bash
 python scripts/generateApiReferencePdf.py
 ```
+
+On this Codex workstation, the bundled Python runtime is available under
+`C:\Users\Admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`.
 
 ## API Documentation
 
@@ -294,7 +330,7 @@ These cannot be fully proven from source code alone and must be verified in the 
 | AI provider | Model access, quota, cost settings, safety behavior |
 | Domain/DNS/HTTPS | `https://jobzain.com` routing and certificate |
 | Hosting provider | Env vars, logs, rollback, process restart |
-| Payment/subscription provider if enabled | Checkout, webhook signature, subscription status |
+| Payment/subscription provider if online payments are enabled | Provider account, checkout, webhook signature, replay protection, subscription status, failed payment handling |
 
 ## Current Limitations To Verify Before Public Launch
 
@@ -303,6 +339,7 @@ These cannot be fully proven from source code alone and must be verified in the 
 3. Database backup restore must be tested on a non-production target.
 4. Admin panel coverage must be rechecked whenever new backend features are added.
 5. Mobile and web clients must be tested on real devices/browsers after each API or navigation change.
+6. Manual/admin subscriptions are implemented and tested; online checkout is not enabled until the owner selects a payment provider and supplies merchant/webhook setup.
 
 ## Handover Rule
 

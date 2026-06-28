@@ -1,6 +1,8 @@
 import express from "express";
 import { authUser } from "../middlewares/userAuth.js";
 import { requireAppAccount } from "../middlewares/appAccountGuard.js";
+import validate from "../middlewares/validate.js";
+import seekerSchemas from "../validations/seeker.validation.js";
 import CvTranslationController from "../controllers/translations/CvTranslationController.js";
 import multer from "../utils/multer.js";
 
@@ -12,6 +14,7 @@ router.put(
   authUser,
   requireAppAccount("employee"),
   upload.none(),
+  validate(seekerSchemas.cvTranslationSaveSchema),
   CvTranslationController.saveCvTranslation
 );
 

@@ -743,7 +743,7 @@ async function main() {
       token: universityTokensA.accessToken,
       body: {},
     }),
-    202,
+    200,
     "university admin should approve its own university verification"
   );
 

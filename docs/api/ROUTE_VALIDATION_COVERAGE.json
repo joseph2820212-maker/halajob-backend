@@ -1,0 +1,115 @@
+{
+  "generatedAt": "2026-06-28T08:10:40.312Z",
+  "totals": {
+    "totalEndpoints": 3401,
+    "publicSystemEndpoints": 5,
+    "readOnlyEndpointsAllowedWithoutBodyValidator": 286,
+    "writeUpdateDeleteEndpoints": 2149,
+    "writeUpdateDeleteEndpointsWithValidator": 2149,
+    "writeUpdateDeleteEndpointsMissingValidator": 0,
+    "writeValidationCoveragePercent": 100,
+    "coreAuthAccountMissingValidators": 0
+  },
+  "modules": [
+    {
+      "module": "account",
+      "total": 6,
+      "writes": 3,
+      "writesWithValidator": 3,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "admin",
+      "total": 2882,
+      "writes": 1902,
+      "writesWithValidator": 1902,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "ai",
+      "total": 12,
+      "writes": 12,
+      "writesWithValidator": 12,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "analytics",
+      "total": 5,
+      "writes": 2,
+      "writesWithValidator": 2,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "auth",
+      "total": 14,
+      "writes": 14,
+      "writesWithValidator": 14,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "campus",
+      "total": 61,
+      "writes": 34,
+      "writesWithValidator": 34,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "company",
+      "total": 134,
+      "writes": 65,
+      "writesWithValidator": 65,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "jobs",
+      "total": 2,
+      "writes": 1,
+      "writesWithValidator": 1,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "legacy-user",
+      "total": 139,
+      "writes": 42,
+      "writesWithValidator": 42,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "notifications",
+      "total": 16,
+      "writes": 12,
+      "writesWithValidator": 12,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "other",
+      "total": 12,
+      "writes": 6,
+      "writesWithValidator": 6,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "seeker",
+      "total": 94,
+      "writes": 45,
+      "writesWithValidator": 45,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "trust",
+      "total": 4,
+      "writes": 4,
+      "writesWithValidator": 4,
+      "writesMissingValidator": 0
+    },
+    {
+      "module": "university",
+      "total": 20,
+      "writes": 7,
+      "writesWithValidator": 7,
+      "writesMissingValidator": 0
+    }
+  ],
+  "coreAuthAccountMissing": [],
+  "writeMissingValidator": []
+}

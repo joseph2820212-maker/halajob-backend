@@ -1,79 +1,147 @@
 # Hala Job
 
-This repository contains the Express/MongoDB backend and the Vite web frontend in `web/`.
+HalaJob is a Node.js/Express and MongoDB backend with a Vite web frontend and a
+Flutter mobile app. The current launch-hardening branch is:
+
+```text
+codex/gate-a-mobile-ui-lock
+```
 
 > Historical note: "JobZain" was an earlier internal/product name. The public product name is now **Hala Job** (operated by llill ltd; public web domain halajob.com). The backend API domain may temporarily remain `jobzain.com` as a technical URL — see `BRAND_CLEANUP_AUDIT.md`.
 
-## Backend
+The launch source branch remains `flutter-seeker-campus`; new hardening branches
+should be based directly on it.
 
-Install and run locally:
+## Repository Map
+
+| Area | Path |
+|---|---|
+| Backend app | `app.js`, `index.js` |
+| Backend routes | `routes/`, `routesUser/`, `routesCompany/`, `routesEmployee/`, `routesCampus/`, `routesUniversity/`, `routesAi/`, `routesAnalytics/`, `routesNotifications/`, `routesTrust/` |
+| Backend controllers | `controllers/` |
+| Models | `models/` |
+| Services/helpers | `services/`, `helper/`, `utils/` |
+| Validation | `validations/`, `middlewares/validate.js` |
+| Verification scripts | `scripts/` |
+| Web frontend | `web/` |
+| Flutter mobile app | `mobile/` |
+| Generated API docs | `docs/api/` |
+| Security/testing docs | `docs/security/`, `docs/testing/` |
+
+## Start Here
+
+Read these before handoff or new launch work:
+
+- `CODEX.md`
+- `CONTRIBUTING.md`
+- `docs/HANDOVER.md`
+- `docs/TESTING_GUIDE.md`
+- `docs/DEPLOYMENT.md`
+- `docs/ENVIRONMENT.md`
+- `docs/PAYMENTS_AND_SUBSCRIPTIONS.md`
+- `docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md`
+- `docs/one-phase-launch-scope.md`
+- `docs/launch-hardening-status.md`
+
+## Backend Setup
 
 ```bash
 npm ci
 npm run dev
 ```
 
-For a seeded local setup with working admin, company, and job seeker logins, see [docs/local-auth-qa.md](docs/local-auth-qa.md).
-
-Production backend environment variables:
+Minimum local `.env`:
 
 ```text
-NODE_ENV=production
+CONNECTION_URL=<mongodb-connection-string>
+JWT_SECRET=<long-random-secret>
 PORT=3000
-CONNECTION_URL=your_mongodb_connection_string
-JWT_SECRET=your_long_private_secret
-PUBLIC_BASE_URL=https://jobzain.com
-HEALTH_SECRET=your_private_health_page_secret
-CORS_ORIGINS=https://your-vercel-site.vercel.app,https://your-custom-domain.com
-CORS_ORIGIN_PATTERNS=https://*.vercel.app
+NODE_ENV=development
 ```
 
-Use exact frontend URLs in `CORS_ORIGINS`. Keep `CORS_ORIGIN_PATTERNS=https://*.vercel.app` if you want Vercel preview deployments to work during testing.
+See `docs/ENVIRONMENT.md` for the full environment reference.
 
 ## Web Frontend
 
-The deployable frontend lives in `web/`.
-
 ```bash
-cd web
-npm ci
-npm run build
+npm --prefix web ci
+npm --prefix web run build
+npm --prefix web test
 ```
 
-For Vercel, import the GitHub repo, select branch `website-implementation`, and use:
-
-```text
-Framework Preset: Vite
-Root Directory: web
-Build Command: npm run build
-Output Directory: dist
-Install Command: npm ci
-```
-
-If Vercel does not show the branch/root controls and builds from the repository root, the root `vercel.json` is configured to use:
-
-```text
-Install Command: cd web && npm ci
-Build Command: cd web && npm run build
-Output Directory: web/dist
-```
-
-Do not use `vite build` as the build command in the root project. It will fail because Vite is installed in `web/`, not in the backend root.
-
-Frontend environment variables:
+Frontend environment:
 
 ```text
 VITE_API_URL=https://jobzain.com
 VITE_ENABLE_UNIVERSITY_PREVIEW=false
 ```
 
-## Checks
+The root `vercel.json` builds the `web/` app for Vercel deployments.
+
+## Mobile App
 
 ```bash
+cd mobile
+flutter pub get
+flutter analyze
+flutter test
+```
+
+The tester APK is local/debug signed unless a production signing strategy is
+configured. Do not call an APK fresh unless it was rebuilt from the current
+source. Campus tester builds can enable local-device campus auth for UI/device
+QA; production campus auth should use the backend.
+
+## Verification
+
+Use `docs/TESTING_GUIDE.md` as the source of truth. Core branch checks include:
+
+```bash
+npm run check:secrets
 npm run check:syntax
 npm run check:imports
 npm run smoke:import
 npm run smoke:http
 npm run smoke:cors
-cd web && npm run build
+npm run test:route-validation
+npm run test:response-codes
+npm run test:model-integrity
+npm run test:mixed-fields
+npm --prefix web run build
+npm --prefix web test
+npm --prefix web run e2e
+npm run test:web-smoke
 ```
+
+CI also runs the web build, unit tests, and `npm --prefix web run e2e` on the
+Linux verification job.
+
+Regenerate source-of-truth docs after route/model/auth/contract changes:
+
+```bash
+npm run docs:route-report
+npm run docs:api-artifacts
+npm run docs:database
+npm run docs:api-pdf
+```
+
+## Current Payment Position
+
+Manual/admin subscriptions are implemented and tested. Online checkout,
+provider webhooks, automatic payment status sync, failed-payment handling, and
+refund logic are not enabled until the owner selects and provides a payment
+provider setup. See `docs/PAYMENTS_AND_SUBSCRIPTIONS.md`.
+
+## External Launch Blockers
+
+The source can be hardened locally, but public launch still needs owner-side
+proof for:
+
+- production secret rotation
+- production admin-user audit
+- live production smoke tests
+- SMTP/email, Firebase/push, Cloudinary/storage, AI provider, domain/HTTPS,
+  hosting, and backup/restore checks against real accounts
+- manual subscription launch acceptance or online payment provider setup
+- production Android signing/package/update strategy
+- owner real-device mobile UI approval

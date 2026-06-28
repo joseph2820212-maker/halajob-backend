@@ -28,6 +28,7 @@ import JobMatchModel from './JobMatchModel.js';
 import JobEmployeeMatchModel from './JobEmployeeMatchModel.js';
 
 import CountryModel from './CountryModel.js';
+import CityModel from './CityModel.js';
 import CurrencyModel from './CurrencyModel.js';
 import SheetModel from './SheetModel.js';
 import LanguageModel from './LanguageModel.js';
@@ -133,6 +134,7 @@ export {
   JobMatchModel,
   JobEmployeeMatchModel,
   CountryModel,
+  CityModel,
   CurrencyModel,
   SheetModel,
   LanguageModel,

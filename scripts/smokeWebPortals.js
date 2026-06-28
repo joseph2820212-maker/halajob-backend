@@ -3,8 +3,19 @@ import puppeteer from "puppeteer";
 
 const baseUrl = process.argv[2] || "http://127.0.0.1:4173";
 const logPath = new URL("../tmp-smoke-web-portals.log", import.meta.url);
-const executablePath =
-  process.env.PUPPETEER_EXECUTABLE_PATH || "C:/Program Files/Google/Chrome/Application/chrome.exe";
+
+const knownBrowserPaths = [
+  process.env.PUPPETEER_EXECUTABLE_PATH,
+  "C:/Program Files/Google/Chrome/Application/chrome.exe",
+  "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
+  "/usr/bin/google-chrome",
+  "/usr/bin/google-chrome-stable",
+  "/usr/bin/chromium",
+  "/usr/bin/chromium-browser",
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+].filter(Boolean);
+
+const executablePath = knownBrowserPaths.find((candidate) => fs.existsSync(candidate));
 
 const log = (message) => {
   fs.appendFileSync(logPath, `${message}\n`);
@@ -28,12 +39,12 @@ const routeActions = {
   admin: ["companies", "jobs", "trust", "analytics", "talent", "universities", "subscriptions"],
 };
 
-log(`launch browser ${executablePath}`);
+log(`launch browser ${executablePath || "puppeteer-default"}`);
 const browser = await puppeteer.launch({
-  executablePath,
+  ...(executablePath ? { executablePath } : {}),
   headless: "new",
   protocolTimeout: 45000,
-  args: ["--no-first-run", "--no-default-browser-check"],
+  args: ["--no-first-run", "--no-default-browser-check", "--disable-dev-shm-usage", "--no-sandbox"],
 });
 log("browser launched");
 const page = await browser.newPage();

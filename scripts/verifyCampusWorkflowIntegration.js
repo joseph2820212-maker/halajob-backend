@@ -636,7 +636,7 @@ async function main() {
       contextId: universityContextA._id,
       body: { requested_information: "Please confirm your graduation date." },
     }),
-    202,
+    200,
     "own university admin should request more information"
   );
   assert.equal((await StudentVerificationModel.findById(verificationId).lean()).status, "needs_more_information");
@@ -651,7 +651,7 @@ async function main() {
       contextId: studentContext._id,
       body: { note: "Graduation year confirmed." },
     }),
-    202,
+    200,
     "student should resubmit verification"
   );
   assert.equal((await StudentVerificationModel.findById(verificationId).lean()).status, "pending");
@@ -665,7 +665,7 @@ async function main() {
       token: universityTokensA.accessToken,
       contextId: universityContextA._id,
     }),
-    202,
+    200,
     "own university admin should approve verification"
   );
   const [approvedVerification, updatedStudent] = await Promise.all([

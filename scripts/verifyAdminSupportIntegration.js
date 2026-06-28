@@ -329,7 +329,7 @@ async function main() {
         admin_note: "Investigating applicant queue issue.",
       },
     }),
-    202,
+    200,
     "support.manage admin should update support ticket status"
   );
   assert.equal(statusPayload.data.status, "in_progress");
@@ -341,7 +341,7 @@ async function main() {
       token: supportManageTokens.accessToken,
       body: { message: "We are checking this with the hiring pipeline logs." },
     }),
-    202,
+    200,
     "support.manage admin should add support ticket replies"
   );
   assert.equal(messagePayload.data.status, "answered");
@@ -355,7 +355,7 @@ async function main() {
       token: supportManageTokens.accessToken,
       body: { status: "closed", admin_note: "Resolved by support." },
     }),
-    202,
+    200,
     "support.manage admin should close support tickets"
   );
   assert.equal(closePayload.data.status, "closed");

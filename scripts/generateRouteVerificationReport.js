@@ -42,7 +42,7 @@ const moduleForPath = (pathName) => {
 const isKnownPublic = ({ method, path: pathName, middlewares = [] }) => {
   if (method === "OPTIONS" || pathName === "*") return true;
   if (middlewares.includes("optionalAuthUser")) return true;
-  if (pathName === "/health") return true;
+  if (pathName === "/health" || pathName.startsWith("/health/")) return true;
   if (pathName.startsWith("/cv/generated/")) return true;
   if (pathName.startsWith("/dash/v1/image/")) return true;
   if (pathName === "/dash/v1/auth/refresh") return true;
