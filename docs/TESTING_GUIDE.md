@@ -70,14 +70,15 @@ npm run test:integration:campus-workflows
 npm --prefix web ci --ignore-scripts
 npm --prefix web run build
 npm --prefix web test
+npm --prefix web run e2e
 npm run test:web-smoke
 ```
 
 Current web tests cover API auth/path behavior, scoped 401 logout, URL helpers,
 i18n helpers, and route smoke rendering for home, jobs, campus, company, seeker,
-and admin views. `npm run test:web-smoke` starts a local Vite preview, runs the
-Puppeteer portal smoke across the main web portals, and then stops the preview
-server.
+and admin views. `npm --prefix web run e2e` and the root shortcut
+`npm run test:web-smoke` both start a local Vite preview, run the Puppeteer
+portal smoke across the main web portals, and then stop the preview server.
 
 ## Mobile Checks
 

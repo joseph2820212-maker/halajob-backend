@@ -14,7 +14,7 @@
 | Mobile UI/UX | 8.6 | Design-handout polish and campus tester APK exist; APK `1.0.2+19` includes campus local-device tester entry. Owner real-device approval is still pending. |
 | Backend/API correctness | 9.2 | 3401 endpoints inventoried; 2149/2149 write/update/delete endpoints have validation; response-code, model-integrity, Mixed-field, auth/context, object-authorization, campus, hiring, subscription, admin, trust, AI, analytics, notification, translation, and file/export suites passed locally. |
 | Security/privacy/permissions | 9.1 | OTP/hardening, route guards, fine-grained admin permissions, audit redaction, private document download tests, upload rejection tests, HSTS/Helmet, and secret scan passed. Production admin audit and secret rotation remain owner-controlled. |
-| Web frontend | 8.9 | Web build passed, 4 Vitest files/9 tests passed, and `npm run test:web-smoke` walked home/campus/company/seeker/admin routes through a local Vite preview. |
+| Web frontend | 9.0 | Web build passed, 4 Vitest files/9 tests passed, and `npm --prefix web run e2e` / `npm run test:web-smoke` walked home/campus/company/seeker/admin routes through a local Vite preview. |
 | Docs/handover | 9.4 | Required handover package files exist, generated API/OpenAPI/Postman/database docs were refreshed, and `CODEX.md`, `CLAUDE.md`, `CONTRIBUTING.md`, payment decision, testing, deployment, and handover docs are current. |
 | Operations/deployment | 8.4 | Deployment, environment, backup/restore, health, CI, and rollback docs exist; live provider checks, production smoke, and restore proof require owner accounts. |
 | Business readiness/payments | 8.0 | Manual/admin subscriptions are implemented and tested. Online checkout/payment-provider webhooks are intentionally not claimed until the owner selects a provider and supplies merchant setup. |
@@ -36,7 +36,7 @@
 | Gate K - Translation/global/country/currency | translation controllers/services, global routes, launch-contract verifier | Translation save/read/approval and USD/EUR/GBP plus work-mode contract are covered. |
 | Gate L - Files/CVs/documents/exports | file upload/download controllers, CV controllers, export/audit scripts | Private document, CV, company file, upload rejection, and export audit paths are covered. |
 | Gate M - Trust/anti-scam | `routesTrust/**`, `controllers/trust/**`, `services/trust/**`, trust verifier scripts | Trust routes, evidence URL safety, reporting, and admin queue behavior are covered locally. |
-| Gate N - Web frontend | `web/src/**`, `web/src/tests/**`, `scripts/smokeWebPortals.js` | Web API path encoding, 401 logout behavior, route smoke tests, build, and portal smoke are green. |
+| Gate N - Web frontend | `web/src/**`, `web/src/tests/**`, `web/package.json`, `scripts/smokeWebPortals.js`, `scripts/runWebPortalSmoke.js` | Web API path encoding, 401 logout behavior, route smoke tests, build, and one-command portal smoke/e2e are green. |
 | Gate O - Testing/CI | `.github/workflows/flutter-mobile-ci.yml`, `package.json`, `web/package.json`, `scripts/**` | CI includes backend contracts, web build/tests, mobile analyze/tests/builds, and now triggers for `codex/**`. |
 | Gate P - API docs | `docs/api/**`, `docs/DATABASE_MODELS.md`, doc generator scripts | API reference, PDF, OpenAPI, Postman collection, route inventory, and database docs regenerated. |
 | Gate Q - Deployment/ops | `docs/DEPLOYMENT.md`, `docs/ENVIRONMENT.md`, `docs/BACKUP_RESTORE.md`, `docs/HANDOVER.md` | Deployment, env, handover, health, rollback, and production-proof blockers documented. |
@@ -60,7 +60,8 @@
 | `npm run test:integration:subscriptions` | Passed | Fresh run on 2026-06-28; company billing permissions, invoice ownership, support ticket, admin assignment, and missing-plan failure verified. |
 | `npm --prefix web run build` | Passed | Fresh run on 2026-06-28; Vite built 89 modules and prerendered 6 routes. |
 | `npm --prefix web test` | Passed | Fresh run on 2026-06-28; 4 files and 9 tests passed. |
-| `npm run test:web-smoke` | Passed | Starts local Vite preview, runs Puppeteer portal smoke across home/campus/company/seeker/admin, then stops preview. |
+| `npm --prefix web run e2e` | Passed | Starts local Vite preview, runs Puppeteer portal smoke across home/campus/company/seeker/admin, then stops preview. |
+| `npm run test:web-smoke` | Passed | Root shortcut for the same web portal smoke. |
 | `git diff --check` | Passed | Whitespace diff check passed after final trimming. |
 | Required handover package check | Passed | `README.md`, `CLAUDE.md`, `CODEX.md`, `CONTRIBUTING.md`, required docs, API docs, security docs, and live-smoke doc all exist. |
 | `git diff --name-only f07d9c179e351a55383125b2f6795e748df6200f..HEAD -- mobile` | Passed | No mobile file changes after the APK build commit. |
@@ -87,7 +88,7 @@ Note: this is a tester APK, not a production-signed store release. There are no
 ## Web evidence
 - Build result: Passed on 2026-06-28 via `npm --prefix web run build`.
 - Test result: Passed on 2026-06-28 via `npm --prefix web test`; 4 files, 9 tests.
-- Smoke/e2e result: `npm run test:web-smoke` passed against local Vite preview.
+- Smoke/e2e result: `npm --prefix web run e2e` and `npm run test:web-smoke` passed against local Vite preview.
 
 ## Backend evidence
 - Static checks: `check:secrets`, `check:syntax`, `check:imports`, and `check:i18n` passed.
@@ -126,7 +127,7 @@ Note: this is a tester APK, not a production-signed store release. There are no
 - Online payment is not implemented; manual/admin subscription must be explicitly accepted or a provider must be selected.
 - Real AI provider output is not claimed without provider credentials and live QA.
 - Production-signed APK/AAB is not produced yet.
-- Full authenticated browser e2e coverage is not present; current web proof is build, unit/smoke tests, and Puppeteer portal smoke.
+- Full authenticated browser e2e coverage is not present; current web proof is build, unit/smoke tests, and unauthenticated Puppeteer portal smoke/e2e.
 - Owner real-device UI approval remains pending.
 
 ## Launch recommendation

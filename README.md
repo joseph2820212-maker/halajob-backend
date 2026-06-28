@@ -107,6 +107,7 @@ npm run test:model-integrity
 npm run test:mixed-fields
 npm --prefix web run build
 npm --prefix web test
+npm --prefix web run e2e
 npm run test:web-smoke
 ```
 

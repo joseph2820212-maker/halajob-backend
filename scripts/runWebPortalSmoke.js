@@ -1,5 +1,10 @@
 import http from "http";
 import { spawn } from "child_process";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(scriptDir, "..");
 
 const port = Number(process.env.WEB_SMOKE_PORT || 4173);
 const host = process.env.WEB_SMOKE_HOST || "127.0.0.1";
@@ -63,12 +68,12 @@ const stopProcessTree = async (child) => {
 const preview = spawn(
   previewCommand,
   previewArgs,
-  { stdio: "inherit", shell: false }
+  { cwd: repoRoot, stdio: "inherit", shell: false }
 );
 
 try {
   await waitForHttp(baseUrl);
-  await run(process.execPath, ["scripts/smokeWebPortals.js", baseUrl]);
+  await run(process.execPath, ["scripts/smokeWebPortals.js", baseUrl], { cwd: repoRoot });
 } finally {
   await stopProcessTree(preview);
 }

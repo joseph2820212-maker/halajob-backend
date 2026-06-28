@@ -180,6 +180,7 @@ npm run test:integration:job-mutations
 npm run test:integration:hiring-workflows
 npm --prefix web run build
 npm --prefix web test
+npm --prefix web run e2e
 npm run test:web-smoke
 ```
 
