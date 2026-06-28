@@ -1,6 +1,6 @@
 # Route Validation Coverage
 
-Generated: 2026-06-28T07:22:59.861Z
+Generated: 2026-06-28T07:26:43.042Z
 
 ## Summary
 
@@ -8,11 +8,11 @@ Generated: 2026-06-28T07:22:59.861Z
 |---|---:|
 | Total endpoints | 3401 |
 | Public/system endpoints | 5 |
-| Read-only endpoints allowed without body validator | 311 |
+| Read-only endpoints allowed without body validator | 294 |
 | Write/update/delete endpoints | 2149 |
-| Write/update/delete endpoints with validator | 1997 |
-| Write/update/delete endpoints missing validator | 152 |
-| Write validation coverage | 92.9% |
+| Write/update/delete endpoints with validator | 2062 |
+| Write/update/delete endpoints missing validator | 87 |
+| Write validation coverage | 96% |
 | Core auth/account missing validators | 0 |
 
 ## Module Summary
@@ -25,7 +25,7 @@ Generated: 2026-06-28T07:22:59.861Z
 | analytics | 5 | 2 | 2 | 0 |
 | auth | 14 | 14 | 14 | 0 |
 | campus | 61 | 34 | 34 | 0 |
-| company | 134 | 65 | 0 | 65 |
+| company | 134 | 65 | 65 | 0 |
 | jobs | 2 | 1 | 1 | 0 |
 | legacy-user | 139 | 42 | 0 | 42 |
 | notifications | 16 | 12 | 12 | 0 |
@@ -38,71 +38,6 @@ Generated: 2026-06-28T07:22:59.861Z
 
 | Method | Path | Module | Middlewares |
 | --- | --- | --- | --- |
-| POST | /company/v1/auth/login | company | multerMiddleware, login |
-| POST | /company/v1/auth/logout | company | multerMiddleware, logout |
-| POST | /company/v1/campus/opportunities | company | anonymous, companyOpportunities |
-| POST | /company/v1/campus/partners | company | anonymous, partners |
-| POST | /company/v1/global/applications/:applicationId/note | company | anonymous, multerMiddleware, addApplicationNote |
-| POST | /company/v1/global/applications/:applicationId/rate | company | anonymous, multerMiddleware, rateApplicant |
-| PATCH | /company/v1/global/applications/:applicationId/status | company | anonymous, multerMiddleware, changeApplicationStatus |
-| POST | /company/v1/global/interviews | company | anonymous, getCompanyInterviews |
-| DELETE | /company/v1/global/interviews/:interviewId | company | anonymous, multerMiddleware, updateInterview |
-| PATCH | /company/v1/global/interviews/:interviewId | company | anonymous, multerMiddleware, updateInterview |
-| POST | /company/v1/global/jobs | company | anonymous, getMyJobs |
-| DELETE | /company/v1/global/jobs/:jobId | company | anonymous, getMyJobDetails |
-| PATCH | /company/v1/global/jobs/:jobId | company | anonymous, getMyJobDetails |
-| POST | /company/v1/global/jobs/:jobId | company | anonymous, getMyJobDetails |
-| PUT | /company/v1/global/jobs/:jobId | company | anonymous, getMyJobDetails |
-| PATCH | /company/v1/global/jobs/:jobId/archive | company | anonymous, multerMiddleware |
-| POST | /company/v1/global/jobs/:jobId/clone | company | anonymous, multerMiddleware, cloneJob |
-| PATCH | /company/v1/global/jobs/:jobId/pause | company | anonymous, multerMiddleware |
-| PATCH | /company/v1/global/jobs/:jobId/publish | company | anonymous, multerMiddleware |
-| PATCH | /company/v1/global/jobs/:jobId/restore | company | anonymous, multerMiddleware |
-| PATCH | /company/v1/global/jobs/:jobId/status | company | anonymous, multerMiddleware, changeJobStatus |
-| PATCH | /company/v1/global/jobs/bulk | company | anonymous, multerMiddleware, bulkUpdateJobs |
-| PUT | /company/v1/global/me/basic-profile | company | getMyBasicCompanyProfile |
-| PUT | /company/v1/global/me/image | company | multerMiddleware, updateMyCompanyUserProfile |
-| POST | /company/v1/global/members | company | anonymous, listMembers |
-| DELETE | /company/v1/global/members/:memberId | company | anonymous, multerMiddleware, updateMember |
-| PATCH | /company/v1/global/members/:memberId | company | anonymous, multerMiddleware, updateMember |
-| POST | /company/v1/global/message-templates | company | anonymous, listTemplates |
-| DELETE | /company/v1/global/message-templates/:templateId | company | anonymous, multerMiddleware, updateTemplate |
-| PATCH | /company/v1/global/message-templates/:templateId | company | anonymous, multerMiddleware, updateTemplate |
-| PUT | /company/v1/global/profile | company | getMyCompanyProfile |
-| POST | /company/v1/global/profile/:section | company | getMySection |
-| PUT | /company/v1/global/profile/:section | company | getMySection |
-| DELETE | /company/v1/global/profile/:section/:itemId | company | anonymous, multerMiddleware, updateSectionItem |
-| PATCH | /company/v1/global/profile/:section/:itemId | company | anonymous, multerMiddleware, updateSectionItem |
-| PUT | /company/v1/global/profile/about | company | anonymous, multerMiddleware, updateCompanyAbout |
-| PUT | /company/v1/global/profile/contact | company | anonymous, multerMiddleware, updateCompanyContact |
-| POST | /company/v1/global/profile/files | company | listCompanyFiles |
-| DELETE | /company/v1/global/profile/files/:filename | company | anonymous, deleteCompanyFile |
-| PUT | /company/v1/global/profile/location | company | anonymous, multerMiddleware, updateCompanyLocation |
-| PUT | /company/v1/global/profile/media | company | anonymous, multerMiddleware, updateCompanyMedia |
-| POST | /company/v1/global/profile/rebuild-search-filters | company | anonymous, multerMiddleware, rebuildMyCompanySearchFilters |
-| POST | /company/v1/global/question-library | company | anonymous, listQuestions |
-| DELETE | /company/v1/global/question-library/:questionId | company | anonymous, multerMiddleware, updateQuestion |
-| PATCH | /company/v1/global/question-library/:questionId | company | anonymous, multerMiddleware, updateQuestion |
-| POST | /company/v1/global/subscription/request | company | anonymous, multerMiddleware, requestPlanChange |
-| POST | /company/v1/global/support-tickets | company | anonymous, listTickets |
-| POST | /company/v1/global/support-tickets/:ticketId/messages | company | anonymous, multerMiddleware, addTicketMessage |
-| POST | /company/v1/jobs/hiring/:jobId/invitations | company | anonymous, multerMiddleware, sendJobInvitation |
-| PATCH | /company/v1/jobs/hiring/applications/:applicationId/block-applicant | company | anonymous, multerMiddleware, blockApplicationApplicant |
-| POST | /company/v1/jobs/hiring/applications/:applicationId/interviews | company | anonymous, multerMiddleware, createInterview |
-| POST | /company/v1/jobs/hiring/applications/:applicationId/messages | company | anonymous, multerMiddleware, sendApplicationMessage |
-| PATCH | /company/v1/jobs/hiring/applications/:applicationId/restore | company | anonymous, multerMiddleware, restoreApplication |
-| PATCH | /company/v1/jobs/hiring/applications/:applicationId/status | company | anonymous, multerMiddleware, updateApplicationStatus |
-| POST | /company/v1/jobs/hiring/applications/bulk-cv | company | anonymous, multerMiddleware, bulkApplicationCvs |
-| POST | /company/v1/jobs/hiring/applications/bulk-export | company | anonymous, multerMiddleware, bulkExportApplications |
-| POST | /company/v1/jobs/hiring/interviews | company | anonymous, multerMiddleware, createInterview |
-| PATCH | /company/v1/jobs/hiring/interviews/:interviewId | company | anonymous, multerMiddleware, updateInterview |
-| PATCH | /company/v1/jobs/hiring/interviews/:interviewId/status | company | anonymous, multerMiddleware, changeInterviewStatus |
-| POST | /company/v1/jobs/hiring/invitations | company | anonymous, multerMiddleware, sendJobInvitation |
-| PATCH | /company/v1/jobs/hiring/invitations/:invitationId/cancel | company | anonymous, multerMiddleware, cancelJobInvitation |
-| POST | /company/v1/jobs/talent/:jobId/help-requests | company | anonymous, multerMiddleware, requestJobZainTalentHelp |
-| POST | /company/v1/jobs/talent/:jobId/smart-employees/generate | company | anonymous, multerMiddleware, generateSmartEmployeesForJob |
-| POST | /company/v1/jobs/talent/help-requests | company | anonymous, multerMiddleware, requestJobZainTalentHelp |
-| PATCH | /company/v1/jobs/talent/help-requests/:requestId/cancel | company | anonymous, multerMiddleware, cancelJobZainTalentRequest |
 | POST | /user/v1/applying-job/insert/:id | legacy-user | authUser, anonymous, applyJob |
 | PUT | /user/v1/career-passport | legacy-user | authUser, anonymous, get |
 | POST | /user/v1/career-passport/share | legacy-user | authUser, anonymous, jsonParser, share |
@@ -188,3 +123,5 @@ Generated: 2026-06-28T07:22:59.861Z
 | POST | /employee/v1/jobs/:jobId/apply | seeker | authUser, anonymous, multerMiddleware, applyToJob |
 | POST | /employee/v1/jobs/:jobId/rate | seeker | authUser, anonymous, multerMiddleware, rateJob |
 | POST | /employee/v1/jobs/:jobId/review | seeker | authUser, anonymous, multerMiddleware, reviewJob |
+| DELETE | /employee/v1/jobs/:jobId/save | seeker | authUser, anonymous, multerMiddleware, saveJob |
+| POST | /employee/v1/jobs/:jobId/save | seeker | authUser, anonymous, multerMiddleware, saveJob |
