@@ -97150,6 +97150,140 @@
       "name": "Campus",
       "item": [
         {
+          "name": "GET /campus/v1/admin/members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/campus/v1/admin/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "campus",
+                "v1",
+                "admin",
+                "members"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /campus/v1/admin/members",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/campus/v1/admin/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "campus",
+                "v1",
+                "admin",
+                "members"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus. Guard source: explicit."
+          }
+        },
+        {
+          "name": "DELETE /campus/v1/admin/members/:memberId",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/campus/v1/admin/members/:memberId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "campus",
+                "v1",
+                "admin",
+                "members",
+                ":memberId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /campus/v1/admin/members/:memberId",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/campus/v1/admin/members/:memberId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "campus",
+                "v1",
+                "admin",
+                "members",
+                ":memberId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus. Guard source: explicit."
+          }
+        },
+        {
           "name": "GET /campus/v1/admin/verifications",
           "request": {
             "method": "GET",
@@ -97212,6 +97346,41 @@
                 "verifications",
                 ":id",
                 "approve"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /campus/v1/admin/verifications/:id/document",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/campus/v1/admin/verifications/:id/document",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "campus",
+                "v1",
+                "admin",
+                "verifications",
+                ":id",
+                "document"
               ]
             },
             "description": "Generated from live route inventory. Module: Campus. Guard source: explicit."
@@ -97314,6 +97483,40 @@
                 "campus",
                 "v1",
                 "student-verifications"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /campus/v1/student-verifications/:id/document",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/campus/v1/student-verifications/:id/document",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "campus",
+                "v1",
+                "student-verifications",
+                ":id",
+                "document"
               ]
             },
             "description": "Generated from live route inventory. Module: Campus. Guard source: explicit."
@@ -103640,6 +103843,60 @@
             },
             "description": "Generated from live route inventory. Module: Health. Guard source: none."
           }
+        },
+        {
+          "name": "GET /health/live",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health/live",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health",
+                "live"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Health. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /health/ready",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health/ready",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health",
+                "ready"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Health. Guard source: none."
+          }
         }
       ]
     },
@@ -103719,6 +103976,106 @@
     {
       "name": "Legacy User",
       "item": [
+        {
+          "name": "POST /user/v1/account/delete-request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/account/delete-request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "account",
+                "delete-request"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /user/v1/account/delete-request/cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/account/delete-request/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "account",
+                "delete-request",
+                "cancel"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/account/export",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/account/export",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "account",
+                "export"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
         {
           "name": "GET /user/v1/app/dashboard",
           "request": {
@@ -104032,6 +104389,39 @@
               ]
             },
             "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /user/v1/auth/logout-all",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/auth/logout-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "auth",
+                "logout-all"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
           }
         },
         {
@@ -112554,6 +112944,136 @@
           }
         },
         {
+          "name": "GET /university/v1/members",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "members"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /university/v1/members",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/members",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "members"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "DELETE /university/v1/members/:memberId",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/members/:memberId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "members",
+                ":memberId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /university/v1/members/:memberId",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/members/:memberId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "members",
+                ":memberId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
           "name": "GET /university/v1/opportunities",
           "request": {
             "method": "GET",
@@ -112841,6 +113361,40 @@
                 "verifications",
                 ":id",
                 "approve"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /university/v1/verifications/:id/document",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/verifications/:id/document",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "verifications",
+                ":id",
+                "document"
               ]
             },
             "description": "Generated from live route inventory. Module: University. Guard source: explicit."

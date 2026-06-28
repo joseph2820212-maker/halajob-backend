@@ -8,7 +8,7 @@ import adminSchemas from '../validations/admin.validation.js';
 const upload = multer;
 const router = express.Router();
 
-router.post('/login', upload.none(), validate(adminSchemas.dashboardLoginSchema), Login.login);
+router.post('/login', upload.none(), Login.auditMissingDashboardLoginCredentials, validate(adminSchemas.dashboardLoginSchema), Login.login);
 router.post('/refresh', upload.none(), validate(adminSchemas.dashboardRefreshSchema), Login.refresh);
 router.post('/logout', upload.none(), validate(adminSchemas.dashboardLogoutSchema), Login.logout);
 router.get('/me', isAdmin, Login.me);

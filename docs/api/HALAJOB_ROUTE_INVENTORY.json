@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T08:06:04.176Z",
+  "generatedAt": "2026-06-28T08:10:37.575Z",
   "records": [
     {
       "method": "PATCH",
@@ -3490,6 +3490,7 @@
       "module": "Admin",
       "middlewares": [
         "multerMiddleware",
+        "auditMissingDashboardLoginCredentials",
         "validateRequest",
         "login"
       ],

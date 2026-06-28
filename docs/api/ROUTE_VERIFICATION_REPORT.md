@@ -1,6 +1,6 @@
 # Route Verification Report
 
-Generated: 2026-06-28T08:06:04.176Z
+Generated: 2026-06-28T08:10:37.575Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
@@ -80,6 +80,7 @@ applyToJob
 approveCompanyRequest
 approveJob
 assignSubscriptionPlan
+auditMissingDashboardLoginCredentials
 authUser
 blockApplicationApplicant
 browseCompanies

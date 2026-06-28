@@ -599,6 +599,96 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/campus/v1/admin/members":
+    get:
+      tags: ["Campus"]
+      summary: "GET /campus/v1/admin/members"
+      operationId: "campus_get_campus_v1_admin_members"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    post:
+      tags: ["Campus"]
+      summary: "POST /campus/v1/admin/members"
+      operationId: "campus_post_campus_v1_admin_members"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/campus/v1/admin/members/{memberId}":
+    delete:
+      tags: ["Campus"]
+      summary: "DELETE /campus/v1/admin/members/:memberId"
+      operationId: "campus_delete_campus_v1_admin_members_memberid"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "memberId"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    patch:
+      tags: ["Campus"]
+      summary: "PATCH /campus/v1/admin/members/:memberId"
+      operationId: "campus_patch_campus_v1_admin_members_memberid"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "memberId"
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/campus/v1/admin/verifications":
     get:
       tags: ["Campus"]
@@ -636,6 +726,29 @@ paths:
           application/json:
             schema:
               type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/campus/v1/admin/verifications/{id}/document":
+    get:
+      tags: ["Campus"]
+      summary: "GET /campus/v1/admin/verifications/:id/document"
+      operationId: "campus_get_campus_v1_admin_verifications_id_document"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Successful response
@@ -717,6 +830,29 @@ paths:
           application/json:
             schema:
               type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/campus/v1/student-verifications/{id}/document":
+    get:
+      tags: ["Campus"]
+      summary: "GET /campus/v1/student-verifications/:id/document"
+      operationId: "campus_get_campus_v1_student_verifications_id_document"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Successful response
@@ -75094,6 +75230,28 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+  "/health/live":
+    get:
+      tags: ["Health"]
+      summary: "GET /health/live"
+      operationId: "health_get_health_live"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+  "/health/ready":
+    get:
+      tags: ["Health"]
+      summary: "GET /health/ready"
+      operationId: "health_get_health_ready"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
   "/jobs/v1/{jobId}/translations/{lang}":
     get:
       tags: ["Jobs"]
@@ -75682,6 +75840,96 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/university/v1/members":
+    get:
+      tags: ["University"]
+      summary: "GET /university/v1/members"
+      operationId: "university_get_university_v1_members"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    post:
+      tags: ["University"]
+      summary: "POST /university/v1/members"
+      operationId: "university_post_university_v1_members"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/university/v1/members/{memberId}":
+    delete:
+      tags: ["University"]
+      summary: "DELETE /university/v1/members/:memberId"
+      operationId: "university_delete_university_v1_members_memberid"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "memberId"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    patch:
+      tags: ["University"]
+      summary: "PATCH /university/v1/members/:memberId"
+      operationId: "university_patch_university_v1_members_memberid"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "memberId"
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/university/v1/opportunities":
     get:
       tags: ["University"]
@@ -75858,6 +76106,29 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/university/v1/verifications/{id}/document":
+    get:
+      tags: ["University"]
+      summary: "GET /university/v1/verifications/:id/document"
+      operationId: "university_get_university_v1_verifications_id_document"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/university/v1/verifications/{id}/reject":
     post:
       tags: ["University"]
@@ -75907,6 +76178,69 @@ paths:
           application/json:
             schema:
               type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/user/v1/account/delete-request":
+    post:
+      tags: ["Legacy User"]
+      summary: "POST /user/v1/account/delete-request"
+      operationId: "legacy_user_post_user_v1_account_delete_request"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/user/v1/account/delete-request/cancel":
+    post:
+      tags: ["Legacy User"]
+      summary: "POST /user/v1/account/delete-request/cancel"
+      operationId: "legacy_user_post_user_v1_account_delete_request_cancel"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/user/v1/account/export":
+    get:
+      tags: ["Legacy User"]
+      summary: "GET /user/v1/account/export"
+      operationId: "legacy_user_get_user_v1_account_export"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successful response
@@ -76104,6 +76438,29 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+  "/user/v1/auth/logout-all":
+    post:
+      tags: ["Legacy User"]
+      summary: "POST /user/v1/auth/logout-all"
+      operationId: "legacy_user_post_user_v1_auth_logout_all"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/user/v1/auth/passcode-forgot-password":
     post:
       tags: ["Legacy User"]

@@ -134,10 +134,10 @@ const requiredWebTrustReview = [
   "trustRequestDocuments",
   "submitTrustDocuments",
   '"/dash/v1/trust/review-queue"',
-  '`/dash/v1/trust/jobs/${id}/mark-safe`',
-  '`/dash/v1/trust/jobs/${id}/suspend`',
-  '`/dash/v1/trust/jobs/${id}/request-documents`',
-  '`/trust/v1/jobs/${id}/documents`',
+  '`/dash/v1/trust/jobs/${pathSegment(id)}/mark-safe`',
+  '`/dash/v1/trust/jobs/${pathSegment(id)}/suspend`',
+  '`/dash/v1/trust/jobs/${pathSegment(id)}/request-documents`',
+  '`/trust/v1/jobs/${pathSegment(id)}/documents`',
 ].filter((snippet) => !webApiSource.includes(snippet));
 
 assert.deepEqual(requiredWebTrustReview, [], "web/src/shared/api.ts is missing admin trust review calls");

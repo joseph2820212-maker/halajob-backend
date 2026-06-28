@@ -84,6 +84,22 @@ async function auditAdminAuth(req, { action, user = null, identifier = '', reaso
   });
 }
 
+const auditMissingDashboardLoginCredentials = async (req, _res, next) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) {
+    try {
+      await auditAdminAuth(req, {
+        action: 'admin_login_failed',
+        identifier: email,
+        reason: 'missing_credentials',
+      });
+    } catch (err) {
+      console.warn('admin missing-credentials audit failed:', err?.message || err);
+    }
+  }
+  return next();
+};
+
 async function buildAuthPayload(user, device) {
   const tokens = await generateAuthTokens(user, device);
 
@@ -458,6 +474,7 @@ const createDashboardUser = async (req, res) => {
 };
 
 export default {
+  auditMissingDashboardLoginCredentials,
   login,
   me,
   refresh,
