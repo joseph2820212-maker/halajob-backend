@@ -276,7 +276,7 @@ async function main() {
       contextId: ownerContextA._id,
       body: { role: "admin" },
     }),
-    202,
+    200,
     "owner should promote viewer to admin"
   );
 

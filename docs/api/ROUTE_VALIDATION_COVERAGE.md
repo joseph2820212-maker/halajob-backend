@@ -1,6 +1,6 @@
 # Route Validation Coverage
 
-Generated: 2026-06-28T07:16:20.467Z
+Generated: 2026-06-28T07:22:59.861Z
 
 ## Summary
 
@@ -8,11 +8,11 @@ Generated: 2026-06-28T07:16:20.467Z
 |---|---:|
 | Total endpoints | 3401 |
 | Public/system endpoints | 5 |
-| Read-only endpoints allowed without body validator | 316 |
+| Read-only endpoints allowed without body validator | 311 |
 | Write/update/delete endpoints | 2149 |
-| Write/update/delete endpoints with validator | 1956 |
-| Write/update/delete endpoints missing validator | 193 |
-| Write validation coverage | 91% |
+| Write/update/delete endpoints with validator | 1997 |
+| Write/update/delete endpoints missing validator | 152 |
+| Write validation coverage | 92.9% |
 | Core auth/account missing validators | 0 |
 
 ## Module Summary
@@ -24,7 +24,7 @@ Generated: 2026-06-28T07:16:20.467Z
 | ai | 12 | 12 | 12 | 0 |
 | analytics | 5 | 2 | 2 | 0 |
 | auth | 14 | 14 | 14 | 0 |
-| campus | 61 | 34 | 0 | 34 |
+| campus | 61 | 34 | 34 | 0 |
 | company | 134 | 65 | 0 | 65 |
 | jobs | 2 | 1 | 1 | 0 |
 | legacy-user | 139 | 42 | 0 | 42 |
@@ -32,46 +32,12 @@ Generated: 2026-06-28T07:16:20.467Z
 | other | 12 | 6 | 6 | 0 |
 | seeker | 94 | 45 | 0 | 45 |
 | trust | 4 | 4 | 4 | 0 |
-| university | 20 | 7 | 0 | 7 |
+| university | 20 | 7 | 7 | 0 |
 
 ## Missing Write Validators
 
 | Method | Path | Module | Middlewares |
 | --- | --- | --- | --- |
-| POST | /campus/v1/admin/members | campus | authUser, activeContextGuard, activeContextPermissionGuard, listUniversityMembers |
-| DELETE | /campus/v1/admin/members/:memberId | campus | authUser, activeContextGuard, activeContextPermissionGuard, multerMiddleware, updateUniversityMember |
-| PATCH | /campus/v1/admin/members/:memberId | campus | authUser, activeContextGuard, activeContextPermissionGuard, multerMiddleware, updateUniversityMember |
-| POST | /campus/v1/admin/verifications/:id/approve | campus | authUser, activeContextGuard, multerMiddleware, adminApproveVerification |
-| POST | /campus/v1/admin/verifications/:id/reject | campus | authUser, activeContextGuard, multerMiddleware, adminRejectVerification |
-| POST | /campus/v1/admin/verifications/:id/request-info | campus | authUser, activeContextGuard, multerMiddleware, adminRequestVerificationInfo |
-| POST | /campus/v1/student-verifications | campus | authUser, multerMiddleware, startStudentVerification |
-| POST | /campus/v1/student-verifications/:id/resubmit | campus | authUser, multerMiddleware, resubmitStudentVerification |
-| POST | /campus/v1/verification/confirm-email | campus | authUser, multerMiddleware, confirmStudentVerificationEmail |
-| POST | /campus/v1/verification/start | campus | authUser, multerMiddleware, startStudentVerification |
-| POST | /campus/v1/verification/upload-document | campus | authUser, multerMiddleware, uploadStudentVerificationDocument |
-| POST | /user/v1/campus/admin/verifications/:id/approve | campus | authUser, activeContextGuard, multerMiddleware, adminApproveVerification |
-| POST | /user/v1/campus/admin/verifications/:id/reject | campus | authUser, activeContextGuard, multerMiddleware, adminRejectVerification |
-| POST | /user/v1/campus/admin/verifications/:id/request-info | campus | authUser, activeContextGuard, multerMiddleware, adminRequestVerificationInfo |
-| PATCH | /user/v1/campus/applications/:id/cancel | campus | authUser, anonymous, requireCampusStudent, multerMiddleware, cancelApplication |
-| POST | /user/v1/campus/applications/:id/cancel | campus | authUser, anonymous, requireCampusStudent, multerMiddleware, cancelApplication |
-| POST | /user/v1/campus/applications/:id/messages | campus | authUser, anonymous, requireCampusStudent, multerMiddleware, sendApplicationMessage |
-| PATCH | /user/v1/campus/events/:eventId/cancel | campus | authUser, anonymous, requireCampusStudent, multerMiddleware, cancelEventRegistration |
-| POST | /user/v1/campus/events/:eventId/cancel | campus | authUser, anonymous, requireCampusStudent, multerMiddleware, cancelEventRegistration |
-| POST | /user/v1/campus/events/:eventId/register | campus | authUser, anonymous, requireCampusStudent, multerMiddleware, registerEvent |
-| POST | /user/v1/campus/opportunities/:id/apply | campus | authUser, anonymous, requireCampusStudent, requireCampusOpportunity, multerMiddleware, applyJob |
-| POST | /user/v1/campus/opportunities/:id/apply-external | campus | authUser, anonymous, requireCampusStudent, requireCampusOpportunity, multerMiddleware, applyExternalOpportunity |
-| DELETE | /user/v1/campus/opportunities/:id/save | campus | authUser, anonymous, requireCampusStudent, multerMiddleware, saveOpportunity |
-| POST | /user/v1/campus/opportunities/:id/save | campus | authUser, anonymous, requireCampusStudent, multerMiddleware, saveOpportunity |
-| POST | /user/v1/campus/opportunities/:id/toggle-save | campus | authUser, anonymous, requireCampusStudent, multerMiddleware, toggleSaveOpportunity |
-| PATCH | /user/v1/campus/profile | campus | authUser, anonymous, requireCampusStudent, profile |
-| POST | /user/v1/campus/profile | campus | authUser, anonymous, requireCampusStudent, profile |
-| PUT | /user/v1/campus/profile | campus | authUser, anonymous, requireCampusStudent, profile |
-| POST | /user/v1/campus/student-verifications | campus | authUser, multerMiddleware, startStudentVerification |
-| POST | /user/v1/campus/student-verifications/:id/resubmit | campus | authUser, multerMiddleware, resubmitStudentVerification |
-| POST | /user/v1/campus/university/opportunities | campus | authUser, activeContextGuard, userUniversityOpportunities |
-| POST | /user/v1/campus/verification/confirm-email | campus | authUser, multerMiddleware, confirmStudentVerificationEmail |
-| POST | /user/v1/campus/verification/start | campus | authUser, multerMiddleware, startStudentVerification |
-| POST | /user/v1/campus/verification/upload-document | campus | authUser, multerMiddleware, uploadStudentVerificationDocument |
 | POST | /company/v1/auth/login | company | multerMiddleware, login |
 | POST | /company/v1/auth/logout | company | multerMiddleware, logout |
 | POST | /company/v1/campus/opportunities | company | anonymous, companyOpportunities |
@@ -188,3 +154,37 @@ Generated: 2026-06-28T07:16:20.467Z
 | POST | /employee/v1/applications/offers/:invitationId/respond | seeker | authUser, anonymous, multerMiddleware, respondToJobInvitation |
 | POST | /employee/v1/auth/login | seeker | multerMiddleware, login |
 | POST | /employee/v1/companies/:companyId/review | seeker | authUser, anonymous, multerMiddleware, reviewCompany |
+| POST | /employee/v1/cv/generate/download | seeker | downloadMyCv |
+| POST | /employee/v1/cv/generate/download-url | seeker | createMyCvDownloadUrl |
+| POST | /employee/v1/cv/generate/preview | seeker | previewMyCv |
+| POST | /employee/v1/cv/generate/save | seeker | saveMyCvSettings |
+| POST | /employee/v1/cv/upload | seeker | multerMiddleware, uploadMyCv |
+| PUT | /employee/v1/cv/upload/:cvId | seeker | setActiveCv |
+| DELETE | /employee/v1/cv/uploaded/:cvId | seeker | deleteMyUploadedCv |
+| PATCH | /employee/v1/global/applications/:applicationId/cancel | seeker | multerMiddleware, cancelMyApplication |
+| POST | /employee/v1/global/applications/:applicationId/messages | seeker | multerMiddleware, addApplicationMessage |
+| PATCH | /employee/v1/global/applications/interviews/:interviewId/respond | seeker | multerMiddleware, respondToInterview |
+| PATCH | /employee/v1/global/applications/offers/:invitationId/reject | seeker | multerMiddleware, anonymous |
+| PATCH | /employee/v1/global/applications/offers/:invitationId/respond | seeker | multerMiddleware, respondToJobInvitation |
+| POST | /employee/v1/global/companies/:companyId/review | seeker | multerMiddleware, reviewCompany |
+| POST | /employee/v1/global/jobs/:jobId/apply | seeker | multerMiddleware, applyToJob |
+| POST | /employee/v1/global/jobs/:jobId/rate | seeker | multerMiddleware, rateJob |
+| POST | /employee/v1/global/jobs/:jobId/review | seeker | multerMiddleware, reviewJob |
+| DELETE | /employee/v1/global/jobs/:jobId/save | seeker | multerMiddleware, saveJob |
+| POST | /employee/v1/global/jobs/:jobId/save | seeker | multerMiddleware, saveJob |
+| PUT | /employee/v1/global/me/basic-profile | seeker | getMyBasicProfile |
+| PUT | /employee/v1/global/profile | seeker | getMyEmployeeProfile |
+| POST | /employee/v1/global/profile/:section | seeker | getMySection |
+| PUT | /employee/v1/global/profile/:section | seeker | getMySection |
+| DELETE | /employee/v1/global/profile/:section/:itemId | seeker | multerMiddleware, updateSectionItem |
+| PATCH | /employee/v1/global/profile/:section/:itemId | seeker | multerMiddleware, updateSectionItem |
+| PUT | /employee/v1/global/profile/about-me | seeker | multerMiddleware, updateAboutMe |
+| PUT | /employee/v1/global/profile/job-names | seeker | multerMiddleware, replaceJobNames |
+| PUT | /employee/v1/global/profile/job-types | seeker | multerMiddleware, replaceJobTypes |
+| PUT | /employee/v1/global/profile/latest-work-experience | seeker | multerMiddleware, updateLatestWorkExperience |
+| PUT | /employee/v1/global/profile/min-salary | seeker | multerMiddleware, replaceMinSalary |
+| POST | /employee/v1/global/profile/rebuild-search-filters | seeker | multerMiddleware, rebuildMySearchFilters |
+| PUT | /employee/v1/global/profile/work-preferences | seeker | multerMiddleware, updateWorkPreferences |
+| POST | /employee/v1/jobs/:jobId/apply | seeker | authUser, anonymous, multerMiddleware, applyToJob |
+| POST | /employee/v1/jobs/:jobId/rate | seeker | authUser, anonymous, multerMiddleware, rateJob |
+| POST | /employee/v1/jobs/:jobId/review | seeker | authUser, anonymous, multerMiddleware, reviewJob |

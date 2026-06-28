@@ -64,6 +64,18 @@ const optionalIdParam = yup.object({
   id: objectId,
 });
 
+const idParam = yup.object({
+  id: objectId.required("id is required"),
+});
+
+const memberIdParam = yup.object({
+  memberId: objectId.required("memberId is required"),
+});
+
+const eventIdParam = yup.object({
+  eventId: yup.string().trim().max(120).required("eventId is required"),
+});
+
 const notificationIdentifierBody = bodyObject.shape({
   id: objectId,
   notification_id: objectId,
@@ -211,6 +223,175 @@ const schemas = {
       rejection_reason: yup.string().trim().max(1000),
       source: yup.string().trim().max(80),
       metadata: safeObject,
+    }),
+  }),
+
+  campusListSchema: yup.object({
+    query: yup.object({
+      page: yup.number().integer().min(1).max(100000),
+      limit: yup.number().integer().min(1).max(200),
+      status: yup.string().trim().max(80),
+      q: yup.string().trim().max(200),
+      search: yup.string().trim().max(200),
+    }),
+    body: bodyObject,
+  }),
+
+  campusIdActionSchema: yup.object({
+    params: idParam,
+    body: bodyObject,
+  }),
+
+  campusEventActionSchema: yup.object({
+    params: eventIdParam,
+    body: bodyObject.shape({
+      event_id: yup.string().trim().max(120),
+      title: yup.string().trim().max(240),
+      event_title: yup.string().trim().max(240),
+      organizer: yup.string().trim().max(240),
+      kind: yup.string().trim().max(120),
+      date_label: yup.string().trim().max(120),
+      date: yup.string().trim().max(120),
+      start_at: yup.string().trim().max(120),
+      starts_at: yup.string().trim().max(120),
+      event_start_at: yup.string().trim().max(120),
+      eventStartAt: yup.string().trim().max(120),
+      mode: yup.string().trim().max(120),
+      note: yup.string().trim().max(1000),
+    }),
+  }),
+
+  campusApplicationMessageSchema: yup.object({
+    params: idParam,
+    body: bodyObject.shape({
+      message: yup.string().trim().max(5000),
+      body: yup.string().trim().max(5000),
+      note: yup.string().trim().max(5000),
+      channel: yup.string().trim().max(80),
+    }),
+  }),
+
+  campusProfileSchema: yup.object({
+    body: bodyObject.shape({
+      university_id: objectId,
+      university: yup.string().trim().max(240),
+      specialty: yup.string().trim().max(240),
+      sub_specialty: yup.string().trim().max(240),
+      academic_year: yup.string().trim().max(80),
+      gpa: yup.string().trim().max(80),
+      work_readiness: yup.string().trim().max(120),
+      preferred_work_location: yup.string().trim().max(240),
+      readiness_score: yup.number().min(0).max(100),
+      candidate_stage: yup.string().trim().max(80),
+      expected_graduation_year: yup.number().integer().min(1900).max(2200),
+      profile_headline: yup.string().trim().max(240),
+      about_me: yup.string().trim().max(5000),
+    }),
+  }),
+
+  campusVerificationStartSchema: yup.object({
+    body: bodyObject.shape({
+      university_id: objectId,
+      university: yup.string().trim().max(240),
+      student_email: yup.string().trim().email().max(254),
+      method: yup.string().trim().max(80),
+      verification_method: yup.string().trim().max(80),
+      student_id_number: yup.string().trim().max(120),
+      student_number: yup.string().trim().max(120),
+      campus: yup.string().trim().max(240),
+      faculty_major: yup.string().trim().max(240),
+      major: yup.string().trim().max(240),
+      specialty: yup.string().trim().max(240),
+      degree_level: yup.string().trim().max(120),
+      degree: yup.string().trim().max(120),
+      graduation_year: yup.number().integer().min(1900).max(2200),
+      expected_graduation_year: yup.number().integer().min(1900).max(2200),
+      invite_code: yup.string().trim().max(120),
+      code: yup.string().trim().max(120),
+      source: yup.string().trim().max(120),
+      academic_year: yup.string().trim().max(80),
+    }),
+  }),
+
+  campusVerificationConfirmSchema: yup.object({
+    body: bodyObject.shape({
+      code: yup.string().trim().max(32),
+      passcode: yup.string().trim().max(32),
+      otp: yup.string().trim().max(32),
+      verification_id: objectId,
+      id: objectId,
+    }),
+  }),
+
+  campusVerificationDocumentSchema: yup.object({
+    body: bodyObject.shape({
+      verification_id: objectId,
+      id: objectId,
+      university_id: objectId,
+      university: yup.string().trim().max(240),
+      document_url: yup.string().trim().max(2000),
+      note: yup.string().trim().max(2000),
+    }),
+  }),
+
+  campusVerificationResubmitSchema: yup.object({
+    params: idParam,
+    body: bodyObject.shape({
+      note: yup.string().trim().max(2000),
+    }),
+  }),
+
+  campusAdminVerificationActionSchema: yup.object({
+    params: idParam,
+    body: bodyObject.shape({
+      reason: yup.string().trim().max(2000),
+      rejection_reason: yup.string().trim().max(2000),
+      requested_information: yup.string().trim().max(2000),
+      status: yup.string().trim().max(80),
+    }),
+  }),
+
+  universityMemberCreateSchema: yup.object({
+    body: bodyObject.shape({
+      user_id: objectId,
+      user: objectId,
+      role: yup.string().trim().max(80),
+      member_role: yup.string().trim().max(80),
+      status: yup.string().trim().max(80),
+      permissions: yup.mixed().test("valid-permissions", "permissions must be an array", (value) => {
+        if (value === undefined) return true;
+        return Array.isArray(value);
+      }),
+    }),
+  }),
+
+  universityMemberUpdateSchema: yup.object({
+    params: memberIdParam,
+    body: bodyObject.shape({
+      role: yup.string().trim().max(80),
+      member_role: yup.string().trim().max(80),
+      status: yup.string().trim().max(80),
+      permissions: yup.mixed().test("valid-permissions", "permissions must be an array", (value) => {
+        if (value === undefined) return true;
+        return Array.isArray(value);
+      }),
+    }),
+  }),
+
+  universityMemberDeleteSchema: yup.object({
+    params: memberIdParam,
+  }),
+
+  universityOpportunityRequestSchema: yup.object({
+    body: bodyObject.shape({
+      title: yup.string().trim().max(240),
+      job_name: yup.string().trim().max(240),
+      target: yup.string().trim().max(80),
+      candidate_target: yup.string().trim().max(80),
+      description: yup.string().trim().max(5000),
+      details: yup.string().trim().max(5000),
+      requested_count: yup.number().integer().min(1).max(100000),
+      note: yup.string().trim().max(2000),
     }),
   }),
 };
