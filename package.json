@@ -30,6 +30,7 @@
     "security:audit-users": "node scripts/securityAuditPrivilegedUsers.js",
     "test:security-http": "node scripts/verifySecurityHttpContracts.js",
     "test:response-codes": "node scripts/verifyResponseCodeContract.js",
+    "test:route-validation": "node scripts/verifyRouteValidationCoverage.js",
     "test:integration:auth-context": "node scripts/verifyAuthContextIntegration.js",
     "test:integration:trust-documents": "node scripts/verifyTrustDocumentWorkflowIntegration.js",
     "test:object-authorization": "node scripts/verifyObjectAuthorizationIntegration.js",

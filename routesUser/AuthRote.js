@@ -22,19 +22,19 @@ const router = express.Router();
 
 // رفع ملف واحد مع البيانات
 router.post('/register', upload.none(), validate(authSchemas.registerSchema), Register.register);
-router.post('/campus/register', upload.none(), CampusAuthController.campusRegister);
-router.post('/campus/university-login', upload.none(), CampusAuthController.universityLogin);
+router.post('/campus/register', upload.none(), validate(authSchemas.campusRegisterSchema), CampusAuthController.campusRegister);
+router.post('/campus/university-login', upload.none(), validate(authSchemas.universityLoginSchema), CampusAuthController.universityLogin);
 router.post('/login', upload.none(), validate(authSchemas.loginSchema), Login.login);
-router.post('/logout', upload.none(), Login.logout);
-router.post('/logout-all', authUser, upload.none(), Login.logoutAll);
+router.post('/logout', upload.none(), validate(authSchemas.logoutSchema), Login.logout);
+router.post('/logout-all', authUser, upload.none(), validate(authSchemas.emptyBodySchema), Login.logoutAll);
 router.post('/refresh-token', upload.none(), validate(authSchemas.refreshTokenSchema), Login.refreshToken);
 router.post("/passcode-verify", validate(authSchemas.passcodeVerifySchema), PassCodeController.passcodeVerify);
 router.post("/passcode-forgot-password", validate(authSchemas.passcodeVerifySchema), PassCodeForgotPasswordController.passcodeVerify);
 router.post("/resend-otp", validate(authSchemas.resendOtpSchema), ResendOtpController.resendOtp);
 router.post("/forgot-password", validate(authSchemas.forgotPasswordSchema), ForgotPassword.forgotPassword);
 router.post("/resetPassword", validate(authSchemas.forgotResetPasswordSchema), ForGotPasswordResetPasswordController.resetPassword);
-router.post("/update-image",authUser,upload.single("image"), UpdateProfileController.updateImage);
-router.post("/update-profile",authUser, UpdateProfileController.updateProfile);
+router.post("/update-image",authUser,upload.single("image"), validate(authSchemas.updateImageSchema), UpdateProfileController.updateImage);
+router.post("/update-profile",authUser, validate(authSchemas.updateProfileSchema), UpdateProfileController.updateProfile);
 
 
 // استرجاع البيانات

@@ -2,16 +2,20 @@
 //   yup.object({ body: ..., params: ..., query: ... })
 // On failure it forwards the yup ValidationError to the central error
 // handler (middlewares/error.js), which converts it to a 400 response.
-const validate = (schema) => async (req, res, next) => {
-  try {
-    await schema.validate(
-      { body: req.body, params: req.params, query: req.query },
-      { abortEarly: false }
-    );
-    return next();
-  } catch (err) {
-    return next(err);
-  }
+const validate = (schema) => {
+  const validateRequest = async (req, res, next) => {
+    try {
+      await schema.validate(
+        { body: req.body, params: req.params, query: req.query },
+        { abortEarly: false, stripUnknown: false }
+      );
+      return next();
+    } catch (err) {
+      return next(err);
+    }
+  };
+
+  return validateRequest;
 };
 
 export default validate;
