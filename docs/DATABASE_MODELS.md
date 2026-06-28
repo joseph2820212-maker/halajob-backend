@@ -1,6 +1,6 @@
 # Database Models
 
-Generated: 2026-06-27T03:40:54.192Z
+Generated: 2026-06-28T07:43:14.660Z
 Source: live Mongoose schemas loaded from `models/index.js`.
 
 This is a generated schema inventory. It documents collections, fields, required/default/enum/ref metadata, and declared indexes. Business meaning, migration history, and data-retention rules still need owner/developer review.
@@ -19,6 +19,7 @@ This is a generated schema inventory. It documents collections, fields, required
 | banner | `banner` | 5 | 0 |
 | campus_event_registrations | `campus_event_registrations` | 15 | 9 |
 | career_passports | `career_passports` | 22 | 9 |
+| cities | `countries` | 7 | 1 |
 | colors | `colors` | 5 | 0 |
 | companies | `companies` | 85 | 68 |
 | company_invoices | `company_invoices` | 25 | 10 |
@@ -33,7 +34,7 @@ This is a generated schema inventory. It documents collections, fields, required
 | currencies | `currencies` | 15 | 4 |
 | cv_templates | `cv_templates` | 23 | 3 |
 | education_levels | `education_levels` | 12 | 3 |
-| employee_cvs | `employee_cvs` | 30 | 5 |
+| employee_cvs | `employee_cvs` | 32 | 7 |
 | employees | `employees` | 62 | 107 |
 | experience_levels | `experience_levels` | 14 | 3 |
 | FcmToken | `fcm_tokens` | 18 | 4 |
@@ -75,7 +76,7 @@ This is a generated schema inventory. It documents collections, fields, required
 | user_review_job | `user_review_job` | 7 | 4 |
 | user_saved_job | `user_saved_job` | 6 | 4 |
 | user_show_job | `user_show_job` | 6 | 5 |
-| users | `users` | 31 | 12 |
+| users | `users` | 35 | 13 |
 | work_location | `work_location` | 10 | 3 |
 | work_modes | `work_modes` | 13 | 3 |
 | work_time | `work_time` | 11 | 3 |
@@ -226,7 +227,7 @@ This is a generated schema inventory. It documents collections, fields, required
 | `company_id` | ObjectID |  | null |  | companies |
 | `active_context_id` | ObjectID |  | null |  | account_contexts |
 | `context_type` | String |  |  |  |  |
-| `entity_type` | String |  | other | job, application, company, campus, university, ai_request, notification, cv, career_passport, translation, other |  |
+| `entity_type` | String |  | other | job, application, interview, job_invitation, company, campus, university, ai_request, notification, cv, career_passport, translation, other |  |
 | `entity_id` | ObjectID |  | null |  |  |
 | `job_id` | ObjectID |  | null |  | jobs |
 | `application_id` | ObjectID |  | null |  | user_applying_job |
@@ -340,7 +341,7 @@ This is a generated schema inventory. It documents collections, fields, required
 | `actor_user_id` | ObjectID |  | null |  | users |
 | `actor_type` | String |  | system | system, admin, company_owner, company_member, employee, university_admin |  |
 | `action` | String | yes |  |  |  |
-| `entity_type` | String |  | other | job, application, interview, company, company_member, question_library, message_template, support_ticket, subscription, verification, notification, translation, user, admin, other |  |
+| `entity_type` | String |  | other | job, application, interview, job_invitation, company, company_member, question_library, message_template, support_ticket, subscription, verification, notification, translation, user, admin, other |  |
 | `entity_id` | ObjectID |  | null |  |  |
 | `job_id` | ObjectID |  | null |  | jobs |
 | `application_id` | ObjectID |  | null |  | user_applying_job |
@@ -478,6 +479,30 @@ No explicit schema indexes.
 | `{"employee_id":1}` (background=true) |
 | `{"share.token":1}` (sparse=true, background=true) |
 
+## cities
+
+| Item | Value |
+|---|---|
+| Collection | `countries` |
+| Timestamps | no |
+
+### Fields
+
+| Field | Type | Required | Default | Enum | Ref |
+| --- | --- | --- | --- | --- | --- |
+| `country_code` | String | yes |  |  |  |
+| `country_name_ar` | String | yes |  |  |  |
+| `country_name_en` | String | yes |  |  |  |
+| `city_name_ar` | String | yes |  |  |  |
+| `city_name_en` | String | yes |  |  |  |
+| `_id` | ObjectID |  | defaultId |  |  |
+
+### Indexes
+
+| Index |
+| --- |
+| `{"country_code":1,"city_name_en":1}` (unique=true, background=true) |
+
 ## colors
 
 | Item | Value |
@@ -547,7 +572,7 @@ No explicit schema indexes.
 | `company_size_type` | String |  | unknown | 1_10, 11_50, 51_200, 201_500, 500_plus, startup, small, medium, large, enterprise, unknown |  |
 | `company_type` | String |  |  |  |  |
 | `country_id` | ObjectID |  | null |  | countries |
-| `city_id` | ObjectID |  | null |  | countries |
+| `city_id` | ObjectID |  | null |  | cities |
 | `company_country` | String |  |  |  |  |
 | `company_city` | String |  |  |  |  |
 | `company_address` | String |  |  |  |  |
@@ -1174,6 +1199,8 @@ No explicit schema indexes.
 | `sections.expected_salary` | Boolean |  | false |  |  |
 | `section_order` | Array<String> |  | defaultFn |  |  |
 | `pdf_file` | String |  |  |  |  |
+| `public_download_token` | String |  |  |  |  |
+| `public_download_expires_at` | Date |  | null |  |  |
 | `is_default` | Boolean |  | false |  |  |
 | `_id` | ObjectID |  | defaultId |  |  |
 | `createdAt` | Date |  |  |  |  |
@@ -1186,6 +1213,8 @@ No explicit schema indexes.
 | `{"employee_id":1}` (background=true) |
 | `{"template_id":1}` (background=true) |
 | `{"template_key":1}` (background=true) |
+| `{"public_download_token":1}` (background=true) |
+| `{"public_download_expires_at":1}` (background=true) |
 | `{"is_default":1}` (background=true) |
 | `{"employee_id":1,"is_default":1}` (background=true) |
 
@@ -1227,7 +1256,7 @@ No explicit schema indexes.
 | `profile_completion` | Number |  | 0 |  |  |
 | `birthday` | Date |  | null |  |  |
 | `current_country_id` | ObjectID |  | null |  | countries |
-| `current_city_id` | ObjectID |  | null |  | countries |
+| `current_city_id` | ObjectID |  | null |  | cities |
 | `current_country` | String |  |  |  |  |
 | `current_city` | String |  |  |  |  |
 | `candidate_stage` | String |  | unknown | student, graduate, fresh_graduate, experienced, career_changer, unknown |  |
@@ -3035,11 +3064,15 @@ No explicit schema indexes.
 | `phone_national` | String | yes |  |  |  |
 | `passcode` | String |  | null |  |  |
 | `passcode_expires_at` | Date |  | null |  |  |
+| `passcode_attempts` | Number |  | 0 |  |  |
 | `otp_last_sent_at` | Date |  | null |  |  |
 | `another_device_code` | String |  | null |  |  |
 | `another_device_expires_at` | Date |  | null |  |  |
 | `pending_device` | Embedded |  | null |  |  |
 | `device` | Array<Function> |  | function |  |  |
+| `account_deletion_requested_at` | Date |  | null |  |  |
+| `account_deletion_status` | String |  | none | none, requested, cancelled, processed |  |
+| `account_deletion_reason` | String |  | null |  |  |
 | `_id` | ObjectID |  | defaultId |  |  |
 | `createdAt` | Date |  |  |  |  |
 | `updatedAt` | Date |  |  |  |  |
@@ -3055,6 +3088,7 @@ No explicit schema indexes.
 | `{"status":1}` (background=true) |
 | `{"phone_e164":1}` (unique=true, background=true) |
 | `{"phone_national":1}` (unique=true, background=true) |
+| `{"account_deletion_status":1}` (background=true) |
 | `{"email":1}` (unique=true, background=true) |
 | `{"phone_e164":1}` (unique=true, background=true) |
 | `{"phone_national":1}` (unique=true, background=true) |

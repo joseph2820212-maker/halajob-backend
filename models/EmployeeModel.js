@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import "./CityModel.js";
 
 const { Schema } = mongoose;
 
@@ -355,7 +356,7 @@ const EmployeeSchema = new Schema(
     profile_completion: { type: Number, default: 0, min: 0, max: 100 },
     birthday: { type: Date, default: null, index: true },
     current_country_id: { type: Schema.Types.ObjectId, ref: "countries", default: null, index: true },
-    current_city_id: { type: Schema.Types.ObjectId, ref: "countries", default: null, index: true },
+    current_city_id: { type: Schema.Types.ObjectId, ref: "cities", default: null, index: true },
     current_country: { type: String, trim: true, default: "" },
     current_city: { type: String, trim: true, default: "" },
 

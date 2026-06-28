@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import "./CityModel.js";
 
 const { Schema } = mongoose;
 
@@ -87,7 +88,7 @@ const VerificationDocumentSchema = new Schema(
 const CompanyLocationSchema = new Schema(
   {
     country_id: { type: Schema.Types.ObjectId, ref: "countries", default: null },
-    city_id: { type: Schema.Types.ObjectId, ref: "countries", default: null },
+    city_id: { type: Schema.Types.ObjectId, ref: "cities", default: null },
     country: { type: String, trim: true, default: "" },
     city: { type: String, trim: true, default: "" },
     address: { type: String, trim: true, default: "" },
@@ -153,7 +154,7 @@ const CompanySearchFiltersSchema = new Schema(
       },
       city_id: {
         type: Schema.Types.ObjectId,
-        ref: "countries",
+        ref: "cities",
         default: null,
         index: true,
       },
@@ -422,7 +423,7 @@ const CompanySchema = new Schema(
 
     city_id: {
       type: Schema.Types.ObjectId,
-      ref: "countries",
+      ref: "cities",
       default: null,
       index: true,
     },
