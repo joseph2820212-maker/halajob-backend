@@ -1,0 +1,143 @@
+[
+  {
+    "key": "privacy_policy",
+    "category": "privacy",
+    "audience": ["public", "seeker", "employer", "campus_student", "university_admin"],
+    "title": { "en": "Privacy Policy", "ar": "سياسة الخصوصية" },
+    "summary": { "en": "What data Hala Job collects, how we use it, and your rights.", "ar": "ما البيانات التي تجمعها هلا جوب وكيف نستخدمها وحقوقك." },
+    "contentBlocks": [
+      { "type": "heading", "text": { "en": "Data we collect", "ar": "البيانات التي نجمعها" }, "sortOrder": 1 },
+      { "type": "bullet_list", "items": [
+        { "en": "Account and profile data", "ar": "بيانات الحساب والملف الشخصي" },
+        { "en": "CV, documents, and application data", "ar": "السيرة الذاتية والمستندات وبيانات التقديم" },
+        { "en": "Company, campus, and university data", "ar": "بيانات الشركات والحرم الجامعي والجامعات" },
+        { "en": "AI request, notification, device, and analytics data", "ar": "بيانات طلبات الذكاء الاصطناعي والإشعارات والجهاز والتحليلات" }
+      ], "sortOrder": 2 },
+      { "type": "heading", "text": { "en": "How we use and share data", "ar": "كيف نستخدم البيانات ونشاركها" }, "sortOrder": 3 },
+      { "type": "paragraph", "text": { "en": "We use data to operate the service, match jobs, enable applications, ensure safety, and improve Hala Job. When you apply, your data is shared with the relevant company. We do not sell personal data.", "ar": "نستخدم البيانات لتشغيل الخدمة ومطابقة الوظائف وتمكين التقديمات وضمان السلامة وتحسين هلا جوب. عند التقديم، تتم مشاركة بياناتك مع الشركة المعنية. نحن لا نبيع البيانات الشخصية." }, "sortOrder": 4 },
+      { "type": "heading", "text": { "en": "Your rights", "ar": "حقوقك" }, "sortOrder": 5 },
+      { "type": "paragraph", "text": { "en": "You can access, correct, export, or delete your data, and control marketing. Contact {{PRIVACY_EMAIL}} or use Privacy Center. Retention periods, international transfers, and minimum age are defined per applicable law and confirmed before launch.", "ar": "يمكنك الوصول إلى بياناتك أو تصحيحها أو تصديرها أو حذفها، والتحكم في التسويق. تواصل مع {{PRIVACY_EMAIL}} أو استخدم مركز الخصوصية. تُحدد فترات الاحتفاظ والتحويلات الدولية والحد الأدنى للعمر وفق القانون المعمول به وتُؤكد قبل الإطلاق." }, "sortOrder": 6 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": true, "acknowledgementAudience": ["seeker", "employer", "campus_student", "university_admin"], "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "privacy"
+  },
+  {
+    "key": "cookies_policy",
+    "category": "privacy",
+    "audience": ["public"],
+    "title": { "en": "Cookie Policy", "ar": "سياسة ملفات تعريف الارتباط" },
+    "summary": { "en": "How Hala Job uses cookies on the web and how to control them.", "ar": "كيف تستخدم هلا جوب ملفات تعريف الارتباط على الويب وكيفية التحكم بها." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Necessary cookies required to run the service", "ar": "ملفات تعريف الارتباط الضرورية لتشغيل الخدمة" },
+        { "en": "Analytics cookies to understand usage", "ar": "ملفات تعريف الارتباط التحليلية لفهم الاستخدام" },
+        { "en": "Preference cookies to remember your choices", "ar": "ملفات تعريف الارتباط للتفضيلات لتذكّر اختياراتك" }
+      ], "sortOrder": 1 },
+      { "type": "paragraph", "text": { "en": "You can accept all, reject optional, or manage preferences from the cookie banner on the web. Mobile apps use device settings rather than web cookies.", "ar": "يمكنك قبول الكل أو رفض الاختياري أو إدارة التفضيلات من شريط ملفات تعريف الارتباط على الويب. تستخدم تطبيقات الجوال إعدادات الجهاز بدلاً من ملفات تعريف ارتباط الويب." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "privacy"
+  },
+  {
+    "key": "privacy_choices",
+    "category": "privacy",
+    "audience": ["seeker", "employer", "campus_student", "university_admin"],
+    "title": { "en": "Privacy Choices and Data Rights", "ar": "خيارات الخصوصية وحقوق البيانات" },
+    "summary": { "en": "Control your data, marketing, and cookie preferences.", "ar": "تحكّم في بياناتك والتسويق وتفضيلات ملفات تعريف الارتباط." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Access, correct, or export your data", "ar": "الوصول إلى بياناتك أو تصحيحها أو تصديرها" },
+        { "en": "Delete your account", "ar": "حذف حسابك" },
+        { "en": "Opt out of marketing and manage notifications", "ar": "إلغاء الاشتراك في التسويق وإدارة الإشعارات" },
+        { "en": "Manage cookie preferences (web)", "ar": "إدارة تفضيلات ملفات تعريف الارتباط (الويب)" }
+      ], "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "privacy"
+  },
+  {
+    "key": "account_data_deletion_policy",
+    "category": "privacy",
+    "audience": ["seeker", "employer", "campus_student", "university_admin"],
+    "title": { "en": "Account and Data Deletion Policy", "ar": "سياسة حذف الحساب والبيانات" },
+    "summary": { "en": "How account deletion works and what may be retained.", "ar": "كيف يعمل حذف الحساب وما الذي قد يُحتفظ به." },
+    "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "You can request deletion from Settings. We may verify your identity before processing. Deletion removes profile access, CVs, saved jobs, applications, and notifications.", "ar": "يمكنك طلب الحذف من الإعدادات. قد نتحقق من هويتك قبل التنفيذ. يزيل الحذف الوصول إلى الملف الشخصي والسير الذاتية والوظائف المحفوظة والتقديمات والإشعارات." }, "sortOrder": 1 },
+      { "type": "notice", "severity": "warning", "text": { "en": "Some records may be retained where required for legal, security, fraud-prevention, audit, or business-record purposes. Timelines apply per applicable law.", "ar": "قد يُحتفظ ببعض السجلات عند الحاجة لأغراض قانونية أو أمنية أو لمنع الاحتيال أو التدقيق أو حفظ السجلات التجارية. تنطبق المدد الزمنية وفق القانون المعمول به." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "privacy"
+  },
+  {
+    "key": "cv_uploaded_files_policy",
+    "category": "privacy",
+    "audience": ["seeker", "campus_student"],
+    "title": { "en": "CV and Uploaded Files Policy", "ar": "سياسة السيرة الذاتية والملفات المرفوعة" },
+    "summary": { "en": "Allowed files, visibility, and how your documents are handled.", "ar": "الملفات المسموحة وظهورها وكيفية التعامل مع مستنداتك." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Allowed file types are limited; prohibited or malicious uploads are blocked.", "ar": "أنواع الملفات المسموحة محدودة؛ ويُمنع الرفع المحظور أو الخبيث." },
+        { "en": "Your CV may be shared with companies when you apply or make it visible.", "ar": "قد تتم مشاركة سيرتك الذاتية مع الشركات عند التقديم أو جعلها مرئية." },
+        { "en": "Employer CV downloads/exports are logged for accountability.", "ar": "يتم تسجيل تنزيلات/تصدير السير الذاتية من قبل أصحاب العمل للمساءلة." },
+        { "en": "You can delete files; uploads may be scanned for safety.", "ar": "يمكنك حذف الملفات؛ وقد تُفحص المرفوعات للسلامة." }
+      ], "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "privacy"
+  },
+  {
+    "key": "student_data_document_visibility_policy",
+    "category": "campus",
+    "audience": ["campus_student", "university_admin"],
+    "title": { "en": "Student Data and Document Visibility", "ar": "ظهور بيانات ومستندات الطالب" },
+    "summary": { "en": "Who can see student profiles and verification documents.", "ar": "من يمكنه رؤية ملفات الطلاب ومستندات التحقق." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Verification documents are used for verification only and are never shown publicly.", "ar": "تُستخدم مستندات التحقق للتحقق فقط ولا تُعرض علناً أبداً." },
+        { "en": "University admins can see what is needed to manage verification and campus access.", "ar": "يمكن لمشرفي الجامعة رؤية ما يلزم لإدارة التحقق والوصول إلى الحرم الجامعي." },
+        { "en": "Companies see only the campus profile information you choose to share.", "ar": "ترى الشركات فقط معلومات ملف الحرم الجامعي التي تختار مشاركتها." },
+        { "en": "University analytics use aggregated data, not public document exposure.", "ar": "تستخدم تحليلات الجامعة بيانات مجمّعة وليس كشف المستندات علناً." }
+      ], "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "privacy"
+  },
+  {
+    "key": "recommendations_automated_systems_policy",
+    "category": "legal",
+    "audience": ["public", "seeker", "employer"],
+    "title": { "en": "AI and Automated Systems Policy", "ar": "سياسة الذكاء الاصطناعي والأنظمة الآلية" },
+    "summary": { "en": "How Hala Job uses AI and recommendations, and their limits.", "ar": "كيف تستخدم هلا جوب الذكاء الاصطناعي والتوصيات وحدودها." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "AI is assistive and may be inaccurate; review and edit outputs before use.", "ar": "الذكاء الاصطناعي مساعد وقد يكون غير دقيق؛ راجع المخرجات وعدّلها قبل الاستخدام." },
+        { "en": "No auto-apply without your confirmation and no auto-reject without employer confirmation.", "ar": "لا تقديم تلقائي دون تأكيدك ولا رفض تلقائي دون تأكيد صاحب العمل." },
+        { "en": "Match scores and Career Passport scores are recommendations only, not hiring decisions.", "ar": "درجات التطابق ودرجات جواز السفر المهني توصيات فقط وليست قرارات توظيف." },
+        { "en": "AI requests may be logged and rate-limited; you can report wrong output.", "ar": "قد تُسجَّل طلبات الذكاء الاصطناعي وتُحدَّد بمعدلات؛ ويمكنك الإبلاغ عن المخرجات الخاطئة." }
+      ], "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "communications_notification_policy",
+    "category": "privacy",
+    "audience": ["seeker", "employer", "campus_student", "university_admin"],
+    "title": { "en": "Communications and Notifications Policy", "ar": "سياسة الاتصالات والإشعارات" },
+    "summary": { "en": "Types of messages we send and how to control them.", "ar": "أنواع الرسائل التي نرسلها وكيفية التحكم بها." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Transactional emails (security, applications) keep you informed.", "ar": "الرسائل المعاملاتية (الأمن، التقديمات) لإبقائك على اطلاع." },
+        { "en": "Job alerts and marketing emails can be turned off anytime.", "ar": "يمكن إيقاف تنبيهات الوظائف والرسائل التسويقية في أي وقت." },
+        { "en": "Push notifications can be managed in settings.", "ar": "يمكن إدارة إشعارات الدفع في الإعدادات." },
+        { "en": "Critical security and legal notices cannot be turned off.", "ar": "لا يمكن إيقاف الإشعارات الأمنية والقانونية الحرجة." }
+      ], "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "privacy"
+  },
+  {
+    "key": "accessibility_statement",
+    "category": "public",
+    "audience": ["public"],
+    "title": { "en": "Accessibility Statement", "ar": "بيان إمكانية الوصول" },
+    "summary": { "en": "Our commitment to an accessible app and website.", "ar": "التزامنا بتطبيق وموقع يمكن الوصول إليهما." },
+    "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "We aim to make Hala Job usable for everyone, including users of assistive technologies. We work to support readable text, clear structure, and accessible contrast across web and mobile.", "ar": "نسعى لجعل هلا جوب قابلة للاستخدام للجميع، بمن فيهم مستخدمو التقنيات المساعدة. نعمل على دعم نص قابل للقراءة وبنية واضحة وتباين يمكن الوصول إليه عبر الويب والجوال." }, "sortOrder": 1 },
+      { "type": "contact_card", "text": { "en": "If you encounter an accessibility barrier, contact {{ACCESSIBILITY_EMAIL}} and we will respond and work to resolve it.", "ar": "إذا واجهت عائقاً في إمكانية الوصول، تواصل مع {{ACCESSIBILITY_EMAIL}} وسنرد ونعمل على حله." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "support"
+  }
+]

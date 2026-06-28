@@ -1,8 +1,25 @@
 import express from "express";
+import mongoose from "mongoose";
 import listEndpoints from "express-list-endpoints";
 import { protectHealth } from "../middlewares/protectHealth.js";
 
 const router = express.Router();
+
+// Liveness: process is up. Unauthenticated so load balancers / uptime monitors
+// can probe it. Returns no sensitive data.
+router.get("/live", (req, res) => {
+  res.status(200).json({ status: "ok", uptime: process.uptime() });
+});
+
+// Readiness: app can serve traffic (DB connected). 503 when not ready so
+// orchestrators can hold traffic until Mongo is up.
+router.get("/ready", (req, res) => {
+  const ready = mongoose.connection?.readyState === 1; // 1 = connected
+  res.status(ready ? 200 : 503).json({
+    status: ready ? "ready" : "not_ready",
+    db: ready ? "connected" : "disconnected",
+  });
+});
 
 router.get("/",protectHealth, (req, res) => {
   const endpoints = listEndpoints(req.app);

@@ -2,14 +2,11 @@ import yup from 'yup';
 
 const schemas = {
   loginSchema: yup.object({
+    // "email" is an identifier: it may be an email OR a phone number, so do not
+    // constrain its format here (the controller resolves which it is).
     body: yup.object({
-      email: yup.string().email().required(),
-      // password: yup.string()
-      //   .required('please enter your password')
-      //   .matches(
-      //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      //   "Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 special Character"
-      //   ),
+      email: yup.string().trim().required('Email or phone is required'),
+      password: yup.string().required('Password is required'),
     }),
   }),
 
@@ -25,15 +22,48 @@ const schemas = {
     }),
   }),
 
+  // Mirrors the required-field check inside RegisterController (email, password,
+  // first_name, last_name, gender, birthday, candidate_stage). Formats are left
+  // unconstrained so we never reject a request the controller would accept.
   registerSchema: yup.object({
     body: yup.object({
-      email: yup.string().required(),
-      // password: yup.string()
-      // .required('please enter your password')
-      //   .matches(
-      //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      //   "Must Contain 8 Characters, 1 Uppercase, 1 Lowercase, 1 Number and 1 special Character"
-      //   ),
+      email: yup.string().trim().required(),
+      password: yup.string().required(),
+      first_name: yup.string().trim().required(),
+      last_name: yup.string().trim().required(),
+      gender: yup.string().trim().required(),
+      birthday: yup.string().trim().required(),
+      candidate_stage: yup.string().trim().required(),
+    }),
+  }),
+
+  // passcode-verify / passcode-forgot-password: identifier (email OR phone) +
+  // the one-time code. device is optional and left unconstrained.
+  passcodeVerifySchema: yup.object({
+    body: yup.object({
+      email: yup.string().trim().required('Email or phone is required'),
+      passcode: yup.string().trim().required('Passcode is required'),
+    }),
+  }),
+
+  resendOtpSchema: yup.object({
+    body: yup.object({
+      email: yup.string().trim().required('Email or phone is required'),
+      type: yup.string().trim(),
+    }),
+  }),
+
+  forgotPasswordSchema: yup.object({
+    body: yup.object({
+      email: yup.string().trim().required('Email or phone is required'),
+    }),
+  }),
+
+  // /resetPassword -> ForGotPasswordResetPasswordController reads { email, password }.
+  forgotResetPasswordSchema: yup.object({
+    body: yup.object({
+      email: yup.string().trim().required('Email or phone is required'),
+      password: yup.string().required('Password is required'),
     }),
   }),
 

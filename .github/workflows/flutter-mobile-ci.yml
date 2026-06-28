@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - flutter-seeker-campus
+      - 'claude/**'
   pull_request:
     branches:
       - flutter-seeker-campus
@@ -27,6 +28,19 @@ on:
 jobs:
   verify-linux:
     runs-on: ubuntu-latest
+
+    # MongoDB service for DB-backed integration tests (fast + reliable vs
+    # downloading an in-memory binary at runtime).
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - name: Check out repository
@@ -52,6 +66,20 @@ jobs:
 
       - name: Verify backend mobile route contract
         run: npm run test:mobile-routes
+
+      - name: Backend integration tests (auth/context isolation)
+        env:
+          CONNECTION_URL: mongodb://localhost:27017/halajob_ci_test
+        run: npm run test:integration:auth-context
+
+      - name: Secret scan
+        run: npm run check:secrets
+
+      - name: i18n resources check
+        run: npm run check:i18n
+
+      - name: Security HTTP contract
+        run: npm run test:security-http
 
       - name: Guard approved mobile palette
         run: |
@@ -94,6 +122,26 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: halajob-mobile-fresh-apk-linux
+          if-no-files-found: error
+          retention-days: 14
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Build campus-tester APK (enter-without-signing enabled)
+        if: github.event_name != 'pull_request'
+        working-directory: mobile
+        env:
+          HALA_LOCAL_DEBUG_RELEASE_SIGNING: 'true'
+        run: |
+          APP_VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}')
+          APP_BUILD_NAME="${APP_VERSION%%+*}"
+          APP_BUILD_NUMBER="${APP_VERSION##*+}"
+          flutter build apk --release --build-name="$APP_BUILD_NAME" --build-number="$APP_BUILD_NUMBER" --dart-define=HALA_DEFAULT_BASE_URL=https://jobzain.com --dart-define=HALA_ENABLE_REMOTE_CAMPUS_AUTH=false --dart-define=HALA_APP_BUILD_MODE=ci-tester --dart-define=HALA_APP_BUILD_COMMIT=${{ github.sha }}
+
+      - name: Upload campus-tester APK
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: halajob-mobile-tester-apk
           if-no-files-found: error
           retention-days: 14
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
@@ -182,6 +230,14 @@ jobs:
       - name: Run Windows mobile tester drop
         shell: pwsh
         working-directory: mobile
+        env:
+          # GitHub-hosted runners cannot reach the production backend
+          # (https://jobzain.com), so the live backend-reachability and
+          # live-API-route probes time out and fail the build. Those are
+          # deploy/release-time checks, not per-commit CI concerns. Skip them
+          # here via the preflight's own first-class switches. Set this to
+          # 'false' on a runner that can reach the backend to re-enable them.
+          HALA_CI_SKIP_LIVE_BACKEND_CHECKS: 'true'
         run: |
           $arguments = @(
             '-ExecutionPolicy',
@@ -199,6 +255,11 @@ jobs:
 
           if ($env:HALA_CI_LOCAL_CAMPUS_AUTH -eq 'true') {
             $arguments += '-LocalCampusAuth'
+          }
+
+          if ($env:HALA_CI_SKIP_LIVE_BACKEND_CHECKS -ne 'false') {
+            $arguments += '-SkipBackendReachability'
+            $arguments += '-SkipLiveApiRouteReport'
           }
 
           powershell.exe @arguments

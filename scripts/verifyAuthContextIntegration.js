@@ -60,13 +60,18 @@ async function expectRefreshTokenCleared(RefreshTokenModel, token, label) {
 }
 
 async function main() {
-  mongo = await MongoMemoryServer.create({
-    instance: {
-      dbName: `halajob-auth-context-${nowIso()}`,
-    },
-  });
-
-  process.env.CONNECTION_URL = mongo.getUri();
+  // Prefer an externally provided Mongo (CI service container / local mongod)
+  // for speed and reliability; fall back to in-memory only when unset.
+  if (process.env.CONNECTION_URL) {
+    console.log("[auth-context] using external CONNECTION_URL for integration DB");
+  } else {
+    mongo = await MongoMemoryServer.create({
+      instance: {
+        dbName: `halajob-auth-context-${nowIso()}`,
+      },
+    });
+    process.env.CONNECTION_URL = mongo.getUri();
+  }
 
   const [{ default: app }, models, tokenService, jwtHelpers] = await Promise.all([
     import("../app.js"),

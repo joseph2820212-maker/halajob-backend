@@ -11,6 +11,8 @@ import { generateAuthTokens } from "../../../services/tokenService.js";
 import { syncAccountContextsForUser } from "../../../services/accountContext.service.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 
+const MAX_PASSCODE_ATTEMPTS = 5;
+
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
 const normEmail = (e) => (e || "").trim().toLowerCase();
@@ -115,6 +117,23 @@ export const passcodeVerify = async (req, res, next) => {
     }
 
     const now = new Date();
+
+    // Brute-force lockout: too many wrong attempts while a code is still valid.
+    const codeStillValid =
+      (user.passcode_expires_at && now < new Date(user.passcode_expires_at)) ||
+      (user.another_device_expires_at &&
+        now < new Date(user.another_device_expires_at));
+    if ((user.passcode_attempts || 0) >= MAX_PASSCODE_ATTEMPTS && codeStillValid) {
+      return ReturnAppData.createError({
+        res,
+        status: 429,
+        message:
+          lan === "ar"
+            ? "محاولات كثيرة غير صحيحة. اطلب رمزًا جديدًا."
+            : "Too many incorrect attempts. Please request a new code.",
+      });
+    }
+
     const passcodeValid =
       user.passcode &&
       String(user.passcode) === String(passcode).trim() &&
@@ -153,6 +172,7 @@ export const passcodeVerify = async (req, res, next) => {
       user.another_device_code = undefined;
       user.another_device_expires_at = undefined;
       user.pending_device = undefined;
+      user.passcode_attempts = 0;
       user.markModified?.("device");
       user.last_login_at = new Date();
       await user.save();
@@ -190,6 +210,7 @@ export const passcodeVerify = async (req, res, next) => {
       user.status = true;
       user.passcode = undefined;
       user.passcode_expires_at = undefined;
+      user.passcode_attempts = 0;
 
       let dev = incomingDevice;
       if (incomingDevice?.brand && incomingDevice?.model_name) {
@@ -231,6 +252,12 @@ export const passcodeVerify = async (req, res, next) => {
         message: lan === "ar" ? "تم تسجيل الدخول" : "Logged in",
       });
     }
+
+    // Wrong/expired code: count the failed attempt toward the lockout threshold.
+    user.passcode_attempts = (user.passcode_attempts || 0) + 1;
+    try {
+      await user.save();
+    } catch (_) {}
 
     return ReturnAppData.createError({
       res,

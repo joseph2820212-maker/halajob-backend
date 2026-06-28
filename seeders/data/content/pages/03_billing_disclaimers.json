@@ -1,0 +1,55 @@
+[
+  {
+    "key": "payment_refund_policy",
+    "category": "billing",
+    "audience": ["employer", "public"],
+    "title": { "en": "Payment and Refund Policy", "ar": "سياسة الدفع والاسترداد" },
+    "summary": { "en": "How paid services, invoices, and refunds work.", "ar": "كيف تعمل الخدمات المدفوعة والفواتير والاستردادات." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Some services are free; paid plans are billed by subscription or invoice.", "ar": "بعض الخدمات مجانية؛ وتُفوتر الخطط المدفوعة بالاشتراك أو الفاتورة." },
+        { "en": "Taxes, payment failures, and cancellations are handled per plan terms.", "ar": "تُعالج الضرائب وحالات فشل الدفع والإلغاءات وفق شروط الخطة." },
+        { "en": "Where online payment is not active, manual billing may apply.", "ar": "حيث لا يكون الدفع الإلكتروني مفعّلاً، قد تنطبق الفوترة اليدوية." }
+      ], "sortOrder": 1 },
+      { "type": "notice", "severity": "info", "text": { "en": "Paid plans do not guarantee hires or applicants. Refund eligibility is defined per plan and confirmed before launch.", "ar": "الخطط المدفوعة لا تضمن التوظيف أو المتقدمين. تُحدد أهلية الاسترداد لكل خطة وتُؤكد قبل الإطلاق." }, "sortOrder": 2 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "subscription_terms",
+    "category": "billing",
+    "audience": ["employer"],
+    "title": { "en": "Subscription Terms", "ar": "شروط الاشتراك" },
+    "summary": { "en": "Plan features, limits, billing periods, and cancellation.", "ar": "ميزات الخطة والحدود وفترات الفوترة والإلغاء." },
+    "contentBlocks": [
+      { "type": "bullet_list", "items": [
+        { "en": "Plans define feature access, usage limits, and company member seats.", "ar": "تحدد الخطط الوصول إلى الميزات وحدود الاستخدام ومقاعد أعضاء الشركة." },
+        { "en": "You can upgrade, downgrade, or cancel; data export is available after cancellation.", "ar": "يمكنك الترقية أو التخفيض أو الإلغاء؛ ويتوفر تصدير البيانات بعد الإلغاء." },
+        { "en": "Fair-use limits may apply to protect platform stability.", "ar": "قد تنطبق حدود الاستخدام العادل لحماية استقرار المنصة." }
+      ], "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "external_apply_third_party_links_policy",
+    "category": "legal",
+    "audience": ["public", "seeker", "campus_student"],
+    "title": { "en": "External Apply and Third-Party Links", "ar": "التقديم الخارجي وروابط الجهات الخارجية" },
+    "summary": { "en": "What to know when a job sends you to another website.", "ar": "ما يجب معرفته عندما توجهك وظيفة إلى موقع آخر." },
+    "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "Some jobs redirect you to an external website to apply. Those sites have their own terms and privacy practices, and Hala Job is not responsible for their content or security. You will see a warning before leaving the app or website.", "ar": "توجهك بعض الوظائف إلى موقع خارجي للتقديم. لتلك المواقع شروطها وممارساتها الخاصة بالخصوصية، وهلا جوب ليست مسؤولة عن محتواها أو أمنها. سترى تحذيراً قبل مغادرة التطبيق أو الموقع." }, "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  },
+  {
+    "key": "salary_currency_job_info_disclaimer",
+    "category": "legal",
+    "audience": ["public", "seeker"],
+    "title": { "en": "Salary, Currency, and Job Information Disclaimer", "ar": "إخلاء مسؤولية الراتب والعملة ومعلومات الوظيفة" },
+    "summary": { "en": "Job details are employer-provided and should be confirmed.", "ar": "تفاصيل الوظيفة مقدمة من صاحب العمل ويجب تأكيدها." },
+    "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "Salary may be employer-provided, estimated, or missing. Supported launch currencies are USD, EUR, and GBP. Remote, hybrid, and onsite labels depend on the job data. Always confirm details with the employer.", "ar": "قد يكون الراتب مقدماً من صاحب العمل أو تقديرياً أو غير متوفر. العملات المدعومة عند الإطلاق هي الدولار الأمريكي واليورو والجنيه الإسترليني. تعتمد تسميات العمل عن بُعد والمختلط والحضوري على بيانات الوظيفة. تأكد دائماً من التفاصيل مع صاحب العمل." }, "sortOrder": 1 }
+    ],
+    "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
+  }
+]

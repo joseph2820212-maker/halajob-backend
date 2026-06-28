@@ -41,6 +41,27 @@ const converter = (err, req, res, next) => {
       multerErrorMessage(err) || 'invalid_file_upload',
       'File Upload Error'
     );
+  } else if (err?.code === 11000) {
+    // Mongo duplicate key -> 409 with the offending field (safe to expose).
+    const field = Object.keys(err?.keyValue || err?.keyPattern || {})[0];
+    convertedError = new ApiError(
+      httpStatus.CONFLICT,
+      field ? `A record with this ${field} already exists.` : 'Duplicate value.',
+      'Duplicate Key'
+    );
+  } else if (err?.name === 'CastError') {
+    // Invalid ObjectId / type cast -> 400 instead of a confusing 500.
+    convertedError = new ApiError(
+      httpStatus.BAD_REQUEST,
+      `Invalid value for ${err?.path || 'identifier'}.`,
+      'Cast Error'
+    );
+  } else if (err?.name === 'JsonWebTokenError' || err?.name === 'TokenExpiredError') {
+    convertedError = new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'Invalid or expired token.',
+      'Auth Error'
+    );
   } else if (!(err instanceof ApiError)) {
     let uuid = uuidv4();
     logger.error({
