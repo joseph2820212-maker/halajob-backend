@@ -96,10 +96,10 @@ router.get('/global-search', can('dashboard.search'), adminSearchController.glob
 
 /* ----------------------------- AI administration ----------------------------- */
 router.get('/ai/features', can('ai.view'), AiAdminController.listFeatures);
-router.get('/ai/limits', can('ai.view'), AiAdminController.listLimits);
-router.post('/ai/limits', can('ai.manage'), upload.none(), AiAdminController.upsertLimit);
-router.patch('/ai/limits/:id', can('ai.manage'), upload.none(), AiAdminController.updateLimit);
-router.delete('/ai/limits/:id', can('ai.manage'), AiAdminController.deactivateLimit);
+router.get('/ai/limits', can('ai.view'), validate(adminSchemas.listResourceSchema), AiAdminController.listLimits);
+router.post('/ai/limits', can('ai.manage'), upload.none(), validate(adminSchemas.aiLimitCreateSchema), AiAdminController.upsertLimit);
+router.patch('/ai/limits/:id', can('ai.manage'), upload.none(), validate(adminSchemas.aiLimitUpdateSchema), AiAdminController.updateLimit);
+router.delete('/ai/limits/:id', can('ai.manage'), validate(adminSchemas.idOnlySchema), AiAdminController.deactivateLimit);
 router.get('/ai/requests', can('ai.view'), AiAdminController.listRequests);
 router.get('/ai/requests/:id', can('ai.view'), AiAdminController.getRequest);
 router.get('/ai/summary', can('ai.view'), AiAdminController.summary);
@@ -112,50 +112,51 @@ router.get('/translations', can('translations.view'), adminOperationsController.
 router.get('/translation-logs', can('translations.view'), adminOperationsController.listTranslations);
 router.get('/notifications/logs', can('notifications.view'), adminOperationsController.listNotificationLogs);
 router.get('/notification-logs', can('notifications.view'), adminOperationsController.listNotificationLogs);
-router.post('/notifications/send', can('notifications.manage'), upload.none(), adminNotificationController.sendNotification);
-router.post('/notification/send', can('notifications.manage'), upload.none(), adminNotificationController.sendNotification);
-router.post('/operations/notifications/send', can('notifications.manage'), upload.none(), adminNotificationController.sendNotification);
+router.post('/notifications/send', can('notifications.manage'), upload.none(), validate(adminSchemas.adminNotificationSendSchema), adminNotificationController.sendNotification);
+router.post('/notification/send', can('notifications.manage'), upload.none(), validate(adminSchemas.adminNotificationSendSchema), adminNotificationController.sendNotification);
+router.post('/operations/notifications/send', can('notifications.manage'), upload.none(), validate(adminSchemas.adminNotificationSendSchema), adminNotificationController.sendNotification);
 
 router.get('/support-tickets', can(['support.view', 'support.manage']), adminSupportController.listTickets);
 router.get('/operations/support-tickets', can(['support.view', 'support.manage']), adminSupportController.listTickets);
 router.get('/support-tickets/:ticketId', can(['support.view', 'support.manage']), adminSupportController.getTicketDetails);
 router.get('/operations/support-tickets/:ticketId', can(['support.view', 'support.manage']), adminSupportController.getTicketDetails);
-router.patch('/support-tickets/:ticketId/status', can('support.manage'), upload.none(), adminSupportController.updateTicketStatus);
-router.patch('/operations/support-tickets/:ticketId/status', can('support.manage'), upload.none(), adminSupportController.updateTicketStatus);
-router.post('/support-tickets/:ticketId/messages', can('support.manage'), upload.none(), adminSupportController.addAdminMessage);
-router.post('/operations/support-tickets/:ticketId/messages', can('support.manage'), upload.none(), adminSupportController.addAdminMessage);
+router.patch('/support-tickets/:ticketId/status', can('support.manage'), upload.none(), validate(adminSchemas.supportTicketStatusSchema), adminSupportController.updateTicketStatus);
+router.patch('/operations/support-tickets/:ticketId/status', can('support.manage'), upload.none(), validate(adminSchemas.supportTicketStatusSchema), adminSupportController.updateTicketStatus);
+router.post('/support-tickets/:ticketId/messages', can('support.manage'), upload.none(), validate(adminSchemas.supportTicketMessageSchema), adminSupportController.addAdminMessage);
+router.post('/operations/support-tickets/:ticketId/messages', can('support.manage'), upload.none(), validate(adminSchemas.supportTicketMessageSchema), adminSupportController.addAdminMessage);
 
 /* ----------------------------- Moderation / operations queues ----------------------------- */
 router.get('/moderation/company-requests', can('companies.moderate'), adminModerationController.listCompanyRequests);
 router.get('/company-requests', can('companies.moderate'), adminModerationController.listCompanyRequests);
-router.post('/company-requests/:id/approve', can('companies.moderate'), upload.none(), adminModerationController.approveCompanyRequest);
-router.post('/company-requests/:id/reject', can('companies.moderate'), upload.none(), adminModerationController.rejectCompanyRequest);
-router.patch('/company-requests/:id/approve', can('companies.moderate'), upload.none(), adminModerationController.approveCompanyRequest);
-router.patch('/company-requests/:id/reject', can('companies.moderate'), upload.none(), adminModerationController.rejectCompanyRequest);
+router.post('/company-requests/:id/approve', can('companies.moderate'), upload.none(), validate(adminSchemas.companyApprovalSchema), adminModerationController.approveCompanyRequest);
+router.post('/company-requests/:id/reject', can('companies.moderate'), upload.none(), validate(adminSchemas.companyRejectSchema), adminModerationController.rejectCompanyRequest);
+router.patch('/company-requests/:id/approve', can('companies.moderate'), upload.none(), validate(adminSchemas.companyApprovalSchema), adminModerationController.approveCompanyRequest);
+router.patch('/company-requests/:id/reject', can('companies.moderate'), upload.none(), validate(adminSchemas.companyRejectSchema), adminModerationController.rejectCompanyRequest);
 
 router.get('/moderation/jobs', can('jobs.moderate'), adminModerationController.listJobReviewQueue);
 router.get('/job-approvals', can('jobs.moderate'), adminModerationController.listJobReviewQueue);
-router.post('/jobs/:id/approve', can('jobs.moderate'), upload.none(), adminModerationController.approveJob);
-router.post('/jobs/:id/reject', can('jobs.moderate'), upload.none(), adminModerationController.rejectJob);
-router.patch('/jobs/:id/approve', can('jobs.moderate'), upload.none(), adminModerationController.approveJob);
-router.patch('/jobs/:id/reject', can('jobs.moderate'), upload.none(), adminModerationController.rejectJob);
+router.post('/jobs/:id/approve', can('jobs.moderate'), upload.none(), validate(adminSchemas.jobApprovalSchema), adminModerationController.approveJob);
+router.post('/jobs/:id/reject', can('jobs.moderate'), upload.none(), validate(adminSchemas.jobRejectSchema), adminModerationController.rejectJob);
+router.patch('/jobs/:id/approve', can('jobs.moderate'), upload.none(), validate(adminSchemas.jobApprovalSchema), adminModerationController.approveJob);
+router.patch('/jobs/:id/reject', can('jobs.moderate'), upload.none(), validate(adminSchemas.jobRejectSchema), adminModerationController.rejectJob);
 
 router.get('/trust/review-queue', can('trust.view'), TrustAdminController.reviewQueue);
-router.post('/trust/jobs/:jobId/mark-safe', can('trust.manage'), upload.none(), TrustAdminController.markJobSafe);
-router.patch('/trust/jobs/:jobId/mark-safe', can('trust.manage'), upload.none(), TrustAdminController.markJobSafe);
-router.post('/trust/jobs/:jobId/suspend', can('trust.manage'), upload.none(), TrustAdminController.suspendJob);
-router.patch('/trust/jobs/:jobId/suspend', can('trust.manage'), upload.none(), TrustAdminController.suspendJob);
-router.post('/trust/jobs/:jobId/request-documents', can('trust.manage'), upload.none(), TrustAdminController.requestDocuments);
-router.patch('/trust/jobs/:jobId/request-documents', can('trust.manage'), upload.none(), TrustAdminController.requestDocuments);
+router.post('/trust/jobs/:jobId/mark-safe', can('trust.manage'), upload.none(), validate(adminSchemas.trustJobActionSchema), TrustAdminController.markJobSafe);
+router.patch('/trust/jobs/:jobId/mark-safe', can('trust.manage'), upload.none(), validate(adminSchemas.trustJobActionSchema), TrustAdminController.markJobSafe);
+router.post('/trust/jobs/:jobId/suspend', can('trust.manage'), upload.none(), validate(adminSchemas.trustJobActionSchema), TrustAdminController.suspendJob);
+router.patch('/trust/jobs/:jobId/suspend', can('trust.manage'), upload.none(), validate(adminSchemas.trustJobActionSchema), TrustAdminController.suspendJob);
+router.post('/trust/jobs/:jobId/request-documents', can('trust.manage'), upload.none(), validate(adminSchemas.trustJobActionSchema), TrustAdminController.requestDocuments);
+router.patch('/trust/jobs/:jobId/request-documents', can('trust.manage'), upload.none(), validate(adminSchemas.trustJobActionSchema), TrustAdminController.requestDocuments);
 
 router.get('/operations/talent-requests', can('talentrequests.manage'), adminModerationController.listTalentRequests);
-router.get('/talent-requests', can('talentrequests.manage'), adminModerationController.listTalentRequests);
-router.patch('/talent-requests/:id/status', can('talentrequests.manage'), upload.none(), adminModerationController.updateTalentRequestStatus);
-router.post('/talent-requests/:id/status', can('talentrequests.manage'), upload.none(), adminModerationController.updateTalentRequestStatus);
+router.get('/talent-requests', can('talentrequests.manage'), validate(adminSchemas.talentRequestListSchema), adminModerationController.listTalentRequests);
+router.post('/talent-requests', can('talentrequests.manage'), upload.none(), validate(adminSchemas.talentRequestListSchema), adminModerationController.listTalentRequests);
+router.patch('/talent-requests/:id/status', can('talentrequests.manage'), upload.none(), validate(adminSchemas.talentRequestStatusSchema), adminModerationController.updateTalentRequestStatus);
+router.post('/talent-requests/:id/status', can('talentrequests.manage'), upload.none(), validate(adminSchemas.talentRequestStatusSchema), adminModerationController.updateTalentRequestStatus);
 
-router.post('/subscriptions/seed-free', can('subscriptions.manage'), upload.none(), adminModerationController.seedFreePlan);
+router.post('/subscriptions/seed-free', can('subscriptions.manage'), upload.none(), validate(adminSchemas.seedFreePlanSchema), adminModerationController.seedFreePlan);
 router.get('/subscriptions/companies/:companyId', can('subscriptions.manage'), adminModerationController.getCompanySubscription);
-router.post('/subscriptions/companies/:companyId/assign-plan', can('subscriptions.manage'), upload.none(), adminModerationController.assignSubscriptionPlan);
+router.post('/subscriptions/companies/:companyId/assign-plan', can('subscriptions.manage'), upload.none(), validate(adminSchemas.assignSubscriptionPlanSchema), adminModerationController.assignSubscriptionPlan);
 
 /* ----------------------------- Legacy upload/import routes ----------------------------- */
 router.use('/exsel', exselRoute);
@@ -248,9 +249,9 @@ router.use('/talent-requests', createDashResourceRouter('talentrequests'));
 router.use('/University', createDashResourceRouter('universities'));
 router.use('/Universities', createDashResourceRouter('universities'));
 router.use('/universities', createDashResourceRouter('universities'));
-router.get('/campus/universities', can('universities.read'), campusController.listUniversities);
-router.post('/campus/universities', can('universities.manage'), upload.none(), campusController.createUniversity);
-router.patch('/campus/universities/:id/status', can('universities.manage'), upload.none(), campusController.updateUniversityStatus);
+router.get('/campus/universities', can('universities.read'), validate(adminSchemas.listResourceSchema), campusController.listUniversities);
+router.post('/campus/universities', can('universities.manage'), upload.none(), validate(adminSchemas.universityCreateSchema), campusController.createUniversity);
+router.patch('/campus/universities/:id/status', can('universities.manage'), upload.none(), validate(adminSchemas.universityStatusSchema), campusController.updateUniversityStatus);
 
 router.use('/Country', createDashResourceRouter('countries'));
 router.use('/countries', createDashResourceRouter('countries'));

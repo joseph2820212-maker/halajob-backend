@@ -1,6 +1,6 @@
 # Route Validation Coverage
 
-Generated: 2026-06-28T07:02:24.215Z
+Generated: 2026-06-28T07:09:32.590Z
 
 ## Summary
 
@@ -8,11 +8,11 @@ Generated: 2026-06-28T07:02:24.215Z
 |---|---:|
 | Total endpoints | 3401 |
 | Public/system endpoints | 5 |
-| Read-only endpoints allowed without body validator | 326 |
+| Read-only endpoints allowed without body validator | 319 |
 | Write/update/delete endpoints | 2149 |
-| Write/update/delete endpoints with validator | 1864 |
-| Write/update/delete endpoints missing validator | 285 |
-| Write validation coverage | 86.7% |
+| Write/update/delete endpoints with validator | 1919 |
+| Write/update/delete endpoints missing validator | 230 |
+| Write validation coverage | 89.3% |
 | Core auth/account missing validators | 0 |
 
 ## Module Summary
@@ -20,7 +20,7 @@ Generated: 2026-06-28T07:02:24.215Z
 | Module | Total | Writes | Writes With Validator | Writes Missing Validator |
 | --- | --- | --- | --- | --- |
 | account | 6 | 3 | 3 | 0 |
-| admin | 2882 | 1902 | 1847 | 55 |
+| admin | 2882 | 1902 | 1902 | 0 |
 | ai | 12 | 12 | 0 | 12 |
 | analytics | 5 | 2 | 0 | 2 |
 | auth | 14 | 14 | 14 | 0 |
@@ -38,61 +38,6 @@ Generated: 2026-06-28T07:02:24.215Z
 
 | Method | Path | Module | Middlewares |
 | --- | --- | --- | --- |
-| POST | /dash/v1/ai/limits | admin | checkPermissionMiddleware, listLimits |
-| DELETE | /dash/v1/ai/limits/:id | admin | checkPermissionMiddleware, multerMiddleware, updateLimit |
-| PATCH | /dash/v1/ai/limits/:id | admin | checkPermissionMiddleware, multerMiddleware, updateLimit |
-| POST | /dash/v1/auth/admins | admin | isAdmin, multerMiddleware, createDashboardUser |
-| POST | /dash/v1/auth/create-admin | admin | isAdmin, multerMiddleware, createDashboardUser |
-| POST | /dash/v1/auth/login | admin | multerMiddleware, login |
-| POST | /dash/v1/auth/logout | admin | multerMiddleware, logout |
-| POST | /dash/v1/auth/refresh | admin | multerMiddleware, refresh |
-| POST | /dash/v1/campus/universities | admin | checkPermissionMiddleware, listUniversities |
-| PATCH | /dash/v1/campus/universities/:id/status | admin | checkPermissionMiddleware, multerMiddleware, updateUniversityStatus |
-| PATCH | /dash/v1/company-requests/:id/approve | admin | checkPermissionMiddleware, multerMiddleware, approveCompanyRequest |
-| POST | /dash/v1/company-requests/:id/approve | admin | checkPermissionMiddleware, multerMiddleware, approveCompanyRequest |
-| PATCH | /dash/v1/company-requests/:id/reject | admin | checkPermissionMiddleware, multerMiddleware, rejectCompanyRequest |
-| POST | /dash/v1/company-requests/:id/reject | admin | checkPermissionMiddleware, multerMiddleware, rejectCompanyRequest |
-| POST | /dash/v1/cv/admin/cv-templates | admin | createCvTemplate |
-| DELETE | /dash/v1/cv/admin/cv-templates/:id | admin | updateCvTemplate |
-| PATCH | /dash/v1/cv/admin/cv-templates/:id | admin | updateCvTemplate |
-| PUT | /dash/v1/cv/admin/cv-templates/:id | admin | updateCvTemplate |
-| POST | /dash/v1/cv/templates | admin | createCvTemplate |
-| DELETE | /dash/v1/cv/templates/:id | admin | updateCvTemplate |
-| PATCH | /dash/v1/cv/templates/:id | admin | updateCvTemplate |
-| PUT | /dash/v1/cv/templates/:id | admin | updateCvTemplate |
-| POST | /dash/v1/excel/create | admin | multerMiddleware, create |
-| POST | /dash/v1/excel/csv | admin | multerMiddleware, csv |
-| POST | /dash/v1/excel/exsel | admin | multerMiddleware, uploadExcel |
-| POST | /dash/v1/exsel/create | admin | multerMiddleware, create |
-| POST | /dash/v1/exsel/csv | admin | multerMiddleware, csv |
-| POST | /dash/v1/exsel/exsel | admin | multerMiddleware, uploadExcel |
-| POST | /dash/v1/import/create | admin | multerMiddleware, create |
-| POST | /dash/v1/import/csv | admin | multerMiddleware, csv |
-| POST | /dash/v1/import/exsel | admin | multerMiddleware, uploadExcel |
-| PATCH | /dash/v1/jobs/:id/approve | admin | checkPermissionMiddleware, multerMiddleware, approveJob |
-| POST | /dash/v1/jobs/:id/approve | admin | checkPermissionMiddleware, multerMiddleware, approveJob |
-| PATCH | /dash/v1/jobs/:id/reject | admin | checkPermissionMiddleware, multerMiddleware, rejectJob |
-| POST | /dash/v1/jobs/:id/reject | admin | checkPermissionMiddleware, multerMiddleware, rejectJob |
-| POST | /dash/v1/keyword/update/:id | admin | multerMiddleware, updateKeyWord |
-| POST | /dash/v1/Keyword/update/:id | admin | multerMiddleware, updateKeyWord |
-| POST | /dash/v1/notification/send | admin | checkPermissionMiddleware, multerMiddleware, sendNotification |
-| POST | /dash/v1/notifications/send | admin | checkPermissionMiddleware, multerMiddleware, sendNotification |
-| POST | /dash/v1/operations/notifications/send | admin | checkPermissionMiddleware, multerMiddleware, sendNotification |
-| POST | /dash/v1/operations/support-tickets/:ticketId/messages | admin | checkPermissionMiddleware, multerMiddleware, addAdminMessage |
-| PATCH | /dash/v1/operations/support-tickets/:ticketId/status | admin | checkPermissionMiddleware, multerMiddleware, updateTicketStatus |
-| POST | /dash/v1/subscriptions/companies/:companyId/assign-plan | admin | checkPermissionMiddleware, multerMiddleware, assignSubscriptionPlan |
-| POST | /dash/v1/subscriptions/seed-free | admin | checkPermissionMiddleware, multerMiddleware, seedFreePlan |
-| POST | /dash/v1/support-tickets/:ticketId/messages | admin | checkPermissionMiddleware, multerMiddleware, addAdminMessage |
-| PATCH | /dash/v1/support-tickets/:ticketId/status | admin | checkPermissionMiddleware, multerMiddleware, updateTicketStatus |
-| POST | /dash/v1/talent-requests | admin | checkPermissionMiddleware, listTalentRequests |
-| PATCH | /dash/v1/talent-requests/:id/status | admin | checkPermissionMiddleware, multerMiddleware, updateTalentRequestStatus |
-| POST | /dash/v1/talent-requests/:id/status | admin | checkPermissionMiddleware, multerMiddleware, updateTalentRequestStatus |
-| PATCH | /dash/v1/trust/jobs/:jobId/mark-safe | admin | checkPermissionMiddleware, multerMiddleware, markJobSafe |
-| POST | /dash/v1/trust/jobs/:jobId/mark-safe | admin | checkPermissionMiddleware, multerMiddleware, markJobSafe |
-| PATCH | /dash/v1/trust/jobs/:jobId/request-documents | admin | checkPermissionMiddleware, multerMiddleware, requestDocuments |
-| POST | /dash/v1/trust/jobs/:jobId/request-documents | admin | checkPermissionMiddleware, multerMiddleware, requestDocuments |
-| PATCH | /dash/v1/trust/jobs/:jobId/suspend | admin | checkPermissionMiddleware, multerMiddleware, suspendJob |
-| POST | /dash/v1/trust/jobs/:jobId/suspend | admin | checkPermissionMiddleware, multerMiddleware, suspendJob |
 | POST | /ai/v1/career-passport/score | ai | authUser, anonymous, refreshScore |
 | POST | /ai/v1/career/copilot | ai | authUser, anonymous |
 | POST | /ai/v1/company/jobs/:jobId/shortlist | ai | authUser, anonymous |
@@ -188,3 +133,58 @@ Generated: 2026-06-28T07:02:24.215Z
 | PATCH | /company/v1/global/question-library/:questionId | company | anonymous, multerMiddleware, updateQuestion |
 | POST | /company/v1/global/subscription/request | company | anonymous, multerMiddleware, requestPlanChange |
 | POST | /company/v1/global/support-tickets | company | anonymous, listTickets |
+| POST | /company/v1/global/support-tickets/:ticketId/messages | company | anonymous, multerMiddleware, addTicketMessage |
+| POST | /company/v1/jobs/hiring/:jobId/invitations | company | anonymous, multerMiddleware, sendJobInvitation |
+| PATCH | /company/v1/jobs/hiring/applications/:applicationId/block-applicant | company | anonymous, multerMiddleware, blockApplicationApplicant |
+| POST | /company/v1/jobs/hiring/applications/:applicationId/interviews | company | anonymous, multerMiddleware, createInterview |
+| POST | /company/v1/jobs/hiring/applications/:applicationId/messages | company | anonymous, multerMiddleware, sendApplicationMessage |
+| PATCH | /company/v1/jobs/hiring/applications/:applicationId/restore | company | anonymous, multerMiddleware, restoreApplication |
+| PATCH | /company/v1/jobs/hiring/applications/:applicationId/status | company | anonymous, multerMiddleware, updateApplicationStatus |
+| POST | /company/v1/jobs/hiring/applications/bulk-cv | company | anonymous, multerMiddleware, bulkApplicationCvs |
+| POST | /company/v1/jobs/hiring/applications/bulk-export | company | anonymous, multerMiddleware, bulkExportApplications |
+| POST | /company/v1/jobs/hiring/interviews | company | anonymous, multerMiddleware, createInterview |
+| PATCH | /company/v1/jobs/hiring/interviews/:interviewId | company | anonymous, multerMiddleware, updateInterview |
+| PATCH | /company/v1/jobs/hiring/interviews/:interviewId/status | company | anonymous, multerMiddleware, changeInterviewStatus |
+| POST | /company/v1/jobs/hiring/invitations | company | anonymous, multerMiddleware, sendJobInvitation |
+| PATCH | /company/v1/jobs/hiring/invitations/:invitationId/cancel | company | anonymous, multerMiddleware, cancelJobInvitation |
+| POST | /company/v1/jobs/talent/:jobId/help-requests | company | anonymous, multerMiddleware, requestJobZainTalentHelp |
+| POST | /company/v1/jobs/talent/:jobId/smart-employees/generate | company | anonymous, multerMiddleware, generateSmartEmployeesForJob |
+| POST | /company/v1/jobs/talent/help-requests | company | anonymous, multerMiddleware, requestJobZainTalentHelp |
+| PATCH | /company/v1/jobs/talent/help-requests/:requestId/cancel | company | anonymous, multerMiddleware, cancelJobZainTalentRequest |
+| PUT | /jobs/v1/:jobId/translations/:lang | jobs | authUser, anonymous, multerMiddleware, saveJobTranslation |
+| POST | /user/v1/applying-job/insert/:id | legacy-user | authUser, anonymous, applyJob |
+| PUT | /user/v1/career-passport | legacy-user | authUser, anonymous, get |
+| POST | /user/v1/career-passport/share | legacy-user | authUser, anonymous, jsonParser, share |
+| POST | /user/v1/company/delete-file | legacy-user | authUser, deleteFile |
+| POST | /user/v1/company/join-request | legacy-user | authUser, multerMiddleware, joinRequest |
+| POST | /user/v1/company/update-my-company | legacy-user | authUser, update |
+| POST | /user/v1/company/update-my-company-image | legacy-user | authUser, multerMiddleware, updateImage |
+| POST | /user/v1/company/upload-file | legacy-user | authUser, multerMiddleware, uploadFile |
+| PUT | /user/v1/cv/translations/:lang | legacy-user | authUser, anonymous, multerMiddleware, saveCvTranslation |
+| POST | /user/v1/employee/profile-update | legacy-user | authUser, anonymous, multerMiddleware, update |
+| POST | /user/v1/fcm/delete-tokens/:id | legacy-user | authUser, deleteToken |
+| POST | /user/v1/fcm/tokens | legacy-user | authUser, listTokens |
+| POST | /user/v1/fcm/update-tokens/:id | legacy-user | authUser, jsonParser, updateToken |
+| POST | /user/v1/handle-applied-job/change-job-status/:id | legacy-user | authUser, anonymous, changeStatus |
+| POST | /user/v1/handle-applied-job/send-interview/:id | legacy-user | authUser, anonymous, SendInterView |
+| POST | /user/v1/job-information/apply-outside/:id | legacy-user | authUser, anonymous, applyOutsideJob |
+| POST | /user/v1/job-information/rate-job/:id | legacy-user | authUser, anonymous, rateJob |
+| POST | /user/v1/job-information/report-job/:id | legacy-user | authUser, anonymous, reportJob |
+| POST | /user/v1/job-information/review-job/:id | legacy-user | authUser, anonymous, reviewJob |
+| POST | /user/v1/job-information/toggle-save-job/:id | legacy-user | authUser, anonymous, toggleSaveJob |
+| POST | /user/v1/job/create | legacy-user | authUser, anonymous, create |
+| POST | /user/v1/job/update/:id | legacy-user | authUser, anonymous, update |
+| DELETE | /user/v1/notification/:id | legacy-user | authUser, remove |
+| POST | /user/v1/notification/:id/delete | legacy-user | authUser, remove |
+| PATCH | /user/v1/notification/:id/read | legacy-user | authUser, markRead |
+| POST | /user/v1/notification/:id/read | legacy-user | authUser, markRead |
+| PATCH | /user/v1/notification/:id/unread | legacy-user | authUser, markUnread |
+| POST | /user/v1/notification/:id/unread | legacy-user | authUser, markUnread |
+| PATCH | /user/v1/notification/preferences | legacy-user | authUser, getPreferences |
+| PUT | /user/v1/notification/preferences | legacy-user | authUser, getPreferences |
+| PATCH | /user/v1/notification/read-all | legacy-user | authUser, markAllRead |
+| POST | /user/v1/notification/read-all | legacy-user | authUser, markAllRead |
+| DELETE | /user/v1/notifications/:id | legacy-user | authUser, remove |
+| POST | /user/v1/notifications/:id/delete | legacy-user | authUser, remove |
+| PATCH | /user/v1/notifications/:id/read | legacy-user | authUser, markRead |
+| POST | /user/v1/notifications/:id/read | legacy-user | authUser, markRead |
