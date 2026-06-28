@@ -1,6 +1,30 @@
 # Hala Job — Design Theme Audit
 
-**Date:** 2026-06-28 · **Scope:** web app, mobile app, transactional emails · **Status:** audit + suggestions (no code changed yet)
+**Date:** 2026-06-28 · **Scope:** web app, mobile app, transactional emails
+
+## Implementation status (2026-06-28)
+- ✅ **P0 — Web palette aligned to Hala.** Both `:root` token blocks + all hardcoded
+  literals in `styles.css` flipped JF → Hala (navy `#1F3654`, accent `#E38B3C`,
+  cream `#FCF7EF`, border `#EBDAC2`, etc.). The whole web app now matches mobile + emails.
+- ✅ **P0 — Content screens de-hardcoded.** `web/src/public/legalHelp.tsx` inline
+  hexes replaced with `var(--jf-*)` tokens (added `--jf-accent-deep/-tint`, `--jf-ink-soft`,
+  `--jf-info-soft`, `--jf-danger-soft`).
+- ✅ **Typography ("thick & ugly").** Global `font-weight: 800` → `700`; body set to
+  weight 400 / line-height 1.6 with `-webkit-font-smoothing: antialiased` +
+  `text-rendering: optimizeLegibility`; unified font stack (dropped stray Roboto from body).
+- ✅ **Login reorganized.** Cleaner `auth-fold` card: hover state, open-state divider,
+  rotating chevron, stacked labelled fields, and a 2-up actions row (Sign in / Sign out).
+- ✅ **Favicon** navy `#13213a` → `#1F3654`.
+- ✅ **Shadows** softened to navy-tinted (replaced a harsh pure-black card shadow).
+- ◻️ **P2 — Semantic tokens** (success/warning/danger) partially added (`--jf-info-soft`,
+  `--jf-danger-soft`); full success/warning reconciliation with mobile is still open.
+- ◻️ **P3 — Dark mode** not implemented (tokens are now structured to allow it later).
+
+Verified: `cd web && npm run build` (tsc + vite + SEO prerender) passes.
+
+---
+
+**Original audit follows.**
 
 ## TL;DR
 The product ships **three slightly different brand palettes** depending on surface.
