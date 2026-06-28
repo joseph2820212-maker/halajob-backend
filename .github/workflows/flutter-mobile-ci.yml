@@ -5,6 +5,7 @@ on:
     branches:
       - flutter-seeker-campus
       - 'claude/**'
+      - 'codex/**'
   pull_request:
     branches:
       - flutter-seeker-campus
