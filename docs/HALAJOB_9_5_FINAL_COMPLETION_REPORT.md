@@ -2,7 +2,7 @@
 
 ## Source
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Commit: `92c4e1c` functional branch state before this report-only artifact
+- Commit: `45de8ff` latest pushed functional proof commit before this report refresh
 - Date: 2026-06-28
 - Mobile version: `1.0.2+19`
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -81,7 +81,8 @@ Full local proof details are recorded in `docs/testing/API_REGRESSION_TEST_RESUL
 - Build commit: `f07d9c179e351a55383125b2f6795e748df6200f`
 
 Note: this is a tester APK, not a production-signed store release. There are no
-`mobile/` file changes between the APK build commit and branch commit `92c4e1c`.
+`mobile/` file changes between the APK build commit and functional proof commit
+`45de8ff`.
 
 ## Web evidence
 - Build result: Passed on 2026-06-28 via `npm --prefix web run build`.
