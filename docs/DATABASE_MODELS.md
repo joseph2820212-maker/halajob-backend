@@ -1,6 +1,6 @@
 # Database Models
 
-Generated: 2026-06-28T07:43:14.660Z
+Generated: 2026-06-28T07:47:38.154Z
 Source: live Mongoose schemas loaded from `models/index.js`.
 
 This is a generated schema inventory. It documents collections, fields, required/default/enum/ref metadata, and declared indexes. Business meaning, migration history, and data-retention rules still need owner/developer review.
@@ -1983,20 +1983,20 @@ No explicit schema indexes.
 | `address` | String |  |  |  |  |
 | `work_location_scope` | String |  | local | local, international, both |  |
 | `work_mode_id` | ObjectID | yes |  |  | work_modes |
-| `work_mode_info` | Mixed |  | function |  |  |
+| `work_mode_info` | Embedded |  | default |  |  |
 | `is_remote` | Boolean |  | false |  |  |
 | `job_type_id` | ObjectID | yes |  |  | job_type |
-| `job_type_info` | Mixed |  | function |  |  |
+| `job_type_info` | Embedded |  | default |  |  |
 | `job_time_id` | ObjectID | yes |  |  | work_time |
-| `job_time_info` | Mixed |  | function |  |  |
+| `job_time_info` | Embedded |  | default |  |  |
 | `job_salary_id` | ObjectID | yes |  |  | job_salary |
-| `job_salary_info` | Mixed |  | function |  |  |
+| `job_salary_info` | Embedded |  | default |  |  |
 | `experience_level_id` | ObjectID |  | null |  | experience_levels |
-| `experience_level_info` | Mixed |  | function |  |  |
+| `experience_level_info` | Embedded |  | default |  |  |
 | `min_experience_years` | Number |  | 0 |  |  |
 | `max_experience_years` | Number |  | null |  |  |
 | `education_level_id` | ObjectID |  | null |  | education_levels |
-| `education_level_info` | Mixed |  | function |  |  |
+| `education_level_info` | Embedded |  | default |  |  |
 | `age_min` | Number |  | null |  |  |
 | `age_max` | Number |  | null |  |  |
 | `gender_requirement` | String |  | any | any, male, female |  |

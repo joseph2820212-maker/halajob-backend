@@ -122,6 +122,40 @@ const CompanyPrivacySettingsSchema = new Schema(
   },
   { _id: false }
 );
+
+const SubscriptionFeatureSnapshotSchema = new Schema(
+  {
+    can_post_jobs: { type: Boolean, default: true },
+    can_publish_external_jobs: { type: Boolean, default: true },
+    can_search_employees: { type: Boolean, default: true },
+    can_view_employee_contacts: { type: Boolean, default: true },
+    can_request_talent_help: { type: Boolean, default: true },
+    can_use_smart_matching: { type: Boolean, default: true },
+    can_invite_candidates: { type: Boolean, default: true },
+    can_schedule_interviews: { type: Boolean, default: true },
+    can_download_cvs: { type: Boolean, default: true },
+    can_export_applications: { type: Boolean, default: true },
+    can_manage_applications: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
+
+const SubscriptionLimitSnapshotSchema = new Schema(
+  {
+    job_posts: { type: Number, default: -1 },
+    active_jobs: { type: Number, default: -1 },
+    talent_searches: { type: Number, default: -1 },
+    talent_requests: { type: Number, default: -1 },
+    invitations: { type: Number, default: -1 },
+    interviews: { type: Number, default: -1 },
+    cv_downloads: { type: Number, default: -1 },
+    application_exports: { type: Number, default: -1 },
+    smart_matching: { type: Number, default: -1 },
+    external_jobs: { type: Number, default: -1 },
+    max_questions_per_job: { type: Number, default: -1 },
+  },
+  { _id: false }
+);
 const CompanySearchFiltersSchema = new Schema(
   {
     text: {
@@ -201,8 +235,8 @@ const CompanySubscriptionSnapshotSchema = new Schema(
     plan_key: { type: String, lowercase: true, trim: true, default: "free", index: true },
     status: { type: String, trim: true, default: "active", index: true },
     active_until: { type: Date, default: null },
-    features: { type: Schema.Types.Mixed, default: {} },
-    limits: { type: Schema.Types.Mixed, default: {} },
+    features: { type: SubscriptionFeatureSnapshotSchema, default: () => ({}) },
+    limits: { type: SubscriptionLimitSnapshotSchema, default: () => ({}) },
     jobs_require_admin_approval: { type: Boolean, default: true, index: true },
   },
   { _id: false }

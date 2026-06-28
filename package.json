@@ -31,6 +31,7 @@
     "test:security-http": "node scripts/verifySecurityHttpContracts.js",
     "test:response-codes": "node scripts/verifyResponseCodeContract.js",
     "test:model-integrity": "node scripts/verifyModelReferenceIntegrity.js",
+    "test:mixed-fields": "node scripts/verifyMixedFieldRegister.js",
     "test:route-validation": "node scripts/verifyRouteValidationCoverage.js",
     "test:integration:auth-context": "node scripts/verifyAuthContextIntegration.js",
     "test:integration:trust-documents": "node scripts/verifyTrustDocumentWorkflowIntegration.js",

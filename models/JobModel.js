@@ -124,6 +124,25 @@ const JobServiceSnapshotSchema = new Schema(
   { _id: false }
 );
 
+const LookupSnapshotSchema = new Schema(
+  {
+    _id: { type: Schema.Types.ObjectId, default: null },
+    id: { type: String, trim: true, default: "" },
+    key: { type: String, trim: true, default: "" },
+    code: { type: String, trim: true, default: "" },
+    name: { type: String, trim: true, default: "" },
+    title: { type: String, trim: true, default: "" },
+    title_ar: { type: String, trim: true, default: "" },
+    title_en: { type: String, trim: true, default: "" },
+    keyword: { type: String, trim: true, default: "" },
+    keywords_ar: { type: [String], default: [] },
+    keywords_en: { type: [String], default: [] },
+    description_ar: { type: String, trim: true, default: "" },
+    description_en: { type: String, trim: true, default: "" },
+  },
+  { _id: false }
+);
+
 const AtsWeightsSchema = new Schema(
   {
     skills: { type: Number, default: 35, min: 0, max: 100 },
@@ -363,22 +382,22 @@ const JobsSchema = new Schema(
     },
 
     work_mode_id: { type: Schema.Types.ObjectId, ref: "work_modes", required: true },
-    work_mode_info: { type: Schema.Types.Mixed, default: {} },
+    work_mode_info: { type: LookupSnapshotSchema, default: () => ({}) },
     is_remote: { type: Boolean, default: false },
 
     job_type_id: { type: Schema.Types.ObjectId, ref: "job_type", required: true },
-    job_type_info: { type: Schema.Types.Mixed, default: {} },
+    job_type_info: { type: LookupSnapshotSchema, default: () => ({}) },
     job_time_id: { type: Schema.Types.ObjectId, ref: "work_time", required: true },
-    job_time_info: { type: Schema.Types.Mixed, default: {} },
+    job_time_info: { type: LookupSnapshotSchema, default: () => ({}) },
     job_salary_id: { type: Schema.Types.ObjectId, ref: "job_salary", required: true },
-    job_salary_info: { type: Schema.Types.Mixed, default: {} },
+    job_salary_info: { type: LookupSnapshotSchema, default: () => ({}) },
 
     experience_level_id: { type: Schema.Types.ObjectId, ref: "experience_levels", default: null, index: true },
-    experience_level_info: { type: Schema.Types.Mixed, default: {} },
+    experience_level_info: { type: LookupSnapshotSchema, default: () => ({}) },
     min_experience_years: { type: Number, default: 0, min: 0 },
     max_experience_years: { type: Number, default: null, min: 0 },
     education_level_id: { type: Schema.Types.ObjectId, ref: "education_levels", default: null, index: true },
-    education_level_info: { type: Schema.Types.Mixed, default: {} },
+    education_level_info: { type: LookupSnapshotSchema, default: () => ({}) },
     age_min: { type: Number, default: null, min: 14, max: 100 },
     age_max: { type: Number, default: null, min: 14, max: 100 },
     gender_requirement: { type: String, enum: ["any", "male", "female"], default: "any" },
