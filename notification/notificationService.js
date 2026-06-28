@@ -108,7 +108,7 @@ export async function notifyUser({
     const target = buildDashboardTarget(finalAudience, finalRouteKey, routeParams);
     const rendered = renderNotificationText(eventKey, userLang, params);
 
-    const finalTitle = title || rendered.title || eventKey || 'JobZain';
+    const finalTitle = title || rendered.title || eventKey || 'Hala Job';
     const finalBody = body || rendered.body || '';
 
     const finalData = {

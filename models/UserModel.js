@@ -195,6 +195,16 @@ const userSchema = new mongoose.Schema(
   {
     collection: "users",
     timestamps: true,
+    // Defense-in-depth: never serialize credential/OTP fields, even if a
+    // controller accidentally returns a raw user document.
+    toJSON: {
+      transform(_doc, ret) {
+        delete ret.password;
+        delete ret.passcode;
+        delete ret.another_device_code;
+        return ret;
+      },
+    },
   }
 );
 

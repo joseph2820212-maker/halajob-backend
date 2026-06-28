@@ -6,6 +6,7 @@
     "title": { "en": "Privacy Policy", "ar": "سياسة الخصوصية" },
     "summary": { "en": "What data Hala Job collects, how we use it, and your rights.", "ar": "ما البيانات التي تجمعها هلا جوب وكيف نستخدمها وحقوقك." },
     "contentBlocks": [
+      { "type": "paragraph", "text": { "en": "The data controller for Hala Job (halajob.com) is llill ltd. For privacy questions, contact {{PRIVACY_EMAIL}}.", "ar": "المتحكم في بيانات هلا جوب (halajob.com) هو شركة llill ltd. لأسئلة الخصوصية، تواصل مع {{PRIVACY_EMAIL}}." }, "sortOrder": 0 },
       { "type": "heading", "text": { "en": "Data we collect", "ar": "البيانات التي نجمعها" }, "sortOrder": 1 },
       { "type": "bullet_list", "items": [
         { "en": "Account and profile data", "ar": "بيانات الحساب والملف الشخصي" },

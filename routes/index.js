@@ -159,9 +159,9 @@ router.get('/subscriptions/companies/:companyId', can('subscriptions.manage'), a
 router.post('/subscriptions/companies/:companyId/assign-plan', can('subscriptions.manage'), upload.none(), validate(adminSchemas.assignSubscriptionPlanSchema), adminModerationController.assignSubscriptionPlan);
 
 /* ----------------------------- Legacy upload/import routes ----------------------------- */
-router.use('/exsel', exselRoute);
-router.use('/excel', exselRoute);
-router.use('/import', exselRoute);
+router.use('/exsel', can('jobs.moderate'), exselRoute);
+router.use('/excel', can('jobs.moderate'), exselRoute);
+router.use('/import', can('jobs.moderate'), exselRoute);
 
 /* ----------------------------- Special routes ----------------------------- */
 router.use('/Keyword', keywordRoute);
@@ -278,6 +278,25 @@ router.use('/banners', createDashResourceRouter('banners'));
 router.use('/Page', createDashResourceRouter('pages'));
 router.use('/Pages', createDashResourceRouter('pages'));
 router.use('/pages', createDashResourceRouter('pages'));
+
+// Legal / Help / Support / Privacy content package (Gate 3) admin management
+router.use('/content/pages', createDashResourceRouter('contentpages'));
+router.use('/content-pages', createDashResourceRouter('contentpages'));
+router.use('/help/categories', createDashResourceRouter('helpcategories'));
+router.use('/help-categories', createDashResourceRouter('helpcategories'));
+router.use('/help/articles', createDashResourceRouter('helparticles'));
+router.use('/help-articles', createDashResourceRouter('helparticles'));
+router.use('/faq', createDashResourceRouter('faqitems'));
+router.use('/faq-items', createDashResourceRouter('faqitems'));
+router.use('/support-queue', createDashResourceRouter('supporttickets'));
+router.use('/legal-reports', createDashResourceRouter('legalreports'));
+router.use('/privacy-requests', createDashResourceRouter('privacyrequests'));
+router.use('/accessibility-requests', createDashResourceRouter('accessibilityrequests'));
+router.use('/email/templates', createDashResourceRouter('emailtemplates'));
+router.use('/email-templates', createDashResourceRouter('emailtemplates'));
+router.use('/email/logs', createDashResourceRouter('emaillogs'));
+router.use('/email-logs', createDashResourceRouter('emaillogs'));
+router.use('/policy-acknowledgements', createDashResourceRouter('policyacknowledgements'));
 router.use('/Notification', createDashResourceRouter('notifications'));
 router.use('/notifications', createDashResourceRouter('notifications'));
 router.use('/FcmToken', createDashResourceRouter('fcmtokens'));

@@ -23,6 +23,7 @@ import { seedEducationLevels } from "./seedEducationLevels.js";
 import { seedJobsAndApplications } from "./seedJobsAndApplications.js";
 import { seedBanners } from "./seedBanner.js";
 import { seedStaticPages } from "./staticPagesSeeder.js";
+import { seedContent } from "./contentSeeder.js";
 import { seedSubscriptionPlans } from "./seedSubscriptionPlans.js";
 
 const seeders = {
@@ -48,6 +49,7 @@ const seeders = {
   banners:seedBanners,
   jobsAndApplications:seedJobsAndApplications,
   staticPages:seedStaticPages,
+  content:seedContent,
   subscriptions:seedSubscriptionPlans
 };
 

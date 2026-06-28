@@ -10,7 +10,7 @@ const JopNameSchema = new mongoose.Schema(
   {
     sheet: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Sheet",
+      ref: "sheet",
       index: true,
       default: null,
     },

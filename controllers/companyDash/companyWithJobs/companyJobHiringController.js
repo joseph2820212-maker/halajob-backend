@@ -1217,7 +1217,7 @@ export const bulkApplicationCvs = async (req, res, next) => {
       },
     });
 
-    const fileName = `jobzain-cvs-${Date.now()}.zip`;
+    const fileName = `halajob-cvs-${Date.now()}.zip`;
     res.setHeader("Content-Type", "application/zip");
     res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`);
     res.setHeader("Content-Length", zipBuffer.length);
@@ -1303,7 +1303,7 @@ export const bulkExportApplications = async (req, res, next) => {
     worksheet.addRows(rows);
     const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
 
-    const fileName = `jobzain-applications-${Date.now()}.xlsx`;
+    const fileName = `halajob-applications-${Date.now()}.xlsx`;
     res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     res.setHeader("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(fileName)}`);
     res.setHeader("Content-Length", buffer.length);

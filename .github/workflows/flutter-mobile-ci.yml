@@ -26,6 +26,12 @@ on:
         type: boolean
         default: false
 
+# Cancel superseded in-flight runs on the same ref so rapid pushes don't stack
+# multiple full builds (which exhausts Actions minutes).
+concurrency:
+  group: flutter-mobile-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify-linux:
     runs-on: ubuntu-latest
@@ -135,7 +141,12 @@ jobs:
         working-directory: mobile
         run: flutter test
 
+      # APK builds are expensive in Actions minutes. Run them only on demand
+      # (workflow_dispatch) or on the release branch — not on every claude/** push.
+      # Per-commit verification above (backend checks, analyze, full flutter test,
+      # palette guard) still runs on every push.
       - name: Android release build smoke check
+        if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/flutter-seeker-campus'
         working-directory: mobile
         env:
           HALA_LOCAL_DEBUG_RELEASE_SIGNING: 'true'
@@ -146,7 +157,7 @@ jobs:
           flutter build apk --release --build-name="$APP_BUILD_NAME" --build-number="$APP_BUILD_NUMBER" --dart-define=HALA_DEFAULT_BASE_URL=https://jobzain.com --dart-define=HALA_APP_BUILD_NAME="$APP_BUILD_NAME" --dart-define=HALA_APP_BUILD_NUMBER="$APP_BUILD_NUMBER" --dart-define=HALA_APP_BUILD_MODE=ci-release --dart-define=HALA_APP_BUILD_COMMIT=${{ github.sha }}
 
       - name: Upload fresh Linux APK
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/flutter-seeker-campus'
         uses: actions/upload-artifact@v4
         with:
           name: halajob-mobile-fresh-apk-linux
@@ -155,7 +166,7 @@ jobs:
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
 
       - name: Build campus-tester APK (enter-without-signing enabled)
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/flutter-seeker-campus'
         working-directory: mobile
         env:
           HALA_LOCAL_DEBUG_RELEASE_SIGNING: 'true'
@@ -166,7 +177,7 @@ jobs:
           flutter build apk --release --build-name="$APP_BUILD_NAME" --build-number="$APP_BUILD_NUMBER" --dart-define=HALA_DEFAULT_BASE_URL=https://jobzain.com --dart-define=HALA_ENABLE_REMOTE_CAMPUS_AUTH=false --dart-define=HALA_APP_BUILD_MODE=ci-tester --dart-define=HALA_APP_BUILD_COMMIT=${{ github.sha }}
 
       - name: Upload campus-tester APK
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/flutter-seeker-campus'
         uses: actions/upload-artifact@v4
         with:
           name: halajob-mobile-tester-apk
@@ -176,6 +187,9 @@ jobs:
 
   verify-windows:
     runs-on: windows-latest
+    # Windows runners bill at 2x and this job builds a tester APK. Run it only on
+    # demand or on the release branch, not on every claude/** push.
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/flutter-seeker-campus'
 
     steps:
       - name: Check out repository

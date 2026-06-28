@@ -276,6 +276,12 @@ Important integration points:
 
 The release APK currently uses `https://jobzain.com` as the API base URL and local-device campus auth mode for testing.
 
+> **Brand note:** The public product name is **Hala Job**. `jobzain.com` is the
+> current backend API domain only (a technical URL, not the product brand) and is
+> a documented temporary exception — see `BRAND_CLEANUP_AUDIT.md`. Migrate the API
+> domain only after DNS, SSL, CORS, mobile build defines, and smoke tests are
+> confirmed for the Hala Job API domain.
+
 ## Security Operations
 
 Security references:

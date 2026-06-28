@@ -277,7 +277,7 @@ router.get("/",protectHealth, (req, res) => {
     </div>
 
     <div class="footer">
-      JobZain Backend Health Page
+      Hala Job Backend Health Page
     </div>
   </div>
 </body>

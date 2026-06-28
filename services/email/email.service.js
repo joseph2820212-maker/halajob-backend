@@ -3,25 +3,32 @@ import path from 'path';
 import nodemailer from 'nodemailer';
 import { fileURLToPath } from 'url';
 import logger from '../../config/logger.js';
+import { PRODUCT_NAME, DEFAULT_EMAIL_FROM_NAME } from '../../config/brand.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '../..');
 const TEMPLATE_DIR = path.join(ROOT_DIR, 'sendEmail', 'templates');
 
+// Hala Job is operated by llill ltd; the public mail domain is halajob.com.
+// Env vars override per address. Preferred names are HALAJOB_EMAIL_*; the older
+// HALA_EMAIL_* and legacy JOBZAIN_EMAIL_* names remain as backward-compatible
+// fallbacks during the brand migration (see BRAND_CLEANUP_AUDIT.md).
+const MAIL_DOMAIN = process.env.HALAJOB_MAIL_DOMAIN || process.env.HALA_MAIL_DOMAIN || 'halajob.com';
+const FROM_NAME = process.env.HALAJOB_MAIL_FROM_NAME || process.env.HALA_MAIL_FROM_NAME || DEFAULT_EMAIL_FROM_NAME;
 const DEFAULT_FROM = {
-  info: process.env.JOBZAIN_EMAIL_INFO || 'info@jobzain.com',
-  forgot_password: process.env.JOBZAIN_EMAIL_FORGOT_PASSWORD || 'forgot.password@jobzain.com',
-  passcode: process.env.JOBZAIN_EMAIL_PASSCODE || 'passcode@jobzain.com',
-  subscription: process.env.JOBZAIN_EMAIL_SUBSCRIPTION || 'subscription@jobzain.com',
-  checkout: process.env.JOBZAIN_EMAIL_CHECKOUT || 'checkout@jobzain.com',
-  contact: process.env.JOBZAIN_EMAIL_CONTACT || 'contact@jobzain.com',
-  appointments: process.env.JOBZAIN_EMAIL_APPOINTMENTS || 'appointments@jobzain.com',
+  info: process.env.HALAJOB_EMAIL_INFO || process.env.HALA_EMAIL_INFO || process.env.JOBZAIN_EMAIL_INFO || `info@${MAIL_DOMAIN}`,
+  forgot_password: process.env.HALAJOB_EMAIL_FORGOT_PASSWORD || process.env.HALA_EMAIL_FORGOT_PASSWORD || process.env.JOBZAIN_EMAIL_FORGOT_PASSWORD || `no-reply@${MAIL_DOMAIN}`,
+  passcode: process.env.HALAJOB_EMAIL_PASSCODE || process.env.HALA_EMAIL_PASSCODE || process.env.JOBZAIN_EMAIL_PASSCODE || `no-reply@${MAIL_DOMAIN}`,
+  subscription: process.env.HALAJOB_EMAIL_SUBSCRIPTION || process.env.HALA_EMAIL_SUBSCRIPTION || process.env.JOBZAIN_EMAIL_SUBSCRIPTION || `billing@${MAIL_DOMAIN}`,
+  checkout: process.env.HALAJOB_EMAIL_CHECKOUT || process.env.HALA_EMAIL_CHECKOUT || process.env.JOBZAIN_EMAIL_CHECKOUT || `billing@${MAIL_DOMAIN}`,
+  contact: process.env.HALAJOB_EMAIL_CONTACT || process.env.HALA_EMAIL_CONTACT || process.env.JOBZAIN_EMAIL_CONTACT || `support@${MAIL_DOMAIN}`,
+  appointments: process.env.HALAJOB_EMAIL_APPOINTMENTS || process.env.HALA_EMAIL_APPOINTMENTS || process.env.JOBZAIN_EMAIL_APPOINTMENTS || `no-reply@${MAIL_DOMAIN}`,
 };
 
 let transporter = null;
 
-const htmlEscape = (value = '') => String(value ?? '')
+export const htmlEscape = (value = '') => String(value ?? '')
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
@@ -57,7 +64,7 @@ export function renderTemplate(templateName, variables = {}) {
   let html = fs.readFileSync(templatePath, 'utf8');
 
   const safeVariables = {
-    app_name: 'JobZain',
+    app_name: PRODUCT_NAME,
     year: new Date().getFullYear(),
     support_email: DEFAULT_FROM.info,
     ...variables,
@@ -89,9 +96,9 @@ export async function sendJobzainEmail({
   let info;
   try {
     info = await getTransporter().sendMail({
-      from: `JobZain <${fromAddress}>`,
+      from: `${FROM_NAME} <${fromAddress}>`,
       to,
-      subject: subject || 'JobZain',
+      subject: subject || PRODUCT_NAME,
       html,
       replyTo: replyTo || fromAddress,
     });
@@ -106,7 +113,7 @@ export async function sendJobzainEmail({
 
 export async function sendPasscodeEmail({ to, passcode, lang = 'en', type = 'passcode' } = {}) {
   const isArabic = String(lang || '').toLowerCase() === 'ar';
-  const subject = isArabic ? 'رمز التحقق من JobZain' : 'JobZain verification code';
+  const subject = isArabic ? 'رمز التحقق من هلا جوب' : 'Hala Job verification code';
 
   return sendJobzainEmail({
     to,
@@ -141,12 +148,12 @@ export async function sendImportantActionEmail({ to, subject, title, message, ac
       title: title || subject,
       message,
       action_url: actionUrl,
-      action_label: actionLabel || (isArabic ? 'فتح JobZain' : 'Open JobZain'),
+      action_label: actionLabel || (isArabic ? 'فتح هلا جوب' : 'Open Hala Job'),
     },
   });
 }
 
-export { DEFAULT_FROM as JOBZAIN_EMAILS };
+export { DEFAULT_FROM as JOBZAIN_EMAILS, DEFAULT_FROM, FROM_NAME, MAIL_DOMAIN };
 
 export default {
   sendJobzainEmail,

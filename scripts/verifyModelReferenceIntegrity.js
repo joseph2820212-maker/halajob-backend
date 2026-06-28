@@ -29,4 +29,36 @@ assert.equal(refFor(CompanyModel, "company_locations.country_id"), "countries", 
 assert.equal(refFor(CompanyModel, "search_filters.location.country_id"), "countries", "CompanyModel.search_filters.location.country_id should reference countries");
 assert.equal(refFor(EmployeeModel, "current_country_id"), "countries", "EmployeeModel.current_country_id should reference countries");
 
-console.log("[model-reference-integrity] ok");
+// --- Comprehensive: every static `ref` must resolve to a registered model ---
+// (importing models/index.js above registers all models). Walks arrays and
+// nested subdocuments; dynamic refPath refs are intentionally skipped.
+const registered = new Set(mongoose.modelNames());
+const brokenRefs = [];
+
+const checkSchema = (schema, modelName, prefix = "") => {
+  schema.eachPath((pathName, schemaType) => {
+    const full = prefix ? `${prefix}.${pathName}` : pathName;
+    const ref = schemaType.options?.ref;
+    if (typeof ref === "string" && !registered.has(ref)) {
+      brokenRefs.push(`${modelName}.${full} -> "${ref}"`);
+    }
+    const casterRef = schemaType.caster?.options?.ref;
+    if (typeof casterRef === "string" && !registered.has(casterRef)) {
+      brokenRefs.push(`${modelName}.${full}[] -> "${casterRef}"`);
+    }
+    const subSchema = schemaType.schema || schemaType.caster?.schema;
+    if (subSchema) checkSchema(subSchema, modelName, full);
+  });
+};
+
+for (const name of mongoose.modelNames()) {
+  checkSchema(mongoose.model(name).schema, name);
+}
+
+assert.equal(
+  brokenRefs.length,
+  0,
+  `Broken model refs (target model not registered):\n  ${brokenRefs.join("\n  ")}`
+);
+
+console.log(`[model-reference-integrity] ok (${registered.size} models, all refs resolve)`);

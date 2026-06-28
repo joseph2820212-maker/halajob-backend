@@ -80,7 +80,35 @@ import CareerPassportModel from './CareerPassportModel.js';
 import CvTemplateModel from './CvTemplateModel.js';
 import EmployeeCvModel from './EmployeeCvModel.js';
 
+// Legal / Help / Support / Privacy content package (Gate 3)
+import ContentPageModel from './ContentPageModel.js';
+import HelpCategoryModel from './HelpCategoryModel.js';
+import HelpArticleModel from './HelpArticleModel.js';
+import FaqItemModel from './FaqItemModel.js';
+import SupportTicketModel from './SupportTicketModel.js';
+import LegalReportModel from './LegalReportModel.js';
+import PrivacyRequestModel from './PrivacyRequestModel.js';
+import AccessibilityRequestModel from './AccessibilityRequestModel.js';
+import UserPolicyAcknowledgementModel from './UserPolicyAcknowledgementModel.js';
+import UserConsentModel from './UserConsentModel.js';
+import CommunicationPreferenceModel from './CommunicationPreferenceModel.js';
+import EmailTemplateModel from './EmailTemplateModel.js';
+import EmailLogModel from './EmailLogModel.js';
+
 export {
+  ContentPageModel,
+  HelpCategoryModel,
+  HelpArticleModel,
+  FaqItemModel,
+  SupportTicketModel,
+  LegalReportModel,
+  PrivacyRequestModel,
+  AccessibilityRequestModel,
+  UserPolicyAcknowledgementModel,
+  UserConsentModel,
+  CommunicationPreferenceModel,
+  EmailTemplateModel,
+  EmailLogModel,
   UserModel,
   RefreshTokenModel,
   PermissionModel,

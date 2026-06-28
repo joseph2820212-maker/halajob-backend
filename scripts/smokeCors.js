@@ -1,6 +1,6 @@
 process.env.NODE_ENV = "production";
 process.env.JWT_SECRET ||= "smoke-test-secret";
-process.env.CONNECTION_URL ||= "mongodb://127.0.0.1:27017/jobzain-smoke";
+process.env.CONNECTION_URL ||= "mongodb://127.0.0.1:27017/halajob-smoke";
 process.env.CORS_ORIGINS = "https://jobzain.com,https://hala-job.vercel.app";
 process.env.CORS_ORIGIN_PATTERNS = "https://*.vercel.app";
 

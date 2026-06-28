@@ -24,6 +24,7 @@ import notificationRoutes from "./routesNotifications/index.js";
 import campusRoutes from "./routesCampus/index.js";
 import universityRoutes from "./routesUniversity/index.js";
 import routesHealth from "./routesHealth/index.js";
+import publicRoutes from "./routesPublic/index.js";
 import error from "./middlewares/error.js";
 import ApiError from "./utils/apiError.js";
 import { EmployeeCvModel } from "./models/index.js";
@@ -354,6 +355,7 @@ app.use("/notifications/v1", notificationRoutes);
 app.use("/campus/v1", campusRoutes);
 app.use("/university/v1", universityRoutes);
 app.use("/health", routesHealth);
+app.use("/public/v1", publicRoutes);
 app.use("/user/v1", userRoutes);
 
 /* ----------------------------- Error Handling ----------------------------- */

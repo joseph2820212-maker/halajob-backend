@@ -1,4 +1,4 @@
-# Hala Job / JobZain
+# Hala Job
 
 HalaJob is a Node.js/Express and MongoDB backend with a Vite web frontend and a
 Flutter mobile app. The current launch-hardening branch is:
@@ -6,6 +6,8 @@ Flutter mobile app. The current launch-hardening branch is:
 ```text
 codex/gate-a-mobile-ui-lock
 ```
+
+> Historical note: "JobZain" was an earlier internal/product name. The public product name is now **Hala Job** (operated by llill ltd; public web domain halajob.com). The backend API domain may temporarily remain `jobzain.com` as a technical URL — see `BRAND_CLEANUP_AUDIT.md`.
 
 The launch source branch remains `flutter-seeker-campus`; new hardening branches
 should be based directly on it.

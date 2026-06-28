@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T08:10:37.575Z",
+  "generatedAt": "2026-06-28T15:32:01.554Z",
   "records": [
     {
       "method": "PATCH",
@@ -103,6 +103,402 @@
       "module": "Admin",
       "middlewares": [
         "reviewQueue"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/accessibility-requests",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/accessibility-requests",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/accessibility-requests/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/accessibility-requests/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/accessibility-requests/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/accessibility-requests/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/accessibility-requests/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/accessibility-requests/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/accessibility-requests/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/accessibility-requests/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/accessibility-requests/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/accessibility-requests/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/accessibility-requests/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/accessibility-requests/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/accessibility-requests/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/accessibility-requests/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/accessibility-requests/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/accessibility-requests/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/accessibility-requests/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/accessibility-requests/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/accessibility-requests/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/accessibility-requests/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/accessibility-requests/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/accessibility-requests/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
       ],
       "inferredGuards": [
         "inferred:isAdmin"
@@ -8824,6 +9220,798 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/content-pages",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content-pages",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/content-pages/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content-pages/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content-pages/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/content-pages/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content-pages/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content-pages/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content-pages/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content-pages/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content-pages/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/content-pages/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content-pages/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content-pages/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content-pages/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content-pages/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content-pages/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content-pages/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content-pages/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content-pages/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content-pages/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content-pages/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content-pages/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/content-pages/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content/pages",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content/pages",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/content/pages/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content/pages/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content/pages/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/content/pages/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content/pages/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content/pages/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content/pages/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content/pages/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content/pages/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/content/pages/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content/pages/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content/pages/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content/pages/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content/pages/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content/pages/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content/pages/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/content/pages/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content/pages/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content/pages/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/content/pages/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/content/pages/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/content/pages/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/dash/v1/countries",
       "module": "Admin",
       "middlewares": [
@@ -12242,6 +13430,1590 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/email-logs",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-logs",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/email-logs/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-logs/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-logs/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/email-logs/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-logs/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-logs/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-logs/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-logs/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-logs/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/email-logs/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-logs/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-logs/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-logs/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-logs/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-logs/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-logs/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-logs/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-logs/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-logs/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-logs/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-logs/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/email-logs/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-templates",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-templates",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/email-templates/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-templates/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-templates/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/email-templates/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-templates/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-templates/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-templates/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-templates/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-templates/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/email-templates/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-templates/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-templates/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-templates/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-templates/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-templates/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-templates/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email-templates/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-templates/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-templates/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email-templates/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email-templates/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/email-templates/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/logs",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/logs",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/email/logs/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/logs/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/logs/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/email/logs/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/logs/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/logs/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/logs/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/logs/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/logs/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/email/logs/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/logs/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/logs/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/logs/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/logs/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/logs/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/logs/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/logs/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/logs/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/logs/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/logs/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/logs/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/email/logs/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/templates",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/templates",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/email/templates/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/templates/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/templates/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/email/templates/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/templates/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/templates/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/templates/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/templates/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/templates/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/email/templates/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/templates/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/templates/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/templates/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/templates/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/templates/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/templates/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/email/templates/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/templates/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/templates/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/email/templates/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/email/templates/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/email/templates/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/dash/v1/Employee",
       "module": "Admin",
       "middlewares": [
@@ -15138,6 +17910,798 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/faq",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq-items",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq-items",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/faq-items/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq-items/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq-items/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/faq-items/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq-items/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq-items/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq-items/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq-items/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq-items/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/faq-items/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq-items/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq-items/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq-items/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq-items/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq-items/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq-items/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq-items/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq-items/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq-items/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq-items/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq-items/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/faq-items/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/faq/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/faq/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/faq/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/faq/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/faq/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/faq/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/faq/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/dash/v1/fcm-tokens",
       "module": "Admin",
       "middlewares": [
@@ -16742,6 +20306,1590 @@
       "middlewares": [
         "checkPermissionMiddleware",
         "globalSearch"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-articles",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-articles",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/help-articles/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-articles/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-articles/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/help-articles/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-articles/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-articles/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-articles/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-articles/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-articles/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/help-articles/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-articles/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-articles/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-articles/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-articles/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-articles/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-articles/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-articles/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-articles/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-articles/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-articles/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-articles/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/help-articles/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-categories",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-categories",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/help-categories/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-categories/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-categories/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/help-categories/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-categories/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-categories/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-categories/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-categories/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-categories/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/help-categories/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-categories/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-categories/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-categories/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-categories/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-categories/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-categories/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help-categories/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-categories/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-categories/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help-categories/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help-categories/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/help-categories/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/articles",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/articles",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/help/articles/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/articles/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/articles/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/help/articles/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/articles/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/articles/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/articles/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/articles/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/articles/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/help/articles/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/articles/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/articles/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/articles/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/articles/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/articles/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/articles/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/articles/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/articles/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/articles/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/articles/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/articles/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/help/articles/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/categories",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/categories",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/help/categories/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/categories/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/categories/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/help/categories/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/categories/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/categories/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/categories/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/categories/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/categories/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/help/categories/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/categories/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/categories/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/categories/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/categories/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/categories/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/categories/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/help/categories/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/categories/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/categories/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/help/categories/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/help/categories/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/help/categories/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
       ],
       "inferredGuards": [
         "inferred:isAdmin"
@@ -27309,6 +32457,402 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/legal-reports",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/legal-reports",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/legal-reports/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/legal-reports/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/legal-reports/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/legal-reports/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/legal-reports/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/legal-reports/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/legal-reports/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/legal-reports/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/legal-reports/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/legal-reports/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/legal-reports/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/legal-reports/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/legal-reports/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/legal-reports/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/legal-reports/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/legal-reports/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/legal-reports/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/legal-reports/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/legal-reports/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/legal-reports/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/legal-reports/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/legal-reports/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/dash/v1/moderation/company-requests",
       "module": "Admin",
       "middlewares": [
@@ -31062,6 +36606,798 @@
     {
       "method": "PUT",
       "path": "/dash/v1/permissions/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/policy-acknowledgements",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/policy-acknowledgements",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/policy-acknowledgements/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/policy-acknowledgements/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/policy-acknowledgements/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/policy-acknowledgements/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/policy-acknowledgements/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/policy-acknowledgements/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/policy-acknowledgements/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/policy-acknowledgements/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/policy-acknowledgements/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/policy-acknowledgements/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/policy-acknowledgements/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/policy-acknowledgements/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/policy-acknowledgements/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/policy-acknowledgements/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/policy-acknowledgements/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/policy-acknowledgements/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/policy-acknowledgements/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/policy-acknowledgements/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/policy-acknowledgements/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/policy-acknowledgements/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/policy-acknowledgements/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/policy-acknowledgements/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/privacy-requests",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/privacy-requests",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/privacy-requests/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/privacy-requests/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/privacy-requests/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/privacy-requests/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/privacy-requests/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/privacy-requests/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/privacy-requests/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/privacy-requests/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/privacy-requests/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/privacy-requests/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/privacy-requests/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/privacy-requests/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/privacy-requests/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/privacy-requests/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/privacy-requests/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/privacy-requests/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/privacy-requests/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/privacy-requests/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/privacy-requests/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/privacy-requests/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/privacy-requests/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/privacy-requests/update/:id",
       "module": "Admin",
       "middlewares": [
         "checkPermissionMiddleware",
@@ -40940,6 +47276,402 @@
         "multerMiddleware",
         "validateRequest",
         "seedFreePlan"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-queue",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/support-queue",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/support-queue/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-queue/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/support-queue/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/support-queue/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/support-queue/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/support-queue/approve/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/support-queue/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/support-queue/bulk-update",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/support-queue/create",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/support-queue/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/support-queue/delete/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-queue/details/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-queue/get",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-queue/get-one/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-queue/getOne",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-queue/getOne/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/support-queue/list",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/support-queue/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/support-queue/reject/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/support-queue/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/support-queue/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/support-queue/update/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
       ],
       "inferredGuards": [
         "inferred:isAdmin"
@@ -52644,6 +59376,49 @@
       "knownPublic": true
     },
     {
+      "method": "GET",
+      "path": "/user/v1/legal-reports",
+      "module": "Legacy User",
+      "middlewares": [
+        "optionalAuthUser",
+        "jsonParser",
+        "validateRequest",
+        "createReport"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/legal-reports",
+      "module": "Legacy User",
+      "middlewares": [
+        "optionalAuthUser",
+        "jsonParser",
+        "validateRequest",
+        "createReport"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/legal-reports/:id",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "getReport"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
       "method": "POST",
       "path": "/user/v1/me/active-context",
       "module": "Legacy User",
@@ -53095,6 +59870,180 @@
       "knownPublic": true
     },
     {
+      "method": "POST",
+      "path": "/user/v1/privacy/accessibility",
+      "module": "Legacy User",
+      "middlewares": [
+        "optionalAuthUser",
+        "jsonParser",
+        "validateRequest",
+        "createAccessibilityRequest"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/privacy/consents",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "listConsents"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/privacy/consents/:pageKey/acknowledge",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "jsonParser",
+        "validateRequest",
+        "acknowledgePolicy"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/privacy/consents/:purpose",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "jsonParser",
+        "validateRequest",
+        "setConsent"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/privacy/requests",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "jsonParser",
+        "validateRequest",
+        "createPrivacyRequest"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/privacy/requests",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "jsonParser",
+        "validateRequest",
+        "createPrivacyRequest"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/support/tickets",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "jsonParser",
+        "validateRequest",
+        "createTicket"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/support/tickets",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "jsonParser",
+        "validateRequest",
+        "createTicket"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/support/tickets/:id",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "getTicket"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/support/tickets/:id/close",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "validateRequest",
+        "closeTicket"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/support/tickets/:id/close",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "validateRequest",
+        "closeTicket"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/support/tickets/:id/messages",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "jsonParser",
+        "validateRequest",
+        "addMessage"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
       "method": "GET",
       "path": "/notifications/v1",
       "module": "Notifications",
@@ -53332,6 +60281,90 @@
       ],
       "hasAuthGuard": true,
       "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/content/pages",
+      "module": "Other",
+      "middlewares": [
+        "listPages"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/content/pages/:key",
+      "module": "Other",
+      "middlewares": [
+        "getPage"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/faq",
+      "module": "Other",
+      "middlewares": [
+        "listFaq"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/help/articles",
+      "module": "Other",
+      "middlewares": [
+        "listHelpArticles"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/help/articles/:key",
+      "module": "Other",
+      "middlewares": [
+        "getHelpArticle"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/help/categories",
+      "module": "Other",
+      "middlewares": [
+        "listHelpCategories"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/legal/:key",
+      "module": "Other",
+      "middlewares": [
+        "getPage"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
       "knownPublic": false
     },
     {

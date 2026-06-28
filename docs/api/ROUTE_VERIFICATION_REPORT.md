@@ -1,17 +1,17 @@
 # Route Verification Report
 
-Generated: 2026-06-28T08:10:37.575Z
+Generated: 2026-06-28T15:32:01.554Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 2154 |
-| Unique method/path endpoints | 3401 |
-| Endpoints with detected auth/role guard | 3310 |
-| Known public/system endpoints | 91 |
-| Unguarded endpoints needing manual classification | 0 |
+| Raw Express endpoint entries | 2410 |
+| Unique method/path endpoints | 3831 |
+| Endpoints with detected auth/role guard | 3730 |
+| Known public/system endpoints | 94 |
+| Unguarded endpoints needing manual classification | 7 |
 
 Full machine-readable inventory:
 
@@ -23,7 +23,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 
 | Module | Total | Protected | Known public | Needs classification |
 | --- | --- | --- | --- | --- |
-| Admin | 2889 | 2884 | 5 | 0 |
+| Admin | 3297 | 3292 | 5 | 0 |
 | AI | 12 | 12 | 0 | 0 |
 | Analytics | 5 | 5 | 0 | 0 |
 | Campus | 18 | 16 | 2 | 0 |
@@ -32,8 +32,9 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Files | 1 | 0 | 1 | 0 |
 | Health | 4 | 0 | 4 | 0 |
 | Jobs | 2 | 2 | 0 | 0 |
-| Legacy User | 159 | 85 | 74 | 0 |
+| Legacy User | 174 | 97 | 77 | 0 |
 | Notifications | 16 | 16 | 0 | 0 |
+| Other | 7 | 0 | 0 | 7 |
 | Seeker | 94 | 93 | 1 | 0 |
 | Trust | 4 | 4 | 0 | 0 |
 | University | 20 | 20 | 0 | 0 |
@@ -57,11 +58,13 @@ Middleware names observed in the live app:
 
 ```text
 SendInterView
+acknowledgePolicy
 activeContextGuard
 activeContextPermissionGuard
 addAdminMessage
 addApplicationMessage
 addApplicationNote
+addMessage
 addTicketMessage
 adminApproveVerification
 adminCohorts
@@ -103,6 +106,7 @@ checkPermissionMiddleware
 checkResourcePermissionMiddleware
 cities
 cloneJob
+closeTicket
 companiesFromMyActivity
 companiesFromSavedJobs
 companiesIAppliedTo
@@ -115,10 +119,14 @@ content
 corsMiddleware
 countries
 create
+createAccessibilityRequest
 createCvTemplate
 createDashboardUser
 createInterview
 createMyCvDownloadUrl
+createPrivacyRequest
+createReport
+createTicket
 csv
 currencies
 dashboard
@@ -164,6 +172,7 @@ getEmployeeDashboard
 getEmployeeDetails
 getFileLinks
 getFilters
+getHelpArticle
 getHiringSummary
 getInterviewedJobs
 getJobApplicants
@@ -196,13 +205,16 @@ getMyJobs
 getMySection
 getMySubscription
 getMyUploadedCvs
+getPage
 getPreferences
 getProfileAnalytics
 getRecommendedEmployeesForJob
+getReport
 getRequest
 getSavedJob
 getSmartEmployeesForJob
 getTalentPool
+getTicket
 getTicketDetails
 getUserJobCounts
 globalSearch
@@ -215,14 +227,19 @@ list
 listAuditLogs
 listCompanyFiles
 listCompanyRequests
+listConsents
 listContexts
+listFaq
 listFeatures
+listHelpArticles
+listHelpCategories
 listJobReviewQueue
 listJobReviews
 listJobSavers
 listLimits
 listMembers
 listNotificationLogs
+listPages
 listQuestions
 listRequests
 listTalentRequests
@@ -309,6 +326,7 @@ sendNotification
 services
 setActiveContext
 setActiveCv
+setConsent
 share
 shared
 skills
@@ -384,7 +402,15 @@ Note: parent-mount guards are inferred because `express-list-endpoints` does not
 
 These endpoints do not expose one of the known guard middleware names, do not match a known protected parent mount, and are not in the known-public allowlist. Some may be intentionally public or may be protected indirectly by controller code. Review them before launch.
 
-None found.
+| Method | Path | Module | Middlewares |
+| --- | --- | --- | --- |
+| GET | /public/v1/content/pages | Other | listPages |
+| GET | /public/v1/content/pages/:key | Other | getPage |
+| GET | /public/v1/faq | Other | listFaq |
+| GET | /public/v1/help/articles | Other | listHelpArticles |
+| GET | /public/v1/help/articles/:key | Other | getHelpArticle |
+| GET | /public/v1/help/categories | Other | listHelpCategories |
+| GET | /public/v1/legal/:key | Other | getPage |
 
 
 

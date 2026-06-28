@@ -163,10 +163,10 @@ async function deletePreviousSeedData() {
 
   const jobsDeleteResult = await jobsModel.deleteMany({ ref: /^SEED-JOB-/ });
 
-  const seedCompanyUsers = await UserModel.find({ email: /^seed\.company\.\d+@jobzain\.test$/ })
+  const seedCompanyUsers = await UserModel.find({ email: /^seed\.company\.\d+@halajob\.test$/ })
     .select("_id")
     .lean();
-  const seedEmployeeUsers = await UserModel.find({ email: /^seed\.employee\.\d+@jobzain\.test$/ })
+  const seedEmployeeUsers = await UserModel.find({ email: /^seed\.employee\.\d+@halajob\.test$/ })
     .select("_id")
     .lean();
 
@@ -175,7 +175,7 @@ async function deletePreviousSeedData() {
 
   const companiesDeleteResult = await CompanyModel.deleteMany({
     $or: [
-      { company_email: /^hr\.\d+@jobzain\.test$/ },
+      { company_email: /^hr\.\d+@halajob\.test$/ },
       ...(seedCompanyUserIds.length ? [{ owner_user_id: { $in: seedCompanyUserIds } }] : []),
     ],
   });
@@ -186,8 +186,8 @@ async function deletePreviousSeedData() {
 
   const usersDeleteResult = await UserModel.deleteMany({
     $or: [
-      { email: /^seed\.company\.\d+@jobzain\.test$/ },
-      { email: /^seed\.employee\.\d+@jobzain\.test$/ },
+      { email: /^seed\.company\.\d+@halajob\.test$/ },
+      { email: /^seed\.employee\.\d+@halajob\.test$/ },
     ],
   });
 
@@ -245,7 +245,7 @@ async function loadExistingJobData() {
 async function loadExistingCompanies({ limit = EXISTING_COMPANIES_LIMIT, min = 1 } = {}) {
   const companiesDocs = await CompanyModel.find({
     $and: [
-      { company_email: { $not: /^hr\.\d+@jobzain\.test$/ } },
+      { company_email: { $not: /^hr\.\d+@halajob\.test$/ } },
       { status: true },
       { accepted: true },
       { owner_user_id: { $exists: true, $ne: null } },
@@ -258,7 +258,7 @@ async function loadExistingCompanies({ limit = EXISTING_COMPANIES_LIMIT, min = 1
   const ownerIds = companiesDocs.map((company) => company.owner_user_id).filter(Boolean);
   const owners = await UserModel.find({
     _id: { $in: ownerIds },
-    email: { $not: /^seed\.company\.\d+@jobzain\.test$/ },
+    email: { $not: /^seed\.company\.\d+@halajob\.test$/ },
     status: true,
   }).lean();
 
@@ -292,7 +292,7 @@ async function loadExistingEmployees({ limit = EXISTING_EMPLOYEES_LIMIT, min = A
   const userIds = employeesDocs.map((employee) => employee.user_id).filter(Boolean);
   const users = await UserModel.find({
     _id: { $in: userIds },
-    email: { $not: /^seed\.employee\.\d+@jobzain\.test$/ },
+    email: { $not: /^seed\.employee\.\d+@halajob\.test$/ },
     status: true,
   }).lean();
 

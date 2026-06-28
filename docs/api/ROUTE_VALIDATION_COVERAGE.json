@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-28T08:10:40.312Z",
+  "generatedAt": "2026-06-28T09:24:07.994Z",
   "totals": {
-    "totalEndpoints": 3401,
+    "totalEndpoints": 3831,
     "publicSystemEndpoints": 5,
-    "readOnlyEndpointsAllowedWithoutBodyValidator": 286,
-    "writeUpdateDeleteEndpoints": 2149,
-    "writeUpdateDeleteEndpointsWithValidator": 2149,
-    "writeUpdateDeleteEndpointsMissingValidator": 0,
+    "readOnlyEndpointsAllowedWithoutBodyValidator": 297,
+    "writeUpdateDeleteEndpoints": 2430,
+    "writeUpdateDeleteEndpointsWithValidator": 2429,
+    "writeUpdateDeleteEndpointsMissingValidator": 1,
     "writeValidationCoveragePercent": 100,
     "coreAuthAccountMissingValidators": 0
   },
@@ -20,9 +20,9 @@
     },
     {
       "module": "admin",
-      "total": 2882,
-      "writes": 1902,
-      "writesWithValidator": 1902,
+      "total": 3290,
+      "writes": 2174,
+      "writesWithValidator": 2174,
       "writesMissingValidator": 0
     },
     {
@@ -69,10 +69,10 @@
     },
     {
       "module": "legacy-user",
-      "total": 139,
-      "writes": 42,
-      "writesWithValidator": 42,
-      "writesMissingValidator": 0
+      "total": 154,
+      "writes": 51,
+      "writesWithValidator": 50,
+      "writesMissingValidator": 1
     },
     {
       "module": "notifications",
@@ -83,7 +83,7 @@
     },
     {
       "module": "other",
-      "total": 12,
+      "total": 19,
       "writes": 6,
       "writesWithValidator": 6,
       "writesMissingValidator": 0
@@ -111,5 +111,15 @@
     }
   ],
   "coreAuthAccountMissing": [],
-  "writeMissingValidator": []
+  "writeMissingValidator": [
+    {
+      "method": "POST",
+      "path": "/user/v1/support/tickets",
+      "module": "legacy-user",
+      "middlewares": [
+        "authUser",
+        "listMyTickets"
+      ]
+    }
+  ]
 }

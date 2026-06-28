@@ -1,5 +1,5 @@
 {
-  "name": "HalaJob Local",
+  "name": "Hala Job Local",
   "values": [
     {
       "key": "baseUrl",
@@ -18,6 +18,6 @@
     }
   ],
   "_postman_variable_scope": "environment",
-  "_postman_exported_at": "2026-06-28T08:10:32.189Z",
+  "_postman_exported_at": "2026-06-28T08:56:26.358Z",
   "_postman_exported_using": "HalaJob generator"
 }
