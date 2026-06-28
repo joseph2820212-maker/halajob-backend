@@ -5,6 +5,8 @@ import app from "../app.js";
 
 const WRITE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 const VALIDATOR_NAMES = new Set(["validateRequest", "validate"]);
+const enforceAll = process.argv.includes("--enforce");
+const writeReport = process.argv.includes("--write-report") || !enforceAll;
 
 const CORE_AUTH_ACCOUNT_WRITES = new Set([
   "POST /user/v1/auth/register",
@@ -106,12 +108,6 @@ const coveragePercent = writeEndpoints.length
   ? Math.round((writeWithValidator.length / writeEndpoints.length) * 1000) / 10
   : 100;
 
-const docsDir = path.join(process.cwd(), "docs", "api");
-fs.mkdirSync(docsDir, { recursive: true });
-
-const jsonPath = path.join(docsDir, "ROUTE_VALIDATION_COVERAGE.json");
-const mdPath = path.join(docsDir, "ROUTE_VALIDATION_COVERAGE.md");
-
 const report = {
   generatedAt: new Date().toISOString(),
   totals: {
@@ -137,8 +133,6 @@ const report = {
     middlewares: record.middlewares,
   })),
 };
-
-fs.writeFileSync(jsonPath, `${JSON.stringify(report, null, 2)}\n`);
 
 const table = (headers, rows) => [
   `| ${headers.join(" | ")} |`,
@@ -187,9 +181,23 @@ ${table(["Module", "Total", "Writes", "Writes With Validator", "Writes Missing V
 ${missingRows.length ? table(["Method", "Path", "Module", "Middlewares"], missingRows) : "No missing write validators."}
 `;
 
-fs.writeFileSync(mdPath, markdown);
+if (writeReport) {
+  const docsDir = path.join(process.cwd(), "docs", "api");
+  fs.mkdirSync(docsDir, { recursive: true });
 
-console.log("Route validation coverage report generated.");
+  const jsonPath = path.join(docsDir, "ROUTE_VALIDATION_COVERAGE.json");
+  const mdPath = path.join(docsDir, "ROUTE_VALIDATION_COVERAGE.md");
+
+  fs.writeFileSync(jsonPath, `${JSON.stringify(report, null, 2)}\n`);
+  fs.writeFileSync(mdPath, markdown);
+
+  console.log("Route validation coverage report generated.");
+  console.log(`JSON: ${jsonPath}`);
+  console.log(`Markdown: ${mdPath}`);
+} else {
+  console.log("Route validation coverage report not written in enforce mode.");
+}
+
 console.log(`Total endpoints: ${report.totals.totalEndpoints}`);
 console.log(`Public/system endpoints: ${report.totals.publicSystemEndpoints}`);
 console.log(
@@ -200,10 +208,7 @@ console.log(`Write/update/delete endpoints with validator: ${report.totals.write
 console.log(`Write/update/delete endpoints missing validator: ${report.totals.writeUpdateDeleteEndpointsMissingValidator}`);
 console.log(`Write validation coverage: ${report.totals.writeValidationCoveragePercent}%`);
 console.log(`Core auth/account missing validators: ${report.totals.coreAuthAccountMissingValidators}`);
-console.log(`JSON: ${jsonPath}`);
-console.log(`Markdown: ${mdPath}`);
 
-const enforceAll = process.argv.includes("--enforce");
 if (coreAuthAccountMissing.length) {
   console.error("Core auth/account write routes are missing route-level validators:");
   for (const record of coreAuthAccountMissing) console.error(`- ${record.key}`);

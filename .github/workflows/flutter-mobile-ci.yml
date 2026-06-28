@@ -64,6 +64,21 @@ jobs:
       - name: Backend app import smoke check
         run: npm run smoke:import
 
+      - name: Backend route validation contract
+        run: npm run test:route-validation
+
+      - name: Backend response-code contract
+        run: npm run test:response-codes
+
+      - name: Backend model reference integrity
+        run: npm run test:model-integrity
+
+      - name: Backend mixed-field register
+        run: npm run test:mixed-fields
+
+      - name: Backend global launch contract
+        run: npm run test:global-launch-contract
+
       - name: Verify backend mobile route contract
         run: npm run test:mobile-routes
 
