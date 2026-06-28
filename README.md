@@ -37,6 +37,7 @@ Read these before handoff or new launch work:
 - `docs/DEPLOYMENT.md`
 - `docs/ENVIRONMENT.md`
 - `docs/PAYMENTS_AND_SUBSCRIPTIONS.md`
+- `docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md`
 - `docs/one-phase-launch-scope.md`
 - `docs/launch-hardening-status.md`
 

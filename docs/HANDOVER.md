@@ -52,6 +52,7 @@ Use these generated files as the current backend source of truth:
 | Security baseline report | `docs/security/SECURITY_AUDIT_REPORT.md` |
 | Deployment access audit | `docs/security/DEPLOYMENT_ACCESS_AUDIT.md` |
 | Payments/subscriptions launch decision | `docs/PAYMENTS_AND_SUBSCRIPTIONS.md` |
+| Final launch-readiness report | `docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md` |
 
 Regenerate source-of-truth artifacts after route, model, auth, or contract changes.
 
