@@ -136,7 +136,7 @@ requests into `flutter-seeker-campus`, and manual dispatch.
 
 Current CI includes backend syntax/import/secret/i18n checks, route validation,
 response-code contract, model integrity, Mixed-field register, global launch
-contract, mobile route contract, web build/tests, auth-context integration,
+contract, mobile route contract, web build/tests/e2e, auth-context integration,
 security HTTP contract, Flutter analyze/tests, Android release smoke build, and
 campus tester APK artifact creation.
 

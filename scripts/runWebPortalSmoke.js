@@ -12,8 +12,8 @@ const baseUrl = process.argv[2] || `http://${host}:${port}`;
 const previewCommand = process.platform === "win32" ? "cmd.exe" : "npm";
 const previewArgs =
   process.platform === "win32"
-    ? ["/d", "/s", "/c", "npm", "--prefix", "web", "run", "preview", "--", "--host", host, "--port", String(port)]
-    : ["--prefix", "web", "run", "preview", "--", "--host", host, "--port", String(port)];
+    ? ["/d", "/s", "/c", "npm", "--prefix", "web", "run", "preview", "--", "--port", String(port)]
+    : ["--prefix", "web", "run", "preview", "--", "--port", String(port)];
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

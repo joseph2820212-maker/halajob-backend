@@ -111,6 +111,9 @@ npm --prefix web run e2e
 npm run test:web-smoke
 ```
 
+CI also runs the web build, unit tests, and `npm --prefix web run e2e` on the
+Linux verification job.
+
 Regenerate source-of-truth docs after route/model/auth/contract changes:
 
 ```bash
