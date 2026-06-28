@@ -320,7 +320,7 @@ async function main() {
         },
       },
     }),
-    202,
+    200,
     "admin updates user through generic resources"
   );
   assertSafeUser(updatedUserPayload.data, "updated user response");
@@ -363,7 +363,7 @@ async function main() {
         another_device_code: "555555",
       },
     }),
-    202,
+    200,
     "admin bulk-updates users through generic resources"
   );
   const bulkUpdatedUsers = await UserModel.find({ _id: { $in: [bulkUserOne._id, bulkUserTwo._id] } }).lean();
@@ -388,7 +388,7 @@ async function main() {
     request(baseUrl, "POST", `/dash/v1/resources/users/${bulkUserOne._id}/approve`, {
       token: adminTokens.accessToken,
     }),
-    202,
+    200,
     "admin approves a user through generic resources"
   );
   const approvedUser = await UserModel.findById(bulkUserOne._id).lean();
@@ -406,7 +406,7 @@ async function main() {
     request(baseUrl, "POST", `/dash/v1/resources/users/${bulkUserTwo._id}/reject`, {
       token: adminTokens.accessToken,
     }),
-    202,
+    200,
     "admin rejects a user through generic resources"
   );
   const rejectedUser = await UserModel.findById(bulkUserTwo._id).lean();
@@ -424,7 +424,7 @@ async function main() {
     request(baseUrl, "DELETE", `/dash/v1/resources/users/${createdUserPayload.data._id}`, {
       token: adminTokens.accessToken,
     }),
-    203,
+    200,
     "admin disables user through generic resources"
   );
   const disabledUser = await UserModel.findById(createdUserPayload.data._id).lean();

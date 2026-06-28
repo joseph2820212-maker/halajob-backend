@@ -24,13 +24,13 @@ const createData = ({ res, data, other = {}, status = 201, message = 'created su
 const createError = ({ res, message = 'create failed', other = {}, status = 400 }) =>
   response({ res, httpStatus: status, status: false, message, other });
 
-const updateData = ({ res, data, other = {}, status = 202, message = 'updated successfully' }) =>
+const updateData = ({ res, data, other = {}, status = 200, message = 'updated successfully' }) =>
   response({ res, httpStatus: status, status: true, message, data, other });
 
 const updateError = ({ res, message = 'update failed', other = {}, status = 400 }) =>
   response({ res, httpStatus: status, status: false, message, other });
 
-const deleteData = ({ res, other = {}, status = 203, message = 'deleted successfully' }) =>
+const deleteData = ({ res, other = {}, status = 200, message = 'deleted successfully' }) =>
   response({ res, httpStatus: status, status: true, message, other });
 
 const deleteError = ({ res, message = 'delete failed', other = {}, status = 400 }) =>
