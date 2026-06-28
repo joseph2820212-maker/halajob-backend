@@ -4,7 +4,7 @@ Date: 2026-06-28
 Branch: `codex/gate-a-mobile-ui-lock` directly on `origin/flutter-seeker-campus`
 Latest Gate A source commit audited: recorded in `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk.json`
 Fresh APK handed off: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`
-APK version: `1.0.4+25`
+APK version: `1.0.5+26`
 APK SHA-256: recorded in `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk.sha256`
 Base URL: `https://jobzain.com`
 Campus auth mode: `local-device`
@@ -12,7 +12,7 @@ Signing mode: `debug-local`
 
 ## Status
 
-This audit records the current source, fresh APK metadata, and PC emulator screenshot evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. The current APK was rebuilt from the authenticated navy-shell, local campus tester-entry, handout campus-home, Section 3 chrome, logo clipping, and Android Studio keyboard-input fixes, freshly installed on `emulator-5554`, and captured from the artifact whose build commit is recorded in the APK metadata JSON.
+This audit records the current source, fresh APK metadata, and PC emulator screenshot evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. The current APK was rebuilt from the authenticated navy-shell, local campus tester-entry, handout campus-home, Section 3 chrome, logo clipping, Android Studio keyboard-input fixes, and the restored 5-digit verification-code flow. The build commit is recorded in the APK metadata JSON.
 
 Design source decision:
 
@@ -55,8 +55,8 @@ Fresh APK metadata:
 |---|---|
 | Branch | `codex/gate-a-mobile-ui-lock` |
 | Build commit | See `halajob-mobile-campus-tester-latest.apk.json` |
-| Version name | `1.0.4` |
-| Version code | `25` |
+| Version name | `1.0.5` |
+| Version code | `26` |
 | Base URL | `https://jobzain.com` |
 | Campus auth mode | `local-device` |
 | Signing mode | `debug-local` |
@@ -224,7 +224,7 @@ Required proof from the same fresh APK:
 
 Still pending for full Gate A acceptance:
 
-1. Owner installs the same `1.0.4+25` APK/ZIP on a real Android phone and accepts that the UI feels clean, consistent, and app-like.
+1. Owner installs the same `1.0.5+26` APK/ZIP on a real Android phone and accepts that the UI feels clean, consistent, and app-like.
 2. Language switch Arabic.
 3. Register screen.
 4. Forgot password panel.
@@ -251,7 +251,7 @@ Local PC Android tooling status on 2026-06-28:
 - Android SDK command-line tools, platform tools, build tools, platforms, NDK, CMake, system image, and emulator binary are available under `mobile\.android-sdk`.
 - `ANDROID_HOME` and `ANDROID_SDK_ROOT` were set to `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe\mobile\.android-sdk`.
 - AVD `HalaJob_Pixel_API35` is available and connected as `emulator-5554`.
-- The latest tester APK was freshly installed on the emulator; package `com.halajob.halajob_mobile` reports `versionName=1.0.4`, `versionCode=25`, and `lastUpdateTime=2026-06-28 15:42:37`.
+- The latest tester APK is expected to report package `com.halajob.halajob_mobile`, `versionName=1.0.5`, and `versionCode=26` after the final rebuild/install for this OTP fix.
 
 ## Tests And Guards
 
@@ -267,12 +267,13 @@ Last recorded result before this audit update:
 - Mobile screen inventory assertion passed.
 - `flutter analyze` passed with no issues.
 - `flutter test --reporter compact` passed with 414 tests.
+- `npm run check:i18n` passed after regenerating the 5-digit verification copy.
 - APK build passed; current SHA-256 is recorded in `halajob-mobile-campus-tester-latest.apk.sha256`.
 - Flutter analyze: no issues found.
 - Flutter tests: 414 tests passed.
 - APK build passed; current SHA-256 is recorded in `halajob-mobile-campus-tester-latest.apk.sha256`.
-- PC emulator install passed via `adb install -r`; launch, PC-keyboard seeker input, company input, campus tester entry, compact one-tap campus dashboard, and campus application detail screenshots were captured from the current `1.0.4+25` APK. Older `1.0.2+22` screenshots remain historical reference only and must not be used as final fresh-APK acceptance proof.
+- PC emulator install proof will be refreshed from `1.0.5+26` after the final rebuild. The `1.0.4+25` screenshots remain prior visual proof for the Section 3 shell, keyboard input, and campus tester entry, but must not be treated as the final fresh-APK acceptance proof for the 5-digit verification fix.
 
 ## Remaining UI Lock Blocker
 
-Gate 6 is not complete until the remaining authenticated seeker/company/university page-by-page visual proof is captured and the owner confirms the same `1.0.4+25` APK on a real Android phone. Auth, local campus tester entry, compact campus dashboard, Section 3 header/nav chrome, application detail header alignment, logo clipping, and seeker/company text input proof are current for the PC emulator, but the project must not be described as launch-ready from source checks or emulator screenshots alone.
+Gate 6 is not complete until the remaining authenticated seeker/company/university page-by-page visual proof is captured and the owner confirms the same `1.0.5+26` APK on a real Android phone. Auth, local campus tester entry, compact campus dashboard, Section 3 header/nav chrome, application detail header alignment, logo clipping, and seeker/company text input proof are current for the PC emulator, but the project must not be described as launch-ready from source checks or emulator screenshots alone.

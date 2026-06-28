@@ -11,7 +11,7 @@ const OTP_EXPIRE_MINUTES = 10;
 const RESEND_COOLDOWN_SECONDS = 60;
 
 function createPasscode() {
-  return crypto.randomInt(100000, 1000000);
+  return crypto.randomInt(10000, 100000);
 }
 
 function getRemainingSeconds(lastSentAt) {

@@ -184,7 +184,7 @@ const hashVerificationCode = ({ code, userId }) =>
     .update(`${code}:${userId}:${process.env.JWT_SECRET}`)
     .digest("hex");
 
-const createVerificationCode = () => String(crypto.randomInt(100000, 1000000));
+const createVerificationCode = () => String(crypto.randomInt(10000, 100000));
 
 const normalizeVerificationMethod = (value) => {
   const method = cleanText(value).toLowerCase();

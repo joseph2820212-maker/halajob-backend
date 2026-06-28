@@ -418,7 +418,7 @@ function normalizeCandidateStage(value) {
 }
 
 function createPasscode() {
-  return crypto.randomInt(100000, 1000000);
+  return crypto.randomInt(10000, 100000);
 }
 
 async function getEmployeeRole() {

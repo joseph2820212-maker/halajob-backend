@@ -145,7 +145,7 @@ Goal: remove critical security risks before feature work.
 
 **Deferred (with reason — defense-in-depth, lower risk now):**
 - [-] OTP **hashed at rest** — deferred: touches 5 controllers + needs migration of existing plaintext codes; codes are short-lived (10 min) and now attempt-limited, so residual risk is low. Schedule in a focused follow-up.
-- [-] OTP entropy 5→6 digits — deferred: low-risk but spans multiple issue points + email copy; batch with the hashing change.
+- [-] OTP entropy 5→6 digits — deferred and not active for Gate A; owner acceptance currently requires the existing 5-digit verification-code flow.
 - [ ] Secrets: `uploads/` tracked → Phase 4/18; `.env.example` completeness → Phase 17
 
 **\* Phase 1 status:** implementation complete & boot-verified. The acceptance tests (OTP-abuse, session-revocation) are **DB-backed and require Mongo**, which is proxy-blocked in this sandbox — they must go green in CI to fully certify Phase 1.

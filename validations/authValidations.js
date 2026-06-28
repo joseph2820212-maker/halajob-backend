@@ -130,7 +130,11 @@ const schemas = {
   passcodeVerifySchema: yup.object({
     body: yup.object({
       email: yup.string().trim().required('Email or phone is required'),
-      passcode: yup.string().trim().required('Passcode is required'),
+      passcode: yup
+        .string()
+        .trim()
+        .matches(/^\d{5}$/, 'Passcode must be 5 digits')
+        .required('Passcode is required'),
     }),
   }),
 

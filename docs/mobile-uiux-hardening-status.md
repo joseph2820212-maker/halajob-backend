@@ -7,8 +7,8 @@ Last verified:
 - `flutter analyze`: no issues found on 2026-06-28
 - `flutter test --reporter compact`: 414 tests passed on 2026-06-28
 - `powershell -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1`: passed on 2026-06-28
-- `powershell -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth`: built `1.0.4+25`; build commit and SHA are recorded in `outputs\halajob-mobile-campus-tester-latest.apk.json` and `.sha256`
-- `adb install -r C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`: installed the current tester APK on `emulator-5554`; sign-in, PC-keyboard seeker input, company input, campus tester entry, compact campus dashboard, and campus application detail screenshots captured on 2026-06-28
+- `powershell -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth`: builds `1.0.5+26`; build commit and SHA are recorded in `outputs\halajob-mobile-campus-tester-latest.apk.json` and `.sha256`
+- `adb install -r C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`: installs the current tester APK on `emulator-5554`; fresh 5-digit verification proof is required from `1.0.5+26`
 
 ## Completed for testing readiness
 
@@ -19,7 +19,8 @@ Last verified:
 - Current PC emulator proof shows the authenticated campus shell now uses the Section 3 navy handout header and bottom navigation, with `Welcome back`, `Your campus`, and `Events & resources` above the fold.
 - Current PC emulator proof shows the application-detail header has the back arrow and title aligned on one row, and the prior oversized brand-mark paint artifact is fixed.
 - Current PC emulator proof shows seeker and company login text fields accept Windows/emulator keyboard input after enabling `hw.keyboard=yes` on `HalaJob_Pixel_API35`.
-- Older `1.0.2+22` screenshots for Arabic auth, register, password recovery, campus resources/events/details, campus More, campus verification, and Campus Career Passport are retained as historical reference only; they must be recaptured from the current `1.0.4+25` APK before full Gate A closure.
+- The verification-code flow is restored to 5 digits in the mobile UI, mobile validators, backend auth generators, resend/recovery paths, campus local recovery, and visible EN/AR copy.
+- Older `1.0.2+22` screenshots for Arabic auth, register, password recovery, campus resources/events/details, campus More, campus verification, and Campus Career Passport are retained as historical reference only; they must be recaptured from the current `1.0.5+26` APK before full Gate A closure.
 - External web links prefer the device/browser outside the app instead of an in-app webview.
 - Major job seeker and campus flows open as native screens with back navigation:
   - job/opportunity detail
@@ -54,7 +55,7 @@ These items do not block code/test readiness, but should be reviewed on a real p
 
 - Do a physical-device click-through of every role using a fresh APK.
 - Confirm final colors, spacing, and card density against the owner-approved visual handout.
-- Recapture the remaining Gate A screenshots from the current `1.0.4+25` APK, especially seeker, company, and university/admin authenticated paths.
+- Recapture the remaining Gate A screenshots from the current `1.0.5+26` APK, especially seeker, company, and university/admin authenticated paths.
 - Confirm compact native editors and short dialogs still feel comfortable after phone review.
 - Expand Arabic localization beyond top-level labels and important controls.
 - Run live backend QA with real seeker, campus, company, and university/admin accounts.
