@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { LegalReportModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { dispatchTemplatedEmail } from "../../../services/email/templatedEmail.service.js";
 
 const VALID_REASONS = LegalReportModel.schema.path("reason").enumValues;
 const VALID_TARGETS = LegalReportModel.schema.path("targetType").enumValues;
@@ -29,6 +30,17 @@ const createReport = async (req, res, next) => {
       severity: HIGH_RISK.has(body.reason) ? "high" : "normal",
     });
     await writeAuditLog({ req, actorUserId: req.user?._id || null, actorType: req.user ? "employee" : "system", action: "legal_report_submitted", entityType: "other", entityId: report._id, note: `${targetType}:${body.reason}` });
+    // Acknowledgement email when we have a contact address (fire-and-forget).
+    if (report.reporterEmail) {
+      dispatchTemplatedEmail({
+        templateKey: "legal_report_received",
+        to: report.reporterEmail,
+        lang: req.get("lan") || "en",
+        userId: report.reporterUserId,
+        role: report.reporterRole,
+        variables: { reportNo: report.reportNo },
+      });
+    }
     return ReturnAppData.createData({ res, data: { reportNo: report.reportNo, status: report.status }, message: "legal_report_received" });
   } catch (error) {
     return next(error);

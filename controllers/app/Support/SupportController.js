@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { SupportTicketModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { dispatchTemplatedEmail } from "../../../services/email/templatedEmail.service.js";
 
 const VALID_CATEGORIES = SupportTicketModel.schema.path("category").enumValues;
 
@@ -37,6 +38,18 @@ const createTicket = async (req, res, next) => {
       messages: [{ senderType: "user", senderId: req.user._id, message }],
     });
     await writeAuditLog({ req, actorUserId: req.user._id, actorType: "employee", action: "support_ticket_created", entityType: "support_ticket", entityId: ticket._id, note: category });
+    // Acknowledgement email (fire-and-forget; never blocks the response). Company
+    // tickets have a dedicated catalogue template.
+    if (ticket.requesterRole === "company_user" && ticket.requesterEmail) {
+      dispatchTemplatedEmail({
+        templateKey: "company_support_ticket_created",
+        to: ticket.requesterEmail,
+        lang: req.get("lan") || "en",
+        userId: req.user._id,
+        role: ticket.requesterRole,
+        variables: { name: ticket.requesterName, ticketNo: ticket.ticketNo },
+      });
+    }
     return ReturnAppData.createData({ res, data: { ticketNo: ticket.ticketNo, _id: ticket._id, status: ticket.status }, message: "support_ticket_created" });
   } catch (error) {
     return next(error);

@@ -13,6 +13,7 @@
     "seed": "node seeders/index.js",
     "seed:content": "node seeders/index.js content",
     "check:content": "node scripts/verifyContentPackageContract.js",
+    "check:emails": "node scripts/verifyEmailTemplatesRender.js",
     "rebuild:search": "node scripts/rebuildSearchIntegration.js",
     "fix:notification-indexes": "node scripts/fixNotificationIndexes.js",
     "scheduled:run": "node scripts/runScheduledJob.js",

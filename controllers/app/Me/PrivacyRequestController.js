@@ -8,6 +8,7 @@ import {
 } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
+import { dispatchTemplatedEmail } from "../../../services/email/templatedEmail.service.js";
 
 const VALID_TYPES = PrivacyRequestModel.schema.path("type").enumValues;
 const makeNo = (p) => `${p}-${Date.now().toString(36).toUpperCase()}-${crypto.randomInt(1000, 9999)}`;
@@ -24,6 +25,15 @@ const createPrivacyRequest = async (req, res, next) => {
       details: typeof req.body?.details === "string" ? req.body.details.trim().slice(0, 2000) : "",
     });
     await writeAuditLog({ req, actorUserId: req.user._id, actorType: "employee", action: "privacy_request_created", entityType: "user", entityId: req.user._id, note: type });
+    if (reqDoc.email) {
+      dispatchTemplatedEmail({
+        templateKey: "privacy_request_received",
+        to: reqDoc.email,
+        lang: req.get("lan") || "en",
+        userId: req.user._id,
+        variables: { requestNo: reqDoc.requestNo },
+      });
+    }
     return ReturnAppData.createData({ res, data: { requestNo: reqDoc.requestNo, status: reqDoc.status }, message: "privacy_request_received" });
   } catch (error) {
     return next(error);
@@ -96,6 +106,15 @@ const createAccessibilityRequest = async (req, res, next) => {
       area: typeof req.body?.area === "string" ? req.body.area.trim() : "general",
       message,
     });
+    if (doc.email) {
+      dispatchTemplatedEmail({
+        templateKey: "accessibility_request_received",
+        to: doc.email,
+        lang: req.get("lan") || "en",
+        userId: req.user?._id || null,
+        variables: { requestNo: doc.requestNo },
+      });
+    }
     return ReturnAppData.createData({ res, data: { requestNo: doc.requestNo, status: doc.status }, message: "accessibility_request_received" });
   } catch (error) {
     return next(error);

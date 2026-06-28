@@ -28,7 +28,7 @@ const readDir = (sub) => {
 };
 
 // Replace {{ENV_EMAIL}} tokens with configured addresses (env-driven, no hardcoded fakes).
-const emailEnv = {
+export const emailEnv = {
   SUPPORT_EMAIL: process.env.HALA_SUPPORT_EMAIL || "support@halajob.com",
   PRIVACY_EMAIL: process.env.HALA_PRIVACY_EMAIL || "privacy@halajob.com",
   LEGAL_EMAIL: process.env.HALA_LEGAL_EMAIL || "legal@halajob.com",
@@ -65,7 +65,7 @@ const upsertAll = async (Model, items, label) => {
 // Build a complete EmailTemplate from a compact {key,category,subject,preheader,isMarketing}
 // entry: standard bilingual greeting/body/footer, support links, and an unsubscribe
 // line for marketing/job-alert templates.
-const buildEmailTemplate = (raw) => {
+export const buildEmailTemplate = (raw) => {
   const bodyBlocks = [
     { type: "greeting", text: { en: "Hello,", ar: "مرحباً،" } },
     { type: "paragraph", text: { en: raw.preheader?.en || "", ar: raw.preheader?.ar || "" } },

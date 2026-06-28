@@ -25,7 +25,7 @@ const DEFAULT_FROM = {
 
 let transporter = null;
 
-const htmlEscape = (value = '') => String(value ?? '')
+export const htmlEscape = (value = '') => String(value ?? '')
   .replace(/&/g, '&amp;')
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
@@ -150,7 +150,7 @@ export async function sendImportantActionEmail({ to, subject, title, message, ac
   });
 }
 
-export { DEFAULT_FROM as JOBZAIN_EMAILS };
+export { DEFAULT_FROM as JOBZAIN_EMAILS, DEFAULT_FROM, FROM_NAME, MAIL_DOMAIN };
 
 export default {
   sendJobzainEmail,
