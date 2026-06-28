@@ -146,16 +146,24 @@ the symbols/status codes risks breaking clients that switch on the exact codes.
 
 ---
 
-## Category 5 — Internal identifiers / fixtures / i18n keys / tooling (KEPT — not user-visible)
+## Category 5 — Internal identifiers / fixtures / i18n keys (MIGRATED)
+
+These were previously documented exceptions and have now been migrated (they are
+internal and not user-visible; verified safe before changing):
+
+| File | Was | Now | Safety |
+|---|---|---|---|
+| `web/src/shared/api.ts` | `model_id: "jobzain-web"` ×5 | `"halajob-web"` | Device-model label, not a hard identity key (matching keys on `device_id`); aligns with mobile's `halajob-mobile`. |
+| `seeders/seedJobsAndApplications.js` | `…@jobzain.test` ×8 | `…@halajob.test` | Dev seed fixtures; create + cleanup regex changed together (self-contained). |
+| `helper/en.json`, `helper/ar.json` | keys `jobzain`, `welcome_to_jobzain`, `jobzain_notifications`, `notifications_for_jobzain_app` | `app_brand_name`, `welcome_to_halajob`, `halajob_notifications`, `notifications_for_halajob_app` | Keys confirmed unused anywhere; values were already "Hala Job"; renamed identically in both locales. |
+
+## Category 6 — Brand-guard tooling / historical records (KEPT by design)
 
 | File | Occurrence | Why kept |
 |---|---|---|
-| `web/src/shared/api.ts` | `model_id: "jobzain-web"` ×5 | Internal request source identifier sent to backend; not user-visible; changing risks server-side matching. |
-| `seeders/seedJobsAndApplications.js` | `…@jobzain.test` ×8 | Dev/seed user email fixtures (create + cleanup regex, self-contained). Not user-visible. |
-| `helper/en.json`, `helper/ar.json` | keys `jobzain`, `welcome_to_jobzain`, `jobzain_notifications`, `notifications_for_jobzain_app` ×8 | i18n **keys** (internal); their **values are already "Hala Job"**, so users see Hala Job. |
-| `scripts/verifyContentPackageContract.js` | `BANNED = /jobzain|jobzien|…/i` | Brand-guard tooling — intentionally contains the banned word to detect it. |
+| `scripts/verifyContentPackageContract.js` | `BANNED = /jobzain|jobzien|…/i` | Brand-guard tooling — intentionally names the banned word to detect regressions. |
 | `scripts/verifyEmailTemplatesRender.js` | `if (/jobzain/i.test(html))` | Brand-guard tooling for rendered emails. |
-| `seeders/data/content/README.md`, `docs/content/CONTENT_SYSTEM.md`, `docs/content/COMPLETION_REPORT.md` | rules/notes mentioning `jobzain` | Documentation of the cleanup itself. |
+| `seeders/data/content/README.md`, `docs/content/*`, `BRAND_CLEANUP_AUDIT.md` | notes mentioning `jobzain` | Documentation of the cleanup itself. |
 | `docs/security/SECRETS_ROTATION_REPORT.md` | historical Firebase key filename | Security audit trail — must remain for traceability. |
 
 ---

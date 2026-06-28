@@ -42,7 +42,13 @@ env-driven tokens (`HALA_SUPPORT_EMAIL`, `HALA_PRIVACY_EMAIL`, …) — no hardc
 - Web: `npm run build` (web). Mobile: `flutter analyze`.
 
 ## Known technical exceptions (not user-visible)
-- Backend domain `jobzain.com` is the configured default base URL (env-overridable).
-- Internal identifiers `JobZainTalentRequest*` (model/class names) and the web package
-  name `jobzain-web` retain the legacy token; renaming is a separate refactor and does
-  not affect user-visible text, which uses **Hala Job** throughout.
+- Backend **API** domain `jobzain.com` is the configured default base URL (env-overridable).
+  This is the live backend host and the only remaining intended exception until the
+  Hala Job API domain is provisioned. See `BRAND_CLEANUP_AUDIT.md`.
+- Internal identifiers `JobZainTalentRequest*` (model/class names + the
+  `jobzain_talent_requests` collection) retain the legacy token; a clean rename
+  needs a database migration (script + rollback) in a maintenance window.
+
+The web package name (`halajob-web`), the web device `model_id` (`halajob-web`),
+dev seed emails (`@halajob.test`), and the previously legacy i18n keys have all
+been migrated to Hala Job names. User-visible text uses **Hala Job** throughout.
