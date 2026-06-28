@@ -1,16 +1,16 @@
 # Route Verification Report
 
-Generated: 2026-06-27T03:40:55.783Z
+Generated: 2026-06-28T08:06:04.176Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 2141 |
-| Unique method/path endpoints | 3384 |
-| Endpoints with detected auth/role guard | 3295 |
-| Known public/system endpoints | 89 |
+| Raw Express endpoint entries | 2154 |
+| Unique method/path endpoints | 3401 |
+| Endpoints with detected auth/role guard | 3310 |
+| Known public/system endpoints | 91 |
 | Unguarded endpoints needing manual classification | 0 |
 
 Full machine-readable inventory:
@@ -26,17 +26,17 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Admin | 2889 | 2884 | 5 | 0 |
 | AI | 12 | 12 | 0 | 0 |
 | Analytics | 5 | 5 | 0 | 0 |
-| Campus | 12 | 10 | 2 | 0 |
+| Campus | 18 | 16 | 2 | 0 |
 | Campus Student | 43 | 41 | 2 | 0 |
 | Company | 134 | 132 | 2 | 0 |
 | Files | 1 | 0 | 1 | 0 |
-| Health | 2 | 0 | 2 | 0 |
+| Health | 4 | 0 | 4 | 0 |
 | Jobs | 2 | 2 | 0 | 0 |
-| Legacy User | 155 | 81 | 74 | 0 |
+| Legacy User | 159 | 85 | 74 | 0 |
 | Notifications | 16 | 16 | 0 | 0 |
 | Seeker | 94 | 93 | 1 | 0 |
 | Trust | 4 | 4 | 0 | 0 |
-| University | 15 | 15 | 0 | 0 |
+| University | 20 | 20 | 0 | 0 |
 
 ## Guard Detection
 
@@ -58,12 +58,14 @@ Middleware names observed in the live app:
 ```text
 SendInterView
 activeContextGuard
+activeContextPermissionGuard
 addAdminMessage
 addApplicationMessage
 addApplicationNote
 addTicketMessage
 adminApproveVerification
 adminCohorts
+adminDownloadStudentVerificationDocument
 adminListVerifications
 adminRejectVerification
 adminRequestVerificationInfo
@@ -86,6 +88,7 @@ bulkApplicationCvs
 bulkExportApplications
 bulkUpdateJobs
 campusRegister
+cancelAccountDeletion
 cancelApplication
 cancelEventRegistration
 cancelJobInvitation
@@ -128,9 +131,11 @@ downloadCompanyFile
 downloadFile
 downloadMyCv
 downloadSavedCv
+downloadStudentVerificationDocument
 educationLevel
 events
 experienceLevel
+exportMyData
 forgotPassword
 generateSmartEmployeesForJob
 get
@@ -226,9 +231,11 @@ listTokens
 listTranslations
 listUniversities
 listUniversityCampuses
+listUniversityMembers
 logKeyword
 login
 logout
+logoutAll
 markAllRead
 markJobSafe
 markRead
@@ -269,6 +276,7 @@ replaceJobNames
 replaceJobTypes
 replaceMinSalary
 reportJob
+requestAccountDeletion
 requestDocuments
 requestJobZainTalentHelp
 requestPlanChange
@@ -338,6 +346,7 @@ updateTalentRequestStatus
 updateTemplate
 updateTicketStatus
 updateToken
+updateUniversityMember
 updateUniversityStatus
 updateWorkPreferences
 uploadExcel
@@ -351,6 +360,7 @@ userUniversityOverview
 userUniversityPartners
 userUniversityStudentCareerPassport
 userUniversityStudents
+validateRequest
 whatIsMyRole
 workMode
 workModes

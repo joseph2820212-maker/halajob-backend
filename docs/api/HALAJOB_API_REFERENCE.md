@@ -1,6 +1,6 @@
 # HalaJob API Reference
 
-Generated: 2026-06-27T03:40:53.593Z
+Generated: 2026-06-28T08:05:05.271Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -23,7 +23,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Module | Endpoints |
 | --- | --- |
 | AI | 12 |
-| Admin | 2886 |
+| Admin | 2889 |
 | Analytics | 5 |
 | Campus | 12 |
 | Campus Student | 43 |
@@ -31,8 +31,8 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Files | 1 |
 | Health | 1 |
 | Jobs | 2 |
-| Legacy User | 149 |
-| Notifications | 13 |
+| Legacy User | 155 |
+| Notifications | 16 |
 | Seeker | 94 |
 | Trust | 4 |
 | University | 15 |
@@ -1742,6 +1742,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/dash/v1/Notification/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, anonymous |
 | PATCH | `/dash/v1/Notification/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | POST | `/dash/v1/Notification/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
+| POST | `/dash/v1/notification/send` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, sendNotification |
 | PATCH | `/dash/v1/Notification/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | POST | `/dash/v1/Notification/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | PUT | `/dash/v1/Notification/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
@@ -1767,10 +1768,12 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/dash/v1/notifications/logs` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listNotificationLogs |
 | PATCH | `/dash/v1/notifications/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | POST | `/dash/v1/notifications/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
+| POST | `/dash/v1/notifications/send` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, sendNotification |
 | PATCH | `/dash/v1/notifications/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | POST | `/dash/v1/notifications/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | PUT | `/dash/v1/notifications/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, anonymous |
 | GET | `/dash/v1/operations/audit-logs` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listAuditLogs |
+| POST | `/dash/v1/operations/notifications/send` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, sendNotification |
 | GET | `/dash/v1/operations/support-tickets` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listTickets |
 | GET | `/dash/v1/operations/support-tickets/:ticketId` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, getTicketDetails |
 | POST | `/dash/v1/operations/support-tickets/:ticketId/messages` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, addAdminMessage |
@@ -3315,6 +3318,9 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | PATCH | `/user/v1/notification/:id/unread` | Bearer token | explicit | authUser, markUnread |
 | POST | `/user/v1/notification/:id/unread` | Bearer token | explicit | authUser, markUnread |
 | GET | `/user/v1/notification/get` | Bearer token | explicit | authUser, list |
+| GET | `/user/v1/notification/preferences` | Bearer token | explicit | authUser, getPreferences |
+| PATCH | `/user/v1/notification/preferences` | Bearer token | explicit | authUser, getPreferences |
+| PUT | `/user/v1/notification/preferences` | Bearer token | explicit | authUser, getPreferences |
 | PATCH | `/user/v1/notification/read-all` | Bearer token | explicit | authUser, markAllRead |
 | POST | `/user/v1/notification/read-all` | Bearer token | explicit | authUser, markAllRead |
 | GET | `/user/v1/notification/unread-count` | Bearer token | explicit | authUser, unreadCount |
@@ -3326,6 +3332,9 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | PATCH | `/user/v1/notifications/:id/unread` | Bearer token | explicit | authUser, markUnread |
 | POST | `/user/v1/notifications/:id/unread` | Bearer token | explicit | authUser, markUnread |
 | GET | `/user/v1/notifications/get` | Bearer token | explicit | authUser, list |
+| GET | `/user/v1/notifications/preferences` | Bearer token | explicit | authUser, getPreferences |
+| PATCH | `/user/v1/notifications/preferences` | Bearer token | explicit | authUser, getPreferences |
+| PUT | `/user/v1/notifications/preferences` | Bearer token | explicit | authUser, getPreferences |
 | PATCH | `/user/v1/notifications/read-all` | Bearer token | explicit | authUser, markAllRead |
 | POST | `/user/v1/notifications/read-all` | Bearer token | explicit | authUser, markAllRead |
 | GET | `/user/v1/notifications/unread-count` | Bearer token | explicit | authUser, unreadCount |
@@ -3344,6 +3353,9 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | DELETE | `/notifications/v1/device-token/:id` | Bearer token | inferred-parent-mount | inferred:authUser, deleteDeviceToken |
 | POST | `/notifications/v1/device-token/delete` | Bearer token | inferred-parent-mount | inferred:authUser, jsonParser, deleteDeviceToken |
 | GET | `/notifications/v1/list` | Bearer token | inferred-parent-mount | inferred:authUser, list |
+| GET | `/notifications/v1/preferences` | Bearer token | inferred-parent-mount | inferred:authUser, getPreferences |
+| PATCH | `/notifications/v1/preferences` | Bearer token | inferred-parent-mount | inferred:authUser, getPreferences |
+| PUT | `/notifications/v1/preferences` | Bearer token | inferred-parent-mount | inferred:authUser, getPreferences |
 | PATCH | `/notifications/v1/read` | Bearer token | inferred-parent-mount | inferred:authUser, markRead |
 | POST | `/notifications/v1/read` | Bearer token | inferred-parent-mount | inferred:authUser, markRead |
 | PATCH | `/notifications/v1/read-all` | Bearer token | inferred-parent-mount | inferred:authUser, markRead |

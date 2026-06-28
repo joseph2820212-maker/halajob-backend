@@ -1,6 +1,6 @@
 # Database Models
 
-Generated: 2026-06-28T07:47:38.154Z
+Generated: 2026-06-28T08:05:07.142Z
 Source: live Mongoose schemas loaded from `models/index.js`.
 
 This is a generated schema inventory. It documents collections, fields, required/default/enum/ref metadata, and declared indexes. Business meaning, migration history, and data-retention rules still need owner/developer review.
