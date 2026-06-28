@@ -1,17 +1,17 @@
 # Route Verification Report
 
-Generated: 2026-06-27T03:40:55.783Z
+Generated: 2026-06-28T07:32:42.194Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 2141 |
-| Unique method/path endpoints | 3384 |
-| Endpoints with detected auth/role guard | 3295 |
-| Known public/system endpoints | 89 |
-| Unguarded endpoints needing manual classification | 0 |
+| Raw Express endpoint entries | 2410 |
+| Unique method/path endpoints | 3831 |
+| Endpoints with detected auth/role guard | 3730 |
+| Known public/system endpoints | 92 |
+| Unguarded endpoints needing manual classification | 9 |
 
 Full machine-readable inventory:
 
@@ -23,20 +23,21 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 
 | Module | Total | Protected | Known public | Needs classification |
 | --- | --- | --- | --- | --- |
-| Admin | 2889 | 2884 | 5 | 0 |
+| Admin | 3297 | 3292 | 5 | 0 |
 | AI | 12 | 12 | 0 | 0 |
 | Analytics | 5 | 5 | 0 | 0 |
-| Campus | 12 | 10 | 2 | 0 |
+| Campus | 18 | 16 | 2 | 0 |
 | Campus Student | 43 | 41 | 2 | 0 |
 | Company | 134 | 132 | 2 | 0 |
 | Files | 1 | 0 | 1 | 0 |
-| Health | 2 | 0 | 2 | 0 |
+| Health | 4 | 0 | 2 | 2 |
 | Jobs | 2 | 2 | 0 | 0 |
-| Legacy User | 155 | 81 | 74 | 0 |
+| Legacy User | 174 | 97 | 77 | 0 |
 | Notifications | 16 | 16 | 0 | 0 |
+| Other | 7 | 0 | 0 | 7 |
 | Seeker | 94 | 93 | 1 | 0 |
 | Trust | 4 | 4 | 0 | 0 |
-| University | 15 | 15 | 0 | 0 |
+| University | 20 | 20 | 0 | 0 |
 
 ## Guard Detection
 
@@ -57,13 +58,17 @@ Middleware names observed in the live app:
 
 ```text
 SendInterView
+acknowledgePolicy
 activeContextGuard
+activeContextPermissionGuard
 addAdminMessage
 addApplicationMessage
 addApplicationNote
+addMessage
 addTicketMessage
 adminApproveVerification
 adminCohorts
+adminDownloadStudentVerificationDocument
 adminListVerifications
 adminRejectVerification
 adminRequestVerificationInfo
@@ -86,6 +91,7 @@ bulkApplicationCvs
 bulkExportApplications
 bulkUpdateJobs
 campusRegister
+cancelAccountDeletion
 cancelApplication
 cancelEventRegistration
 cancelJobInvitation
@@ -99,6 +105,7 @@ checkPermissionMiddleware
 checkResourcePermissionMiddleware
 cities
 cloneJob
+closeTicket
 companiesFromMyActivity
 companiesFromSavedJobs
 companiesIAppliedTo
@@ -111,10 +118,13 @@ content
 corsMiddleware
 countries
 create
+createAccessibilityRequest
 createCvTemplate
 createDashboardUser
 createInterview
 createMyCvDownloadUrl
+createPrivacyRequest
+createReport
 csv
 currencies
 dashboard
@@ -128,9 +138,11 @@ downloadCompanyFile
 downloadFile
 downloadMyCv
 downloadSavedCv
+downloadStudentVerificationDocument
 educationLevel
 events
 experienceLevel
+exportMyData
 forgotPassword
 generateSmartEmployeesForJob
 get
@@ -158,6 +170,7 @@ getEmployeeDashboard
 getEmployeeDetails
 getFileLinks
 getFilters
+getHelpArticle
 getHiringSummary
 getInterviewedJobs
 getJobApplicants
@@ -190,13 +203,16 @@ getMyJobs
 getMySection
 getMySubscription
 getMyUploadedCvs
+getPage
 getPreferences
 getProfileAnalytics
 getRecommendedEmployeesForJob
+getReport
 getRequest
 getSavedJob
 getSmartEmployeesForJob
 getTalentPool
+getTicket
 getTicketDetails
 getUserJobCounts
 globalSearch
@@ -209,14 +225,20 @@ list
 listAuditLogs
 listCompanyFiles
 listCompanyRequests
+listConsents
 listContexts
+listFaq
 listFeatures
+listHelpArticles
+listHelpCategories
 listJobReviewQueue
 listJobReviews
 listJobSavers
 listLimits
 listMembers
+listMyTickets
 listNotificationLogs
+listPages
 listQuestions
 listRequests
 listTalentRequests
@@ -226,9 +248,11 @@ listTokens
 listTranslations
 listUniversities
 listUniversityCampuses
+listUniversityMembers
 logKeyword
 login
 logout
+logoutAll
 markAllRead
 markJobSafe
 markRead
@@ -269,6 +293,7 @@ replaceJobNames
 replaceJobTypes
 replaceMinSalary
 reportJob
+requestAccountDeletion
 requestDocuments
 requestJobZainTalentHelp
 requestPlanChange
@@ -300,6 +325,7 @@ sendNotification
 services
 setActiveContext
 setActiveCv
+setConsent
 share
 shared
 skills
@@ -338,6 +364,7 @@ updateTalentRequestStatus
 updateTemplate
 updateTicketStatus
 updateToken
+updateUniversityMember
 updateUniversityStatus
 updateWorkPreferences
 uploadExcel
@@ -373,7 +400,17 @@ Note: parent-mount guards are inferred because `express-list-endpoints` does not
 
 These endpoints do not expose one of the known guard middleware names, do not match a known protected parent mount, and are not in the known-public allowlist. Some may be intentionally public or may be protected indirectly by controller code. Review them before launch.
 
-None found.
+| Method | Path | Module | Middlewares |
+| --- | --- | --- | --- |
+| GET | /health/live | Health | anonymous |
+| GET | /health/ready | Health | anonymous |
+| GET | /public/v1/content/pages | Other | listPages |
+| GET | /public/v1/content/pages/:key | Other | getPage |
+| GET | /public/v1/faq | Other | listFaq |
+| GET | /public/v1/help/articles | Other | listHelpArticles |
+| GET | /public/v1/help/articles/:key | Other | getHelpArticle |
+| GET | /public/v1/help/categories | Other | listHelpCategories |
+| GET | /public/v1/legal/:key | Other | getPage |
 
 
 
