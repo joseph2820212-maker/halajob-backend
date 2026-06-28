@@ -6,6 +6,7 @@ import {
   HelpCategoryModel,
   HelpArticleModel,
   FaqItemModel,
+  EmailTemplateModel,
 } from "../models/index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -61,17 +62,51 @@ const upsertAll = async (Model, items, label) => {
   return { created, updated, total: items.length };
 };
 
+// Build a complete EmailTemplate from a compact {key,category,subject,preheader,isMarketing}
+// entry: standard bilingual greeting/body/footer, support links, and an unsubscribe
+// line for marketing/job-alert templates.
+const buildEmailTemplate = (raw) => {
+  const bodyBlocks = [
+    { type: "greeting", text: { en: "Hello,", ar: "مرحباً،" } },
+    { type: "paragraph", text: { en: raw.preheader?.en || "", ar: raw.preheader?.ar || "" } },
+    {
+      type: "footer",
+      text: {
+        en: `This message was sent by Hala Job. Need help? Contact ${emailEnv.SUPPORT_EMAIL}. Privacy: ${emailEnv.PRIVACY_EMAIL}. Legal: ${emailEnv.LEGAL_EMAIL}.`,
+        ar: `أُرسلت هذه الرسالة من هلا جوب. تحتاج مساعدة؟ تواصل مع ${emailEnv.SUPPORT_EMAIL}. الخصوصية: ${emailEnv.PRIVACY_EMAIL}. القانونية: ${emailEnv.LEGAL_EMAIL}.`,
+      },
+    },
+  ];
+  if (raw.isMarketing) {
+    bodyBlocks.push({ type: "unsubscribe", text: { en: "To stop these emails, manage your notification preferences or unsubscribe.", ar: "لإيقاف هذه الرسائل، أدر تفضيلات الإشعارات أو ألغِ الاشتراك." } });
+  }
+  return {
+    key: raw.key,
+    category: raw.category || "account",
+    subject: raw.subject || {},
+    preheader: raw.preheader || {},
+    bodyBlocks,
+    isMarketing: Boolean(raw.isMarketing),
+    fromName: "Hala Job",
+    variables: ["name", "actionUrl", "code"],
+    status: "published",
+    version: "2026.06.28",
+  };
+};
+
 export const seedContent = async () => {
-  console.log("Seeding legal/help/faq content...");
+  console.log("Seeding legal/help/faq/email content...");
   const pages = readDir("pages");
   const categories = readJson("help/categories.json");
   const articles = readJson("help/articles.json");
   const faq = readJson("faq/faq.json");
+  const emails = readJson("email_templates/emails.json").map(buildEmailTemplate);
 
   await upsertAll(ContentPageModel, pages, "content_pages");
   await upsertAll(HelpCategoryModel, categories, "help_categories");
   await upsertAll(HelpArticleModel, articles, "help_articles");
   await upsertAll(FaqItemModel, faq, "faq_items");
+  await upsertAll(EmailTemplateModel, emails, "email_templates");
   console.log("Content seeding complete.");
 };
 

@@ -53,6 +53,33 @@ for (const p of ["/content/pages", "/content/pages/:key", "/legal/:key", "/help/
   if (pubPaths.has(p)) ok(`public ${p}`); else fail(`public route missing: ${p}`);
 }
 
+// 3b. Email templates: present, bilingual subject, unsubscribe on marketing, no placeholders
+const emails = JSON.parse(fs.readFileSync(path.join(contentDir, "email_templates/emails.json"), "utf-8"));
+if (emails.length >= 50) ok(`email templates (${emails.length})`); else fail(`too few email templates: ${emails.length}`);
+const requiredEmailCats = ["account", "seeker", "company", "campus", "privacy", "billing"];
+const emailCats = new Set(emails.map((e) => e.category));
+for (const c of requiredEmailCats) { if (emailCats.has(c)) ok(`email category ${c}`); else fail(`email category missing: ${c}`); }
+for (const e of emails) {
+  if (!e.subject?.en || !e.subject?.ar) fail(`email ${e.key} missing bilingual subject`);
+}
+
+// 3c. Placeholder / old-brand scan over all seed content
+const BANNED = /jobzain|jobzien|\bTODO\b|lorem ipsum|coming soon/i;
+let scanned = 0;
+const scanDir = (dir) => {
+  for (const f of fs.readdirSync(dir)) {
+    const full = path.join(dir, f);
+    if (fs.statSync(full).isDirectory()) { scanDir(full); continue; }
+    if (!f.endsWith(".json")) continue;
+    scanned += 1;
+    const text = fs.readFileSync(full, "utf-8");
+    const m = text.match(BANNED);
+    if (m) fail(`placeholder/old-brand in ${path.relative(root, full)}: "${m[0]}"`);
+  }
+};
+scanDir(contentDir);
+ok(`content placeholder/old-brand scan (${scanned} files clean)`);
+
 // 4. User submit routers load
 for (const r of ["routesUser/SupportRote.js", "routesUser/LegalReportRote.js", "routesUser/PrivacyRote.js"]) {
   const mod = (await import(path.join(root, r))).default;
