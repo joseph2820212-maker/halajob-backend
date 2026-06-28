@@ -1,7 +1,7 @@
 # Hala Job Launch Hardening Status
 
-Date: 2026-06-26
-Branch: `flutter-seeker-campus`
+Date: 2026-06-28
+Branch: `codex/gate-a-mobile-ui-lock`
 
 ## Current Hardening Progress
 
@@ -45,6 +45,13 @@ This file tracks concrete progress toward the launch-hardening goal. It does not
 | Backend route ownership documentation | Documented route ownership, compatibility alias policy, controller/service/model boundaries, and admin resource policy for the current modular-monolith structure. | `docs/architecture/BACKEND_MODULE_MAP.md` |
 | Web sanity | Confirmed production web build still passes. | `npm --prefix web run build` |
 | APK tester build | Rebuilt latest local tester APK from current branch with `https://jobzain.com` and remote-backend campus auth. | `mobile/dist/android/halajob-mobile-1.0.2+16-release-local.apk` |
+| Route validation coverage | All backend write/update/delete routes now have route-level validation coverage or are explicitly classified. Enforcement is wired into CI. | `scripts/verifyRouteValidationCoverage.js --enforce`, `npm run test:route-validation` |
+| API response-code contract | Legacy update/delete helper behavior is standardized so known update/delete paths return stable API status codes instead of helper-default surprises. | `scripts/verifyResponseCodeContract.js`, `npm run test:response-codes` |
+| Model reference integrity | Concrete model reference issues are covered, including the city semantic model alias used by company/employee city references. | `scripts/verifyModelReferenceIntegrity.js`, `npm run test:model-integrity` |
+| Mixed-field register | Remaining `Schema.Types.Mixed` fields are classified in a register and enforced by script so new unreviewed Mixed fields fail checks. | `docs/architecture/MIXED_FIELD_REGISTER.md`, `npm run test:mixed-fields` |
+| Web auth and smoke tests | Added Vitest coverage for scoped 401 logout behavior, safe path parameter encoding, i18n helpers, URL helpers, and route smoke renders for home/jobs/campus/company/seeker/admin. | `npm --prefix web run build`, `npm --prefix web test` |
+| Generated docs refresh | API reference, OpenAPI, Postman collection, database model inventory, and route verification report were regenerated after route/auth/doc changes. | `npm run docs:api-artifacts`, `npm run docs:database`, `npm run docs:route-report`, `npm run docs:api-pdf` |
+| Payments/subscriptions decision | Manual/admin subscription workflows are implemented and tested; online payment checkout/webhooks remain an owner-controlled provider decision. | `docs/PAYMENTS_AND_SUBSCRIPTIONS.md`, `npm run test:integration:subscriptions` |
 
 ## Verification Run
 
@@ -54,6 +61,10 @@ npm run check:imports
 npm run smoke:http
 npm run test:mobile-routes
 npm run test:security-http
+npm run test:response-codes
+npm run test:model-integrity
+npm run test:mixed-fields
+npm run test:route-validation
 npm run test:integration:student-verification-documents
 npm run test:integration:profile-uploads
 npm run test:audit-logging
@@ -84,7 +95,11 @@ npm run test:translation-routes
 npm run test:admin-operations-routes
 npm run test:career-passport
 npm run check:secrets
+npm run docs:api-artifacts
+npm run docs:database
+npm run docs:route-report
 npm --prefix web run build
+npm --prefix web test
 ```
 
 The list above is the running hardening verification set. During the stored-default context safety slice, the rerun checks were `npm run test:integration:auth-context`, `npm run check:syntax`, `npm run check:imports`, and `npm run check:secrets`; all passed.
@@ -118,4 +133,4 @@ These are working scores, not final launch certification scores.
 
 ## Current Position
 
-The branch is safer than the initial backend audit state, but it is not yet fully launch-hardened. The next best backend step is to extend the seeded integration harness from company/university/student object-level IDOR coverage, company file/download/export and employee saved-CV coverage, subscription/billing coverage, company/admin permission boundaries, job mutation side effects, ATS/hiring workflow coverage, campus workflow coverage, and admin resource redaction into remaining workflow side effects and the remaining protected private download routes.
+The branch is safer than the initial backend audit state, but it is not yet fully launch-certified. Manual/admin subscriptions are implemented and tested. Online payments are intentionally not claimed until the owner chooses a payment provider and supplies the merchant/webhook setup. The next best backend step is to extend the seeded integration harness from company/university/student object-level IDOR coverage, company file/download/export and employee saved-CV coverage, subscription/billing coverage, company/admin permission boundaries, job mutation side effects, ATS/hiring workflow coverage, campus workflow coverage, and admin resource redaction into remaining workflow side effects, remaining protected private download routes, and any future online-payment provider callbacks.

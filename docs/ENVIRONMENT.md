@@ -71,6 +71,16 @@ Scope: backend runtime and handover reference. Values in this file are descripti
 | `HALA_AI_INPUT_COST_PER_1M_TOKENS` | Optional | Cost tracking. |
 | `HALA_AI_OUTPUT_COST_PER_1M_TOKENS` | Optional | Cost tracking. |
 
+## Payments
+
+The current launch branch uses manual/admin-managed subscriptions. There are no
+payment-provider variables required unless the owner chooses online checkout
+before launch.
+
+When a provider is selected, add provider-specific public/private API keys,
+webhook signing secret, checkout URLs, and environment/sandbox selectors here
+before implementation. Do not store real payment secrets in Git.
+
 ## Scheduled Jobs
 
 | Variable | Required | Purpose |
