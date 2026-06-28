@@ -2,10 +2,10 @@
 
 Date: 2026-06-28
 Branch: `codex/gate-a-mobile-ui-lock` directly on `origin/flutter-seeker-campus`
-Latest base commit audited: `ab0c6086fe78e48f48872e61dc1a2486b442d0f4`
+Latest Gate A source commit audited: see `halajob-mobile-campus-tester-latest.apk.json`
 Fresh APK handed off: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`
 APK version: `1.0.2+19`
-APK SHA-256: `a16f53bb4d40969ff9a07d04c8d4320e4fdbd82be2eac3f529834ccd195ee1f9`
+APK SHA-256: see `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk.sha256`
 Base URL: `https://jobzain.com`
 Campus auth mode: `local-device`
 Signing mode: `debug-local`
@@ -54,13 +54,13 @@ Fresh APK metadata:
 | Field | Value |
 |---|---|
 | Branch | `codex/gate-a-mobile-ui-lock` |
-| Base commit recorded by build metadata | `ab0c6086fe78e48f48872e61dc1a2486b442d0f4` |
+| Build commit | See `halajob-mobile-campus-tester-latest.apk.json` |
 | Version name | `1.0.2` |
 | Version code | `19` |
 | Base URL | `https://jobzain.com` |
 | Campus auth mode | `local-device` |
 | Signing mode | `debug-local` |
-| APK SHA-256 | `a16f53bb4d40969ff9a07d04c8d4320e4fdbd82be2eac3f529834ccd195ee1f9` |
+| APK SHA-256 | See `halajob-mobile-campus-tester-latest.apk.sha256` |
 
 ### Gate 2: Visual System Source Lock
 
@@ -220,7 +220,7 @@ Last recorded result before this audit update:
 - Mobile screen inventory assertion passed.
 - Flutter analyze: no issues found.
 - Flutter tests: 413 tests passed.
-- APK build passed and produced SHA-256 `a16f53bb4d40969ff9a07d04c8d4320e4fdbd82be2eac3f529834ccd195ee1f9`.
+- APK build passed; current SHA-256 is recorded in `halajob-mobile-campus-tester-latest.apk.sha256`.
 
 ## Remaining UI Lock Blocker
 
