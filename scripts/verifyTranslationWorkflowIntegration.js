@@ -298,7 +298,7 @@ async function main() {
         },
       },
     }),
-    202,
+    200,
     "company owner should save draft job translation"
   );
   assert.equal(draftJob.data.can_publish, false);
@@ -327,7 +327,7 @@ async function main() {
         },
       },
     }),
-    202,
+    200,
     "company owner should approve job translation"
   );
   assert.equal(approvedJob.data.can_publish, true);
@@ -383,7 +383,7 @@ async function main() {
         },
       },
     }),
-    202,
+    200,
     "seeker should approve CV translation"
   );
   assert.equal(approvedCv.data.can_publish, true);

@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-06-28T07:09:32.590Z",
+  "generatedAt": "2026-06-28T07:16:20.467Z",
   "totals": {
     "totalEndpoints": 3401,
     "publicSystemEndpoints": 5,
-    "readOnlyEndpointsAllowedWithoutBodyValidator": 319,
+    "readOnlyEndpointsAllowedWithoutBodyValidator": 316,
     "writeUpdateDeleteEndpoints": 2149,
-    "writeUpdateDeleteEndpointsWithValidator": 1919,
-    "writeUpdateDeleteEndpointsMissingValidator": 230,
-    "writeValidationCoveragePercent": 89.3,
+    "writeUpdateDeleteEndpointsWithValidator": 1956,
+    "writeUpdateDeleteEndpointsMissingValidator": 193,
+    "writeValidationCoveragePercent": 91,
     "coreAuthAccountMissingValidators": 0
   },
   "modules": [
@@ -29,15 +29,15 @@
       "module": "ai",
       "total": 12,
       "writes": 12,
-      "writesWithValidator": 0,
-      "writesMissingValidator": 12
+      "writesWithValidator": 12,
+      "writesMissingValidator": 0
     },
     {
       "module": "analytics",
       "total": 5,
       "writes": 2,
-      "writesWithValidator": 0,
-      "writesMissingValidator": 2
+      "writesWithValidator": 2,
+      "writesMissingValidator": 0
     },
     {
       "module": "auth",
@@ -64,8 +64,8 @@
       "module": "jobs",
       "total": 2,
       "writes": 1,
-      "writesWithValidator": 0,
-      "writesMissingValidator": 1
+      "writesWithValidator": 1,
+      "writesMissingValidator": 0
     },
     {
       "module": "legacy-user",
@@ -78,15 +78,15 @@
       "module": "notifications",
       "total": 16,
       "writes": 12,
-      "writesWithValidator": 0,
-      "writesMissingValidator": 12
+      "writesWithValidator": 12,
+      "writesMissingValidator": 0
     },
     {
       "module": "other",
       "total": 12,
       "writes": 6,
-      "writesWithValidator": 0,
-      "writesMissingValidator": 6
+      "writesWithValidator": 6,
+      "writesMissingValidator": 0
     },
     {
       "module": "seeker",
@@ -99,8 +99,8 @@
       "module": "trust",
       "total": 4,
       "writes": 4,
-      "writesWithValidator": 0,
-      "writesMissingValidator": 4
+      "writesWithValidator": 4,
+      "writesMissingValidator": 0
     },
     {
       "module": "university",
@@ -112,131 +112,6 @@
   ],
   "coreAuthAccountMissing": [],
   "writeMissingValidator": [
-    {
-      "method": "POST",
-      "path": "/ai/v1/career-passport/score",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous",
-        "refreshScore"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/career/copilot",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/company/jobs/:jobId/shortlist",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/company/jobs/generate",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/company/messages/generate",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/cv/rewrite",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/interview/practice",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/jobs/:jobId/cover-letter",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/jobs/:jobId/match",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/profile/score",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/translate/cv",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/ai/v1/translate/job/:jobId",
-      "module": "ai",
-      "middlewares": [
-        "authUser",
-        "anonymous"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/analytics/v1/events",
-      "module": "analytics",
-      "middlewares": [
-        "track"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/analytics/v1/track",
-      "module": "analytics",
-      "middlewares": [
-        "track"
-      ]
-    },
     {
       "method": "POST",
       "path": "/campus/v1/admin/members",
@@ -1236,17 +1111,6 @@
       ]
     },
     {
-      "method": "PUT",
-      "path": "/jobs/v1/:jobId/translations/:lang",
-      "module": "jobs",
-      "middlewares": [
-        "authUser",
-        "anonymous",
-        "multerMiddleware",
-        "saveJobTranslation"
-      ]
-    },
-    {
       "method": "POST",
       "path": "/user/v1/applying-job/insert/:id",
       "module": "legacy-user",
@@ -1643,159 +1507,6 @@
       "middlewares": [
         "authUser",
         "markAllRead"
-      ]
-    },
-    {
-      "method": "PATCH",
-      "path": "/notifications/v1/:id/read",
-      "module": "notifications",
-      "middlewares": [
-        "markRead"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/notifications/v1/:id/read",
-      "module": "notifications",
-      "middlewares": [
-        "markRead"
-      ]
-    },
-    {
-      "method": "DELETE",
-      "path": "/notifications/v1/device-token",
-      "module": "notifications",
-      "middlewares": [
-        "jsonParser",
-        "registerToken"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/notifications/v1/device-token",
-      "module": "notifications",
-      "middlewares": [
-        "jsonParser",
-        "registerToken"
-      ]
-    },
-    {
-      "method": "DELETE",
-      "path": "/notifications/v1/device-token/:id",
-      "module": "notifications",
-      "middlewares": [
-        "deleteDeviceToken"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/notifications/v1/device-token/delete",
-      "module": "notifications",
-      "middlewares": [
-        "jsonParser",
-        "deleteDeviceToken"
-      ]
-    },
-    {
-      "method": "PATCH",
-      "path": "/notifications/v1/preferences",
-      "module": "notifications",
-      "middlewares": [
-        "getPreferences"
-      ]
-    },
-    {
-      "method": "PUT",
-      "path": "/notifications/v1/preferences",
-      "module": "notifications",
-      "middlewares": [
-        "getPreferences"
-      ]
-    },
-    {
-      "method": "PATCH",
-      "path": "/notifications/v1/read",
-      "module": "notifications",
-      "middlewares": [
-        "markRead"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/notifications/v1/read",
-      "module": "notifications",
-      "middlewares": [
-        "markRead"
-      ]
-    },
-    {
-      "method": "PATCH",
-      "path": "/notifications/v1/read-all",
-      "module": "notifications",
-      "middlewares": [
-        "markRead"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/notifications/v1/read-all",
-      "module": "notifications",
-      "middlewares": [
-        "markRead"
-      ]
-    },
-    {
-      "method": "PATCH",
-      "path": "/admin/v1/trust/jobs/:jobId/mark-safe",
-      "module": "other",
-      "middlewares": [
-        "multerMiddleware",
-        "markJobSafe"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/admin/v1/trust/jobs/:jobId/mark-safe",
-      "module": "other",
-      "middlewares": [
-        "multerMiddleware",
-        "markJobSafe"
-      ]
-    },
-    {
-      "method": "PATCH",
-      "path": "/admin/v1/trust/jobs/:jobId/request-documents",
-      "module": "other",
-      "middlewares": [
-        "multerMiddleware",
-        "requestDocuments"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/admin/v1/trust/jobs/:jobId/request-documents",
-      "module": "other",
-      "middlewares": [
-        "multerMiddleware",
-        "requestDocuments"
-      ]
-    },
-    {
-      "method": "PATCH",
-      "path": "/admin/v1/trust/jobs/:jobId/suspend",
-      "module": "other",
-      "middlewares": [
-        "multerMiddleware",
-        "suspendJob"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/admin/v1/trust/jobs/:jobId/suspend",
-      "module": "other",
-      "middlewares": [
-        "multerMiddleware",
-        "suspendJob"
       ]
     },
     {
@@ -2217,50 +1928,6 @@
         "anonymous",
         "multerMiddleware",
         "saveJob"
-      ]
-    },
-    {
-      "method": "PATCH",
-      "path": "/trust/v1/jobs/:jobId/documents",
-      "module": "trust",
-      "middlewares": [
-        "authUser",
-        "anonymous",
-        "multerMiddleware",
-        "submitJobDocuments"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/trust/v1/jobs/:jobId/documents",
-      "module": "trust",
-      "middlewares": [
-        "authUser",
-        "anonymous",
-        "multerMiddleware",
-        "submitJobDocuments"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/trust/v1/jobs/:jobId/report",
-      "module": "trust",
-      "middlewares": [
-        "authUser",
-        "anonymous",
-        "multerMiddleware",
-        "reportJob"
-      ]
-    },
-    {
-      "method": "POST",
-      "path": "/trust/v1/jobs/:jobId/score",
-      "module": "trust",
-      "middlewares": [
-        "authUser",
-        "anonymous",
-        "multerMiddleware",
-        "scoreJob"
       ]
     },
     {

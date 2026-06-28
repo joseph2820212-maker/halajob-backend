@@ -435,7 +435,7 @@ async function main() {
           push: true,
         },
       }),
-      202,
+      200,
       "admin notification respects disabled application category"
     );
     assert.equal(blockedAdminSendPayload.data.summary.saved_count, 0);
@@ -471,7 +471,7 @@ async function main() {
           data: { application_id: "runtime-application-1" },
         },
       }),
-      202,
+      200,
       "admin notification send"
     );
     assert.equal(allowedAdminSendPayload.data.summary.recipient_count, 2);

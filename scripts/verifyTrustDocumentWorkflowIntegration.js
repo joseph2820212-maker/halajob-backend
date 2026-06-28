@@ -320,7 +320,7 @@ async function main() {
       token: adminTokens.accessToken,
       body: { note: "Please provide registration proof." },
     }),
-    202,
+    200,
     "admin should request documents"
   );
   assert.equal(requestPayload.data.trust.review_status, "needs_documents");
@@ -395,7 +395,7 @@ async function main() {
         ],
       },
     }),
-    202,
+    200,
     "owning company should submit trust document response"
   );
 

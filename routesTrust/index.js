@@ -3,6 +3,8 @@ import { authUser } from "../middlewares/userAuth.js";
 import { requireAppAccount } from "../middlewares/appAccountGuard.js";
 import TrustController from "../controllers/trust/TrustController.js";
 import multer from "../utils/multer.js";
+import validate from "../middlewares/validate.js";
+import platformSchemas from "../validations/platform.validation.js";
 
 const router = express.Router();
 const upload = multer;
@@ -12,6 +14,7 @@ router.post(
   authUser,
   requireAppAccount("employee"),
   upload.none(),
+  validate(platformSchemas.trustJobScoreSchema),
   TrustController.scoreJob
 );
 
@@ -20,6 +23,7 @@ router.post(
   authUser,
   requireAppAccount("employee"),
   upload.none(),
+  validate(platformSchemas.trustJobReportSchema),
   TrustController.reportJob
 );
 
@@ -28,6 +32,7 @@ router.post(
   authUser,
   requireAppAccount("company"),
   upload.none(),
+  validate(platformSchemas.trustJobDocumentsSchema),
   TrustController.submitJobDocuments
 );
 
@@ -36,6 +41,7 @@ router.patch(
   authUser,
   requireAppAccount("company"),
   upload.none(),
+  validate(platformSchemas.trustJobDocumentsSchema),
   TrustController.submitJobDocuments
 );
 

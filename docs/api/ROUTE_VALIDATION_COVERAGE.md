@@ -1,6 +1,6 @@
 # Route Validation Coverage
 
-Generated: 2026-06-28T07:09:32.590Z
+Generated: 2026-06-28T07:16:20.467Z
 
 ## Summary
 
@@ -8,11 +8,11 @@ Generated: 2026-06-28T07:09:32.590Z
 |---|---:|
 | Total endpoints | 3401 |
 | Public/system endpoints | 5 |
-| Read-only endpoints allowed without body validator | 319 |
+| Read-only endpoints allowed without body validator | 316 |
 | Write/update/delete endpoints | 2149 |
-| Write/update/delete endpoints with validator | 1919 |
-| Write/update/delete endpoints missing validator | 230 |
-| Write validation coverage | 89.3% |
+| Write/update/delete endpoints with validator | 1956 |
+| Write/update/delete endpoints missing validator | 193 |
+| Write validation coverage | 91% |
 | Core auth/account missing validators | 0 |
 
 ## Module Summary
@@ -21,37 +21,23 @@ Generated: 2026-06-28T07:09:32.590Z
 | --- | --- | --- | --- | --- |
 | account | 6 | 3 | 3 | 0 |
 | admin | 2882 | 1902 | 1902 | 0 |
-| ai | 12 | 12 | 0 | 12 |
-| analytics | 5 | 2 | 0 | 2 |
+| ai | 12 | 12 | 12 | 0 |
+| analytics | 5 | 2 | 2 | 0 |
 | auth | 14 | 14 | 14 | 0 |
 | campus | 61 | 34 | 0 | 34 |
 | company | 134 | 65 | 0 | 65 |
-| jobs | 2 | 1 | 0 | 1 |
+| jobs | 2 | 1 | 1 | 0 |
 | legacy-user | 139 | 42 | 0 | 42 |
-| notifications | 16 | 12 | 0 | 12 |
-| other | 12 | 6 | 0 | 6 |
+| notifications | 16 | 12 | 12 | 0 |
+| other | 12 | 6 | 6 | 0 |
 | seeker | 94 | 45 | 0 | 45 |
-| trust | 4 | 4 | 0 | 4 |
+| trust | 4 | 4 | 4 | 0 |
 | university | 20 | 7 | 0 | 7 |
 
 ## Missing Write Validators
 
 | Method | Path | Module | Middlewares |
 | --- | --- | --- | --- |
-| POST | /ai/v1/career-passport/score | ai | authUser, anonymous, refreshScore |
-| POST | /ai/v1/career/copilot | ai | authUser, anonymous |
-| POST | /ai/v1/company/jobs/:jobId/shortlist | ai | authUser, anonymous |
-| POST | /ai/v1/company/jobs/generate | ai | authUser, anonymous |
-| POST | /ai/v1/company/messages/generate | ai | authUser, anonymous |
-| POST | /ai/v1/cv/rewrite | ai | authUser, anonymous |
-| POST | /ai/v1/interview/practice | ai | authUser, anonymous |
-| POST | /ai/v1/jobs/:jobId/cover-letter | ai | authUser, anonymous |
-| POST | /ai/v1/jobs/:jobId/match | ai | authUser, anonymous |
-| POST | /ai/v1/profile/score | ai | authUser, anonymous |
-| POST | /ai/v1/translate/cv | ai | authUser, anonymous |
-| POST | /ai/v1/translate/job/:jobId | ai | authUser, anonymous |
-| POST | /analytics/v1/events | analytics | track |
-| POST | /analytics/v1/track | analytics | track |
 | POST | /campus/v1/admin/members | campus | authUser, activeContextGuard, activeContextPermissionGuard, listUniversityMembers |
 | DELETE | /campus/v1/admin/members/:memberId | campus | authUser, activeContextGuard, activeContextPermissionGuard, multerMiddleware, updateUniversityMember |
 | PATCH | /campus/v1/admin/members/:memberId | campus | authUser, activeContextGuard, activeContextPermissionGuard, multerMiddleware, updateUniversityMember |
@@ -151,7 +137,6 @@ Generated: 2026-06-28T07:09:32.590Z
 | POST | /company/v1/jobs/talent/:jobId/smart-employees/generate | company | anonymous, multerMiddleware, generateSmartEmployeesForJob |
 | POST | /company/v1/jobs/talent/help-requests | company | anonymous, multerMiddleware, requestJobZainTalentHelp |
 | PATCH | /company/v1/jobs/talent/help-requests/:requestId/cancel | company | anonymous, multerMiddleware, cancelJobZainTalentRequest |
-| PUT | /jobs/v1/:jobId/translations/:lang | jobs | authUser, anonymous, multerMiddleware, saveJobTranslation |
 | POST | /user/v1/applying-job/insert/:id | legacy-user | authUser, anonymous, applyJob |
 | PUT | /user/v1/career-passport | legacy-user | authUser, anonymous, get |
 | POST | /user/v1/career-passport/share | legacy-user | authUser, anonymous, jsonParser, share |
@@ -188,3 +173,18 @@ Generated: 2026-06-28T07:09:32.590Z
 | POST | /user/v1/notifications/:id/delete | legacy-user | authUser, remove |
 | PATCH | /user/v1/notifications/:id/read | legacy-user | authUser, markRead |
 | POST | /user/v1/notifications/:id/read | legacy-user | authUser, markRead |
+| PATCH | /user/v1/notifications/:id/unread | legacy-user | authUser, markUnread |
+| POST | /user/v1/notifications/:id/unread | legacy-user | authUser, markUnread |
+| PATCH | /user/v1/notifications/preferences | legacy-user | authUser, getPreferences |
+| PUT | /user/v1/notifications/preferences | legacy-user | authUser, getPreferences |
+| PATCH | /user/v1/notifications/read-all | legacy-user | authUser, markAllRead |
+| POST | /user/v1/notifications/read-all | legacy-user | authUser, markAllRead |
+| PATCH | /employee/v1/applications/:applicationId/cancel | seeker | authUser, anonymous, multerMiddleware, cancelMyApplication |
+| POST | /employee/v1/applications/:applicationId/cancel | seeker | authUser, anonymous, multerMiddleware, cancelMyApplication |
+| POST | /employee/v1/applications/:applicationId/messages | seeker | authUser, anonymous, multerMiddleware, addApplicationMessage |
+| PATCH | /employee/v1/applications/interviews/:interviewId/respond | seeker | authUser, anonymous, multerMiddleware, respondToInterview |
+| POST | /employee/v1/applications/interviews/:interviewId/respond | seeker | authUser, anonymous, multerMiddleware, respondToInterview |
+| PATCH | /employee/v1/applications/offers/:invitationId/respond | seeker | authUser, anonymous, multerMiddleware, respondToJobInvitation |
+| POST | /employee/v1/applications/offers/:invitationId/respond | seeker | authUser, anonymous, multerMiddleware, respondToJobInvitation |
+| POST | /employee/v1/auth/login | seeker | multerMiddleware, login |
+| POST | /employee/v1/companies/:companyId/review | seeker | authUser, anonymous, multerMiddleware, reviewCompany |

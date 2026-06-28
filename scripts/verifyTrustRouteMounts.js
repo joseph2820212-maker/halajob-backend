@@ -6,7 +6,8 @@ import app from "../app.js";
 const endpoints = listEndpoints(app);
 const endpointByPath = new Map(endpoints.map((endpoint) => [endpoint.path, endpoint]));
 
-const readSource = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const readSource = (path) =>
+  fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8").replace(/\r\n/g, "\n");
 const appSource = readSource("app.js");
 const trustSource = readSource("routesTrust/index.js");
 const trustAdminSource = readSource("routesTrust/admin.js");
