@@ -11,6 +11,8 @@
     "start": "node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "seed": "node seeders/index.js",
+    "seed:content": "node seeders/index.js content",
+    "check:content": "node scripts/verifyContentPackageContract.js",
     "rebuild:search": "node scripts/rebuildSearchIntegration.js",
     "fix:notification-indexes": "node scripts/fixNotificationIndexes.js",
     "scheduled:run": "node scripts/runScheduledJob.js",

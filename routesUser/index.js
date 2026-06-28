@@ -22,10 +22,16 @@ import CareerPassportRote from './CareerPassportRote.js';
 import GlobalRote from './GlobalRote.js';
 import CvTranslationRote from './CvTranslationRote.js';
 import AccountRote from './AccountRote.js';
+import SupportRote from './SupportRote.js';
+import LegalReportRote from './LegalReportRote.js';
+import PrivacyRote from './PrivacyRote.js';
 
 const router = express.Router();
 router.use('/me', MeRote);
 router.use('/account', AccountRote);
+router.use('/support', SupportRote);
+router.use('/legal-reports', LegalReportRote);
+router.use('/privacy', PrivacyRote);
 router.use('/career-passport', CareerPassportRote);
 router.use('/cv', CvTranslationRote);
 router.use('/global', GlobalRote);

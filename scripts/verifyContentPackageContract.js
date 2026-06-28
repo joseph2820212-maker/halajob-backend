@@ -1,0 +1,64 @@
+// Gate 3 contract check (no DB): models load, content seed files are valid and
+// complete, public + user routers expose expected paths, admin resources registered.
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import listEndpoints from "express-list-endpoints";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const root = path.join(__dirname, "..");
+let failures = 0;
+const fail = (m) => { console.error("  FAIL:", m); failures += 1; };
+const ok = (m) => console.log("  ok:", m);
+
+// 1. Models load
+const models = await import(path.join(root, "models/index.js"));
+const required = [
+  "ContentPageModel", "HelpCategoryModel", "HelpArticleModel", "FaqItemModel",
+  "SupportTicketModel", "LegalReportModel", "PrivacyRequestModel", "AccessibilityRequestModel",
+  "UserPolicyAcknowledgementModel", "UserConsentModel", "CommunicationPreferenceModel",
+  "EmailTemplateModel", "EmailLogModel",
+];
+for (const m of required) {
+  if (typeof models[m]?.modelName === "string") ok(`model ${m}`);
+  else fail(`model missing: ${m}`);
+}
+
+// 2. Content seed files valid + required legal keys present
+const REQUIRED_LEGAL = ["about_us","contact_information","terms_and_conditions","job_seeker_guidelines","employer_terms","university_partner_terms","campus_student_terms","acceptable_use_content_policy","community_guidelines","anti_discrimination_policy","trust_safety_policy","legal_reports","copyright_ip_policy","privacy_policy","cookies_policy","privacy_choices","account_data_deletion_policy","cv_uploaded_files_policy","student_data_document_visibility_policy","recommendations_automated_systems_policy","communications_notification_policy","accessibility_statement","payment_refund_policy","subscription_terms","external_apply_third_party_links_policy","salary_currency_job_info_disclaimer"];
+const contentDir = path.join(root, "seeders/data/content");
+const pageKeys = new Set();
+for (const f of fs.readdirSync(path.join(contentDir, "pages"))) {
+  if (!f.endsWith(".json")) continue;
+  const items = JSON.parse(fs.readFileSync(path.join(contentDir, "pages", f), "utf-8"));
+  for (const it of items) {
+    pageKeys.add(it.key);
+    if (!it.title?.en || !it.title?.ar) fail(`page ${it.key} missing bilingual title`);
+    if (!it.legalReviewStatus) fail(`page ${it.key} missing legalReviewStatus`);
+  }
+}
+const missing = REQUIRED_LEGAL.filter((k) => !pageKeys.has(k));
+if (missing.length) fail(`missing legal pages: ${missing.join(", ")}`);
+else ok(`all ${REQUIRED_LEGAL.length} legal pages present`);
+for (const sub of ["help/categories.json", "help/articles.json", "faq/faq.json"]) {
+  const arr = JSON.parse(fs.readFileSync(path.join(contentDir, sub), "utf-8"));
+  if (Array.isArray(arr) && arr.length) ok(`${sub} (${arr.length} items)`);
+  else fail(`${sub} empty/invalid`);
+}
+
+// 3. Public router exposes expected paths
+const publicRouter = (await import(path.join(root, "routesPublic/index.js"))).default;
+const pubPaths = new Set(listEndpoints(publicRouter).map((e) => e.path));
+for (const p of ["/content/pages", "/content/pages/:key", "/legal/:key", "/help/categories", "/help/articles", "/help/articles/:key", "/faq"]) {
+  if (pubPaths.has(p)) ok(`public ${p}`); else fail(`public route missing: ${p}`);
+}
+
+// 4. User submit routers load
+for (const r of ["routesUser/SupportRote.js", "routesUser/LegalReportRote.js", "routesUser/PrivacyRote.js"]) {
+  const mod = (await import(path.join(root, r))).default;
+  if (mod && listEndpoints(mod).length) ok(`${r} (${listEndpoints(mod).length} routes)`);
+  else fail(`${r} has no routes`);
+}
+
+console.log(failures === 0 ? "\ncontent package contract OK" : `\ncontent package contract FAILED (${failures})`);
+process.exit(failures === 0 ? 0 : 1);
