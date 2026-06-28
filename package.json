@@ -21,6 +21,7 @@
     "smoke:import": "node scripts/smokeImport.js",
     "smoke:http": "node scripts/smokeHttp.js",
     "smoke:cors": "node scripts/smokeCors.js",
+    "test:web-smoke": "node scripts/runWebPortalSmoke.js",
     "check:secrets": "node scripts/verifyNoSecrets.js && node scripts/verifyNoTrackedRuntimeFiles.js",
     "check:runtime-files": "node scripts/verifyNoTrackedRuntimeFiles.js",
     "docs:api-artifacts": "node scripts/generateApiArtifacts.js",

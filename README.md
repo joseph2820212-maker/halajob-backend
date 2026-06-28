@@ -107,6 +107,7 @@ npm run test:model-integrity
 npm run test:mixed-fields
 npm --prefix web run build
 npm --prefix web test
+npm run test:web-smoke
 ```
 
 Regenerate source-of-truth docs after route/model/auth/contract changes:

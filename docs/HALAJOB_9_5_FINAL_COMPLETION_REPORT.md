@@ -14,7 +14,7 @@
 | Mobile UI/UX | 8.6 | Design-handout polish and campus tester APK exist; APK `1.0.2+19` includes campus local-device tester entry. Owner real-device approval is still pending. |
 | Backend/API correctness | 9.2 | 3401 endpoints inventoried; 2149/2149 write/update/delete endpoints have validation; response-code, model-integrity, Mixed-field, auth/context, object-authorization, campus, hiring, subscription, admin, trust, AI, analytics, notification, translation, and file/export suites passed locally. |
 | Security/privacy/permissions | 9.1 | OTP/hardening, route guards, fine-grained admin permissions, audit redaction, private document download tests, upload rejection tests, HSTS/Helmet, and secret scan passed. Production admin audit and secret rotation remain owner-controlled. |
-| Web frontend | 8.8 | Web build passed, 4 Vitest files/9 tests passed, and `node scripts/smokeWebPortals.js http://127.0.0.1:4173` walked home/campus/company/seeker/admin routes. No separate `web e2e` script exists. |
+| Web frontend | 8.9 | Web build passed, 4 Vitest files/9 tests passed, and `npm run test:web-smoke` walked home/campus/company/seeker/admin routes through a local Vite preview. |
 | Docs/handover | 9.4 | Required handover package files exist, generated API/OpenAPI/Postman/database docs were refreshed, and `CODEX.md`, `CLAUDE.md`, `CONTRIBUTING.md`, payment decision, testing, deployment, and handover docs are current. |
 | Operations/deployment | 8.4 | Deployment, environment, backup/restore, health, CI, and rollback docs exist; live provider checks, production smoke, and restore proof require owner accounts. |
 | Business readiness/payments | 8.0 | Manual/admin subscriptions are implemented and tested. Online checkout/payment-provider webhooks are intentionally not claimed until the owner selects a provider and supplies merchant setup. |
@@ -60,7 +60,7 @@
 | `npm run test:integration:subscriptions` | Passed | Fresh run on 2026-06-28; company billing permissions, invoice ownership, support ticket, admin assignment, and missing-plan failure verified. |
 | `npm --prefix web run build` | Passed | Fresh run on 2026-06-28; Vite built 89 modules and prerendered 6 routes. |
 | `npm --prefix web test` | Passed | Fresh run on 2026-06-28; 4 files and 9 tests passed. |
-| `node scripts/smokeWebPortals.js http://127.0.0.1:4173` | Passed | Local preview smoke walked home, campus, company, seeker, and admin routes. |
+| `npm run test:web-smoke` | Passed | Starts local Vite preview, runs Puppeteer portal smoke across home/campus/company/seeker/admin, then stops preview. |
 | `git diff --check` | Passed | Whitespace diff check passed after final trimming. |
 | Required handover package check | Passed | `README.md`, `CLAUDE.md`, `CODEX.md`, `CONTRIBUTING.md`, required docs, API docs, security docs, and live-smoke doc all exist. |
 | `git diff --name-only f07d9c179e351a55383125b2f6795e748df6200f..HEAD -- mobile` | Passed | No mobile file changes after the APK build commit. |
@@ -86,7 +86,7 @@ Note: this is a tester APK, not a production-signed store release. There are no
 ## Web evidence
 - Build result: Passed on 2026-06-28 via `npm --prefix web run build`.
 - Test result: Passed on 2026-06-28 via `npm --prefix web test`; 4 files, 9 tests.
-- Smoke/e2e result: `node scripts/smokeWebPortals.js http://127.0.0.1:4173` passed against local Vite preview. No separate `npm --prefix web run e2e` script exists.
+- Smoke/e2e result: `npm run test:web-smoke` passed against local Vite preview.
 
 ## Backend evidence
 - Static checks: `check:secrets`, `check:syntax`, `check:imports`, and `check:i18n` passed.
@@ -125,7 +125,7 @@ Note: this is a tester APK, not a production-signed store release. There are no
 - Online payment is not implemented; manual/admin subscription must be explicitly accepted or a provider must be selected.
 - Real AI provider output is not claimed without provider credentials and live QA.
 - Production-signed APK/AAB is not produced yet.
-- Full web browser e2e script is not present; current web proof is build, unit/smoke tests, and Puppeteer portal smoke.
+- Full authenticated browser e2e coverage is not present; current web proof is build, unit/smoke tests, and Puppeteer portal smoke.
 - Owner real-device UI approval remains pending.
 
 ## Launch recommendation
