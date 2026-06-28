@@ -8,7 +8,7 @@ Last verified:
 - `flutter test --reporter compact`: 414 tests passed on 2026-06-28
 - `powershell -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1`: passed on 2026-06-28
 - `powershell -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth`: builds `1.0.5+26`; build commit and SHA are recorded in `outputs\halajob-mobile-campus-tester-latest.apk.json` and `.sha256`
-- `adb install -r C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`: installed the current tester APK on `emulator-5554`; Android reports `versionName=1.0.5`, `versionCode=26`, `lastUpdateTime=2026-06-28 16:13:57`
+- `adb install -r C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`: install the current tester APK on `emulator-5554`; Android package metadata must report `versionName=1.0.5` and `versionCode=26`
 
 ## Completed for testing readiness
 

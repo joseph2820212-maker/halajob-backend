@@ -221,7 +221,7 @@ Required proof from the same fresh APK:
 | Campus tester entry | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-tab.png` | Prior `+25` proof: visible `Use campus tester account` button. Must be recaptured from `1.0.5+26` before full Gate A closure |
 | Campus dashboard after one-tap | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-dashboard.png` | Prior `+25` proof: button opened native campus dashboard for `campus.tester@halajob.test`, Section 3 navy authenticated shell, consistent HalaJob logo, notification/profile/settings icons, and bottom nav orange indicator under the active icon |
 | Campus application detail | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-detail.png` | Prior `+25` proof: native detail route, back arrow and `Application` title aligned, prior oversized logo paint artifact fixed |
-| APK ZIP export | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\HalaJob-UI-Lock-Fresh-APK.zip` | Script validated APK SHA/build metadata against `mobile/pubspec.yaml`; ZIP SHA-256 `3edbff72742b045a3f48859f2670743933b2b0dbd46f594b50b411ecfb39885f` |
+| APK ZIP export | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\HalaJob-UI-Lock-Fresh-APK.zip` | Script validates APK SHA/build metadata against `mobile/pubspec.yaml`; current ZIP SHA is reported by the export command and final handoff summary |
 
 Still pending for full Gate A acceptance:
 
@@ -252,7 +252,7 @@ Local PC Android tooling status on 2026-06-28:
 - Android SDK command-line tools, platform tools, build tools, platforms, NDK, CMake, system image, and emulator binary are available under `mobile\.android-sdk`.
 - `ANDROID_HOME` and `ANDROID_SDK_ROOT` were set to `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe\mobile\.android-sdk`.
 - AVD `HalaJob_Pixel_API35` is available and connected as `emulator-5554`.
-- The latest tester APK was installed on the emulator; package `com.halajob.halajob_mobile` reports `versionName=1.0.5`, `versionCode=26`, and `lastUpdateTime=2026-06-28 16:13:57`.
+- The latest tester APK should be installed on the emulator before handoff; package `com.halajob.halajob_mobile` must report `versionName=1.0.5` and `versionCode=26`.
 
 ## Tests And Guards
 
