@@ -14,7 +14,8 @@
         { "en": "Campus students seeking opportunities", "ar": "طلاب الحرم الجامعي الباحثون عن الفرص" },
         { "en": "Universities supporting student outcomes", "ar": "الجامعات التي تدعم نتائج الطلاب" }
       ], "sortOrder": 3 },
-      { "type": "notice", "severity": "info", "text": { "en": "Hala Job is not an employer and does not guarantee hiring. Employment decisions are made by companies.", "ar": "هلا جوب ليست جهة توظيف ولا تضمن الحصول على وظيفة. قرارات التوظيف تتخذها الشركات." }, "sortOrder": 4 }
+      { "type": "notice", "severity": "info", "text": { "en": "Hala Job is not an employer and does not guarantee hiring. Employment decisions are made by companies.", "ar": "هلا جوب ليست جهة توظيف ولا تضمن الحصول على وظيفة. قرارات التوظيف تتخذها الشركات." }, "sortOrder": 4 },
+      { "type": "paragraph", "text": { "en": "Hala Job (halajob.com) is operated by llill ltd.", "ar": "تُشغّل هلا جوب (halajob.com) شركة llill ltd." }, "sortOrder": 5 }
     ],
     "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "product"
   },
@@ -45,7 +46,7 @@
     "title": { "en": "Terms and Conditions", "ar": "الشروط والأحكام" },
     "summary": { "en": "The agreement that governs your use of Hala Job across all account types.", "ar": "الاتفاقية التي تحكم استخدامك لهلا جوب عبر جميع أنواع الحسابات." },
     "contentBlocks": [
-      { "type": "paragraph", "text": { "en": "By creating an account or using Hala Job, you agree to these Terms. If you do not agree, do not use the service.", "ar": "بإنشائك حساباً أو استخدامك هلا جوب، فإنك توافق على هذه الشروط. إذا لم توافق، فلا تستخدم الخدمة." }, "sortOrder": 1 },
+      { "type": "paragraph", "text": { "en": "Hala Job (halajob.com) is operated by llill ltd, a company registered in England and Wales (registration details available from Companies House). By creating an account or using Hala Job, you agree to these Terms. If you do not agree, do not use the service.", "ar": "تُشغّل هلا جوب (halajob.com) شركة llill ltd، وهي شركة مسجّلة في إنجلترا وويلز (تفاصيل التسجيل متاحة من Companies House). بإنشائك حساباً أو استخدامك هلا جوب، فإنك توافق على هذه الشروط. إذا لم توافق، فلا تستخدم الخدمة." }, "sortOrder": 1 },
       { "type": "heading", "text": { "en": "Your responsibilities", "ar": "مسؤولياتك" }, "sortOrder": 2 },
       { "type": "bullet_list", "items": [
         { "en": "Keep your account credentials secure and provide accurate information.", "ar": "حافظ على سرية بيانات حسابك وقدّم معلومات دقيقة." },
