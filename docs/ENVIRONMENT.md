@@ -42,13 +42,21 @@ Scope: backend runtime and handover reference. Values in this file are descripti
 | `SMTP_SECURE` | If email enabled | `true` for TLS SMTP. |
 | `SMTP_USER` | If email enabled | SMTP username. |
 | `SMTP_PASS` | If email enabled | SMTP password. |
-| `JOBZAIN_EMAIL_INFO` | Optional | From/reply mailbox. |
-| `JOBZAIN_EMAIL_FORGOT_PASSWORD` | Optional | Password reset mailbox. |
-| `JOBZAIN_EMAIL_PASSCODE` | Optional | Passcode/OTP mailbox. |
-| `JOBZAIN_EMAIL_SUBSCRIPTION` | Optional | Subscription mailbox. |
-| `JOBZAIN_EMAIL_CHECKOUT` | Optional | Checkout mailbox. |
-| `JOBZAIN_EMAIL_CONTACT` | Optional | Contact mailbox. |
-| `JOBZAIN_EMAIL_APPOINTMENTS` | Optional | Appointment mailbox. |
+| `HALAJOB_MAIL_DOMAIN` | Optional | Default mail domain (defaults to `halajob.com`). |
+| `HALAJOB_MAIL_FROM_NAME` | Optional | Sender display name (defaults to `Hala Job`). |
+| `HALAJOB_EMAIL_INFO` | Optional | From/reply mailbox. |
+| `HALAJOB_EMAIL_FORGOT_PASSWORD` | Optional | Password reset mailbox. |
+| `HALAJOB_EMAIL_PASSCODE` | Optional | Passcode/OTP mailbox. |
+| `HALAJOB_EMAIL_SUBSCRIPTION` | Optional | Subscription mailbox. |
+| `HALAJOB_EMAIL_CHECKOUT` | Optional | Checkout mailbox. |
+| `HALAJOB_EMAIL_CONTACT` | Optional | Contact mailbox. |
+| `HALAJOB_EMAIL_APPOINTMENTS` | Optional | Appointment mailbox. |
+
+> **Brand migration:** The mailbox variables were previously named `JOBZAIN_EMAIL_*`.
+> Use the `HALAJOB_EMAIL_*` names. The older `HALA_EMAIL_*` and legacy
+> `JOBZAIN_EMAIL_*` names are still read as backward-compatible fallbacks during the
+> transition. **Deprecated:** `JOBZAIN_EMAIL_INFO` / `JOBZAIN_EMAIL_*` — use
+> `HALAJOB_EMAIL_*` instead. See `BRAND_CLEANUP_AUDIT.md`.
 
 ## Firebase / Push
 

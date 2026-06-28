@@ -1,6 +1,8 @@
-# Hala Job / JobZain
+# Hala Job
 
 This repository contains the Express/MongoDB backend and the Vite web frontend in `web/`.
+
+> Historical note: "JobZain" was an earlier internal/product name. The public product name is now **Hala Job** (operated by llill ltd; public web domain halajob.com). The backend API domain may temporarily remain `jobzain.com` as a technical URL — see `BRAND_CLEANUP_AUDIT.md`.
 
 ## Backend
 

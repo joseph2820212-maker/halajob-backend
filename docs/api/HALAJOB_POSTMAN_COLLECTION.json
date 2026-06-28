@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "HalaJob API",
+    "name": "Hala Job API",
     "description": "Generated route-level Postman collection. Add request bodies/tests as schemas mature.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -56696,6 +56696,39 @@
           }
         },
         {
+          "name": "POST /dash/v1/notification/send",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/notification/send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "notification",
+                "send"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "PATCH /dash/v1/Notification/update/:id",
           "request": {
             "method": "PATCH",
@@ -57531,6 +57564,39 @@
           }
         },
         {
+          "name": "POST /dash/v1/notifications/send",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/notifications/send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "notifications",
+                "send"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "PATCH /dash/v1/notifications/update/:id",
           "request": {
             "method": "PATCH",
@@ -57660,6 +57726,40 @@
                 "v1",
                 "operations",
                 "audit-logs"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/operations/notifications/send",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/operations/notifications/send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "operations",
+                "notifications",
+                "send"
               ]
             },
             "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
@@ -107752,6 +107852,105 @@
           }
         },
         {
+          "name": "GET /user/v1/notification/preferences",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/notification/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "notification",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /user/v1/notification/preferences",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/notification/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "notification",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PUT /user/v1/notification/preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/notification/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "notification",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
           "name": "PATCH /user/v1/notification/read-all",
           "request": {
             "method": "PATCH",
@@ -108113,6 +108312,105 @@
                 "v1",
                 "notifications",
                 "get"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/notifications/preferences",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/notifications/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "notifications",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /user/v1/notifications/preferences",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/notifications/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "notifications",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PUT /user/v1/notifications/preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/notifications/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "notifications",
+                "preferences"
               ]
             },
             "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
@@ -108535,6 +108833,102 @@
                 "notifications",
                 "v1",
                 "list"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Notifications. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /notifications/v1/preferences",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/v1/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "v1",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Notifications. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /notifications/v1/preferences",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/v1/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "v1",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Notifications. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PUT /notifications/v1/preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/v1/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "v1",
+                "preferences"
               ]
             },
             "description": "Generated from live route inventory. Module: Notifications. Guard source: inferred-parent-mount."

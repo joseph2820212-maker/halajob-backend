@@ -64,7 +64,7 @@ const referenceSections = modules.map((module) => {
   return `## ${module}\n\n${table(["Method", "Path", "Auth", "Guard source", "Middleware/guards"], rows)}\n`;
 });
 
-const apiReference = `# HalaJob API Reference
+const apiReference = `# Hala Job API Reference
 
 Generated: ${now}
 Source: \`docs/api/HALAJOB_ROUTE_INVENTORY.json\`.
@@ -97,7 +97,7 @@ ${referenceSections.join("\n")}
 const openApiLines = [
   "openapi: 3.0.3",
   "info:",
-  "  title: HalaJob API",
+  "  title: Hala Job API",
   "  version: 1.0.0",
   "  description: Generated route-level OpenAPI skeleton. Add schemas/examples before treating as complete.",
   "servers:",
@@ -200,7 +200,7 @@ const postmanItems = modules.map((module) => ({
 
 const postmanCollection = {
   info: {
-    name: "HalaJob API",
+    name: "Hala Job API",
     description: "Generated route-level Postman collection. Add request bodies/tests as schemas mature.",
     schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
   },
@@ -231,8 +231,8 @@ const makeEnvironment = ({ name, baseUrl }) => ({
 fs.writeFileSync(apiReferencePath, apiReference);
 fs.writeFileSync(openApiPath, `${openApiLines.join("\n")}\n`);
 fs.writeFileSync(postmanPath, `${JSON.stringify(postmanCollection, null, 2)}\n`);
-fs.writeFileSync(postmanLocalPath, `${JSON.stringify(makeEnvironment({ name: "HalaJob Local", baseUrl: "http://localhost:3000" }), null, 2)}\n`);
-fs.writeFileSync(postmanDevPath, `${JSON.stringify(makeEnvironment({ name: "HalaJob Dev", baseUrl: "https://jobzain.com" }), null, 2)}\n`);
+fs.writeFileSync(postmanLocalPath, `${JSON.stringify(makeEnvironment({ name: "Hala Job Local", baseUrl: "http://localhost:3000" }), null, 2)}\n`);
+fs.writeFileSync(postmanDevPath, `${JSON.stringify(makeEnvironment({ name: "Hala Job Dev", baseUrl: "https://jobzain.com" }), null, 2)}\n`);
 
 console.log(`API reference written to ${path.relative(process.cwd(), apiReferencePath)}`);
 console.log(`OpenAPI skeleton written to ${path.relative(process.cwd(), openApiPath)}`);

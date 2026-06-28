@@ -64,7 +64,8 @@ router.get("/talent/employees", requireCompanyPermission("ats.view"), upload.non
 router.get("/talent/employees/:employeeId", requireCompanyPermission("ats.view"), upload.none(), controllerTalent.getEmployeeDetails);
 
 /* =========================
-   JobZain Talent Help Requests
+   Hala Job Talent Support Requests (internal model/route function names retain
+   the legacy "JobZainTalent" identifiers — documented in BRAND_CLEANUP_AUDIT.md)
 ========================= */
 router.post("/talent/help-requests", requireCompanyPermission("ats.view"), upload.none(), controllerTalent.requestJobZainTalentHelp);
 router.post("/talent/:jobId/help-requests", requireCompanyPermission("ats.view"), upload.none(), controllerTalent.requestJobZainTalentHelp);

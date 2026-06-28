@@ -418,7 +418,7 @@ export const buildInterviewPayload = ({ body = {}, companyData, application, old
 
   if (!payload.meet_link && payload.type === "online") {
     const suffix = String(application?._id || Date.now()).slice(-8);
-    payload.meet_link = `https://meet.jit.si/JobZain-${suffix}`;
+    payload.meet_link = `https://meet.jit.si/HalaJob-${suffix}`;
   }
 
   return { payload };

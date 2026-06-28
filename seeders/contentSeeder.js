@@ -28,14 +28,15 @@ const readDir = (sub) => {
 };
 
 // Replace {{ENV_EMAIL}} tokens with configured addresses (env-driven, no hardcoded fakes).
+// Preferred names are HALAJOB_*; the older HALA_* names remain as fallbacks.
 export const emailEnv = {
-  SUPPORT_EMAIL: process.env.HALA_SUPPORT_EMAIL || "support@halajob.com",
-  PRIVACY_EMAIL: process.env.HALA_PRIVACY_EMAIL || "privacy@halajob.com",
-  LEGAL_EMAIL: process.env.HALA_LEGAL_EMAIL || "legal@halajob.com",
-  BILLING_EMAIL: process.env.HALA_BILLING_EMAIL || "billing@halajob.com",
-  ACCESSIBILITY_EMAIL: process.env.HALA_ACCESSIBILITY_EMAIL || "accessibility@halajob.com",
-  PARTNERS_EMAIL: process.env.HALA_PARTNERS_EMAIL || "partners@halajob.com",
-  SECURITY_EMAIL: process.env.HALA_SECURITY_EMAIL || "security@halajob.com",
+  SUPPORT_EMAIL: process.env.HALAJOB_SUPPORT_EMAIL || process.env.HALA_SUPPORT_EMAIL || "support@halajob.com",
+  PRIVACY_EMAIL: process.env.HALAJOB_PRIVACY_EMAIL || process.env.HALA_PRIVACY_EMAIL || "privacy@halajob.com",
+  LEGAL_EMAIL: process.env.HALAJOB_LEGAL_EMAIL || process.env.HALA_LEGAL_EMAIL || "legal@halajob.com",
+  BILLING_EMAIL: process.env.HALAJOB_BILLING_EMAIL || process.env.HALA_BILLING_EMAIL || "billing@halajob.com",
+  ACCESSIBILITY_EMAIL: process.env.HALAJOB_ACCESSIBILITY_EMAIL || process.env.HALA_ACCESSIBILITY_EMAIL || "accessibility@halajob.com",
+  PARTNERS_EMAIL: process.env.HALAJOB_PARTNERS_EMAIL || process.env.HALA_PARTNERS_EMAIL || "partners@halajob.com",
+  SECURITY_EMAIL: process.env.HALAJOB_SECURITY_EMAIL || process.env.HALA_SECURITY_EMAIL || "security@halajob.com",
 };
 
 const interpolate = (value) => {

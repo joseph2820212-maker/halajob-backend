@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: HalaJob API
+  title: Hala Job API
   version: 1.0.0
   description: Generated route-level OpenAPI skeleton. Add schemas/examples before treating as complete.
 servers:
@@ -44017,6 +44017,29 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/dash/v1/notification/send":
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/notification/send"
+      operationId: "admin_post_dash_v1_notification_send"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/dash/v1/Notification/update/{id}":
     patch:
       tags: ["Admin"]
@@ -44612,6 +44635,29 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/dash/v1/notifications/send":
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/notifications/send"
+      operationId: "admin_post_dash_v1_notifications_send"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/dash/v1/notifications/update/{id}":
     patch:
       tags: ["Admin"]
@@ -44705,6 +44751,29 @@ paths:
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
       security:
         - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/operations/notifications/send":
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/operations/notifications/send"
+      operationId: "admin_post_dash_v1_operations_notifications_send"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           description: Successful response
@@ -75262,6 +75331,67 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/notifications/v1/preferences":
+    get:
+      tags: ["Notifications"]
+      summary: "GET /notifications/v1/preferences"
+      operationId: "notifications_get_notifications_v1_preferences"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    patch:
+      tags: ["Notifications"]
+      summary: "PATCH /notifications/v1/preferences"
+      operationId: "notifications_patch_notifications_v1_preferences"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    put:
+      tags: ["Notifications"]
+      summary: "PUT /notifications/v1/preferences"
+      operationId: "notifications_put_notifications_v1_preferences"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/notifications/v1/read":
     patch:
       tags: ["Notifications"]
@@ -79006,6 +79136,67 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/user/v1/notification/preferences":
+    get:
+      tags: ["Legacy User"]
+      summary: "GET /user/v1/notification/preferences"
+      operationId: "legacy_user_get_user_v1_notification_preferences"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    patch:
+      tags: ["Legacy User"]
+      summary: "PATCH /user/v1/notification/preferences"
+      operationId: "legacy_user_patch_user_v1_notification_preferences"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    put:
+      tags: ["Legacy User"]
+      summary: "PUT /user/v1/notification/preferences"
+      operationId: "legacy_user_put_user_v1_notification_preferences"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/user/v1/notification/read-all":
     patch:
       tags: ["Legacy User"]
@@ -79259,6 +79450,67 @@ paths:
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
       security:
         - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/user/v1/notifications/preferences":
+    get:
+      tags: ["Legacy User"]
+      summary: "GET /user/v1/notifications/preferences"
+      operationId: "legacy_user_get_user_v1_notifications_preferences"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    patch:
+      tags: ["Legacy User"]
+      summary: "PATCH /user/v1/notifications/preferences"
+      operationId: "legacy_user_patch_user_v1_notifications_preferences"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    put:
+      tags: ["Legacy User"]
+      summary: "PUT /user/v1/notifications/preferences"
+      operationId: "legacy_user_put_user_v1_notifications_preferences"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           description: Successful response
