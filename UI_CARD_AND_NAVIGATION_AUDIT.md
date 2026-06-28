@@ -2,17 +2,17 @@
 
 Date: 2026-06-28
 Branch: `codex/gate-a-mobile-ui-lock` directly on `origin/flutter-seeker-campus`
-Latest Gate A source commit audited: `ff1c2db4029957c6b3f32d0662e6a49d92ef2b49`
+Latest Gate A source commit audited: recorded in `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk.json`
 Fresh APK handed off: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk`
-APK version: `1.0.2+22`
-APK SHA-256: `e6be45e70b8d514aec1173c9020f9134ea41826bb27cf4fe2cbea83867d11403`
+APK version: `1.0.4+25`
+APK SHA-256: recorded in `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-campus-tester-latest.apk.sha256`
 Base URL: `https://jobzain.com`
 Campus auth mode: `local-device`
 Signing mode: `debug-local`
 
 ## Status
 
-This audit records the current source, fresh APK metadata, and PC emulator screenshot evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. The current APK was rebuilt from the authenticated navy-shell, local campus tester-entry, and handout campus-home fixes, freshly installed on `emulator-5554`, and captured from the same `ff1c2db` build artifact.
+This audit records the current source, fresh APK metadata, and PC emulator screenshot evidence for the mobile UI lock gates. It does not mark the UI as owner-accepted. The current APK was rebuilt from the authenticated navy-shell, local campus tester-entry, handout campus-home, Section 3 chrome, logo clipping, and Android Studio keyboard-input fixes, freshly installed on `emulator-5554`, and captured from the artifact whose build commit is recorded in the APK metadata JSON.
 
 Design source decision:
 
@@ -54,13 +54,13 @@ Fresh APK metadata:
 | Field | Value |
 |---|---|
 | Branch | `codex/gate-a-mobile-ui-lock` |
-| Build commit | `ff1c2db4029957c6b3f32d0662e6a49d92ef2b49` |
-| Version name | `1.0.2` |
-| Version code | `22` |
+| Build commit | See `halajob-mobile-campus-tester-latest.apk.json` |
+| Version name | `1.0.4` |
+| Version code | `25` |
 | Base URL | `https://jobzain.com` |
 | Campus auth mode | `local-device` |
 | Signing mode | `debug-local` |
-| APK SHA-256 | `e6be45e70b8d514aec1173c9020f9134ea41826bb27cf4fe2cbea83867d11403` |
+| APK SHA-256 | See `halajob-mobile-campus-tester-latest.apk.sha256` |
 
 ### Gate 2: Visual System Source Lock
 
@@ -151,13 +151,13 @@ Result: no matches.
 
 | Role | Page | Card/Button/Action | Current behavior | Required behavior | Native screen / bottom sheet / external browser | Empty state | Error state | File(s) changed | Test proof | Screenshot/recording |
 |---|---|---|---|---|---|---|---|---|---|---|
-| Auth | Sign in | Email/phone, password, save password, forgot password, sign-in CTA | Cream native auth screen; owner confirmed this is the new good screen | Keep minimal login, no navy banner, readable fields | Native auth/passcode flow | N/A | Validation/status notice | `mobile/lib/src/features/auth/auth_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.2+22-auth.png` |
-| Auth | Register | Name, email, date of birth, password | Short launch form, no heavy profile fields | Keep registration compact and route to passcode when required | Native registration/passcode flow | N/A | Field validation/status notice | `mobile/lib/src/features/auth/auth_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.2+22-register.png` |
-| Auth | Role/account selection | Job seeker, Campus, Company selector | Visible segmented role selector on auth screen | Role selector remains visible and readable in EN/AR | Inline native auth state | N/A | Clean status/error notice | `mobile/lib/src/features/auth/auth_screen.dart` | `assert-mobile-screen-inventory.ps1` | `halajob-1.0.2+22-auth.png`, `halajob-1.0.2+22-campus-auth.png` |
-| Auth | Language switch | English/Arabic segmented control | Visible on auth screen with readable selected/unselected states | Maintain readable language switch and RTL Arabic | Inline native auth state | N/A | N/A | `mobile/lib/src/features/auth/auth_screen.dart`, `mobile/lib/l10n/**` | `flutter test --reporter compact`, `npm run check:i18n` | `halajob-1.0.2+22-auth.png`, `halajob-1.0.2+22-language-arabic.png` |
-| Auth | Forgot password | Forgot password link and recovery panel | Opens native recovery controls from auth | Keep recovery native; no long bottom sheet | Native auth recovery panel | N/A | Recovery validation/status notice | `mobile/lib/src/features/auth/auth_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.2+22-forgot-password.png` |
+| Auth | Sign in | Email/phone, password, save password, forgot password, sign-in CTA | Cream native auth screen; owner confirmed this is the new good screen | Keep minimal login, no navy banner, readable fields | Native auth/passcode flow | N/A | Validation/status notice | `mobile/lib/src/features/auth/auth_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.4+25-auth-after-keyboard-config.png` |
+| Auth | Register | Name, email, date of birth, password | Short launch form, no heavy profile fields | Keep registration compact and route to passcode when required | Native registration/passcode flow | N/A | Field validation/status notice | `mobile/lib/src/features/auth/auth_screen.dart` | `flutter test --reporter compact` | Pending `1.0.4+25` recapture; legacy `+22` reference exists |
+| Auth | Role/account selection | Job seeker, Campus, Company selector | Visible segmented role selector on auth screen | Role selector remains visible and readable in EN/AR | Inline native auth state | N/A | Clean status/error notice | `mobile/lib/src/features/auth/auth_screen.dart` | `assert-mobile-screen-inventory.ps1` | `halajob-1.0.4+25-auth-after-keyboard-config.png`, `halajob-1.0.4+25-campus-tab.png` |
+| Auth | Language switch | English/Arabic segmented control | Visible on auth screen with readable selected/unselected states | Maintain readable language switch and RTL Arabic | Inline native auth state | N/A | N/A | `mobile/lib/src/features/auth/auth_screen.dart`, `mobile/lib/l10n/**` | `flutter test --reporter compact`, `npm run check:i18n` | Pending `1.0.4+25` recapture; legacy `+22` reference exists |
+| Auth | Forgot password | Forgot password link and recovery panel | Opens native recovery controls from auth | Keep recovery native; no long bottom sheet | Native auth recovery panel | N/A | Recovery validation/status notice | `mobile/lib/src/features/auth/auth_screen.dart` | `flutter test --reporter compact` | Pending `1.0.4+25` recapture; legacy `+22` reference exists |
 | Auth | Passcode/OTP | OTP/passcode verification | Native passcode panel with code boxes | Keep verification as native screen/panel with clear error copy | Native auth/passcode flow | N/A | Incorrect/expired code notice | `mobile/lib/src/features/auth/auth_screen.dart` | `flutter test --reporter compact` | Pending full visual capture |
-| Auth | Local campus tester login | `Use campus tester account` button | Visible only when Campus + local-device auth are active | QA can enter campus mode without university email | Native auth state, then native campus dashboard | N/A | Local auth failure notice | `mobile/lib/src/features/auth/auth_screen.dart`, `mobile/lib/src/features/auth/campus_local_auth_service.dart` | `flutter test --plain-name "local campus tester shortcut"` | `halajob-1.0.2+22-campus-auth.png`, `halajob-1.0.2+22-campus-home.png` |
+| Auth | Local campus tester login | `Use campus tester account` button | Visible only when Campus + local-device auth are active | QA can enter campus mode without university email | Native auth state, then native campus dashboard | N/A | Local auth failure notice | `mobile/lib/src/features/auth/auth_screen.dart`, `mobile/lib/src/features/auth/campus_local_auth_service.dart` | `flutter test --plain-name "local campus tester shortcut"` | `halajob-1.0.4+25-campus-tab.png`, `halajob-1.0.4+25-campus-dashboard.png` |
 | Job seeker | Seeker home | Welcome/profile score, activity, recommendations | Uses shared dashboard shell and compact home after Gate A changes | Shared cream cards, dashboard content above the fold | Native bottom tab | Approved empty cards/notices where data missing | `HalaStateNotice` style load errors | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | Pending Gate 6 capture |
 | Job seeker | Job search/list | Search, filters, job cards, chips | Native explore panel with filters and sort controls | Cream cards, navy labels, orange active states | Native tab; filters/sort may use short controls | Clear no-jobs/no-results wording | Clear load/action notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --plain-name "seeker jobs feed"` | Pending Gate 6 capture |
 | Job seeker | Job detail | Job detail cards, trust, skills, highlights | Native detail route | Detail remains native, no bottom sheet | Native `MaterialPageRoute`; external links outside app | Guidance card when data missing | Failed save/report/load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | Pending Gate 6 capture |
@@ -171,15 +171,15 @@ Result: no matches.
 | Job seeker | AI career tools | CV rewrite, interview, match, cover letter | Native AI tools route | AI output is labelled suggestion/fallback where provider disabled | Native screen | Provider unavailable fallback card | AI result/error notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --plain-name "seeker AI career tools"` | Pending Gate 6 capture |
 | Job seeker | Notifications | Notification list and routing | Native notification screen | Clear empty notifications and route targets | Native screen | No notifications guidance | Failed read/delete notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --plain-name "notifications"` | Pending Gate 6 capture |
 | Job seeker | Profile/settings | Profile editors and settings | Native profile/settings screens | Cream cards, concise editors, account menu access | Native screens/dialogs for short edits | Missing-profile guidance | Save/upload/session notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | Pending Gate 6 capture |
-| Campus | Campus entry | Campus selector and tester mode | `+22` local APK shows tester card and button | Campus QA entry available without university email | Native auth state | N/A | Local auth failure notice | `mobile/lib/src/features/auth/auth_screen.dart` | `flutter test --plain-name "local campus"` | `halajob-1.0.2+22-campus-auth.png` |
-| Campus | Tester/local campus mode | One-tap local tester account | Opens native dashboard as `campus.tester@halajob.test` | Button enters dashboard without typing credentials | Native auth to native dashboard | Local tester/demo data guidance | Local storage/auth notice | `mobile/lib/src/features/auth/campus_local_auth_service.dart` | `flutter test --plain-name "local campus tester shortcut"` | `halajob-1.0.2+22-campus-home.png` |
-| Campus | Campus home | Welcome, `Your campus`, `Events & resources` | Compact home matches the rendered handout order and no longer shows the old progress-ring hero or old focus section | Navy authenticated shell, cream cards, dashboard content above the fold | Native bottom tab | Campus tester/demo data guidance | Remote sync/load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter analyze`; `flutter test --reporter compact` | `halajob-1.0.2+22-campus-home.png` |
-| Campus | Campus verification | Verification status/actions | Native campus verification route | Cream cards, readable status, clear next action | Native screen | Missing verification guidance | Save/submit error notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.2+22-campus-verification.png` |
-| Campus | Student Passport | Campus profile/readiness | Native profile/passport route | Shared cards and readable status | Native screen | Missing profile guidance | Save/load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.2+22-campus-career-passport.png` |
-| Campus | Opportunities | Opportunity cards/search/filters | Native Campus tab segmented feed | Cream cards with clear metadata chips | Native tab and detail route | No campus opportunities guidance | Backend/load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.2+22-campus-feed.png` |
-| Campus | Events | Event list/detail/register | Native event detail route | Cream cards, clear register state | Native screen | No campus events guidance | Register/load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --plain-name "campus event"` | `halajob-1.0.2+22-campus-events.png`, `halajob-1.0.2+22-campus-event-detail.png` |
-| Campus | Resources | Resource list | Native resource list/detail | Cream cards with readable categories | Native screen | No campus resources guidance | Load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.2+22-campus-resources.png` |
-| Campus | Resource detail | Resource bullets/actions | Native detail route | Detail remains native, external URLs outside app | Native screen / external browser | N/A | Load/open notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.2+22-campus-resource-detail.png` |
+| Campus | Campus entry | Campus selector and tester mode | `+25` local APK shows tester card and button | Campus QA entry available without university email | Native auth state | N/A | Local auth failure notice | `mobile/lib/src/features/auth/auth_screen.dart` | `flutter test --plain-name "local campus"` | `halajob-1.0.4+25-campus-tab.png` |
+| Campus | Tester/local campus mode | One-tap local tester account | Opens native dashboard as `campus.tester@halajob.test` | Button enters dashboard without typing credentials | Native auth to native dashboard | Local tester/demo data guidance | Local storage/auth notice | `mobile/lib/src/features/auth/campus_local_auth_service.dart` | `flutter test --plain-name "local campus tester shortcut"` | `halajob-1.0.4+25-campus-dashboard.png` |
+| Campus | Campus home | Welcome, `Your campus`, `Events & resources` | Compact home matches the rendered handout order and no longer shows the old progress-ring hero or old focus section | Navy authenticated shell, cream cards, dashboard content above the fold | Native bottom tab | Campus tester/demo data guidance | Remote sync/load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter analyze`; `flutter test --reporter compact` | `halajob-1.0.4+25-campus-dashboard.png` |
+| Campus | Campus verification | Verification status/actions | Native campus verification route | Cream cards, readable status, clear next action | Native screen | Missing verification guidance | Save/submit error notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | Pending `1.0.4+25` recapture; legacy `+22` reference exists |
+| Campus | Student Passport | Campus profile/readiness | Native profile/passport route | Shared cards and readable status | Native screen | Missing profile guidance | Save/load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | Pending `1.0.4+25` recapture; legacy `+22` reference exists |
+| Campus | Opportunities | Opportunity cards/search/filters | Native Campus tab segmented feed | Cream cards with clear metadata chips | Native tab and detail route | No campus opportunities guidance | Backend/load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | `halajob-1.0.4+25-campus-dashboard.png` |
+| Campus | Events | Event list/detail/register | Native event detail route | Cream cards, clear register state | Native screen | No campus events guidance | Register/load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --plain-name "campus event"` | Pending `1.0.4+25` recapture; legacy `+22` reference exists |
+| Campus | Resources | Resource list | Native resource list/detail | Cream cards with readable categories | Native screen | No campus resources guidance | Load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | Pending `1.0.4+25` recapture; legacy `+22` reference exists |
+| Campus | Resource detail | Resource bullets/actions | Native detail route | Detail remains native, external URLs outside app | Native screen / external browser | N/A | Load/open notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | Pending `1.0.4+25` recapture; legacy `+22` reference exists |
 | Campus | Partner/university detail | Partner/university info | Native detail route where available | Shared cards and clear status | Native screen | No partner detail guidance | Load notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | Pending Gate 6 capture |
 | Campus | Campus profile/settings | Profile checkpoints/settings | Native profile/settings screens | Cream cards and concise editors | Native screens/dialogs for short edits | Missing-profile guidance | Save/session notice | `mobile/lib/src/features/dashboard/dashboard_screen.dart` | `flutter test --reporter compact` | Pending Gate 6 capture |
 | Company | Dashboard header | Company name/logo/status, notification, account menu | Source uses shared navy authenticated header with notifications plus one menu | Navy authenticated shell, no scattered profile/settings/switch buttons | Native dashboard header/menu | N/A | Menu actions route to native screens | `mobile/lib/src/features/company/company_dashboard_screen.dart`, `mobile/lib/src/widgets/hala_cards.dart` | `assert-mobile-screen-inventory.ps1` | Pending Gate 6 capture |
@@ -214,41 +214,36 @@ Required proof from the same fresh APK:
 
 | Screen | Evidence | Status |
 |---|---|---|
-| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-auth.png` | Captured from `ff1c2db` APK after clean install/data clear on `emulator-5554`; owner confirmed this authorization screen is the new good one |
-| Language switch Arabic | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-language-arabic.png` | Arabic/RTL auth screen captured from the same `+22` APK; selected/unselected segmented controls remain readable |
-| Register screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-register.png` | Native create-account panel captured from the same `+22` APK; compact launch form visible |
-| Forgot password panel | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-forgot-password.png` | Native recovery panel captured from the same `+22` APK; no bottom sheet or webview |
-| Campus tester entry | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-auth.png` | Captured from `ff1c2db` APK after tapping `Campus`; visible `Use campus tester account` button |
-| Campus dashboard after one-tap | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-home.png` | Button opened native campus dashboard for `campus.tester@halajob.test`; screenshot shows navy authenticated shell, compact `Welcome back`, `Your campus`, and `Events & resources` above the fold |
-| Campus feed | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-feed.png` | Campus tab shows Opportunities, Events, and Resources in the native segmented feed |
-| Campus resources | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-resources.png` | Dedicated Resources segment captured from the same `+22` APK with three cream-card resources |
-| Campus resource detail | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-resource-detail.png` | Native resource detail route captured with summary and bullet guidance |
-| Campus events | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-events.png` | Dedicated Events segment captured from the same `+22` APK |
-| Campus event detail | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-event-detail.png` | Native event detail route captured with register CTA visible; CTA was not pressed |
-| Campus More menu | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-more.png` | Campus More tab captured with Profile, Career Passport, verification, notifications, feed, and events tiles |
-| Campus verification | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-verification.png` | Native verification route captured; local tester limitation is explained clearly instead of showing a broken state |
-| Campus Career Passport | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-career-passport.png` | Native Career Passport route captured; local tester limitation and privacy guidance are clear |
-| Campus More Arabic | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-campus-more-arabic.png` | Extra Arabic campus More capture from the same APK; not required for Gate 6 but useful for RTL visual review |
-| Job seeker text input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-seeker-input-proof.png` | Android input path entered `5551234567` plus masked password into seeker login fields on the `+22` APK |
-| Company text input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.2+22-company-input-proof.png` | Android input path entered `5557778888` plus masked password into company login fields on the `+22` APK |
+| Sign-in screen | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-auth-after-keyboard-config.png` | Captured from the current APK after clean install/data clear on `emulator-5554`; owner previously confirmed this authorization screen is the new good one |
+| Job seeker PC keyboard input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-windows-keyboard-password.png` | Windows keystrokes were sent to the emulator window, proving the same PC-keyboard path the owner uses; email and password fields accepted input |
+| Company login input | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-company-fields.png` | Company role selected and both login fields accepted input on the `+25` APK |
+| Campus tester entry | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-tab.png` | Captured from the current APK after tapping `Campus`; visible `Use campus tester account` button |
+| Campus dashboard after one-tap | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-dashboard.png` | Button opened native campus dashboard for `campus.tester@halajob.test`; screenshot shows Section 3 navy authenticated shell, consistent HalaJob logo, notification/profile/settings icons, and bottom nav orange indicator under the active icon |
+| Campus application detail | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-1.0.4+25-campus-detail.png` | Native detail route captured; back arrow and `Application` title align on the same row, and the prior oversized logo paint artifact is gone |
+| APK ZIP export | `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\HalaJob-UI-Lock-Fresh-APK.zip` | Script validated APK SHA/build metadata against `mobile/pubspec.yaml`; ZIP SHA-256 `4b77125df0ebfebceb62f75786dd2d42231cfebacb00714559364e4c288e8b08` |
 
 Still pending for full Gate A acceptance:
 
-1. Job seeker home.
-2. Job list.
-3. Job detail.
-4. Apply flow.
-5. Companies view.
-6. Company detail.
-7. Applications.
-8. Career Passport / AI tools with a real seeker or backend campus account.
-9. Company dashboard.
-10. Company jobs.
-11. Create/edit job.
-12. Applicants.
-13. Application detail.
-14. Company settings/header/menu.
-15. University/admin dashboard if available.
+1. Owner installs the same `1.0.4+25` APK/ZIP on a real Android phone and accepts that the UI feels clean, consistent, and app-like.
+2. Language switch Arabic.
+3. Register screen.
+4. Forgot password panel.
+5. Passcode/OTP panel.
+6. Job seeker home.
+7. Job list.
+8. Job detail.
+9. Apply flow.
+10. Companies view.
+11. Company detail.
+12. Applications.
+13. Career Passport / AI tools with a real seeker or backend campus account.
+14. Company dashboard.
+15. Company jobs.
+16. Create/edit job.
+17. Applicants.
+18. Application detail.
+19. Company settings/header/menu.
+20. University/admin dashboard if available.
 
 Local PC Android tooling status on 2026-06-28:
 
@@ -256,7 +251,7 @@ Local PC Android tooling status on 2026-06-28:
 - Android SDK command-line tools, platform tools, build tools, platforms, NDK, CMake, system image, and emulator binary are available under `mobile\.android-sdk`.
 - `ANDROID_HOME` and `ANDROID_SDK_ROOT` were set to `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe\mobile\.android-sdk`.
 - AVD `HalaJob_Pixel_API35` is available and connected as `emulator-5554`.
-- The latest tester APK was freshly installed on the emulator; package `com.halajob.halajob_mobile` reports `versionName=1.0.2`, `versionCode=22`, and `lastUpdateTime=2026-06-28 13:39:43`.
+- The latest tester APK was freshly installed on the emulator; package `com.halajob.halajob_mobile` reports `versionName=1.0.4`, `versionCode=25`, and `lastUpdateTime=2026-06-28 15:42:37`.
 
 ## Tests And Guards
 
@@ -272,12 +267,12 @@ Last recorded result before this audit update:
 - Mobile screen inventory assertion passed.
 - `flutter analyze` passed with no issues.
 - `flutter test --reporter compact` passed with 414 tests.
-- APK build passed; current SHA-256 is `e6be45e70b8d514aec1173c9020f9134ea41826bb27cf4fe2cbea83867d11403`.
+- APK build passed; current SHA-256 is recorded in `halajob-mobile-campus-tester-latest.apk.sha256`.
 - Flutter analyze: no issues found.
 - Flutter tests: 414 tests passed.
 - APK build passed; current SHA-256 is recorded in `halajob-mobile-campus-tester-latest.apk.sha256`.
-- PC emulator install passed via `adb install -r`; launch, Arabic language switch, register, forgot password, campus tester entry, compact one-tap campus dashboard, campus feed, campus resources/detail, campus events/detail, campus More, campus verification, campus Career Passport, seeker input, and company input screenshots were captured from the current APK.
+- PC emulator install passed via `adb install -r`; launch, PC-keyboard seeker input, company input, campus tester entry, compact one-tap campus dashboard, and campus application detail screenshots were captured from the current `1.0.4+25` APK. Older `1.0.2+22` screenshots remain historical reference only and must not be used as final fresh-APK acceptance proof.
 
 ## Remaining UI Lock Blocker
 
-Gate 6 is not complete until the remaining authenticated seeker/company/university page-by-page visual proof is captured and the owner confirms the same APK on a real Android phone. Auth, campus tester entry, compact campus dashboard, campus resources/events/details, campus More, campus verification/passport limitation states, and seeker/company text input proof are now current for the PC emulator, but the project must not be described as launch-ready from source checks or emulator screenshots alone.
+Gate 6 is not complete until the remaining authenticated seeker/company/university page-by-page visual proof is captured and the owner confirms the same `1.0.4+25` APK on a real Android phone. Auth, local campus tester entry, compact campus dashboard, Section 3 header/nav chrome, application detail header alignment, logo clipping, and seeker/company text input proof are current for the PC emulator, but the project must not be described as launch-ready from source checks or emulator screenshots alone.
