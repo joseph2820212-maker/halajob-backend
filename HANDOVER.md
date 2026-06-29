@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Current reviewed implementation commit: `c39b191` (`Harden saved search filter contract`)
+Current reviewed source commit: `1dd5c20` (`Guard mobile More canonical placement`)
 
 ## Current Position
 
@@ -16,6 +16,7 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 | Commit | Summary |
 |---|---|
+| `1dd5c20` | Mobile inventory and launch UI-contract guards now explicitly prevent seeker/campus More from duplicating primary flows and company More from reintroducing Jobs/Applicants/Talent dashboard cards. |
 | `c39b191` | Backend saved-search filters now preserve and match skills, education level, SYP salary minimum, and currency; integration proof covers create/update/run-now and mobile summary rendering handles list skills cleanly. |
 | `dce2c03` | Mobile job filters now include skills, education level, SYP minimum salary, canonical date/job/experience/deadline choices, and saved-alert frequency, with widget and source-inventory coverage. |
 | `fb2cc30` | Mobile Settings small fixed choices now use explicit ticked choice rows, and the mobile inventory guard blocks settings dropdown regression. |
@@ -32,17 +33,17 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 ## Proof From The Latest Work
 
-Latest focused proof after `c39b191`:
+Latest focused proof after `1dd5c20`:
 
 | Command | Result |
 |---|---|
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed; now guards canonical More placement and company More primary-flow duplication. |
+| `npm run test:launch-gate:ui-contracts --silent` | Passed; JS mobile UI contract also guards canonical More sections and company AI grouping. |
 | `npm run test:integration:saved-search-alerts` | Passed; proves the backend saved-search API accepts, normalizes, stores, lists, updates, and runs richer filters including skills, education level, salary minimum, and currency. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed |
 | `flutter analyze` from `mobile/` using `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\tools\flutter\bin\flutter.bat` | Passed, no issues |
 | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` | Passed |
 | `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` | Passed |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "creates, runs, updates, and deletes saved searches through app routes"` | Passed |
-| `npm run test:launch-gate:ui-contracts --silent` | Passed |
 | `npm --prefix web test -- jobAlerts` | Passed, 2 tests |
 | `npm --prefix web run build` | Passed |
 | `npm --prefix web test -- settings` | Passed, 3 tests |
@@ -52,7 +53,7 @@ The web Settings requirement is already covered by `web/src/shared/settings.test
 
 ## APK Status
 
-A fresh debug tester APK was built and installed on 2026-06-29 from commit `7c2365b`, after the `c39b191` saved-search contract work. This is a current app-code tester build; a later docs-only commit may exist after it.
+A fresh debug tester APK was built and installed on 2026-06-29 from commit `7c2365b`, after the `c39b191` saved-search contract work. This is still current for app behavior after `1dd5c20` because that later commit only changed verifier scripts.
 
 - Output APK: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-latest-codex-gate-a-mobile-ui-lock-debug.apk`
 - SHA-256: `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`
@@ -71,8 +72,8 @@ Rebuild again after the next app-code commit before making a new "latest APK" cl
 - Web Settings booleans and small fixed choices use checkbox/radio rows and have tests.
 - Mobile and web CV surfaces now emphasize current CV, library, build-from-profile, and honest parser-disabled state.
 - Job filters now include keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency with mobile persistence plus backend API round-trip/run-now coverage.
-- Seeker/Campus More is grouped and avoids primary-tab duplication.
-- Company mobile separates profile/settings header actions and keeps sign out in account settings.
+- Seeker/Campus More is grouped and guarded against primary-tab duplication.
+- Company mobile separates profile/settings header actions, keeps sign out in account settings, and is guarded against More reintroducing Jobs/Applicants/Talent dashboard cards.
 - Company AI hiring tools are grouped and gated instead of scattered.
 - Launch UI contracts, mobile inventory, and focused web tests are green for the latest slice.
 

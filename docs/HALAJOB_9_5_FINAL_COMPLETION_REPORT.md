@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed source commit: `c39b191`
+- Current reviewed source commit: `1dd5c20`
 - Current APK build commit: `7c2365b` (docs/proof commit after `c39b191`; app code unchanged)
 - Date: 2026-06-29
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Commit | Summary |
 |---|---|
+| `1dd5c20` | Mobile source contracts now explicitly guard canonical More placement for seeker/campus/company, including company More not duplicating Jobs/Applicants/Talent primary-tab cards. |
 | `c39b191` | Backend saved-search filter contract now preserves skills, education level, salary minimum, and currency through create/update/run-now, with API integration proof and mobile list-summary compatibility. |
 | `dce2c03` | Mobile job filters now include skills, education level, SYP minimum salary, canonical date/job/experience/deadline choices, and saved-alert frequency, with widget and source-inventory coverage. |
 | `fb2cc30` | Mobile Settings fixed choices now use explicit ticked rows instead of dropdown concepts, with an inventory guard to prevent regression. |
@@ -40,13 +41,13 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Command | Result | Notes |
 |---|---|---|
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Protects mobile screen inventory, locked chrome, More placement, company header actions, AI single-entry rules, Settings fixed-choice source, expanded opportunity filter source, and canonical More placement. |
+| `npm run test:launch-gate:ui-contracts --silent` | Passed | Web routes, UI actions, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed. |
 | `npm run test:integration:saved-search-alerts` | Passed | Proves saved-search create/list/get/update/delete, ownership isolation, richer filter normalization, run-now matching, duplicate suppression, scheduler dispatch, logs, and legacy employee alert migration. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Protects mobile screen inventory, locked chrome, More placement, company header actions, AI single-entry rules, Settings fixed-choice source, and expanded opportunity filter source. |
 | `flutter analyze` | Passed | Run from `mobile/` with `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\tools\flutter\bin\flutter.bat`; no issues found. |
 | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` | Passed | Proves the mobile filter sheet exposes skills, salary minimum, education level, alert frequency, and the existing filter groups. |
 | `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` | Passed | Proves expanded filters persist to saved-search payloads, including skills, education level, salary minimum, currency, work mode, student/fresh-grad, verified employer, and alert frequency. |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "creates, runs, updates, and deletes saved searches through app routes"` | Passed | Proves saved-search app routes still work with filter payloads. |
-| `npm run test:launch-gate:ui-contracts --silent` | Passed | Web routes, UI actions, mobile routes, mobile UI contract, and bilingual payload contracts passed. |
 | `npm --prefix web test -- settings` | Passed | 1 file / 3 tests; proves web Settings has no `<select>` for fixed choices and serializes checkbox/radio values correctly. |
 | `npm --prefix web test -- jobAlerts` | Passed | 1 file / 2 tests; verifies web job-alert canonical filter behavior after the shared saved-search type update. |
 | `npm --prefix web run build` | Passed | TypeScript build and Vite production build passed after the shared saved-search filter type update. |
@@ -54,7 +55,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 ## APK Status
 
-A fresh debug APK was built and installed on 2026-06-29 from commit `7c2365b`, after the latest `c39b191` saved-search contract commit.
+A fresh debug APK was built and installed on 2026-06-29 from commit `7c2365b`, after the latest app-code change in this proof set. Later commit `1dd5c20` only changes verifier scripts, so the APK remains current for app behavior.
 
 - Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-latest-codex-gate-a-mobile-ui-lock-debug.apk`
 - SHA-256: `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`
@@ -75,8 +76,8 @@ This APK is current for the app code reviewed here. Rebuild again after the next
 | CV Manager / CV Studio | Improved: current CV hero, library, build-from-profile, parser-disabled honesty, and visibility choice flow are in place. |
 | CV parser honesty | Done for launch: parser defaults disabled unless configured; UI does not call it ready. |
 | Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency; backend create/update/run-now now preserves and matches skills, education, salary, and currency. |
-| Seeker/Campus More cleanup | Improved: grouped More sections and no full duplicate primary Campus cards. |
-| Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, and guarded header actions. |
+| Seeker/Campus More cleanup | Improved: grouped More sections and guarded against primary-flow duplication. |
+| Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
 | Web/admin/company fixed choices | Improved with focused tests across settings, resources, admin analytics, company choices, and interview prep. |
 | Proof reproducibility | Partially done: focused gates pass; full clean-checkout release replay remains required. |
 | Docs freshness | Improved by this report; must be refreshed again after the final commit and final APK build. |
