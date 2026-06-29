@@ -126,11 +126,17 @@ npm run check:imports
 npm run smoke:import
 npm run smoke:http
 npm run smoke:cors
+npm run test:critical-launch-blockers
+npm run test:otp-contract
 npm run test:route-validation
 npm run test:response-codes
 npm run test:model-integrity
 npm run test:mixed-fields
+npm run test:data-retention
+npm run test:object-authorization
+npm run test:audit-logging
 npm run test:integration:syria-product
+npm run check:web-routes
 npm --prefix web run build
 npm --prefix web test
 npm --prefix web run e2e
