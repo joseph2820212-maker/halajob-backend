@@ -16,6 +16,9 @@ Companies can save a candidate only when one of these is true:
 - The company has a valid accepted invitation relationship.
 - The candidate is an opted-in campus student from an active university partner.
 
+Saved candidates, notes, tags, and invitations remain scoped to the same company;
+another company must never see or reuse that CRM data.
+
 Do-not-contact candidates cannot be invited again.
 
 ## UI Surfaces
@@ -32,4 +35,3 @@ npm run test:integration:talent-pool-crm
 ```
 
 This covers save, privacy, notes, tags, invitations, and do-not-contact.
-

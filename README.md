@@ -123,6 +123,7 @@ npm run test:launch-gate:ui-contracts
 npm run check:secrets
 npm run check:syntax
 npm run check:imports
+npm run test:syria-docs
 npm run smoke:import
 npm run smoke:http
 npm run smoke:cors

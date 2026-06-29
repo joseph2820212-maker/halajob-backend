@@ -23,6 +23,13 @@ This guide is for a non-technical operator managing the Syria-first launch.
 3. Failed email/SMS should be checked against provider configuration.
 4. Manual WhatsApp links are copy/share helpers, not official auto-sends.
 
+## Manage CV And Message Templates
+
+1. Review CV templates before featuring them in CV Studio.
+2. Keep template preview images, Arabic labels, and English labels aligned.
+3. Update message templates through the communication template tools.
+4. Test a template before using it for a launch-wide notification.
+
 ## Rebuild Salary Insights
 
 1. Open admin salary insights.
@@ -42,4 +49,3 @@ This guide is for a non-technical operator managing the Syria-first launch.
 2. Prioritize fake jobs, money requests, sensitive-document requests, impersonation, and privacy concerns.
 3. Keep audit notes concise and factual.
 4. Escalate production-account, payment, or legal-risk items to the owner.
-

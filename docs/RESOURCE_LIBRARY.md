@@ -8,6 +8,10 @@ The resource library provides launch-safe learning resources for job seekers, ca
 - Admin controllers: `controllers/dash/LearningResourceAdminController.js`.
 - User controllers: `controllers/app/resources/`.
 - University controllers: `controllers/university/resources/`.
+- Admin routes use `/dash/v1/learning-resources` and related
+  `/dash/v1/learning-resource-categories` paths. Do not mount learning content
+  under `/dash/v1/resources`, which remains the generic admin resource CRUD
+  surface.
 
 ## UI Surfaces
 
@@ -26,4 +30,3 @@ npm run test:integration:learning-resources
 ```
 
 This covers admin categories/publishing, seeker list/detail/save/progress/recommendations, campus compatibility, university-private visibility, assignment, and analytics.
-

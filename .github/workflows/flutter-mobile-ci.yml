@@ -147,6 +147,9 @@ jobs:
       - name: i18n resources check
         run: npm run check:i18n
 
+      - name: Syria documentation contract
+        run: npm run test:syria-docs
+
       - name: Security HTTP contract
         run: npm run test:security-http
 

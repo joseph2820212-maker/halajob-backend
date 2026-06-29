@@ -11,6 +11,7 @@ npm run test:launch-gate
 npm run test:launch-gate:backend
 npm run test:launch-gate:ui-contracts
 npm run test:integration:syria-product
+npm run test:syria-docs
 ```
 
 The full launch gate wraps the backend safety/product checks, CI-critical
@@ -19,7 +20,8 @@ The backend gate includes the critical-launch-blocker guard, OTP contract,
 response-code contract, data-retention contract, object authorization, audit
 logging, auth context isolation, company workflow integrations, admin
 permission/resource protections, employee CV download security, campus
-workflows, and the Syria product aggregate.
+workflows, the Syria documentation/env handover contract, and the Syria product
+aggregate.
 
 The Syria product aggregate covers:
 
@@ -43,6 +45,7 @@ npm run check:syntax
 npm run check:imports
 npm run check:secrets
 npm run check:i18n
+npm run test:syria-docs
 npm run smoke:import
 npm run smoke:http
 npm run smoke:cors
