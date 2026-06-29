@@ -461,6 +461,32 @@
       }
     },
     {
+      "label": "web admin platform launch flags placement",
+      "route": {
+        "path": "web/src/shared/api.ts",
+        "mustContain": [
+          "/dash/v1/platform/settings",
+          "/public/v1/client-settings"
+        ]
+      },
+      "ui": {
+        "path": "web/src/shared/settings.tsx",
+        "mustContain": [
+          "cv_studio_enabled",
+          "resource_library_enabled",
+          "interview_prep_enabled",
+          "saved_searches_enabled",
+          "manual_whatsapp_share_enabled",
+          "official_whatsapp_provider_enabled",
+          "salary_insights_enabled",
+          "campus_career_center_enabled",
+          "video_interviews_enabled",
+          "talent_pool_crm_enabled",
+          "employer_branding_enabled"
+        ]
+      }
+    },
+    {
       "label": "mobile seeker salary insights placement",
       "route": {
         "path": "mobile/lib/src/features/salary_insights/salary_service.dart",
