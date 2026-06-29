@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: source contracts through `1dd5c20`; APK build from `7c2365b`
+Commit tested: source contracts through `11f3988`; APK build from `7c2365b`
 
 ## Passed Coverage
 
@@ -28,8 +28,10 @@ Commit tested: source contracts through `1dd5c20`; APK build from `7c2365b`
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
 | Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed web routes, UI actions, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts |
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, seeker/campus More placement, and company More primary-flow duplication against regression |
+| Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed, proving external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures |
+| Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Flutter analyzer | `flutter analyze` passed from `mobile/` with no issues |
-| Current APK emulator smoke | A debug APK from `7c2365b` installed on `emulator-5554` and proved auth screen, visible Campus tester entry, Campus tester dashboard, seeker/company text-field input, password masking, and current navy/cream/orange chrome. SHA-256 `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`. Commit `1dd5c20` is verifier-only, so no APK rebuild was needed for app behavior. |
+| Current APK emulator smoke | A debug APK from `7c2365b` installed on `emulator-5554` and proved auth screen, visible Campus tester entry, Campus tester dashboard, seeker/company text-field input, password masking, and current navy/cream/orange chrome. SHA-256 `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`. Commits through `11f3988` are verifier/docs/test-infra only, so no APK rebuild was needed for app behavior. |
 
 ## Remaining Required Tests
 
