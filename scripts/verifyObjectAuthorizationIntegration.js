@@ -394,18 +394,28 @@ async function main() {
     UserModel.updateOne({ _id: studentUserB._id }, { $set: { default_context_id: studentContextB._id } }),
   ]);
 
-  const [jobA, jobB] = await jobsModel.create([
-    jobSeed({ jobId: objectId(), company: companyA, companyUser: companyUserA, suffix: `Alpha ${suffix}` }),
-    jobSeed({ jobId: objectId(), company: companyB, companyUser: companyUserB, suffix: `Beta ${suffix}` }),
-  ]);
+  // Sequential: JobModel.ref is unique and also generated from a count-based
+  // pre-validate hook, so parallel create([...]) can race on the ref value.
+  const jobA = await jobsModel.create(
+    jobSeed({ jobId: objectId(), company: companyA, companyUser: companyUserA, suffix: `Alpha ${suffix}` })
+  );
+  const jobB = await jobsModel.create(
+    jobSeed({ jobId: objectId(), company: companyB, companyUser: companyUserB, suffix: `Beta ${suffix}` })
+  );
 
   const countryId = objectId();
-  const [applicationA, applicationB] = await UserApplyingJobModel.create([
-    applicationSeed({ seekerUser, seekerEmployee, job: jobA, company: companyA, countryId, suffix: `${suffix}a` }),
-    applicationSeed({ seekerUser, seekerEmployee, job: jobB, company: companyB, countryId, suffix: `${suffix}b` }),
-  ]);
+  // Create applications sequentially: UserApplyingJob generates application_no
+  // from a countDocuments()+1 pre-validate hook, so parallel create([...]) saves
+  // race to the same number and trip the unique index (E11000). Sequential
+  // awaits let the count advance deterministically between inserts.
+  const applicationA = await UserApplyingJobModel.create(
+    applicationSeed({ seekerUser, seekerEmployee, job: jobA, company: companyA, countryId, suffix: `${suffix}a` })
+  );
+  const applicationB = await UserApplyingJobModel.create(
+    applicationSeed({ seekerUser, seekerEmployee, job: jobB, company: companyB, countryId, suffix: `${suffix}b` })
+  );
 
-  const [campusApplicationA, campusApplicationB] = await UserApplyingJobModel.create([
+  const campusApplicationA = await UserApplyingJobModel.create(
     applicationSeed({
       seekerUser: studentUserA,
       seekerEmployee: studentEmployeeA,
@@ -413,7 +423,9 @@ async function main() {
       company: companyA,
       countryId,
       suffix: `${suffix}campusa`,
-    }),
+    })
+  );
+  const campusApplicationB = await UserApplyingJobModel.create(
     applicationSeed({
       seekerUser: studentUserB,
       seekerEmployee: studentEmployeeB,
@@ -421,8 +433,8 @@ async function main() {
       company: companyB,
       countryId,
       suffix: `${suffix}campusb`,
-    }),
-  ]);
+    })
+  );
 
   const eventIdA = `campus-event-alpha-${suffix}`;
   const eventIdB = `campus-event-beta-${suffix}`;
