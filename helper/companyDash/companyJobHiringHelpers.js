@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import mongoose from "mongoose";
 import {
   EmployeeModel,
@@ -391,6 +392,17 @@ export const buildInvitationsFilter = (companyId, query = {}) => {
   return filter;
 };
 
+// Auto-generated video meeting link for online interviews. Defaults to Jitsi
+// (no API key, no video traffic on our servers, self-hostable for sanctions
+// safety) — override the base with HALA_JITSI_BASE_URL. The room name carries a
+// random token so the URL cannot be guessed and joined by uninvited people.
+export const buildInterviewMeetingLink = (application = null) => {
+  const base = (process.env.HALA_JITSI_BASE_URL || "https://meet.jit.si").replace(/\/+$/, "");
+  const ref = String(application?._id || "iv").replace(/[^a-zA-Z0-9]/g, "").slice(-6) || "iv";
+  const token = crypto.randomBytes(9).toString("hex");
+  return `${base}/HalaJob-${ref}-${token}`;
+};
+
 export const buildInterviewPayload = ({ body = {}, companyData, application, oldInterview = null }) => {
   const startAt = toDateOrNull(firstValue(body.start_at, body.startAt, body.date, body.interview_at, body.interviewAt));
   if (!startAt && !oldInterview) return { error: "start_at_required" };
@@ -448,8 +460,7 @@ export const buildInterviewPayload = ({ body = {}, companyData, application, old
   }
 
   if (!payload.meet_link && payload.type === "online") {
-    const suffix = String(application?._id || Date.now()).slice(-8);
-    payload.meet_link = `https://meet.jit.si/HalaJob-${suffix}`;
+    payload.meet_link = buildInterviewMeetingLink(application);
   }
 
   return { payload };

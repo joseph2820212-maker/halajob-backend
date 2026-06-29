@@ -24,6 +24,7 @@ import {
 } from "../../../helper/companyDash/companyDashHelpers.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
+import { buildInterviewMeetingLink } from "../../../helper/companyDash/companyJobHiringHelpers.js";
 
 const recordCompanyApplicationAnalytics = ({
   req,
@@ -467,7 +468,9 @@ export const scheduleInterview = async (req, res, next) => {
       meeting_join_instructions: req.body.meeting_join_instructions || "",
       calendar_provider: calendarProvider,
       calendar_event_id: req.body.calendar_event_id || "",
-      meet_link: req.body.meet_link || "",
+      meet_link:
+        req.body.meet_link ||
+        (type === "online" ? buildInterviewMeetingLink(application) : ""),
       office_address: req.body.office_address || "",
       company_note: req.body.company_note || "",
       candidate_note: req.body.candidate_note || "",
