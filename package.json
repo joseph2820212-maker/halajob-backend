@@ -94,7 +94,10 @@
     "test:integration:cv-studio": "node scripts/verifyCvStudioIntegration.js",
     "test:integration:cv-parsing": "node scripts/verifyCvParsingIntegration.js",
     "test:integration:interview-scheduling": "node scripts/verifyInterviewSchedulingIntegration.js",
-    "test:integration:syria-product": "npm run test:integration:cv-studio && npm run test:integration:cv-parsing && npm run test:integration:learning-resources && npm run test:integration:interview-prep && npm run test:integration:saved-search-alerts && npm run test:integration:communication-hub && npm run test:integration:salary-insights && npm run test:integration:campus-privacy && npm run test:integration:interview-scheduling && npm run test:integration:talent-pool-crm && npm run test:integration:company-branding"
+    "test:integration:syria-product": "npm run test:integration:cv-studio && npm run test:integration:cv-parsing && npm run test:integration:learning-resources && npm run test:integration:interview-prep && npm run test:integration:saved-search-alerts && npm run test:integration:communication-hub && npm run test:integration:salary-insights && npm run test:integration:campus-privacy && npm run test:integration:interview-scheduling && npm run test:integration:talent-pool-crm && npm run test:integration:company-branding",
+    "test:launch-gate:backend": "npm run check:syntax && npm run check:imports && npm run check:secrets && npm run check:i18n && npm run smoke:import && npm run smoke:http && npm run smoke:cors && npm run test:security-http && npm run test:route-validation && npm run test:model-integrity && npm run test:mixed-fields && npm run test:global-launch-contract && npm run test:integration:auth-context && npm run test:integration:admin-resources && npm run test:integration:employee-cv-downloads && npm run test:integration:campus-workflows && npm run test:integration:syria-product",
+    "test:launch-gate:ui-contracts": "npm run test:ui-actions && npm run test:mobile-routes && npm run test:mobile-ui-contract && npm run test:bilingual-ui-payload",
+    "test:launch-gate": "npm run test:launch-gate:backend && npm run test:launch-gate:ui-contracts"
   },
   "keywords": [],
   "author": "",

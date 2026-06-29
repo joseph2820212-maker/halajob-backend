@@ -117,6 +117,9 @@ QA; production campus auth should use the backend.
 Use `docs/TESTING_GUIDE.md` as the source of truth. Core branch checks include:
 
 ```bash
+npm run test:launch-gate
+npm run test:launch-gate:backend
+npm run test:launch-gate:ui-contracts
 npm run check:secrets
 npm run check:syntax
 npm run check:imports
