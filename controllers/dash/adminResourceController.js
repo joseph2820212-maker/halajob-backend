@@ -882,7 +882,13 @@ const create = (resourceName) => async (req, res) => {
     const config = getResourceConfig(resourceName || req.params.resource);
     if (!config) return ReturnDashData.getError({ res, status: 404, message: 'resource_not_found' });
 
-    const payload = await normalizePayload(req, config);
+    // Strip protected fields on CREATE too (not just UPDATE): a generic admin must
+    // not be able to set role_id/permissions/status/accepted/is_verified/publish_status
+    // at creation time. Those flow only through dedicated approve/verify handlers.
+    const payload = stripProtectedAdminUpdateFields(
+      stripControlFields(await normalizePayload(req, config)),
+      config,
+    );
     const doc = await config.model.create(payload);
     const responseDoc = await loadResponseDoc(config, doc);
     await writeAdminResourceAudit({
