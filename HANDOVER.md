@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Current reviewed source commit: `fab3b09` (`Guard admin queue confirmations`)
+Current reviewed source commit: `a809a37` (`Guard company job posting choices`)
 
 ## Current Position
 
@@ -16,6 +16,8 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 | Commit | Summary |
 |---|---|
+| `a809a37` | Company web job posting now uses fixed choice rows for work mode, job type, work time, salary type, and candidate target, with create-payload regression proof. |
+| `4d87d14` | Company web support tickets now have tested create/reply flows, fixed choice rows, queue view actions, and a form-reset/refresh fix. |
 | `fab3b09` | Admin web tests now prove company queue detail loading and confirmation-gated approve actions, including the cancelled-confirmation path. |
 | `c18d9a9` | Web CV Studio now has focused tests for current-CV-first hierarchy, parser-disabled honesty, and radio visibility choices that preserve backend payloads. |
 | `11f3988` | Integration tests now have a fast Mongo helper contract and clearer fallback/preflight guidance for `CONNECTION_URL`, `MONGOMS_SYSTEM_BINARY`, or cached `mongodb-memory-server` binaries. |
@@ -36,20 +38,21 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 ## Proof From The Latest Work
 
-Latest focused proof after `fab3b09`:
+Latest focused proof after `a809a37`:
 
 | Command | Result |
 |---|---|
-| `npm --prefix web test -- admin` | Passed; 2 tests cover analytics fixed choices plus company queue detail and confirmation-gated approve action. |
-| `npm --prefix web test` | Passed; 12 files / 43 tests. |
+| `npm --prefix web test -- company` | Passed; 5 company tests cover applicant actions, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
+| `npm --prefix web test` | Passed; 12 files / 45 tests. |
 | `npm --prefix web run build` | Passed; Vite build and SEO prerender completed. |
+| `npm run test:launch-gate:ui-contracts --silent` | Passed; web API wiring 315/315, UI actions, mobile routes/UI contract, and bilingual payload contracts all passed. |
+| `npm --prefix web test -- admin` | Passed; 2 tests cover analytics fixed choices plus company queue detail and confirmation-gated approve action. |
 | `npm --prefix web test -- seeker` | Passed; 2 CV Studio tests cover current CV hierarchy, parser-disabled copy, no dropdowns, and visibility payloads. |
 | `npm run test:integration-mongo-helper --silent` | Passed; proves external Mongo URI scoping and the clear memory-server fallback error path without requiring a binary download. |
 | `npm run check:syntax --silent` | Passed |
 | `npm run check:imports --silent` | Passed |
 | `npm run test:integration:saved-search-alerts --silent` | Passed with the shared Mongo helper memory-server fallback. |
 | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed; now guards canonical More placement and company More primary-flow duplication. |
-| `npm run test:launch-gate:ui-contracts --silent` | Passed; JS mobile UI contract also guards canonical More sections and company AI grouping. |
 | `flutter analyze` from `mobile/` using `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\tools\flutter\bin\flutter.bat` | Passed, no issues |
 | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` | Passed |
 | `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` | Passed |
@@ -63,14 +66,14 @@ The web Settings requirement is already covered by `web/src/shared/settings.test
 
 ## APK Status
 
-A fresh debug tester APK was built and installed on 2026-06-29 from commit `7c2365b`, after the `c39b191` saved-search contract work. This is still current for mobile app behavior after `fab3b09` because later commits did not change mobile app code.
+A fresh debug tester APK was built and installed on 2026-06-29 from commit `4d87d14`. Later commit `a809a37` changes only the web company job form/tests, so the APK remains current for mobile app behavior.
 
-- Output APK: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-latest-codex-gate-a-mobile-ui-lock-debug.apk`
-- SHA-256: `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`
+- Output APK: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-codex-gate-a-mobile-ui-lock-4d87d14-debug.apk`
+- SHA-256: `B065B19DD28EF8FA081B130A3BA6C9CBB2FB438C317DF755047D19BB1FDA1F08`
 - Version/build: `1.0.6+27`
 - Build flags: `HALA_DEFAULT_BASE_URL=https://jobzain.com`, Campus auth `local-device`, AI tools enabled, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified: auth screen, visible Campus tester entry, Campus tester dashboard, seeker/company text-field entry, password masking, and current navy/cream/orange chrome.
+- Verified: fresh uninstall/reinstall, auth screen launch, visible Campus role entry, and current navy/cream/orange auth chrome on `emulator-5554`.
 
 Rebuild again after the next app-code commit before making a new "latest APK" claim.
 
@@ -81,6 +84,7 @@ Rebuild again after the next app-code commit before making a new "latest APK" cl
 - Mobile Settings fixed choices no longer use dropdown concepts in source.
 - Web Settings booleans and small fixed choices use checkbox/radio rows and have tests.
 - Admin web company queues have tests for detail panels and confirmation-gated approve actions.
+- Company web support tickets and job posting now have focused tests for fixed choices, create/reply/posting payloads, and refresh behavior.
 - Mobile and web CV surfaces now emphasize current CV, library, build-from-profile, and honest parser-disabled state.
 - Web CV Studio has focused regression tests for the current CV hero, disabled parser state, and radio visibility choices.
 - Job filters now include keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency with mobile persistence plus backend API round-trip/run-now coverage.
@@ -92,7 +96,7 @@ Rebuild again after the next app-code commit before making a new "latest APK" cl
 
 ## Still Required Before Calling This 9.5
 
-- Rebuild a fresh APK after the next app-code commit and smoke it before distribution.
+- Rebuild a fresh APK after the next mobile app-code commit and smoke it before distribution.
 - Run the full backend/web/mobile release gate list from a clean checkout.
 - Re-run full Flutter tests after any more mobile UI edits.
 - Complete real Android device review for seeker, campus, and company.
