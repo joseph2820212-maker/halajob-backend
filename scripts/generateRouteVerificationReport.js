@@ -47,7 +47,10 @@ const isKnownPublic = ({ method, path: pathName, middlewares = [] }) => {
   if (pathName.startsWith("/dash/v1/image/")) return true;
   if (pathName === "/dash/v1/auth/refresh") return true;
   if (pathName === "/dash/v1/auth/logout") return true;
+  if (pathName === "/company/v1/auth/refresh") return true;
+  if (pathName === "/company/v1/auth/refresh-token") return true;
   if (pathName === "/company/v1/auth/logout") return true;
+  if (pathName === "/company/v1/auth/reset-password") return true;
   if (pathName === "/user/v1/auth/logout") return true;
   if (pathName === "/user/v1/auth/refresh-token") return true;
   if (pathName === "/user/v1/auth/passcode-verify") return true;
@@ -70,6 +73,7 @@ const isKnownPublic = ({ method, path: pathName, middlewares = [] }) => {
   if (method === "GET" && pathName.startsWith("/user/v1/page/")) return true;
   if (method === "GET" && pathName.startsWith("/user/v1/banner/")) return true;
   if (method === "GET" && pathName.startsWith("/user/v1/keyword/")) return true;
+  if (method === "GET" && pathName === "/user/v1/company/public/:companyId") return true;
   if (method === "GET" && pathName === "/user/v1/job-information/list-job-reviews/:id") return true;
   if (pathName.startsWith("/jobs/v1/public")) return true;
   return false;
@@ -96,9 +100,14 @@ const inferredGuardsForPath = ({ method, path: pathName }) => {
 
   if (
     pathName.startsWith("/company/v1/global") ||
+    pathName.startsWith("/company/v1/settings") ||
+    pathName.startsWith("/company/v1/profile") ||
     pathName.startsWith("/company/v1/helper") ||
     pathName.startsWith("/company/v1/jobs") ||
-    pathName.startsWith("/company/v1/campus")
+    pathName.startsWith("/company/v1/interviews") ||
+    pathName.startsWith("/company/v1/talent-pool") ||
+    pathName.startsWith("/company/v1/campus") ||
+    pathName.startsWith("/company/v1/salary-insights")
   ) {
     guards.push("inferred:approvedCompanyGuard");
   }
@@ -113,6 +122,8 @@ const inferredGuardsForPath = ({ method, path: pathName }) => {
 
   if (pathName.startsWith("/notifications/v1")) guards.push("inferred:authUser");
   if (pathName.startsWith("/analytics/v1")) guards.push("inferred:authUser");
+  if (pathName.startsWith("/user/v1/communication")) guards.push("inferred:authUser");
+  if (pathName.startsWith("/user/v1/salary-insights")) guards.push("inferred:authUser");
   if (pathName.startsWith("/university/v1")) guards.push("inferred:universityAdminGuard");
 
   if (

@@ -3344,16 +3344,24 @@ paths:
       summary: "GET /company/v1/interviews"
       operationId: "company_get_company_v1_interviews"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     post:
       tags: ["Company"]
       summary: "POST /company/v1/interviews"
       operationId: "company_post_company_v1_interviews"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -3365,12 +3373,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/interviews/{interviewId}":
     get:
       tags: ["Company"]
       summary: "GET /company/v1/interviews/:interviewId"
       operationId: "company_get_company_v1_interviews_interviewid"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "interviewId"
           in: path
@@ -3382,11 +3396,17 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     patch:
       tags: ["Company"]
       summary: "PATCH /company/v1/interviews/:interviewId"
       operationId: "company_patch_company_v1_interviews_interviewid"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "interviewId"
           in: path
@@ -3404,12 +3424,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/interviews/{interviewId}/cancel":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/interviews/:interviewId/cancel"
       operationId: "company_post_company_v1_interviews_interviewid_cancel"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "interviewId"
           in: path
@@ -3427,12 +3453,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/interviews/{interviewId}/feedback":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/interviews/:interviewId/feedback"
       operationId: "company_post_company_v1_interviews_interviewid_feedback"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "interviewId"
           in: path
@@ -3450,12 +3482,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/interviews/{interviewId}/mark-no-show":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/interviews/:interviewId/mark-no-show"
       operationId: "company_post_company_v1_interviews_interviewid_mark_no_show"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "interviewId"
           in: path
@@ -3473,12 +3511,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/interviews/{interviewId}/send-reminder":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/interviews/:interviewId/send-reminder"
       operationId: "company_post_company_v1_interviews_interviewid_send_reminder"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "interviewId"
           in: path
@@ -3496,12 +3540,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/interviews/{interviewId}/status":
     patch:
       tags: ["Company"]
       summary: "PATCH /company/v1/interviews/:interviewId/status"
       operationId: "company_patch_company_v1_interviews_interviewid_status"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "interviewId"
           in: path
@@ -3519,6 +3569,10 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/jobs/hiring/{jobId}/applicants":
     get:
       tags: ["Company"]
@@ -4527,16 +4581,24 @@ paths:
       summary: "GET /company/v1/profile/public"
       operationId: "company_get_company_v1_profile_public"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     patch:
       tags: ["Company"]
       summary: "PATCH /company/v1/profile/public"
       operationId: "company_patch_company_v1_profile_public"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -4548,12 +4610,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/profile/public/preview":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/profile/public/preview"
       operationId: "company_post_company_v1_profile_public_preview"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -4565,12 +4633,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/profile/public/submit-review":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/profile/public/submit-review"
       operationId: "company_post_company_v1_profile_public_submit_review"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -4582,12 +4656,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/salary-insights/check":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/salary-insights/check"
       operationId: "company_post_company_v1_salary_insights_check"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -4599,33 +4679,51 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/salary-insights/suggest":
     get:
       tags: ["Company"]
       summary: "GET /company/v1/salary-insights/suggest"
       operationId: "company_get_company_v1_salary_insights_suggest"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/settings":
     get:
       tags: ["Company"]
       summary: "GET /company/v1/settings"
       operationId: "company_get_company_v1_settings"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     patch:
       tags: ["Company"]
       summary: "PATCH /company/v1/settings"
       operationId: "company_patch_company_v1_settings"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -4637,11 +4735,17 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     put:
       tags: ["Company"]
       summary: "PUT /company/v1/settings"
       operationId: "company_put_company_v1_settings"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -4653,23 +4757,35 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/talent-pool":
     get:
       tags: ["Company"]
       summary: "GET /company/v1/talent-pool"
       operationId: "company_get_company_v1_talent_pool"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/talent-pool/candidates":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/talent-pool/candidates"
       operationId: "company_post_company_v1_talent_pool_candidates"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -4681,12 +4797,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/talent-pool/candidates/{id}":
     delete:
       tags: ["Company"]
       summary: "DELETE /company/v1/talent-pool/candidates/:id"
       operationId: "company_delete_company_v1_talent_pool_candidates_id"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "id"
           in: path
@@ -4698,11 +4820,17 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     get:
       tags: ["Company"]
       summary: "GET /company/v1/talent-pool/candidates/:id"
       operationId: "company_get_company_v1_talent_pool_candidates_id"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "id"
           in: path
@@ -4714,11 +4842,17 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     patch:
       tags: ["Company"]
       summary: "PATCH /company/v1/talent-pool/candidates/:id"
       operationId: "company_patch_company_v1_talent_pool_candidates_id"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "id"
           in: path
@@ -4736,12 +4870,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/talent-pool/candidates/{id}/do-not-contact":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/talent-pool/candidates/:id/do-not-contact"
       operationId: "company_post_company_v1_talent_pool_candidates_id_do_not_contact"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "id"
           in: path
@@ -4759,12 +4899,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/talent-pool/candidates/{id}/invite-to-job":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/talent-pool/candidates/:id/invite-to-job"
       operationId: "company_post_company_v1_talent_pool_candidates_id_invite_to_job"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "id"
           in: path
@@ -4782,12 +4928,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/talent-pool/candidates/{id}/notes":
     get:
       tags: ["Company"]
       summary: "GET /company/v1/talent-pool/candidates/:id/notes"
       operationId: "company_get_company_v1_talent_pool_candidates_id_notes"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "id"
           in: path
@@ -4799,11 +4951,17 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     post:
       tags: ["Company"]
       summary: "POST /company/v1/talent-pool/candidates/:id/notes"
       operationId: "company_post_company_v1_talent_pool_candidates_id_notes"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "id"
           in: path
@@ -4821,12 +4979,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/talent-pool/candidates/{id}/tags":
     post:
       tags: ["Company"]
       summary: "POST /company/v1/talent-pool/candidates/:id/tags"
       operationId: "company_post_company_v1_talent_pool_candidates_id_tags"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "id"
           in: path
@@ -4844,12 +5008,18 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/talent-pool/candidates/{id}/tags/{tag}":
     delete:
       tags: ["Company"]
       summary: "DELETE /company/v1/talent-pool/candidates/:id/tags/:tag"
       operationId: "company_delete_company_v1_talent_pool_candidates_id_tags_tag"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "id"
           in: path
@@ -4866,17 +5036,27 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/company/v1/talent-pool/search":
     get:
       tags: ["Company"]
       summary: "GET /company/v1/talent-pool/search"
       operationId: "company_get_company_v1_talent_pool_search"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/cv/generated/{fileName}":
     get:
       tags: ["Files"]
@@ -90366,6 +90546,8 @@ paths:
       summary: "POST /user/v1/communication/manual-whatsapp-link"
       operationId: "legacy_user_post_user_v1_communication_manual_whatsapp_link"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -90377,22 +90559,34 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/user/v1/communication/preferences":
     get:
       tags: ["Legacy User"]
       summary: "GET /user/v1/communication/preferences"
       operationId: "legacy_user_get_user_v1_communication_preferences"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     patch:
       tags: ["Legacy User"]
       summary: "PATCH /user/v1/communication/preferences"
       operationId: "legacy_user_patch_user_v1_communication_preferences"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -90404,11 +90598,17 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
     put:
       tags: ["Legacy User"]
       summary: "PUT /user/v1/communication/preferences"
       operationId: "legacy_user_put_user_v1_communication_preferences"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       requestBody:
         required: false
         content:
@@ -90420,6 +90620,10 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/user/v1/company-jobs-profile/job-details/{id}":
     get:
       tags: ["Legacy User"]
@@ -93249,17 +93453,25 @@ paths:
       summary: "GET /user/v1/salary-insights"
       operationId: "legacy_user_get_user_v1_salary_insights"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/user/v1/salary-insights/jobs/{jobId}":
     get:
       tags: ["Legacy User"]
       summary: "GET /user/v1/salary-insights/jobs/:jobId"
       operationId: "legacy_user_get_user_v1_salary_insights_jobs_jobid"
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
       parameters:
         - name: "jobId"
           in: path
@@ -93271,6 +93483,10 @@ paths:
           description: Successful response
         "400":
           description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/user/v1/saved-searches":
     get:
       tags: ["Legacy User"]

@@ -117924,6 +117924,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -117937,7 +117941,7 @@
                 "interviews"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -117952,6 +117956,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -117965,7 +117973,7 @@
                 "interviews"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -117980,6 +117988,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -117994,7 +118006,7 @@
                 ":interviewId"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -118009,6 +118021,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -118023,7 +118039,7 @@
                 ":interviewId"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -118038,6 +118054,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -118053,7 +118073,7 @@
                 "cancel"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -118068,6 +118088,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -118083,7 +118107,7 @@
                 "feedback"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -118098,6 +118122,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -118113,7 +118141,7 @@
                 "mark-no-show"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -118128,6 +118156,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -118143,7 +118175,7 @@
                 "send-reminder"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -118158,6 +118190,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -118173,7 +118209,7 @@
                 "status"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119661,6 +119697,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119675,7 +119715,7 @@
                 "public"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119690,6 +119730,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119704,7 +119748,7 @@
                 "public"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119719,6 +119763,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119734,7 +119782,7 @@
                 "preview"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119749,6 +119797,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119764,7 +119816,7 @@
                 "submit-review"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119779,6 +119831,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119793,7 +119849,7 @@
                 "check"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119808,6 +119864,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119822,7 +119882,7 @@
                 "suggest"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119837,6 +119897,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119850,7 +119914,7 @@
                 "settings"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119865,6 +119929,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119878,7 +119946,7 @@
                 "settings"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119893,6 +119961,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119906,7 +119978,7 @@
                 "settings"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119921,6 +119993,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119934,7 +120010,7 @@
                 "talent-pool"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119949,6 +120025,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119963,7 +120043,7 @@
                 "candidates"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -119978,6 +120058,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -119993,7 +120077,7 @@
                 ":id"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -120008,6 +120092,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -120023,7 +120111,7 @@
                 ":id"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -120038,6 +120126,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -120053,7 +120145,7 @@
                 ":id"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -120068,6 +120160,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -120084,7 +120180,7 @@
                 "do-not-contact"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -120099,6 +120195,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -120115,7 +120215,7 @@
                 "invite-to-job"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -120130,6 +120230,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -120146,7 +120250,7 @@
                 "notes"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -120161,6 +120265,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -120177,7 +120285,7 @@
                 "notes"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -120192,6 +120300,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -120208,7 +120320,7 @@
                 "tags"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -120223,6 +120335,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -120240,7 +120356,7 @@
                 ":tag"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -120255,6 +120371,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -120269,7 +120389,7 @@
                 "search"
               ]
             },
-            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
           }
         }
       ]
@@ -121324,6 +121444,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -121338,7 +121462,7 @@
                 "manual-whatsapp-link"
               ]
             },
-            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -121353,6 +121477,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -121367,7 +121495,7 @@
                 "preferences"
               ]
             },
-            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -121382,6 +121510,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -121396,7 +121528,7 @@
                 "preferences"
               ]
             },
-            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -121411,6 +121543,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -121425,7 +121561,7 @@
                 "preferences"
               ]
             },
-            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -126370,6 +126506,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -126383,7 +126523,7 @@
                 "salary-insights"
               ]
             },
-            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: inferred-parent-mount."
           }
         },
         {
@@ -126398,6 +126538,10 @@
               {
                 "key": "lan",
                 "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
               }
             ],
             "url": {
@@ -126413,7 +126557,7 @@
                 ":jobId"
               ]
             },
-            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: inferred-parent-mount."
           }
         },
         {

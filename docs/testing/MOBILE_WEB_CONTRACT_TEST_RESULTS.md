@@ -1,14 +1,15 @@
 # Mobile Web Contract Test Results
 
-Date: 2026-06-28
+Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: `9b17a3b`
+Commit tested: current branch after `8562da4`
 
 ## Passed Coverage
 
 | Area | Evidence |
 |---|---|
 | Mobile route mounts | `npm run test:mobile-routes` |
+| Mobile UI contract | `npm run test:mobile-ui-contract` |
 | Campus student routes | `npm run test:mobile-routes` |
 | University admin routes | `npm run test:mobile-routes` |
 | Legacy employee mobile compatibility routes | `npm run test:mobile-routes` |
@@ -20,6 +21,7 @@ Commit tested: `9b17a3b`
 | Web clean install | `npm --prefix web ci --ignore-scripts` |
 | Web production build and SEO prerender | `npm --prefix web run build` |
 | Web API/auth/i18n/smoke tests | `npm --prefix web test` passed 4 test files / 9 tests, including 401 scoped logout, dynamic path encoding, i18n, and home/jobs/campus/company/seeker/admin smoke navigation |
+| UI action wiring | `npm run test:ui-actions` passed 11 source files and 15 route/UI pairs |
 
 ## Remaining Required Tests
 

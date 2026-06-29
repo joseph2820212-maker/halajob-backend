@@ -2,8 +2,8 @@
 
 ## Source
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Commit: `ff1c2db` mobile Gate A handout campus UI and local campus tester APK build commit
-- Date: 2026-06-28
+- Commit: current `codex/gate-a-mobile-ui-lock` branch after `8562da4`; APK source remains `ff1c2db`
+- Date: 2026-06-29
 - Mobile version: `1.0.2+22`
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Web build: `npm --prefix web run build` passed on 2026-06-28; Vite output in `web/dist`
@@ -12,7 +12,7 @@
 | Area | Score | Evidence |
 |---|---:|---|
 | Mobile UI/UX | 9.0 | Auth keeps the owner-approved cream/minimal screen, while authenticated headers now follow the rendered handout navy shell with cream title/subtitle, subtle border, orange accent state, and one account menu for non-notification actions across seeker/campus, company, and university. APK `1.0.2+22` includes a visible one-tap campus tester entry, captures compact campus home/feed proof, and verifies seeker/company text input in the emulator. Owner real-phone approval is still pending. |
-| Backend/API correctness | 9.2 | 3401 endpoints inventoried; 2149/2149 write/update/delete endpoints have validation; response-code, model-integrity, Mixed-field, auth/context, object-authorization, campus, hiring, subscription, admin, trust, AI, analytics, notification, translation, and file/export suites passed locally. |
+| Backend/API correctness | 9.25 | 3991 endpoints inventoried; 2526/2526 write/update/delete endpoints have validation; route verification now has zero unclassified unguarded endpoints; response-code, model-integrity, Mixed-field, auth/context, object-authorization, campus, hiring, subscription, admin, trust, AI, analytics, notification, translation, file/export, Syria-product, and public-company safe-field suites passed locally. |
 | Security/privacy/permissions | 9.1 | OTP/hardening, route guards, fine-grained admin permissions, audit redaction, private document download tests, upload rejection tests, HSTS/Helmet, and secret scan passed. Production admin audit and secret rotation remain owner-controlled. |
 | Web frontend | 9.0 | Web build passed, 4 Vitest files/9 tests passed, and `npm --prefix web run e2e` / `npm run test:web-smoke` walked home/campus/company/seeker/admin routes through a local Vite preview. |
 | Docs/handover | 9.4 | Required handover package files exist, generated API/OpenAPI/Postman/database docs were refreshed, and `CODEX.md`, `CLAUDE.md`, `CONTRIBUTING.md`, payment decision, testing, deployment, and handover docs are current. |
@@ -53,10 +53,12 @@
 | `npm run smoke:import` | Passed | Local app import smoke passed earlier in this branch proof batch. |
 | `npm run smoke:http` | Passed | Local HTTP smoke passed earlier in this branch proof batch. |
 | `npm run smoke:cors` | Passed | Local CORS smoke passed earlier in this branch proof batch. |
-| `npm run test:route-validation` | Passed | 2149/2149 write/update/delete endpoints with validators; 0 missing. |
+| `npm run test:route-validation` | Passed | 2526/2526 write/update/delete endpoints with validators; 0 missing. |
 | `npm run test:response-codes` | Passed | Response-code contract passed earlier in branch proof batch. |
 | `npm run test:model-integrity` | Passed | Model reference integrity check passed earlier in branch proof batch. |
-| `npm run test:mixed-fields` | Passed | Mixed-field register check passed earlier in branch proof batch. |
+| `npm run test:mixed-fields` | Passed | 60 explicitly classified Mixed fields; settings bags, parser snapshots, CV quality output, and redacted communication payloads are registered. |
+| `npm run test:integration:syria-product` | Passed | CV Studio, CV parsing, resources, interview prep, saved searches, communication hub, salary insights, campus privacy, interview scheduling, talent pool CRM, and company branding. |
+| `npm run test:integration:company-branding` | Passed | Public company profile moderation plus legacy `/user/v1/company/public/:companyId` safe-field regression. |
 | `npm run test:integration:subscriptions` | Passed | Fresh run on 2026-06-28; company billing permissions, invoice ownership, support ticket, admin assignment, and missing-plan failure verified. |
 | `npm --prefix web run build` | Passed | Fresh run on 2026-06-28; Vite built 89 modules and prerendered 6 routes. |
 | `npm --prefix web test` | Passed | Fresh run on 2026-06-28; 4 files and 9 tests passed. |
@@ -98,7 +100,7 @@ after `ff1c2db` without rebuilding the APK.
 ## Backend evidence
 - Static checks: `check:secrets`, `check:syntax`, `check:imports`, and `check:i18n` passed.
 - Integration tests: the branch proof batch passed auth/context, trust documents, object authorization, audit logging, file/export, profile uploads, student verification documents, employee CV downloads, AI runtime, notifications, analytics, subscriptions, company permissions, company members, university members, admin permissions, admin support, admin resources, translations, job mutations, hiring workflows, and campus workflows.
-- Route verification: `npm run test:route-validation` passed with 3401 total endpoints and 2149/2149 write/update/delete endpoints validator-covered.
+- Route verification: `npm run docs:route-report` regenerated 3991 endpoints with zero unclassified unguarded endpoints; `npm run test:route-validation` passed with 2526/2526 write/update/delete endpoints validator-covered.
 - API docs regenerated: API reference, PDF, OpenAPI, Postman collection, route inventory, route report, and database model docs were regenerated in this branch.
 
 ## Security evidence

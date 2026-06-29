@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-29T03:48:52.871Z",
+  "generatedAt": "2026-06-29T06:20:24.270Z",
   "records": [
     {
       "method": "PATCH",
@@ -56197,7 +56197,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "POST",
@@ -56211,7 +56211,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "POST",
@@ -56226,7 +56226,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "POST",
@@ -57829,9 +57829,11 @@
         "validateRequest",
         "getInterviews"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -57844,9 +57846,11 @@
         "validateRequest",
         "getInterviews"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -57859,9 +57863,11 @@
         "validateRequest",
         "getInterviewDetails"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -57874,9 +57880,11 @@
         "validateRequest",
         "getInterviewDetails"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -57889,9 +57897,11 @@
         "validateRequest",
         "cancelInterview"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -57904,9 +57914,11 @@
         "validateRequest",
         "submitInterviewFeedback"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -57919,9 +57931,11 @@
         "validateRequest",
         "markInterviewNoShow"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -57934,9 +57948,11 @@
         "validateRequest",
         "sendInterviewReminder"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -57949,9 +57965,11 @@
         "validateRequest",
         "changeInterviewStatus"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58661,9 +58679,11 @@
         "validateRequest",
         "getPublicProfile"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58675,9 +58695,11 @@
         "validateRequest",
         "getPublicProfile"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58690,9 +58712,11 @@
         "validateRequest",
         "previewPublicProfile"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58705,9 +58729,11 @@
         "validateRequest",
         "submitPublicProfileReview"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58719,9 +58745,11 @@
         "validateRequest",
         "companyCheck"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58732,9 +58760,11 @@
         "validateRequest",
         "companySuggest"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58745,9 +58775,11 @@
         "validateRequest",
         "getCompanySettings"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58758,9 +58790,11 @@
         "validateRequest",
         "getCompanySettings"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58771,9 +58805,11 @@
         "validateRequest",
         "getCompanySettings"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58786,9 +58822,11 @@
         "validateRequest",
         "listTalentPool"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58801,9 +58839,11 @@
         "validateRequest",
         "saveCandidate"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58816,9 +58856,11 @@
         "validateRequest",
         "getCandidateDetails"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58831,9 +58873,11 @@
         "validateRequest",
         "getCandidateDetails"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58846,9 +58890,11 @@
         "validateRequest",
         "getCandidateDetails"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58861,9 +58907,11 @@
         "validateRequest",
         "markDoNotContact"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58876,9 +58924,11 @@
         "validateRequest",
         "inviteCandidateToJob"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58891,9 +58941,11 @@
         "validateRequest",
         "addCandidateNote"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58906,9 +58958,11 @@
         "validateRequest",
         "addCandidateNote"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58921,9 +58975,11 @@
         "validateRequest",
         "addCandidateTags"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58936,9 +58992,11 @@
         "validateRequest",
         "removeCandidateTag"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -58951,9 +59009,11 @@
         "validateRequest",
         "listTalentPool"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -59432,9 +59492,11 @@
         "validateRequest",
         "createManualWhatsappLink"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -59445,9 +59507,11 @@
         "validateRequest",
         "getPreferences"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -59458,9 +59522,11 @@
         "validateRequest",
         "getPreferences"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -59471,9 +59537,11 @@
         "validateRequest",
         "getPreferences"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -59582,7 +59650,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "POST",
@@ -61578,9 +61646,11 @@
         "validateRequest",
         "userInsight"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {
@@ -61591,9 +61661,11 @@
         "validateRequest",
         "userJobInsight"
       ],
-      "inferredGuards": [],
-      "hasAuthGuard": false,
-      "guardSource": "none",
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
       "knownPublic": false
     },
     {

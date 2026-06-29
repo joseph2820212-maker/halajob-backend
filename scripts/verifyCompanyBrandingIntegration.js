@@ -277,6 +277,19 @@ async function main() {
   assert.ok(!publicString.includes("verification_documents"), "public response must not expose verification documents");
   assert.ok(!publicString.includes("private-license.pdf"), "public response must not expose private uploaded files");
 
+  const legacyPublicProfile = await expectStatus(
+    request(baseUrl, "GET", `/user/v1/company/public/${company._id}`),
+    200,
+    "legacy public company endpoint should stay compatible"
+  );
+  assert.equal(legacyPublicProfile.data?.company?.company_name, company.company_name, "legacy public endpoint should include company name");
+  const legacyPublicString = JSON.stringify(legacyPublicProfile.data);
+  assert.ok(!legacyPublicString.includes("owner_user_id"), "legacy public endpoint must not expose owner_user_id");
+  assert.ok(!legacyPublicString.includes("private.hr"), "legacy public endpoint must not expose private HR email");
+  assert.ok(!legacyPublicString.includes("subscription"), "legacy public endpoint must not expose subscription fields");
+  assert.ok(!legacyPublicString.includes("verification_documents"), "legacy public endpoint must not expose verification documents");
+  assert.ok(!legacyPublicString.includes("private-license.pdf"), "legacy public endpoint must not expose private uploaded files");
+
   await expectStatus(
     request(baseUrl, "PATCH", "/company/v1/profile/public", {
       token: companyTokens.accessToken,

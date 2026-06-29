@@ -1,6 +1,6 @@
 # Live Smoke Test Results
 
-Date: 2026-06-28
+Date: 2026-06-29
 Status: not yet run against production/live deployment.
 
 ## Local Smoke Results
@@ -11,7 +11,7 @@ Status: not yet run against production/live deployment.
 | `npm run smoke:http` | Passed |
 | `npm run smoke:cors` | Passed |
 
-Latest local run: `codex/gate-a-mobile-ui-lock` at `9b17a3b`.
+Latest local run: `codex/gate-a-mobile-ui-lock` after `8562da4`.
 
 ## Live Smoke Blockers
 

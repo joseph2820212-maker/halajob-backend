@@ -1,6 +1,6 @@
 # Route Verification Report
 
-Generated: 2026-06-29T03:48:52.871Z
+Generated: 2026-06-29T06:20:24.270Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
@@ -9,9 +9,9 @@ Source: live Express app via `express-list-endpoints`.
 |---|---:|
 | Raw Express endpoint entries | 2535 |
 | Unique method/path endpoints | 3991 |
-| Endpoints with detected auth/role guard | 3839 |
-| Known public/system endpoints | 112 |
-| Unguarded endpoints needing manual classification | 40 |
+| Endpoints with detected auth/role guard | 3875 |
+| Known public/system endpoints | 116 |
+| Unguarded endpoints needing manual classification | 0 |
 
 Full machine-readable inventory:
 
@@ -28,11 +28,11 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Analytics | 5 | 5 | 0 | 0 |
 | Campus | 18 | 16 | 2 | 0 |
 | Campus Student | 51 | 49 | 2 | 0 |
-| Company | 181 | 143 | 5 | 33 |
+| Company | 181 | 173 | 8 | 0 |
 | Files | 1 | 0 | 1 | 0 |
 | Health | 4 | 0 | 4 | 0 |
 | Jobs | 2 | 2 | 0 | 0 |
-| Legacy User | 204 | 120 | 77 | 7 |
+| Legacy User | 204 | 126 | 78 | 0 |
 | Notifications | 20 | 20 | 0 | 0 |
 | Other | 15 | 0 | 15 | 0 |
 | Seeker | 110 | 109 | 1 | 0 |
@@ -491,48 +491,7 @@ Note: parent-mount guards are inferred because `express-list-endpoints` does not
 
 These endpoints do not expose one of the known guard middleware names, do not match a known protected parent mount, and are not in the known-public allowlist. Some may be intentionally public or may be protected indirectly by controller code. Review them before launch.
 
-| Method | Path | Module | Middlewares |
-| --- | --- | --- | --- |
-| POST | /company/v1/auth/refresh | Company | multerMiddleware, validateRequest, refresh |
-| POST | /company/v1/auth/refresh-token | Company | multerMiddleware, validateRequest, refresh |
-| POST | /company/v1/auth/reset-password | Company | forceCompanyWebAuthScope, multerMiddleware, validateRequest, resetPassword |
-| GET | /company/v1/interviews | Company | anonymous, multerMiddleware, validateRequest, getInterviews |
-| POST | /company/v1/interviews | Company | anonymous, multerMiddleware, validateRequest, getInterviews |
-| GET | /company/v1/interviews/:interviewId | Company | anonymous, multerMiddleware, validateRequest, getInterviewDetails |
-| PATCH | /company/v1/interviews/:interviewId | Company | anonymous, multerMiddleware, validateRequest, getInterviewDetails |
-| POST | /company/v1/interviews/:interviewId/cancel | Company | anonymous, multerMiddleware, validateRequest, cancelInterview |
-| POST | /company/v1/interviews/:interviewId/feedback | Company | anonymous, multerMiddleware, validateRequest, submitInterviewFeedback |
-| POST | /company/v1/interviews/:interviewId/mark-no-show | Company | anonymous, multerMiddleware, validateRequest, markInterviewNoShow |
-| POST | /company/v1/interviews/:interviewId/send-reminder | Company | anonymous, multerMiddleware, validateRequest, sendInterviewReminder |
-| PATCH | /company/v1/interviews/:interviewId/status | Company | anonymous, multerMiddleware, validateRequest, changeInterviewStatus |
-| GET | /company/v1/profile/public | Company | anonymous, validateRequest, getPublicProfile |
-| PATCH | /company/v1/profile/public | Company | anonymous, validateRequest, getPublicProfile |
-| POST | /company/v1/profile/public/preview | Company | anonymous, multerMiddleware, validateRequest, previewPublicProfile |
-| POST | /company/v1/profile/public/submit-review | Company | anonymous, multerMiddleware, validateRequest, submitPublicProfileReview |
-| POST | /company/v1/salary-insights/check | Company | jsonParser, validateRequest, companyCheck |
-| GET | /company/v1/salary-insights/suggest | Company | validateRequest, companySuggest |
-| GET | /company/v1/settings | Company | validateRequest, getCompanySettings |
-| PATCH | /company/v1/settings | Company | validateRequest, getCompanySettings |
-| PUT | /company/v1/settings | Company | validateRequest, getCompanySettings |
-| GET | /company/v1/talent-pool | Company | anonymous, multerMiddleware, validateRequest, listTalentPool |
-| POST | /company/v1/talent-pool/candidates | Company | anonymous, multerMiddleware, validateRequest, saveCandidate |
-| DELETE | /company/v1/talent-pool/candidates/:id | Company | anonymous, multerMiddleware, validateRequest, getCandidateDetails |
-| GET | /company/v1/talent-pool/candidates/:id | Company | anonymous, multerMiddleware, validateRequest, getCandidateDetails |
-| PATCH | /company/v1/talent-pool/candidates/:id | Company | anonymous, multerMiddleware, validateRequest, getCandidateDetails |
-| POST | /company/v1/talent-pool/candidates/:id/do-not-contact | Company | anonymous, multerMiddleware, validateRequest, markDoNotContact |
-| POST | /company/v1/talent-pool/candidates/:id/invite-to-job | Company | anonymous, multerMiddleware, validateRequest, inviteCandidateToJob |
-| GET | /company/v1/talent-pool/candidates/:id/notes | Company | anonymous, multerMiddleware, validateRequest, addCandidateNote |
-| POST | /company/v1/talent-pool/candidates/:id/notes | Company | anonymous, multerMiddleware, validateRequest, addCandidateNote |
-| POST | /company/v1/talent-pool/candidates/:id/tags | Company | anonymous, multerMiddleware, validateRequest, addCandidateTags |
-| DELETE | /company/v1/talent-pool/candidates/:id/tags/:tag | Company | anonymous, multerMiddleware, validateRequest, removeCandidateTag |
-| GET | /company/v1/talent-pool/search | Company | anonymous, multerMiddleware, validateRequest, listTalentPool |
-| POST | /user/v1/communication/manual-whatsapp-link | Legacy User | jsonParser, validateRequest, createManualWhatsappLink |
-| GET | /user/v1/communication/preferences | Legacy User | validateRequest, getPreferences |
-| PATCH | /user/v1/communication/preferences | Legacy User | validateRequest, getPreferences |
-| PUT | /user/v1/communication/preferences | Legacy User | validateRequest, getPreferences |
-| GET | /user/v1/company/public/:companyId | Legacy User | companyDetails |
-| GET | /user/v1/salary-insights | Legacy User | validateRequest, userInsight |
-| GET | /user/v1/salary-insights/jobs/:jobId | Legacy User | validateRequest, userJobInsight |
+None found.
 
 
 

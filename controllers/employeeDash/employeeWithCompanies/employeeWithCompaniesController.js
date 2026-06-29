@@ -15,6 +15,7 @@ import {
   isValidObjectId,
   getCompanyIdsFromEmployeeActivity,
 } from "../../../helper/employeeDash/employeeDashHelpers.js";
+import { buildPublicCompanyPayload } from "../../../services/companyPublicProfile.service.js";
 
 const publicCompanyFilter = {
   status: true,
@@ -98,10 +99,21 @@ export const companyDetails = async (req, res, next) => {
         .catch(() => []),
     ]);
 
+    const safeCompany = {
+      ...company,
+      public_profile:
+        company.public_profile?.status === "published"
+          ? company.public_profile
+          : {},
+    };
+
     return success(
       res,
       {
-        company,
+        company: buildPublicCompanyPayload(safeCompany, {
+          openJobsCount: stats[0],
+          reviewCount: stats[2],
+        }),
         open_jobs: openJobs,
         reviews,
         stats: {

@@ -2,9 +2,9 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: `6d5dbcf` plus the current Mixed-field register sync in this worktree
+Commit tested: current `codex/gate-a-mobile-ui-lock` worktree after `8562da4`
 Environment: local Codex workspace
-Latest update: route-level validation is enforced for all write/update/delete routes, response-code/model/Mixed-field contracts are under CI, UI-action/source launch guards are under CI, regenerated API/OpenAPI/Postman/database/route artifacts reflect 3401 endpoints, and the Syria product aggregate is documented as the launch-product integration gate.
+Latest update: route-level validation is enforced for all write/update/delete routes, response-code/model/Mixed-field contracts are under CI, UI-action/source launch guards are under CI, regenerated API/OpenAPI/Postman/route artifacts reflect 3991 endpoints with zero unclassified unguarded endpoints, and the Syria product aggregate is documented as the launch-product integration gate.
 
 ## Passed Commands
 
@@ -17,13 +17,14 @@ Latest update: route-level validation is enforced for all write/update/delete ro
 | `npm run smoke:import` | Passed |
 | `npm run smoke:http` | Passed |
 | `npm run smoke:cors` | Passed |
-| `npm run test:route-validation` | Passed, enforced 2149/2149 write/update/delete endpoints with route-level validators and 0 core auth/account gaps |
+| `npm run test:route-validation` | Passed, enforced 2526/2526 write/update/delete endpoints with route-level validators and 0 core auth/account gaps |
 | `npm run test:response-codes` | Passed |
 | `npm run test:model-integrity` | Passed |
 | `npm run test:mixed-fields` | Passed, 60 explicitly allowed `Schema.Types.Mixed` fields after classifying settings section bags, CV parser snapshots, CV quality details, and redacted communication payloads |
 | `npm run test:critical-launch-blockers` | Passed |
 | `npm run test:ui-actions` | Passed, 11 files and 15 route/UI pairs |
 | `npm run test:integration:syria-product` | Passed, covering CV Studio, CV parsing, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy, interview scheduling, talent pool CRM, and company branding |
+| `npm run test:integration:company-branding` | Passed, including legacy `/user/v1/company/public/:companyId` safe-field regression coverage |
 | `npm run test:security-http` | Passed, including private `/uploads/files/*` static denial, generated-CV invalid/traversal rejection, and valid generated-CV attachment/no-store headers |
 | `npm run test:integration:student-verification-documents` | Passed, including upload MIME/size rejection, no mutation on rejected uploads, private student verification document storage, direct public denial, owner-only student download, university-scoped admin download, attachment/no-store/nosniff headers, and upload/download audit logs |
 | `npm run test:audit-logging` | Passed, including admin auth audit rows, admin creation audit rows, and central audit redaction of password/passcode/token/secret/cookie/OTP/API-key/private-key/device-code fields |
@@ -57,7 +58,7 @@ Latest update: route-level validation is enforced for all write/update/delete ro
 | `npm run test:career-passport` | Passed |
 | `npm run test:integration:auth-context` | Passed, including missing/malformed/expired app tokens, expired admin tokens, inactive app-user denial, role/context denial, borrowed-context denial, tampered cross-user stored-default fallback, removed stored-default fallback, suspended-context denial, removed-context denial, removed active-context selection denial, invalid-context rejection, pending-company denial, direct refresh-session revocation denial, and real app/company/admin logout revoking refresh rows and invalidating old access tokens |
 | `npm run test:integration:trust-documents` | Passed, including missing-token, wrong-role, submit-before-request, HTTPS-only evidence, private/internal public-HTTPS evidence rejection, cross-company denial, owning-company submission, admin review queue, audit logs, and analytics |
-| `npm run docs:route-report` | Passed |
+| `npm run docs:route-report` | Passed, regenerated 3991 endpoints with 0 unclassified unguarded endpoints |
 | `npm run docs:api-artifacts` | Passed |
 | `PYTHON=<bundled-python> npm run docs:api-pdf` | Passed, regenerated `docs/api/HALAJOB_API_REFERENCE.pdf` |
 

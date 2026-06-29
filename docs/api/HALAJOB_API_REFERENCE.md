@@ -1,6 +1,6 @@
 # Hala Job API Reference
 
-Generated: 2026-06-29T03:50:48.529Z
+Generated: 2026-06-29T06:20:45.733Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -3486,9 +3486,9 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/company/v1/auth/logout` | Public/system | none | multerMiddleware, validateRequest, logout |
 | POST | `/company/v1/auth/logout-all` | Bearer token | explicit | authUser, activeContextGuard, anonymous, multerMiddleware, validateRequest, logoutAll |
 | POST | `/company/v1/auth/passcode-forgot-password` | Public/system | none | forceCompanyWebAuthScope, multerMiddleware, validateRequest, passcodeVerify |
-| POST | `/company/v1/auth/refresh` | Review | none | multerMiddleware, validateRequest, refresh |
-| POST | `/company/v1/auth/refresh-token` | Review | none | multerMiddleware, validateRequest, refresh |
-| POST | `/company/v1/auth/reset-password` | Review | none | forceCompanyWebAuthScope, multerMiddleware, validateRequest, resetPassword |
+| POST | `/company/v1/auth/refresh` | Public/system | none | multerMiddleware, validateRequest, refresh |
+| POST | `/company/v1/auth/refresh-token` | Public/system | none | multerMiddleware, validateRequest, refresh |
+| POST | `/company/v1/auth/reset-password` | Public/system | none | forceCompanyWebAuthScope, multerMiddleware, validateRequest, resetPassword |
 | POST | `/company/v1/auth/resetPassword` | Public/system | none | forceCompanyWebAuthScope, multerMiddleware, validateRequest, resetPassword |
 | GET | `/company/v1/auth/sessions` | Bearer token | explicit | authUser, activeContextGuard, anonymous, listSessions |
 | DELETE | `/company/v1/auth/sessions/:sessionId` | Bearer token | explicit | authUser, activeContextGuard, anonymous, validateRequest, revokeSession |
@@ -3590,15 +3590,15 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/company/v1/helper/skills` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, multerMiddleware, skills |
 | GET | `/company/v1/helper/work-mode` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, multerMiddleware, workMode |
 | GET | `/company/v1/helper/work-time` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, multerMiddleware, workTime |
-| GET | `/company/v1/interviews` | Review | none | anonymous, multerMiddleware, validateRequest, getInterviews |
-| POST | `/company/v1/interviews` | Review | none | anonymous, multerMiddleware, validateRequest, getInterviews |
-| GET | `/company/v1/interviews/:interviewId` | Review | none | anonymous, multerMiddleware, validateRequest, getInterviewDetails |
-| PATCH | `/company/v1/interviews/:interviewId` | Review | none | anonymous, multerMiddleware, validateRequest, getInterviewDetails |
-| POST | `/company/v1/interviews/:interviewId/cancel` | Review | none | anonymous, multerMiddleware, validateRequest, cancelInterview |
-| POST | `/company/v1/interviews/:interviewId/feedback` | Review | none | anonymous, multerMiddleware, validateRequest, submitInterviewFeedback |
-| POST | `/company/v1/interviews/:interviewId/mark-no-show` | Review | none | anonymous, multerMiddleware, validateRequest, markInterviewNoShow |
-| POST | `/company/v1/interviews/:interviewId/send-reminder` | Review | none | anonymous, multerMiddleware, validateRequest, sendInterviewReminder |
-| PATCH | `/company/v1/interviews/:interviewId/status` | Review | none | anonymous, multerMiddleware, validateRequest, changeInterviewStatus |
+| GET | `/company/v1/interviews` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, getInterviews |
+| POST | `/company/v1/interviews` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, getInterviews |
+| GET | `/company/v1/interviews/:interviewId` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, getInterviewDetails |
+| PATCH | `/company/v1/interviews/:interviewId` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, getInterviewDetails |
+| POST | `/company/v1/interviews/:interviewId/cancel` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, cancelInterview |
+| POST | `/company/v1/interviews/:interviewId/feedback` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, submitInterviewFeedback |
+| POST | `/company/v1/interviews/:interviewId/mark-no-show` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, markInterviewNoShow |
+| POST | `/company/v1/interviews/:interviewId/send-reminder` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, sendInterviewReminder |
+| PATCH | `/company/v1/interviews/:interviewId/status` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, changeInterviewStatus |
 | GET | `/company/v1/jobs/hiring/:jobId/applicants` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, getApplicants |
 | GET | `/company/v1/jobs/hiring/:jobId/applications` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, getJobApplications |
 | POST | `/company/v1/jobs/hiring/:jobId/invitations` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, sendJobInvitation |
@@ -3641,27 +3641,27 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/company/v1/jobs/talent/help-requests` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, requestJobZainTalentHelp |
 | GET | `/company/v1/jobs/talent/help-requests/:requestId` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, getJobZainTalentRequestDetails |
 | PATCH | `/company/v1/jobs/talent/help-requests/:requestId/cancel` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, cancelJobZainTalentRequest |
-| GET | `/company/v1/profile/public` | Review | none | anonymous, validateRequest, getPublicProfile |
-| PATCH | `/company/v1/profile/public` | Review | none | anonymous, validateRequest, getPublicProfile |
-| POST | `/company/v1/profile/public/preview` | Review | none | anonymous, multerMiddleware, validateRequest, previewPublicProfile |
-| POST | `/company/v1/profile/public/submit-review` | Review | none | anonymous, multerMiddleware, validateRequest, submitPublicProfileReview |
-| POST | `/company/v1/salary-insights/check` | Review | none | jsonParser, validateRequest, companyCheck |
-| GET | `/company/v1/salary-insights/suggest` | Review | none | validateRequest, companySuggest |
-| GET | `/company/v1/settings` | Review | none | validateRequest, getCompanySettings |
-| PATCH | `/company/v1/settings` | Review | none | validateRequest, getCompanySettings |
-| PUT | `/company/v1/settings` | Review | none | validateRequest, getCompanySettings |
-| GET | `/company/v1/talent-pool` | Review | none | anonymous, multerMiddleware, validateRequest, listTalentPool |
-| POST | `/company/v1/talent-pool/candidates` | Review | none | anonymous, multerMiddleware, validateRequest, saveCandidate |
-| DELETE | `/company/v1/talent-pool/candidates/:id` | Review | none | anonymous, multerMiddleware, validateRequest, getCandidateDetails |
-| GET | `/company/v1/talent-pool/candidates/:id` | Review | none | anonymous, multerMiddleware, validateRequest, getCandidateDetails |
-| PATCH | `/company/v1/talent-pool/candidates/:id` | Review | none | anonymous, multerMiddleware, validateRequest, getCandidateDetails |
-| POST | `/company/v1/talent-pool/candidates/:id/do-not-contact` | Review | none | anonymous, multerMiddleware, validateRequest, markDoNotContact |
-| POST | `/company/v1/talent-pool/candidates/:id/invite-to-job` | Review | none | anonymous, multerMiddleware, validateRequest, inviteCandidateToJob |
-| GET | `/company/v1/talent-pool/candidates/:id/notes` | Review | none | anonymous, multerMiddleware, validateRequest, addCandidateNote |
-| POST | `/company/v1/talent-pool/candidates/:id/notes` | Review | none | anonymous, multerMiddleware, validateRequest, addCandidateNote |
-| POST | `/company/v1/talent-pool/candidates/:id/tags` | Review | none | anonymous, multerMiddleware, validateRequest, addCandidateTags |
-| DELETE | `/company/v1/talent-pool/candidates/:id/tags/:tag` | Review | none | anonymous, multerMiddleware, validateRequest, removeCandidateTag |
-| GET | `/company/v1/talent-pool/search` | Review | none | anonymous, multerMiddleware, validateRequest, listTalentPool |
+| GET | `/company/v1/profile/public` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, validateRequest, getPublicProfile |
+| PATCH | `/company/v1/profile/public` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, validateRequest, getPublicProfile |
+| POST | `/company/v1/profile/public/preview` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, previewPublicProfile |
+| POST | `/company/v1/profile/public/submit-review` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, submitPublicProfileReview |
+| POST | `/company/v1/salary-insights/check` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, jsonParser, validateRequest, companyCheck |
+| GET | `/company/v1/salary-insights/suggest` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, validateRequest, companySuggest |
+| GET | `/company/v1/settings` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, validateRequest, getCompanySettings |
+| PATCH | `/company/v1/settings` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, validateRequest, getCompanySettings |
+| PUT | `/company/v1/settings` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, validateRequest, getCompanySettings |
+| GET | `/company/v1/talent-pool` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, listTalentPool |
+| POST | `/company/v1/talent-pool/candidates` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, saveCandidate |
+| DELETE | `/company/v1/talent-pool/candidates/:id` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, getCandidateDetails |
+| GET | `/company/v1/talent-pool/candidates/:id` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, getCandidateDetails |
+| PATCH | `/company/v1/talent-pool/candidates/:id` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, getCandidateDetails |
+| POST | `/company/v1/talent-pool/candidates/:id/do-not-contact` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, markDoNotContact |
+| POST | `/company/v1/talent-pool/candidates/:id/invite-to-job` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, inviteCandidateToJob |
+| GET | `/company/v1/talent-pool/candidates/:id/notes` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, addCandidateNote |
+| POST | `/company/v1/talent-pool/candidates/:id/notes` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, addCandidateNote |
+| POST | `/company/v1/talent-pool/candidates/:id/tags` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, addCandidateTags |
+| DELETE | `/company/v1/talent-pool/candidates/:id/tags/:tag` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, removeCandidateTag |
+| GET | `/company/v1/talent-pool/search` | Bearer token | inferred-parent-mount | inferred:approvedCompanyGuard, anonymous, multerMiddleware, validateRequest, listTalentPool |
 
 ## Files
 
@@ -3715,10 +3715,10 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | PUT | `/user/v1/career-passport` | Bearer token | explicit | authUser, anonymous, validateRequest, get |
 | POST | `/user/v1/career-passport/share` | Bearer token | explicit | authUser, anonymous, jsonParser, validateRequest, share |
 | GET | `/user/v1/career-passport/share/:token` | Public/system | none | shared |
-| POST | `/user/v1/communication/manual-whatsapp-link` | Review | none | jsonParser, validateRequest, createManualWhatsappLink |
-| GET | `/user/v1/communication/preferences` | Review | none | validateRequest, getPreferences |
-| PATCH | `/user/v1/communication/preferences` | Review | none | validateRequest, getPreferences |
-| PUT | `/user/v1/communication/preferences` | Review | none | validateRequest, getPreferences |
+| POST | `/user/v1/communication/manual-whatsapp-link` | Bearer token | inferred-parent-mount | inferred:authUser, jsonParser, validateRequest, createManualWhatsappLink |
+| GET | `/user/v1/communication/preferences` | Bearer token | inferred-parent-mount | inferred:authUser, validateRequest, getPreferences |
+| PATCH | `/user/v1/communication/preferences` | Bearer token | inferred-parent-mount | inferred:authUser, validateRequest, getPreferences |
+| PUT | `/user/v1/communication/preferences` | Bearer token | inferred-parent-mount | inferred:authUser, validateRequest, getPreferences |
 | GET | `/user/v1/company-jobs-profile/job-details/:id` | Bearer token | explicit | authUser, anonymous, getJobDetails |
 | GET | `/user/v1/company-jobs-profile/profile-jobs` | Bearer token | explicit | authUser, anonymous, companyData |
 | POST | `/user/v1/company/delete-file` | Bearer token | explicit | authUser, validateRequest, deleteFile |
@@ -3726,7 +3726,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/user/v1/company/get-files` | Bearer token | explicit | authUser, getFileLinks |
 | POST | `/user/v1/company/join-request` | Bearer token | explicit | authUser, multerMiddleware, validateRequest, joinRequest |
 | GET | `/user/v1/company/my-company` | Bearer token | explicit | authUser, get |
-| GET | `/user/v1/company/public/:companyId` | Review | none | companyDetails |
+| GET | `/user/v1/company/public/:companyId` | Public/system | none | companyDetails |
 | POST | `/user/v1/company/update-my-company` | Bearer token | explicit | authUser, validateRequest, update |
 | POST | `/user/v1/company/update-my-company-image` | Bearer token | explicit | authUser, multerMiddleware, validateRequest, updateImage |
 | POST | `/user/v1/company/upload-file` | Bearer token | explicit | authUser, multerMiddleware, validateRequest, uploadFile |
@@ -3875,8 +3875,8 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/user/v1/resources/:idOrSlug` | Bearer token | explicit | authUser, anonymous, validateRequest, getResource |
 | GET | `/user/v1/resources/me/progress` | Bearer token | explicit | authUser, anonymous, validateRequest, myProgress |
 | GET | `/user/v1/resources/recommended` | Bearer token | explicit | authUser, anonymous, validateRequest, recommendedResources |
-| GET | `/user/v1/salary-insights` | Review | none | validateRequest, userInsight |
-| GET | `/user/v1/salary-insights/jobs/:jobId` | Review | none | validateRequest, userJobInsight |
+| GET | `/user/v1/salary-insights` | Bearer token | inferred-parent-mount | inferred:authUser, validateRequest, userInsight |
+| GET | `/user/v1/salary-insights/jobs/:jobId` | Bearer token | inferred-parent-mount | inferred:authUser, validateRequest, userJobInsight |
 | GET | `/user/v1/saved-searches` | Bearer token | explicit | authUser, anonymous, validateRequest, listSavedSearches |
 | POST | `/user/v1/saved-searches` | Bearer token | explicit | authUser, anonymous, validateRequest, listSavedSearches |
 | DELETE | `/user/v1/saved-searches/:id` | Bearer token | explicit | authUser, anonymous, validateRequest, getSavedSearch |

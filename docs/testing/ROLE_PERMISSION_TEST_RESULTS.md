@@ -1,9 +1,9 @@
 # Role Permission Test Results
 
-Date: 2026-06-28
+Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: `9b17a3b`
-Latest update: 2026-06-28 proof pass reran security HTTP, object authorization, audit logging, company/university member permissions, admin permissions/support/resources, campus workflows, student verification documents, trust routes, and admin operation route checks.
+Commit tested: current branch after `8562da4`
+Latest update: 2026-06-29 proof pass reran route validation, response-code, model-integrity, mobile UI contract, global launch contract, company public branding safe-field coverage, and route-report generation with zero unclassified unguarded endpoints.
 
 ## Passed Coverage
 
