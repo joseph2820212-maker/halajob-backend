@@ -1959,7 +1959,7 @@ const startStudentVerification = async (req, res, next) => {
         university_id: university._id,
       },
     });
-    recordAnalyticsEvent({
+    await recordAnalyticsEvent({
       req,
       event: "campus_verification_started",
       entityType: "campus",
@@ -2829,7 +2829,7 @@ const adminApproveVerification = async (req, res, next) => {
     campusVerificationApprovedNotification(verification.toObject()).catch?.(
       console.error,
     );
-    recordAnalyticsEvent({
+    await recordAnalyticsEvent({
       req,
       event: "campus_verification_approved",
       userId: verification.user_id,
