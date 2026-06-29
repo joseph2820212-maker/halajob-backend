@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -297,6 +298,24 @@ assert.match(settingsController, /clearPlatformSettingsCache/);
 const platformSettingsService = read(
   "services/settings/platformSettings.service.js",
 );
+const platformFeatureEnvFlags = [
+  "FEATURE_AI_TOOLS_ENABLED",
+  "FEATURE_CV_PARSING_ENABLED",
+  "FEATURE_CV_STUDIO_ENABLED",
+  "FEATURE_RESOURCE_LIBRARY_ENABLED",
+  "FEATURE_INTERVIEW_PREP_ENABLED",
+  "FEATURE_SAVED_SEARCHES_ENABLED",
+  "FEATURE_SMS_ENABLED",
+  "FEATURE_MANUAL_WHATSAPP_SHARE_ENABLED",
+  "FEATURE_OFFICIAL_WHATSAPP_PROVIDER_ENABLED",
+  "FEATURE_SALARY_INSIGHTS_ENABLED",
+  "FEATURE_CAMPUS_CAREER_CENTER_ENABLED",
+  "FEATURE_VIDEO_INTERVIEWS_ENABLED",
+  "FEATURE_TALENT_POOL_CRM_ENABLED",
+  "FEATURE_EMPLOYER_BRANDING_ENABLED",
+  "FEATURE_PAYMENTS_MODE",
+  "FEATURE_COMPANY_SELF_REGISTER_ENABLED",
+];
 [
   "PLATFORM_SETTINGS_DEFAULTS",
   "clientSettingsFromPlatform",
@@ -316,6 +335,64 @@ const platformSettingsService = read(
     `Platform settings service must expose ${name}.`,
   ),
 );
+platformFeatureEnvFlags.forEach((name) =>
+  assert.match(
+    platformSettingsService,
+    new RegExp(name),
+    `Platform settings service must use ${name} as a launch fallback.`,
+  ),
+);
+
+const platformEnvExample = read(".env.example");
+const platformEnvironmentDocs = read("docs/ENVIRONMENT.md");
+platformFeatureEnvFlags.forEach((name) => {
+  assert.match(platformEnvExample, new RegExp(`^${name}=`, "m"));
+  assert.ok(
+    platformEnvironmentDocs.includes(`\`${name}\``),
+    `docs/ENVIRONMENT.md must document ${name}.`,
+  );
+});
+
+const envFallbackFeatures = JSON.parse(
+  execFileSync(
+    process.execPath,
+    [
+      "--input-type=module",
+      "-e",
+      `
+        import { pathToFileURL } from "node:url";
+        const mod = await import(pathToFileURL("services/settings/platformSettings.service.js").href);
+        const settings = mod.clientSettingsFromPlatform({});
+        console.log(JSON.stringify(settings.features));
+      `,
+    ],
+    {
+      cwd: root,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        FEATURE_CV_STUDIO_ENABLED: "false",
+        FEATURE_INTERVIEW_PREP_ENABLED: "false",
+        FEATURE_SAVED_SEARCHES_ENABLED: "false",
+        FEATURE_SMS_ENABLED: "true",
+        FEATURE_OFFICIAL_WHATSAPP_PROVIDER_ENABLED: "true",
+        FEATURE_TALENT_POOL_CRM_ENABLED: "false",
+        FEATURE_EMPLOYER_BRANDING_ENABLED: "false",
+        FEATURE_PAYMENTS_MODE: "manual",
+        FEATURE_COMPANY_SELF_REGISTER_ENABLED: "false",
+      },
+    },
+  ).trim(),
+);
+assert.equal(envFallbackFeatures.cv_studio_enabled, false);
+assert.equal(envFallbackFeatures.interview_prep_enabled, false);
+assert.equal(envFallbackFeatures.saved_searches_enabled, false);
+assert.equal(envFallbackFeatures.sms_enabled, true);
+assert.equal(envFallbackFeatures.official_whatsapp_provider_enabled, true);
+assert.equal(envFallbackFeatures.talent_pool_crm_enabled, false);
+assert.equal(envFallbackFeatures.employer_branding_enabled, false);
+assert.equal(envFallbackFeatures.payments_mode, "manual");
+assert.equal(envFallbackFeatures.company_self_register, false);
 
 const userRoutes = read("routesUser/index.js");
 const companyRoutes = read("routesCompany/index.js");
@@ -623,10 +700,20 @@ const envExample = read(".env.example");
 [
   "FEATURE_AI_TOOLS_ENABLED=false",
   "FEATURE_CV_PARSING_ENABLED=true",
+  "FEATURE_CV_STUDIO_ENABLED=true",
   "FEATURE_RESOURCE_LIBRARY_ENABLED=true",
+  "FEATURE_INTERVIEW_PREP_ENABLED=true",
+  "FEATURE_SAVED_SEARCHES_ENABLED=true",
+  "FEATURE_SMS_ENABLED=false",
   "FEATURE_SALARY_INSIGHTS_ENABLED=true",
+  "FEATURE_CAMPUS_CAREER_CENTER_ENABLED=true",
+  "FEATURE_VIDEO_INTERVIEWS_ENABLED=true",
+  "FEATURE_TALENT_POOL_CRM_ENABLED=true",
+  "FEATURE_EMPLOYER_BRANDING_ENABLED=true",
   "FEATURE_MANUAL_WHATSAPP_SHARE_ENABLED=true",
   "FEATURE_OFFICIAL_WHATSAPP_PROVIDER_ENABLED=false",
+  "FEATURE_PAYMENTS_MODE=manual",
+  "FEATURE_COMPANY_SELF_REGISTER_ENABLED=true",
   "CV_PARSER_PROVIDER=manual",
   "CV_PARSER_API_KEY=",
   "CV_PARSER_API_URL=",

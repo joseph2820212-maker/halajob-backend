@@ -21,6 +21,10 @@ defaults into controllers or UI-specific code.
 ## Launch Defaults
 
 - `FEATURE_AI_TOOLS_ENABLED=false`.
+- DB-backed platform settings are authoritative when present. When the default
+  platform settings record is missing a value, the backend falls back to the
+  matching `FEATURE_*` environment variable before using the Syria launch
+  default.
 - Client defaults keep `security.otp_digits=5`.
 - CV studio, resource library, interview prep, saved searches, salary insights,
   campus career center, video interviews, talent-pool CRM, and employer branding

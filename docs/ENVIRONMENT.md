@@ -73,10 +73,20 @@ Scope: backend runtime and handover reference. Values in this file are descripti
 | `FEATURE_AI_TOOLS_ENABLED` | Optional | Backend/mobile launch flag for optional AI UI. Default `false`; pass mobile `-EnableAiTools` for tester APK review builds. |
 | `VITE_FEATURE_AI_TOOLS_ENABLED` | Optional | Web launch flag for optional AI UI. Default `false`. |
 | `FEATURE_CV_PARSING_ENABLED` | Optional | Public/client feature flag for CV parsing. Default `true` for the Syria launch plan. |
+| `FEATURE_CV_STUDIO_ENABLED` | Optional | Public/client feature flag for CV Studio. Default `true`. |
 | `FEATURE_RESOURCE_LIBRARY_ENABLED` | Optional | Public/client feature flag for the student resource library. Default `true`. |
+| `FEATURE_INTERVIEW_PREP_ENABLED` | Optional | Public/client feature flag for non-AI interview prep. Default `true`. |
+| `FEATURE_SAVED_SEARCHES_ENABLED` | Optional | Public/client feature flag for saved searches and job alerts. Default `true`. |
+| `FEATURE_SMS_ENABLED` | Optional | Public/client feature flag for SMS channel UI. Default `false` until a provider is configured. |
 | `FEATURE_SALARY_INSIGHTS_ENABLED` | Optional | Public/client feature flag for salary insights. Default `true`. |
+| `FEATURE_CAMPUS_CAREER_CENTER_ENABLED` | Optional | Public/client feature flag for campus career-center surfaces. Default `true`. |
+| `FEATURE_VIDEO_INTERVIEWS_ENABLED` | Optional | Public/client feature flag for live interview scheduling surfaces. Default `true`. |
+| `FEATURE_TALENT_POOL_CRM_ENABLED` | Optional | Public/client feature flag for company talent-pool CRM. Default `true`. |
+| `FEATURE_EMPLOYER_BRANDING_ENABLED` | Optional | Public/client feature flag for employer public profiles and branding. Default `true`. |
 | `FEATURE_MANUAL_WHATSAPP_SHARE_ENABLED` | Optional | Allows manual WhatsApp copy/deep-link helpers. Default `true`. |
 | `FEATURE_OFFICIAL_WHATSAPP_PROVIDER_ENABLED` | Optional | Future provider flag. Keep `false` unless operations explicitly enables official WhatsApp. |
+| `FEATURE_PAYMENTS_MODE` | Optional | Launch billing mode fallback. Default `manual`; online checkout is not required for Syria launch. |
+| `FEATURE_COMPANY_SELF_REGISTER_ENABLED` | Optional | Allows company self-registration when enabled. Default `true`. |
 | `HALA_AI_PROVIDER` | If AI enabled | Provider key such as mock/real adapter. |
 | `HALA_AI_MODEL` | If AI enabled | Model name. |
 | `HALA_AI_API_KEY` | If AI enabled | Backend-only provider key. |

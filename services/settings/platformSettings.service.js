@@ -1,30 +1,61 @@
 import { PlatformSettingsModel } from "../../models/index.js";
 
+const envValue = (name) => {
+  const value = process.env[name];
+  return value === undefined || value === null ? "" : String(value).trim();
+};
+
+const envBool = (name, fallback = false) => {
+  const value = envValue(name);
+  if (!value) return fallback;
+  if (["true", "1", "yes", "on", "enabled"].includes(value.toLowerCase())) {
+    return true;
+  }
+  if (["false", "0", "no", "off", "disabled"].includes(value.toLowerCase())) {
+    return false;
+  }
+  return fallback;
+};
+
+const envText = (name, fallback = "") => envValue(name) || fallback;
+
 export const PLATFORM_SETTINGS_DEFAULTS = {
   general: {
     platform_name: "Hala Job",
     default_language: "ar",
-    default_currency: "SYP",
+    default_currency: envText("SALARY_INSIGHTS_DEFAULT_CURRENCY", "SYP"),
   },
   features: {
     campus_mode: true,
-    ai_tools: false,
-    ai_tools_enabled: false,
-    cv_parsing_enabled: true,
-    cv_studio_enabled: true,
-    resource_library_enabled: true,
-    interview_prep_enabled: true,
-    saved_searches_enabled: true,
-    sms_enabled: false,
-    manual_whatsapp_share_enabled: true,
-    official_whatsapp_provider_enabled: false,
-    salary_insights_enabled: true,
-    campus_career_center_enabled: true,
-    video_interviews_enabled: true,
-    talent_pool_crm_enabled: true,
-    employer_branding_enabled: true,
-    payments_mode: "manual",
-    company_self_register: true,
+    ai_tools: envBool("FEATURE_AI_TOOLS_ENABLED", false),
+    ai_tools_enabled: envBool("FEATURE_AI_TOOLS_ENABLED", false),
+    cv_parsing_enabled: envBool("FEATURE_CV_PARSING_ENABLED", true),
+    cv_studio_enabled: envBool("FEATURE_CV_STUDIO_ENABLED", true),
+    resource_library_enabled: envBool("FEATURE_RESOURCE_LIBRARY_ENABLED", true),
+    interview_prep_enabled: envBool("FEATURE_INTERVIEW_PREP_ENABLED", true),
+    saved_searches_enabled: envBool("FEATURE_SAVED_SEARCHES_ENABLED", true),
+    sms_enabled: envBool("FEATURE_SMS_ENABLED", false),
+    manual_whatsapp_share_enabled: envBool(
+      "FEATURE_MANUAL_WHATSAPP_SHARE_ENABLED",
+      true,
+    ),
+    official_whatsapp_provider_enabled: envBool(
+      "FEATURE_OFFICIAL_WHATSAPP_PROVIDER_ENABLED",
+      false,
+    ),
+    salary_insights_enabled: envBool("FEATURE_SALARY_INSIGHTS_ENABLED", true),
+    campus_career_center_enabled: envBool(
+      "FEATURE_CAMPUS_CAREER_CENTER_ENABLED",
+      true,
+    ),
+    video_interviews_enabled: envBool("FEATURE_VIDEO_INTERVIEWS_ENABLED", true),
+    talent_pool_crm_enabled: envBool("FEATURE_TALENT_POOL_CRM_ENABLED", true),
+    employer_branding_enabled: envBool(
+      "FEATURE_EMPLOYER_BRANDING_ENABLED",
+      true,
+    ),
+    payments_mode: envText("FEATURE_PAYMENTS_MODE", "manual"),
+    company_self_register: envBool("FEATURE_COMPANY_SELF_REGISTER_ENABLED", true),
   },
   security: {
     otp_digits: 5,
