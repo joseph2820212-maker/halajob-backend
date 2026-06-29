@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: current branch after `c39b191`
+Commit tested: implementation through `c39b191`; APK build from `7c2365b`
 
 ## Passed Coverage
 
@@ -29,7 +29,7 @@ Commit tested: current branch after `c39b191`
 | Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed web routes, UI actions, mobile routes, mobile UI contract, and bilingual payload contracts |
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows plus expanded opportunity filter groups against regression |
 | Flutter analyzer | `flutter analyze` passed from `mobile/` with no issues |
-| Historical APK emulator smoke | A debug APK from `c727f65` installed on `emulator-5554` and proved auth, username/password text entry, Campus tester entry, and Campus Tester home. This is not current-HEAD binary proof after `c39b191`; rebuild before distribution or owner approval. |
+| Current APK emulator smoke | A debug APK from `7c2365b` installed on `emulator-5554` and proved auth screen, visible Campus tester entry, Campus tester dashboard, seeker/company text-field input, password masking, and current navy/cream/orange chrome. SHA-256 `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`. |
 
 ## Remaining Required Tests
 

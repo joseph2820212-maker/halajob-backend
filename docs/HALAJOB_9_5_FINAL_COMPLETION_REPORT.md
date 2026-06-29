@@ -4,6 +4,7 @@
 
 - Branch: `codex/gate-a-mobile-ui-lock`
 - Current reviewed source commit: `c39b191`
+- Current APK build commit: `7c2365b` (docs/proof commit after `c39b191`; app code unchanged)
 - Date: 2026-06-29
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -53,15 +54,16 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 ## APK Status
 
-A fresh debug APK was built and installed earlier on 2026-06-29 from commit `c727f65`, before the latest `c39b191` saved-search contract commit.
+A fresh debug APK was built and installed on 2026-06-29 from commit `7c2365b`, after the latest `c39b191` saved-search contract commit.
 
 - Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-latest-codex-gate-a-mobile-ui-lock-debug.apk`
-- SHA-256: `DA788AA7EC3A1C7257F0497286EDC98B25C8140C4AC416DABB5BB80229FE3A9E`
-- Build flags: `LocalCampusAuth=true`, `AI tools enabled=true`, base URL `https://jobzain.com`
+- SHA-256: `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`
+- Version/build: `1.0.6+27`
+- Build flags: Campus auth `local-device`, `AI tools enabled=true`, base URL `https://jobzain.com`, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified screens: auth screen, Campus tester entry, text-field input, and Campus dashboard.
+- Verified screens: auth screen, visible Campus tester entry, seeker/company text-field input, password masking, and Campus tester dashboard.
 
-This is now historical APK proof, not current-HEAD APK proof. Rebuild from `c39b191` or later before distribution, owner visual approval, or any "latest APK" claim.
+This APK is current for the app code reviewed here. Rebuild again after the next app-code commit before distribution, owner visual approval, or a new "latest APK" claim.
 
 ## Current Handout Status
 
@@ -100,6 +102,6 @@ This branch can be called 9.5 only after:
 2. DB-backed integration gates pass with external MongoDB or a documented binary path.
 3. Web build/tests/e2e pass on a machine where Chromium can access local preview.
 4. Flutter analyze/test pass after the final mobile UI change.
-5. A fresh APK/AAB is built from the final review commit and installed/smoked.
+5. A fresh APK/AAB is built from the final app-code review commit and installed/smoked.
 6. Owner-controlled production/provider/security blockers are either proven or explicitly accepted as launch exclusions.
 7. This report is updated again with the final commit, command outputs, APK metadata, and remaining blockers.

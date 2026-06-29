@@ -52,14 +52,16 @@ The web Settings requirement is already covered by `web/src/shared/settings.test
 
 ## APK Status
 
-A debug tester APK was built and installed earlier on 2026-06-29 from commit `c727f65`, with `LocalCampusAuth=true` and `AI tools enabled=true`.
+A fresh debug tester APK was built and installed on 2026-06-29 from commit `7c2365b`, after the `c39b191` saved-search contract work. This is a current app-code tester build; a later docs-only commit may exist after it.
 
 - Output APK: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-latest-codex-gate-a-mobile-ui-lock-debug.apk`
-- SHA-256: `DA788AA7EC3A1C7257F0497286EDC98B25C8140C4AC416DABB5BB80229FE3A9E`
+- SHA-256: `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`
+- Version/build: `1.0.6+27`
+- Build flags: `HALA_DEFAULT_BASE_URL=https://jobzain.com`, Campus auth `local-device`, AI tools enabled, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified: auth screen, Campus tester entry, login text-field input, and Campus dashboard.
+- Verified: auth screen, visible Campus tester entry, Campus tester dashboard, seeker/company text-field entry, password masking, and current navy/cream/orange chrome.
 
-Because `c39b191` was committed after that APK build, this APK is now historical proof, not a current-HEAD binary. Rebuild from `c39b191` or later before handing out a "latest" APK.
+Rebuild again after the next app-code commit before making a new "latest APK" claim.
 
 ## What Is Done Against The Current 9.5 Handout
 
@@ -76,7 +78,7 @@ Because `c39b191` was committed after that APK build, this APK is now historical
 
 ## Still Required Before Calling This 9.5
 
-- Rebuild a fresh APK from `c39b191` or later and smoke it after the latest commit.
+- Rebuild a fresh APK after the next app-code commit and smoke it before distribution.
 - Run the full backend/web/mobile release gate list from a clean checkout.
 - Re-run full Flutter tests after any more mobile UI edits.
 - Complete real Android device review for seeker, campus, and company.
