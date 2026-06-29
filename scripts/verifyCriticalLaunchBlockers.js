@@ -421,6 +421,81 @@ assert.doesNotMatch(
 );
 assert.match(campusController, /source:\s*["']campus_opportunity["']/);
 
+const companyJobRouteSource = read("routesCompany/jobRoute.js");
+const companyTalentPoolRouteSource = read("routesCompany/talentPoolRoute.js");
+const companyTalentPoolController = read(
+  "controllers/companyDash/companyTalentPoolController.js",
+);
+assert.match(
+  companyRoutes,
+  /router\.use\(["']\/talent-pool["'],\s*approvedCompanyGuard,\s*talentPoolRoute\)/,
+  "Company API must keep the richer /company/v1/talent-pool CRM route mounted.",
+);
+assert.match(
+  companyJobRouteSource,
+  /router\.get\(["']\/hiring\/talent-pool["'],\s*requireCompanyPermission\(["']ats\.view["']\)[\s\S]{0,160}controllerHiring\.getTalentPool\)/,
+  "Legacy /company/v1/jobs/hiring/talent-pool must remain compatible for existing clients.",
+);
+[
+  [/router\.get\(["']\/["'][\s\S]{0,220}controller\.listTalentPool/, "list candidates"],
+  [/router\.get\(["']\/search["'][\s\S]{0,220}controller\.searchTalentPool/, "search candidates"],
+  [/router\.post\(["']\/candidates["'][\s\S]{0,220}controller\.saveCandidate/, "save candidates"],
+  [/router\.get\(["']\/candidates\/:id["'][\s\S]{0,220}controller\.getCandidateDetails/, "candidate details"],
+  [/router\.patch\(["']\/candidates\/:id["'][\s\S]{0,220}controller\.updateCandidate/, "candidate updates"],
+  [/router\.delete\(["']\/candidates\/:id["'][\s\S]{0,220}controller\.archiveCandidate/, "candidate archive"],
+  [/router\.post\(["']\/candidates\/:id\/notes["'][\s\S]{0,220}controller\.addCandidateNote/, "notes"],
+  [/router\.get\(["']\/candidates\/:id\/notes["'][\s\S]{0,220}controller\.listCandidateNotes/, "note history"],
+  [/router\.post\(["']\/candidates\/:id\/tags["'][\s\S]{0,220}controller\.addCandidateTags/, "tags"],
+  [/router\.delete\(["']\/candidates\/:id\/tags\/:tag["'][\s\S]{0,220}controller\.removeCandidateTag/, "tag removal"],
+  [/router\.post\(["']\/candidates\/:id\/invite-to-job["'][\s\S]{0,240}controller\.inviteCandidateToJob/, "job invites"],
+  [/router\.post\(["']\/candidates\/:id\/do-not-contact["'][\s\S]{0,240}controller\.markDoNotContact/, "do-not-contact"],
+].forEach(([pattern, label]) => {
+  assert.match(
+    companyTalentPoolRouteSource,
+    pattern,
+    `Talent-pool CRM route is missing ${label}.`,
+  );
+});
+[
+  "CompanySavedCandidateModel",
+  "CompanyCandidateNoteModel",
+  "CompanyCandidateTagModel",
+  "UserApplyingJobModel",
+  "JobInvitationModel",
+  "UniversityModel",
+].forEach((modelName) =>
+  assert.match(companyTalentPoolController, new RegExp(modelName)),
+);
+assert.match(companyTalentPoolController, /resolveCandidateAccess/);
+assert.match(companyTalentPoolController, /isCampusVisibleToCompany/);
+assert.match(
+  companyTalentPoolController,
+  /UserApplyingJobModel\.findOne\(\{\s*_id:\s*applicationId,\s*company_id:\s*companyId/,
+  "Saving from an application must stay scoped to the company application.",
+);
+assert.match(
+  companyTalentPoolController,
+  /JobInvitationModel\.findOne\(\{[\s\S]{0,120}company_id:\s*companyId,[\s\S]{0,120}status:\s*["']accepted["']/,
+  "Saving from an invitation must require an accepted invitation from the same company.",
+);
+[
+  "student_email_verified",
+  "talent_pool_opt_in",
+  "visible_to_partner_companies",
+  "profile_visibility === \"private\"",
+  "candidate_not_visible_to_company",
+].forEach((guard) =>
+  assert.ok(
+    companyTalentPoolController.includes(guard),
+    `Talent-pool campus access guard is missing ${guard}.`,
+  ),
+);
+assert.match(
+  companyTalentPoolController,
+  /UniversityModel\.exists\(\{[\s\S]{0,160}partners:\s*\{\s*\$elemMatch:\s*activeCampusPartnerMatch\(companyId\)/,
+  "Campus talent-pool saves must require an active university partner relationship.",
+);
+
 // Syria-first handout architecture invariants: extend existing systems rather
 // than introducing parallel CV, interview, salary, resource, or branding stacks.
 assertNoFile(
