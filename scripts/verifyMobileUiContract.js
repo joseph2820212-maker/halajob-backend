@@ -39,11 +39,13 @@ function extractClass(source, className) {
 }
 
 const header = extractClass(cards, "HalaNativeHeader");
+const normalizedHeader = header.replace(/\r\n/g, "\n");
 const iconButton = extractClass(cards, "HalaHeaderIconButton");
 const menuButton = extractClass(cards, "HalaHeaderMenuButton");
 const brand = extractClass(cards, "_HalaHeaderBrand");
 const bottomNav = extractClass(cards, "HalaBottomNav");
 const bottomNavItem = extractClass(cards, "_HalaBottomNavItem");
+const normalizedBottomNavItem = bottomNavItem.replace(/\r\n/g, "\n");
 const companyHeader = extractClass(company, "_CompanyHeader");
 const normalizedDashboard = dashboard.replace(/\r\n/g, "\n");
 
@@ -122,7 +124,37 @@ assertContains(
 assertContains(
   bottomNavItem,
   "color: active ? halaOrange : Colors.transparent",
-  "bottom nav selected indicator",
+  "bottom nav selected indicator color",
+);
+assertContains(
+  normalizedBottomNavItem,
+  "Icon(\n                      active ? destination.activeIcon : destination.icon",
+  "bottom nav icon before selected indicator",
+);
+assertContains(
+  normalizedBottomNavItem,
+  "const SizedBox(height: 3),\n                    Container(\n                      width: 22,\n                      height: 4",
+  "bottom nav selected indicator must sit under the icon",
+);
+assertContains(
+  normalizedBottomNavItem,
+  "const SizedBox(height: 3),\n                    Text(",
+  "bottom nav label after selected indicator",
+);
+assertNotContains(
+  bottomNavItem,
+  "Positioned(",
+  "bottom nav selected indicator should not be pinned to the top edge",
+);
+assertContains(
+  normalizedHeader,
+  "if (leading != null) ...[leading!, const SizedBox(width: 6)]",
+  "title header back button alignment",
+);
+assertContains(
+  normalizedHeader,
+  "Expanded(\n            child: showBrand",
+  "title header title alignment",
 );
 assertNotContains(
   dashboard,
