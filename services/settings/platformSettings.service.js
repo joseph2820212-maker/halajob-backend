@@ -29,7 +29,7 @@ export const PLATFORM_SETTINGS_DEFAULTS = {
     campus_mode: true,
     ai_tools: envBool("FEATURE_AI_TOOLS_ENABLED", false),
     ai_tools_enabled: envBool("FEATURE_AI_TOOLS_ENABLED", false),
-    cv_parsing_enabled: envBool("FEATURE_CV_PARSING_ENABLED", true),
+    cv_parsing_enabled: envBool("FEATURE_CV_PARSING_ENABLED", false),
     cv_studio_enabled: envBool("FEATURE_CV_STUDIO_ENABLED", true),
     resource_library_enabled: envBool("FEATURE_RESOURCE_LIBRARY_ENABLED", true),
     interview_prep_enabled: envBool("FEATURE_INTERVIEW_PREP_ENABLED", true),

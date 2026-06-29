@@ -72,7 +72,7 @@ Scope: backend runtime and handover reference. Values in this file are descripti
 |---|---:|---|
 | `FEATURE_AI_TOOLS_ENABLED` | Optional | Backend/mobile launch flag for optional AI UI. Default `false`; pass mobile `-EnableAiTools` for tester APK review builds. |
 | `VITE_FEATURE_AI_TOOLS_ENABLED` | Optional | Web launch flag for optional AI UI. Default `false`. |
-| `FEATURE_CV_PARSING_ENABLED` | Optional | Public/client feature flag for CV parsing. Default `true` for the Syria launch plan. |
+| `FEATURE_CV_PARSING_ENABLED` | Optional | Public/client feature flag for CV parsing. Default `false` until a real parser adapter is configured and tested. |
 | `FEATURE_CV_STUDIO_ENABLED` | Optional | Public/client feature flag for CV Studio. Default `true`. |
 | `FEATURE_RESOURCE_LIBRARY_ENABLED` | Optional | Public/client feature flag for the student resource library. Default `true`. |
 | `FEATURE_INTERVIEW_PREP_ENABLED` | Optional | Public/client feature flag for non-AI interview prep. Default `true`. |

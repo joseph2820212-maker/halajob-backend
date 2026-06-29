@@ -385,6 +385,7 @@ const envFallbackFeatures = JSON.parse(
   ).trim(),
 );
 assert.equal(envFallbackFeatures.cv_studio_enabled, false);
+assert.equal(envFallbackFeatures.cv_parsing_enabled, false);
 assert.equal(envFallbackFeatures.interview_prep_enabled, false);
 assert.equal(envFallbackFeatures.saved_searches_enabled, false);
 assert.equal(envFallbackFeatures.sms_enabled, true);
