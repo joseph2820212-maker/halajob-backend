@@ -110,6 +110,9 @@ jobs:
       - name: Install web dependencies
         run: npm --prefix web ci --ignore-scripts
 
+      - name: Web tab reachability guard
+        run: npm --prefix web run check:tabs
+
       - name: Web build
         run: npm --prefix web run build
 
