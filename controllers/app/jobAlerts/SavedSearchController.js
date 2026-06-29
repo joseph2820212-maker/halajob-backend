@@ -24,7 +24,14 @@ const filterKeys = [
   "search",
   "city",
   "country",
+  "company",
   "category",
+  "date_posted",
+  "job_type",
+  "experience",
+  "salary",
+  "work_mode",
+  "deadline",
   "job_type_id",
   "work_mode_id",
   "experience_level_id",
@@ -32,8 +39,10 @@ const filterKeys = [
   "salary_max",
   "currency_code",
   "is_remote",
+  "easy_apply",
   "is_for_students",
   "is_for_fresh_graduates",
+  "verified_employer",
   "company_id",
 ];
 
@@ -71,7 +80,14 @@ const hasActiveFilter = (filters = {}) =>
     cleanText(filters.keyword) ||
       cleanText(filters.city) ||
       cleanText(filters.country) ||
+      cleanText(filters.company) ||
       cleanText(filters.category) ||
+      cleanText(filters.date_posted) ||
+      cleanText(filters.job_type) ||
+      cleanText(filters.experience) ||
+      cleanText(filters.salary) ||
+      cleanText(filters.work_mode) ||
+      cleanText(filters.deadline) ||
       filters.job_type_id ||
       filters.work_mode_id ||
       filters.experience_level_id ||
@@ -80,12 +96,15 @@ const hasActiveFilter = (filters = {}) =>
       filters.salary_max !== null ||
       cleanText(filters.currency_code) ||
       filters.is_remote !== null ||
+      filters.easy_apply !== null ||
       filters.is_for_students !== null ||
-      filters.is_for_fresh_graduates !== null,
+      filters.is_for_fresh_graduates !== null ||
+      filters.verified_employer !== null,
   );
 
 const defaultNameForFilters = (filters = {}) =>
   cleanText(filters.keyword) ||
+  cleanText(filters.company) ||
   cleanText(filters.category) ||
   cleanText(filters.city) ||
   cleanText(filters.country) ||
@@ -118,7 +137,14 @@ export const listSavedSearches = async (req, res, next) => {
     if (req.query.status === "inactive") filter.is_active = false;
     if (req.query.q || req.query.search) {
       const regex = new RegExp(cleanText(req.query.q || req.query.search).replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
-      filter.$or = [{ name: regex }, { "filters.keyword": regex }, { "filters.city": regex }, { "filters.country": regex }];
+      filter.$or = [
+        { name: regex },
+        { "filters.keyword": regex },
+        { "filters.city": regex },
+        { "filters.country": regex },
+        { "filters.company": regex },
+        { "filters.category": regex },
+      ];
     }
 
     const [items, total] = await Promise.all([

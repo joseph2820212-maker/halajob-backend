@@ -316,6 +316,34 @@ async function main() {
   assert.equal(created.payload.data.filters.keyword, "python");
   assert.equal(created.payload.data.scope, "seeker");
 
+  const richFilters = await expectStatus(
+    request(baseUrl, "POST", "/user/v1/saved-searches", {
+      token: seekerTokens.accessToken,
+      contextId: seekerContext._id,
+      body: {
+        name: "Hybrid Hala Job filters",
+        filters: {
+          company: "Hala Job",
+          date_posted: "week",
+          job_type: "internship",
+          experience: "fresh_grad",
+          salary: "listed",
+          work_mode: "hybrid",
+          deadline: "soon",
+          easy_apply: true,
+          verified_employer: true,
+        },
+        frequency: "daily",
+      },
+    }),
+    201,
+    "seeker creates saved search with launch filter groups",
+  );
+  assert.equal(richFilters.payload.data.filters.company, "Hala Job");
+  assert.equal(richFilters.payload.data.filters.work_mode, "hybrid");
+  assert.equal(richFilters.payload.data.filters.easy_apply, true);
+  assert.equal(richFilters.payload.data.filters.verified_employer, true);
+
   const listed = await expectStatus(
     request(baseUrl, "GET", "/user/v1/saved-searches", {
       token: seekerTokens.accessToken,

@@ -30,7 +30,14 @@ export const normalizeFilters = (input = {}) => ({
   keyword: cleanText(input.keyword || input.q || input.search),
   city: cleanText(input.city),
   country: cleanText(input.country),
+  company: cleanText(input.company),
   category: cleanText(input.category),
+  date_posted: cleanText(input.date_posted),
+  job_type: cleanText(input.job_type),
+  experience: cleanText(input.experience),
+  salary: cleanText(input.salary),
+  work_mode: cleanText(input.work_mode),
+  deadline: cleanText(input.deadline),
   job_type_id: objectId(input.job_type_id),
   work_mode_id: objectId(input.work_mode_id),
   experience_level_id: objectId(input.experience_level_id),
@@ -38,8 +45,10 @@ export const normalizeFilters = (input = {}) => ({
   salary_max: numberOrNull(input.salary_max),
   currency_code: cleanText(input.currency_code).toUpperCase(),
   is_remote: boolOrNull(input.is_remote),
+  easy_apply: boolOrNull(input.easy_apply),
   is_for_students: boolOrNull(input.is_for_students),
   is_for_fresh_graduates: boolOrNull(input.is_for_fresh_graduates),
+  verified_employer: boolOrNull(input.verified_employer),
   company_id: objectId(input.company_id),
 });
 
@@ -138,6 +147,10 @@ export const buildJobQueryForSavedSearch = (search = {}, { since = null } = {}) 
   if (since) query.createdAt = { $gt: since };
   if (filters.city) query.$or = [{ city: new RegExp(escapeRegex(filters.city), "i") }, { cities: filters.city }];
   if (filters.country) query.countries = filters.country;
+  if (filters.company) {
+    const regex = new RegExp(escapeRegex(filters.company), "i");
+    query.$or = [...(query.$or || []), { "search_projection.company.name": regex }, { company_name: regex }];
+  }
   if (filters.job_type_id) query.job_type_id = filters.job_type_id;
   if (filters.work_mode_id) query.work_mode_id = filters.work_mode_id;
   if (filters.experience_level_id) query.experience_level_id = filters.experience_level_id;
@@ -150,14 +163,26 @@ export const buildJobQueryForSavedSearch = (search = {}, { since = null } = {}) 
     query["salary.min"] = { ...(query["salary.min"] || {}), $lte: filters.salary_max };
   }
   if (filters.is_remote !== null && filters.is_remote !== undefined) query.is_remote = filters.is_remote;
+  if (filters.easy_apply === true) query.external_apply_url = { $in: [null, ""] };
   if (filters.is_for_students !== null && filters.is_for_students !== undefined) {
     query.is_for_students = filters.is_for_students;
   }
   if (filters.is_for_fresh_graduates !== null && filters.is_for_fresh_graduates !== undefined) {
     query.is_for_fresh_graduates = filters.is_for_fresh_graduates;
   }
+  if (filters.verified_employer === true) query["trust.review_status"] = "safe";
 
-  const keyword = cleanText(filters.keyword || filters.category);
+  const keyword = cleanText(
+    [
+      filters.keyword,
+      filters.category,
+      filters.job_type,
+      filters.experience,
+      filters.salary,
+      filters.work_mode,
+      filters.deadline,
+    ].filter(Boolean).join(" ")
+  );
   if (keyword) {
     const regex = new RegExp(escapeRegex(keyword), "i");
     const keywordOr = [

@@ -37,7 +37,8 @@
     {
       "path": "web/src/shared/featureFlags.ts",
       "mustContain": [
-        "features.ai_tools_enabled ?? features.ai_tools",
+        "featureAliases",
+        "ai_tools_enabled: [\"ai_tools_enabled\", \"ai_tools\"]",
         "VITE_FEATURE_AI_TOOLS_ENABLED"
       ]
     },
@@ -276,9 +277,9 @@
       "ui": {
         "path": "web/src/seeker/screens.tsx",
         "mustContain": [
-          "Upload & auto-fill",
+          "Upload for parser review",
           "Preview parse",
-          "Confirm auto-fill",
+          "Confirm profile update",
           "Reject parse"
         ]
       }
