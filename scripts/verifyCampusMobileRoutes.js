@@ -76,6 +76,34 @@ function assertSourceIncludes({ fileName, source, required }) {
   assert.deepEqual(missing, [], `${fileName} is missing required mobile route source`);
 }
 
+function escapedRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function routeBlock(source, method, routePath) {
+  const pattern = new RegExp(
+    `router\\.${method.toLowerCase()}\\(\\s*["'\`]${escapedRegExp(routePath)}["'\`][\\s\\S]*?\\n\\);`,
+  );
+  return source.match(pattern)?.[0] || "";
+}
+
+function assertRouteBlocksInclude({ fileName, source, required }) {
+  const missing = [];
+  required.forEach(({ method, path, snippets }) => {
+    const block = routeBlock(source, method, path);
+    if (!block) {
+      missing.push(`${method.toUpperCase()} ${path}`);
+      return;
+    }
+    snippets.forEach((snippet) => {
+      if (!block.includes(snippet)) {
+        missing.push(`${method.toUpperCase()} ${path} -> ${snippet}`);
+      }
+    });
+  });
+  assert.deepEqual(missing, [], `${fileName} is missing required mobile route source`);
+}
+
 assertMounts({
   fileName: "app.js",
   mounts: declaredMounts(sources.app, "app"),
@@ -113,11 +141,16 @@ assertSourceIncludes({
   required: [
     "requireCompanyContext",
     "requireAppAccount",
-    'const approvedCompanyGuard = [authUser, requireCompanyContext, requireAppAccount("company")]',
+    'const approvedCompanyGuard = [\n  authUser,\n  requireCompanyContext,\n  requireAppAccount("company"),\n];',
     'router.use("/global", approvedCompanyGuard, companyDashRoutes)',
+    'router.use("/settings", approvedCompanyGuard, settingsRoute)',
+    'router.use("/profile", approvedCompanyGuard, profileRoute)',
     'router.use("/helper", approvedCompanyGuard, informationHelperRoute)',
     'router.use("/jobs", approvedCompanyGuard, jobRoute)',
+    'router.use("/interviews", approvedCompanyGuard, interviewRoute)',
+    'router.use("/talent-pool", approvedCompanyGuard, talentPoolRoute)',
     'router.use("/campus", approvedCompanyGuard, campusRoute)',
+    'router.use("/salary-insights", approvedCompanyGuard, salaryInsightsRoute)',
   ],
 });
 
@@ -196,16 +229,40 @@ assertSourceIncludes({
   ],
 });
 
-assertSourceIncludes({
+assertRouteBlocksInclude({
   fileName: "routesCompany/campusRoute.js",
   source: sources.companyCampus,
   required: [
-    'router.get("/overview", requireCompanyPermission("ats.view")',
-    'router.get("/opportunities", requireCompanyPermission("jobs.manage")',
-    'router.post("/opportunities", requireCompanyPermission("jobs.manage")',
-    'router.get("/students", requireCompanyPermission("ats.view")',
-    'router.get("/partners", requireCompanyPermission("ats.view")',
-    'router.post("/partners", requireCompanyPermission("jobs.manage")',
+    {
+      method: "GET",
+      path: "/overview",
+      snippets: ['requireCompanyPermission("ats.view")', "campusController.universityOverview"],
+    },
+    {
+      method: "GET",
+      path: "/opportunities",
+      snippets: ['requireCompanyPermission("jobs.manage")', "validate(companySchemas.listSchema)", "campusController.companyOpportunities"],
+    },
+    {
+      method: "POST",
+      path: "/opportunities",
+      snippets: ['requireCompanyPermission("jobs.manage")', "upload.none()", "validate(companySchemas.bodySchema)", "campusController.createCompanyOpportunity"],
+    },
+    {
+      method: "GET",
+      path: "/students",
+      snippets: ['requireCompanyPermission("ats.view")', "validate(companySchemas.listSchema)", "campusController.students"],
+    },
+    {
+      method: "GET",
+      path: "/partners",
+      snippets: ['requireCompanyPermission("ats.view")', "validate(companySchemas.listSchema)", "campusController.partners"],
+    },
+    {
+      method: "POST",
+      path: "/partners",
+      snippets: ['requireCompanyPermission("jobs.manage")', "upload.none()", "validate(companySchemas.bodySchema)", "campusController.addPartner"],
+    },
   ],
 });
 
@@ -426,18 +483,73 @@ assertSourceIncludes({
   required: [
     "requireUniversityAdminContext",
     "const universityAdminGuard = [authUser, requireUniversityAdminContext]",
-    'router.get("/dashboard", universityAdminGuard',
-    'router.get("/dashboard/overview", universityAdminGuard',
-    'router.get("/students", universityAdminGuard',
-    'router.get("/students/:studentId/career-passport", universityAdminGuard',
-    'router.get("/verifications", universityAdminGuard',
-    'router.post("/verifications/:id/approve", universityAdminGuard',
-    'router.post("/verifications/:id/reject", universityAdminGuard',
-    'router.post("/verifications/:id/request-info", universityAdminGuard',
-    'router.get("/analytics/employability", universityAdminGuard',
-    'router.get("/reports/outcomes", universityAdminGuard',
-    'router.get("/opportunities", universityAdminGuard',
-    'router.post("/opportunities", universityAdminGuard',
+  ],
+});
+
+assertRouteBlocksInclude({
+  fileName: "routesUniversity/index.js",
+  source: sources.university,
+  required: [
+    {
+      method: "GET",
+      path: "/dashboard",
+      snippets: ["universityAdminGuard", "campusController.userUniversityOverview"],
+    },
+    {
+      method: "GET",
+      path: "/dashboard/overview",
+      snippets: ["universityAdminGuard", "campusController.userUniversityOverview"],
+    },
+    {
+      method: "GET",
+      path: "/students",
+      snippets: ["universityAdminGuard", "campusController.userUniversityStudents"],
+    },
+    {
+      method: "GET",
+      path: "/students/:studentId/career-passport",
+      snippets: ["universityAdminGuard", "validate(platformSchemas.universityStudentDetailSchema)", "campusController.userUniversityStudentCareerPassport"],
+    },
+    {
+      method: "GET",
+      path: "/verifications",
+      snippets: ["universityAdminGuard", "campusController.adminListVerifications"],
+    },
+    {
+      method: "POST",
+      path: "/verifications/:id/approve",
+      snippets: ["universityAdminGuard", "upload.none()", "validate(platformSchemas.campusAdminVerificationActionSchema)", "campusController.adminApproveVerification"],
+    },
+    {
+      method: "POST",
+      path: "/verifications/:id/reject",
+      snippets: ["universityAdminGuard", "upload.none()", "validate(platformSchemas.campusAdminVerificationActionSchema)", "campusController.adminRejectVerification"],
+    },
+    {
+      method: "POST",
+      path: "/verifications/:id/request-info",
+      snippets: ["universityAdminGuard", "upload.none()", "validate(platformSchemas.campusAdminVerificationActionSchema)", "campusController.adminRequestVerificationInfo"],
+    },
+    {
+      method: "GET",
+      path: "/analytics/employability",
+      snippets: ["universityAdminGuard", "campusController.userUniversityEmployabilityAnalytics"],
+    },
+    {
+      method: "GET",
+      path: "/reports/outcomes",
+      snippets: ["universityAdminGuard", "campusController.userUniversityOutcomeReport"],
+    },
+    {
+      method: "GET",
+      path: "/opportunities",
+      snippets: ["universityAdminGuard", "validate(platformSchemas.campusListSchema)", "campusController.userUniversityOpportunities"],
+    },
+    {
+      method: "POST",
+      path: "/opportunities",
+      snippets: ["universityAdminGuard", "upload.none()", "validate(platformSchemas.universityOpportunityRequestSchema)", "campusController.createUniversityOpportunityRequest"],
+    },
   ],
 });
 
@@ -447,7 +559,8 @@ assertSourceIncludes({
   required: [
     'cleanText(req.query?.format).toLowerCase() === "csv"',
     'res.setHeader("Content-Type", "text/csv; charset=utf-8")',
-    'res.setHeader("Content-Disposition", \'attachment; filename="university-outcomes.csv"\')',
+    '"Content-Disposition"',
+    'attachment; filename="university-outcomes.csv"',
     'export_formats: ["json", "csv"]',
   ],
 });
