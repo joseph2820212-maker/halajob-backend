@@ -406,6 +406,27 @@
       }
     },
     {
+      "label": "mobile company public profile review placement",
+      "route": {
+        "path": "mobile/lib/src/features/company/company_dashboard_service.dart",
+        "mustContain": [
+          "/company/v1/profile/public",
+          "/company/v1/profile/public/submit-review",
+          "Future<CompanyPublicProfileDetail> updateCompanyPublicProfile"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+        "mustContain": [
+          "company-public-profile-seo-title",
+          "company-public-profile-save-button",
+          "company-public-profile-submit-button",
+          "_savePublicProfileDraft",
+          "_submitPublicProfileReview"
+        ]
+      }
+    },
+    {
       "label": "web company salary guidance placement",
       "route": {
         "path": "web/src/shared/api.ts",
