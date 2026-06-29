@@ -1,8 +1,8 @@
 # Hala Job Current Handover
 
-Date: 2026-06-29
+Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Current reviewed source commit: `839cae6` (`Guard admin workspace reachability`)
+Current reviewed source commit: `2138c85` (`Guard web fixed choice ratings`)
 
 ## Current Position
 
@@ -16,6 +16,7 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 | Commit | Summary |
 |---|---|
+| `2138c85` | Public job filters plus public/seeker rating forms now use fixed choice controls instead of dropdowns, with tests proving the unchanged backend payloads. |
 | `839cae6` | Admin web audit and interview-prep workspaces are now reachable from the sidebar and protected by tests. |
 | `4a135c7` | Campus web signup and campus opportunity target forms now use fixed choice rows instead of dropdowns, with tests proving registration and university/company opportunity payloads plus async refresh callbacks. |
 | `a809a37` | Company web job posting now uses fixed choice rows for work mode, job type, work time, salary type, and candidate target, with create-payload regression proof. |
@@ -40,17 +41,18 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 ## Proof From The Latest Work
 
-Latest focused proof after `839cae6`:
+Latest focused proof after `2138c85`:
 
 | Command | Result |
 |---|---|
+| `npm --prefix web test -- public` | Passed; 2 public tests cover segmented public job filters and job rating radio payloads. |
+| `npm --prefix web test -- seeker` | Passed; 3 seeker tests cover CV Studio hierarchy/parser honesty/visibility payloads plus company review rating radio payloads. |
 | `npm --prefix web test -- admin` | Passed; 3 admin tests cover analytics choices, company queue confirmation/detail behavior, and audit/interview-prep sidebar reachability. |
 | `npm --prefix web test -- campus` | Passed; 3 campus tests cover signup gender choice rows, university opportunity target payloads, company campus target payloads, and async refresh callbacks. |
 | `npm --prefix web test -- company` | Passed; 5 company tests cover applicant actions, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
-| `npm --prefix web test` | Passed; 13 files / 49 tests. |
+| `npm --prefix web test` | Passed; 14 files / 52 tests. |
 | `npm --prefix web run build` | Passed; Vite build and SEO prerender completed. |
 | `npm run test:launch-gate:ui-contracts --silent` | Passed; web API wiring 317/317, UI actions, mobile routes/UI contract, and bilingual payload contracts all passed. |
-| `npm --prefix web test -- seeker` | Passed; 2 CV Studio tests cover current CV hierarchy, parser-disabled copy, no dropdowns, and visibility payloads. |
 | `npm run test:integration-mongo-helper --silent` | Passed; proves external Mongo URI scoping and the clear memory-server fallback error path without requiring a binary download. |
 | `npm run check:syntax --silent` | Passed |
 | `npm run check:imports --silent` | Passed |
@@ -69,14 +71,14 @@ The web Settings requirement is already covered by `web/src/shared/settings.test
 
 ## APK Status
 
-A fresh debug tester APK was built and installed on 2026-06-29 from commit `4d87d14`. Later commits through `839cae6` change only web code/tests and docs, so the APK remains current for mobile app behavior.
+A fresh debug tester APK was built and installed on the running emulator from commit `2138c85`.
 
-- Output APK: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-codex-gate-a-mobile-ui-lock-4d87d14-debug.apk`
-- SHA-256: `B065B19DD28EF8FA081B130A3BA6C9CBB2FB438C317DF755047D19BB1FDA1F08`
+- Output APK: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-codex-gate-a-mobile-ui-lock-2138c85-debug.apk`
+- SHA-256: `e5e8b2eafcc5c8e6c18c3d133adfe93696a2258f9162bbfc4cda30c4f4e2a70b`
 - Version/build: `1.0.6+27`
 - Build flags: `HALA_DEFAULT_BASE_URL=https://jobzain.com`, Campus auth `local-device`, AI tools enabled, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified: fresh uninstall/reinstall, auth screen launch, visible Campus role entry, and current navy/cream/orange auth chrome on `emulator-5554`.
+- Verified: auth screen launch, visible Campus role entry, diagnostics showing `1.0.6 (27) | debug-apk | 2138c85 | local-device`, and current cream/navy/orange auth chrome on `emulator-5554`.
 
 Rebuild again after the next app-code commit before making a new "latest APK" claim.
 
@@ -87,6 +89,7 @@ Rebuild again after the next app-code commit before making a new "latest APK" cl
 - Mobile Settings fixed choices no longer use dropdown concepts in source.
 - Web Settings booleans and small fixed choices use checkbox/radio rows and have tests.
 - Campus web signup and campus opportunity target choices use radio rows with payload tests.
+- Public web job filter and public/seeker rating choices use fixed controls with payload tests.
 - Admin web company queues have tests for detail panels and confirmation-gated approve actions.
 - Admin audit and interview-prep workspaces are reachable from the sidebar and covered by tests.
 - Company web support tickets and job posting now have focused tests for fixed choices, create/reply/posting payloads, and refresh behavior.
