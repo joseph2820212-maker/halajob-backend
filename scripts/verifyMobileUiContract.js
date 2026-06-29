@@ -47,6 +47,7 @@ const bottomNav = extractClass(cards, "HalaBottomNav");
 const bottomNavItem = extractClass(cards, "_HalaBottomNavItem");
 const normalizedBottomNavItem = bottomNavItem.replace(/\r\n/g, "\n");
 const companyHeader = extractClass(company, "_CompanyHeader");
+const companyMorePanel = extractClass(company, "_CompanyMorePanel");
 const normalizedDashboard = dashboard.replace(/\r\n/g, "\n");
 
 assertContains(
@@ -289,6 +290,36 @@ assertContains(
   company,
   "key: const ValueKey('company-account-sign-out-button')",
   "company account settings sign out",
+);
+assertContains(
+  company,
+  "aiToolsEnabled: widget.aiToolsEnabled",
+  "company AI flag propagation",
+);
+assertContains(
+  companyMorePanel,
+  "if (aiToolsEnabled)",
+  "company AI tools are feature-flagged",
+);
+assertContains(
+  companyMorePanel,
+  "moduleSection('AI tools', aiModules)",
+  "company AI tools stay grouped when enabled",
+);
+assertNotContains(
+  companyMorePanel,
+  "title: 'AI job drafts'",
+  "company AI tools should not be spread into separate More cards",
+);
+assertNotContains(
+  companyMorePanel,
+  "title: 'Shortlist explanations'",
+  "company AI tools should not be spread into separate More cards",
+);
+assertNotContains(
+  companyMorePanel,
+  "title: 'Hiring messages'",
+  "company AI tools should not be spread into separate More cards",
 );
 assertContains(
   company,
