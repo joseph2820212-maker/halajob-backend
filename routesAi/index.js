@@ -4,12 +4,15 @@ import { requireAppAccount } from "../middlewares/appAccountGuard.js";
 import CareerPassportController from "../controllers/app/CareerPassport/CareerPassportController.js";
 import AiSafetyController from "../controllers/ai/AiSafetyController.js";
 import validate from "../middlewares/validate.js";
+import { requireFeature } from "../middlewares/requireFeature.js";
 import platformSchemas from "../validations/platform.validation.js";
 
 const router = express.Router();
 
 router.use(express.json({ limit: "1mb" }));
 
+// Career Passport scoring degrades to a rule-based result when no AI provider is
+// configured, so it stays available regardless of the AI feature flag.
 router.post(
   "/career-passport/score",
   authUser,
@@ -17,6 +20,11 @@ router.post(
   validate(platformSchemas.aiRequestSchema),
   CareerPassportController.refreshScore
 );
+
+// Everything below depends on the AI provider. Gate it behind the AI feature flag
+// so it is a real server-side kill-switch (off by default for the Syria launch),
+// not just hidden in the UI.
+router.use(requireFeature("ai_tools_enabled"));
 
 router.post("/career/copilot", authUser, requireAppAccount("employee"), validate(platformSchemas.aiRequestSchema), AiSafetyController.careerCopilot);
 router.post("/profile/score", authUser, requireAppAccount("employee"), validate(platformSchemas.aiRequestSchema), AiSafetyController.profileScore);
