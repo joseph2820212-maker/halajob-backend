@@ -3,7 +3,8 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code commit: `f0bdb99`
+- Current reviewed app code commit: `f0bdb99`
+- Current proof baseline before this refresh: `1fd0b40`
 - Date: 2026-06-29
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: locally improved and proof-green for the focused gates below, but not a final 9.5/public-launch certification.
@@ -12,15 +13,16 @@
 
 The project is materially stronger than the earlier Gate A package, but this file must not be read as a final 9.5 completion certificate. The branch now has cleaner settings controls, honest CV parsing defaults, broader job-filter coverage, stronger seeker/campus More placement, company mobile profile/settings chrome split, admin web fixed-choice controls, company AI gating tests, and web code splitting that removes the Vite large-chunk warning.
 
-Current rating: 8.7/10 source readiness.
+Current rating: 8.4/10 source readiness.
 
-The remaining gap to 9.5 is proof and owner-controlled launch readiness: full release gate replay from a clean checkout, production smoke, production secrets/provider checks, production signing, and owner real-device approval.
+The remaining gap to 9.5 is still UI/IA polish plus owner-controlled launch readiness: full release gate replay from a clean checkout, production smoke, production secrets/provider checks, production signing, and owner real-device approval. The external audit handout dated 2026-06-29 is directionally correct that this branch should not be called final 9.5 until Settings, CV Manager, filters, company IA, and final reproducible proof are tighter.
 
 ## Recent Codex 9.5 Polish Commits
 
 | Commit | Summary |
 |---|---|
 | `f0bdb99` | Splits company mobile header into visible notifications/profile/settings actions, keeps sign out in account settings, and groups company More into AI tools, company files, support, account, and team/templates. |
+| `1fd0b40` | Refreshes proof reporting and mobile UI contract guards for the company header/More IA split. |
 | `cbe4c51` | Groups seeker/campus More actions and removes duplicate primary campus tab shortcuts from More. |
 | `af7f923` | Polishes web CV visibility choices with radio/ticked rows and adds CV Studio regression coverage. |
 | `be4d8ca` | Polishes mobile CV visibility selection and related CV manager hierarchy. |
@@ -44,6 +46,7 @@ The remaining gap to 9.5 is proof and owner-controlled launch readiness: full re
 | `flutter test test/widget_test.dart --plain-name "company AI hiring tools are grouped under More when enabled"` | Passed | AI hiring tools appear once under More only when enabled and open the AI tools screen. |
 | `flutter test test/widget_test.dart --plain-name "company IA places workflows in owning tabs"` | Passed | Applicants/interviews/reviews stay in Applicants, talent/campus recruiting stay in Talent, and More keeps secondary tools. |
 | `flutter test test/widget_test.dart --plain-name "company account profile screen updates owner settings"` | Passed | Company settings path updates account owner details and keeps sign out visible. |
+| `flutter test` | Passed | Full mobile widget suite passed: 438 tests. The stale company-support and campus-applications tests were updated to match the current IA instead of the removed duplicate More shortcuts. |
 | `flutter analyze` | Passed | Run with the local Flutter 3.44.4 SDK. |
 | `powershell.exe -ExecutionPolicy Bypass -File mobile/scripts/assert-mobile-screen-inventory.ps1` | Passed | Mobile screen inventory now protects current More placement, company profile/settings header split, and AI single-entry rules. |
 | `flutter build apk --debug` | Passed | Built debug APK from commit `f0bdb99`; Gradle emitted only the existing file_picker Kotlin plugin migration warning. |
@@ -53,6 +56,9 @@ The remaining gap to 9.5 is proof and owner-controlled launch readiness: full re
 | `npm run check:syntax` | Passed | JavaScript syntax check passed. |
 | `npm run check:web-routes` | Passed | 315/315 web API calls matched backend routes. |
 | `npm run test:launch-gate:ui-contracts` | Passed | Web routes, UI actions, mobile routes, mobile UI contract, and bilingual payload contracts passed. |
+| `npm run test:integration:subscriptions` | Passed | Passed standalone after the first aggregate backend gate exited while starting this script. |
+| `npm run test:integration:launch-critical` | Passed | Critical launch integrations passed end-to-end with disposable MongoDB database naming. |
+| `npm run test:integration:syria-product` | Passed | CV Studio, CV parsing, learning resources, interview prep, saved search alerts, communication hub, salary insights, campus privacy, interview scheduling, talent-pool CRM, and company branding integrations passed. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
@@ -89,6 +95,8 @@ This is a debug/test APK, not a production-signed Android release. Production AP
 ## Integration Test Reproducibility
 
 Seeded integration scripts prefer `CONNECTION_URL` when provided and rewrite it to a unique disposable database name. CI uses a MongoDB 7 service container, avoiding the `mongodb-memory-server` runtime download path. Local fresh-checkout instructions are documented in `docs/TESTING_GUIDE.md`.
+
+On 2026-06-29, the standalone DB-backed gates above passed locally. The full `npm run test:launch-gate:backend` aggregate is not claimed as green in this report because one run exited while entering the subscriptions integration script; that same subscriptions script and the launch-critical/Syria-product aggregate suites then passed standalone.
 
 ## External Blockers
 
