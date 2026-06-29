@@ -18,6 +18,9 @@ const university = read(
 );
 const authScreen = read("mobile/lib/src/features/auth/auth_screen.dart");
 const authService = read("mobile/lib/src/features/auth/auth_service.dart");
+const clientFeatureSettings = read(
+  "mobile/lib/src/core/config/client_feature_settings.dart",
+);
 const appShell = read("mobile/lib/src/app.dart");
 const buildAndroid = read("mobile/scripts/build-android.ps1");
 const mobileCi = read(".github/workflows/flutter-mobile-ci.yml");
@@ -402,9 +405,50 @@ assertContains(
   "mobile legacy public client settings fallback",
 );
 assertContains(
-  authService,
-  "features['ai_tools_enabled'] ?? features['ai_tools']",
+  clientFeatureSettings,
+  "'ai_tools_enabled'",
   "mobile AI flag should prefer DB-backed enabled key",
+);
+assertContains(
+  clientFeatureSettings,
+  "'ai_tools'",
+  "mobile AI flag legacy fallback",
+);
+assertContains(
+  authService,
+  "Future<ClientFeatureSettings> fetchClientFeatureSettings",
+  "mobile full client feature settings loader",
+);
+[
+  "cvStudioEnabled",
+  "resourceLibraryEnabled",
+  "interviewPrepEnabled",
+  "savedSearchesEnabled",
+  "salaryInsightsEnabled",
+  "campusCareerCenterEnabled",
+  "talentPoolCrmEnabled",
+  "employerBrandingEnabled",
+].forEach((name) =>
+  assertContains(
+    clientFeatureSettings,
+    name,
+    `mobile client feature setting ${name}`,
+  ),
+);
+assertContains(
+  appShell,
+  "_clientFeatureSettings",
+  "mobile app-shell cached client feature settings",
+);
+assertContains(
+  dashboard,
+  "_isQuickActionFeatureEnabled",
+  "mobile seeker/campus feature guard",
+);
+assertContains(
+  company,
+  "talentPoolCrmEnabled",
+  "mobile company talent-pool feature guard",
 );
 assertContains(appShell, "role: session.role", "mobile role-aware logout");
 assertContains(buildAndroid, "[switch]$EnableAiTools", "mobile AI tester build flag");

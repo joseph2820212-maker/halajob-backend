@@ -474,11 +474,12 @@ const syriaFirstUiSource = syriaFirstUiFiles.map(read).join("\n");
 });
 
 const mobileApp = read("mobile/lib/src/app.dart");
-assert.match(mobileApp, /fetchClientAiToolsEnabled/);
+assert.match(mobileApp, /fetchClientFeatureSettings/);
+assert.match(mobileApp, /_clientFeatureSettings/);
 const aiToolsGate =
   mobileApp.match(/bool get _aiToolsEnabled =>[\s\S]*?;/)?.[0] || "";
 assert.match(aiToolsGate, /_compiledAiToolsEnabled/);
-assert.match(aiToolsGate, /_clientAiToolsEnabled/);
+assert.match(aiToolsGate, /_clientFeatureSettings\.aiToolsEnabled/);
 
 [
   "UserSettingsModel",
