@@ -53,6 +53,8 @@
       "path": "web/src/company/screens.tsx",
       "mustContain": [
         "aiToolsEnabledFromSettings(clientSettings)",
+        "...(webAiToolsEnabled ? [\"ai tools\"] : [])",
+        "{webAiToolsEnabled && tab === \"ai tools\" && <CompanyAiPanel",
         "createTemplateFromAi",
         "createJobFromAi",
         "copyAiResult",
@@ -67,6 +69,8 @@
       "path": "web/src/seeker/screens.tsx",
       "mustContain": [
         "aiToolsEnabledFromSettings(clientSettings)",
+        "...(webAiToolsEnabled ? [\"ai tools\"] : [])",
+        "{webAiToolsEnabled && tab === \"ai tools\" && <SeekerAiPanel",
         "employeeService.downloadCv(id)",
         "CV download opened",
         "{ui(\"Open\")}"
@@ -78,7 +82,9 @@
     {
       "path": "web/src/campus/screens.tsx",
       "mustContain": [
-        "aiToolsEnabledFromSettings(clientSettings)"
+        "aiToolsEnabledFromSettings(clientSettings)",
+        "...(webAiToolsEnabled ? [\"ai tools\"] : [])",
+        "{webAiToolsEnabled && mode === \"student\" && tab === \"ai tools\" && <CampusAiPanel"
       ],
       "mustNotContain": [
         "VITE_FEATURE_AI_TOOLS_ENABLED"
