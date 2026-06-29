@@ -11,7 +11,7 @@
 ## Final scores
 | Area | Score | Evidence |
 |---|---:|---|
-| Mobile UI/UX | 9.0 | Auth keeps the owner-approved cream/minimal screen, while authenticated headers now follow the rendered handout navy shell with cream title/subtitle, subtle border, orange accent state, and one account menu for non-notification actions across seeker/campus, company, and university. APK `1.0.6+27` was rebuilt from commit `5821007` with local-device campus tester entry after the bilingual localization fix. Owner real-phone approval is still pending. |
+| Mobile UI/UX | 9.0 | Auth keeps the owner-approved cream/minimal screen, while authenticated headers now follow the rendered handout navy shell with cream title/subtitle, subtle border, orange accent state, and one account menu for non-notification actions across seeker/campus, company, and university. APK `1.0.6+27` was rebuilt from commit `5821007`, installed on emulator, reported `versionName=1.0.6` / `versionCode=27`, accepted text in username/password fields, exposed the local-device campus tester entry, and opened the campus dashboard. Owner real-phone approval is still pending. |
 | Backend/API correctness | 9.25 | 3991 endpoints inventoried; 2526/2526 write/update/delete endpoints have validation; route verification now has zero unclassified unguarded endpoints; response-code, model-integrity, Mixed-field, auth/context, object-authorization, campus, hiring, subscription, admin, trust, AI, analytics, notification, translation, file/export, Syria-product, and public-company safe-field suites passed locally. |
 | Security/privacy/permissions | 9.1 | OTP/hardening, route guards, fine-grained admin permissions, audit redaction, private document download tests, upload rejection tests, HSTS/Helmet, and secret scan passed. Production admin audit and secret rotation remain owner-controlled. |
 | Web frontend | 9.0 | Web build passed, 4 Vitest files/9 tests passed, `npm --prefix web run e2e` / `npm run test:web-smoke` walked home/campus/company/seeker/admin routes through a local Vite preview, and `npm run test:bilingual-ui-payload` now protects English/Arabic UI payload and language-header behavior across web/mobile. |
@@ -72,7 +72,8 @@
 | `powershell -ExecutionPolicy Bypass -File .\mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Guard now requires the visible local campus tester entry. |
 | `powershell -ExecutionPolicy Bypass -File .\mobile\scripts\build-android.ps1 -BuildTarget release-apk-local -BaseUrl https://jobzain.com -LocalCampusAuth` | Passed | Built tester APK `1.0.6+27` from commit `5821007`; Gradle completed in 106.2s and produced a 63.7 MB APK. |
 | `powershell -ExecutionPolicy Bypass -File .\mobile\scripts\export-latest-apk-zip.ps1 -OutputPath C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\HalaJob-1.0.6+27-campus-tester-5821007.zip` | Passed | Exported the fresh APK ZIP with metadata/readme/checksum; ZIP SHA-256 `2a118991c2f6c9daedd154087174cb34d12897551badba97a0233ef47b926cf3`. |
-| Previous `adb install -r` proof for the same UI shell | Passed | Earlier emulator proof covered campus tester entry, compact dashboard/feed, and seeker/company text input. The APK was rebuilt after the localization change; owner real-device install remains pending. |
+| `adb install -r mobile/dist/android/halajob-mobile-latest-release-local.apk` | Passed | Fresh APK installed on emulator `emulator-5554`; Android package metadata reports `versionName=1.0.6`, `versionCode=27`. |
+| Fresh APK emulator smoke | Passed | Clean auth screenshot captured, username/password fields accepted input, Campus role displayed `Use campus tester account`, and tapping it opened the Campus Tester dashboard. |
 
 Full local proof details are recorded in `docs/testing/API_REGRESSION_TEST_RESULTS.md`,
 `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md`,
@@ -115,7 +116,7 @@ after `5821007` without rebuilding the APK.
 ## UI/UX proof
 - Current APK ZIP artifact: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\HalaJob-1.0.6+27-campus-tester-5821007.zip`.
 - Campus tester entry: source/widget coverage confirms the role selector, visible one-tap tester button, and local campus mode; APK metadata confirms `campusAuthMode: local-device`.
-- Screenshots/recordings: earlier `1.0.2+22` APK proof was captured on PC emulator `HalaJob_Pixel_API35` after a fresh `adb install -r`: `halajob-1.0.2+22-auth.png`, `halajob-1.0.2+22-language-arabic.png`, `halajob-1.0.2+22-register.png`, `halajob-1.0.2+22-forgot-password.png`, `halajob-1.0.2+22-campus-auth.png`, `halajob-1.0.2+22-campus-home.png`, `halajob-1.0.2+22-campus-feed.png`, `halajob-1.0.2+22-campus-resources.png`, `halajob-1.0.2+22-campus-resource-detail.png`, `halajob-1.0.2+22-campus-events.png`, `halajob-1.0.2+22-campus-event-detail.png`, `halajob-1.0.2+22-campus-more.png`, `halajob-1.0.2+22-campus-verification.png`, `halajob-1.0.2+22-campus-career-passport.png`, `halajob-1.0.2+22-seeker-input-proof.png`, and `halajob-1.0.2+22-company-input-proof.png`. Fresh `1.0.6+27` APK install/visual approval is now pending with the owner.
+- Screenshots/recordings: fresh `1.0.6+27` APK proof was captured on emulator `emulator-5554`: `halajob-1.0.6+27-clean-auth.png`, `halajob-1.0.6+27-text-input-proof.png`, `halajob-1.0.6+27-campus-auth.png`, and `halajob-1.0.6+27-campus-home.png`, with matching UI XML dumps for clean auth, text input, campus auth, and campus home in the outputs folder. Earlier `1.0.2+22` screenshots remain historical broader screen proof for register/recovery/resources/events/passport states.
 - Owner visual approval: Pending. The owner still needs to confirm the fresh tester APK on a real Android phone and approve that the design is visibly clean, app-like, and includes the campus tester entry. Auth and local campus proof are stronger now, but authenticated seeker/company/university visual proof still needs real test accounts or seeded access.
 
 ## External blockers
@@ -132,7 +133,7 @@ after `5821007` without rebuilding the APK.
 | Backup/restore | Prove managed backup and restore into a non-production database. | Backup/restore policy is documented. |
 | Payments | Accept manual/admin subscriptions for launch or select an online payment provider and provide merchant/webhook setup. | Manual/admin subscriptions are implemented, tested, and documented. |
 | Production Android release | Decide package ID/update path, production signing key, version strategy, and distribution channel. | Tester APK build/export flow exists; current APK is debug-local signed. |
-| Owner UI approval | Confirm the APK UI on a real Android phone. | Fresh tester APK ZIP `HalaJob-1.0.6+27-campus-tester-5821007.zip` exists, PC emulator screenshots exist for the same UI shell, one-tap campus entry works, and seeker/company fields accepted input in prior emulator proof. |
+| Owner UI approval | Confirm the APK UI on a real Android phone. | Fresh tester APK ZIP `HalaJob-1.0.6+27-campus-tester-5821007.zip` exists; emulator install/version proof, clean auth screenshot, text-input proof, one-tap campus tester entry, and campus home proof are captured for the same APK. |
 
 ## Remaining known issues
 - Public launch cannot be certified until owner-controlled production checks are completed.

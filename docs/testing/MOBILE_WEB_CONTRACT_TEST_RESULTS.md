@@ -23,10 +23,11 @@ Commit tested: current branch after `a3ce4af`
 | Web API/auth/i18n/smoke tests | `npm --prefix web test` passed 4 test files / 9 tests, including 401 scoped logout, dynamic path encoding, i18n, and home/jobs/campus/company/seeker/admin smoke navigation |
 | UI action wiring | `npm run test:ui-actions` passed 11 source files and 15 route/UI pairs |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
+| Fresh APK emulator smoke | `adb install -r mobile/dist/android/halajob-mobile-latest-release-local.apk` installed `1.0.6+27`; package metadata reports `versionCode=27`; screenshots/UI dumps prove clean auth, username/password text entry, Campus tester entry, and Campus Tester home |
 
 ## Remaining Required Tests
 
 - Real browser E2E against a deployed backend with approved seeker/company/campus/admin test accounts.
-- Fresh mobile APK flow test from the final source commit for seeker and campus student.
+- Real-phone fresh APK flow test from the final source commit for seeker, company, and campus student.
 - File upload/download tests with production-like storage.
 - Push notification tap-routing tests on a real Android device.
