@@ -89,6 +89,7 @@ const params = {
   interviewId: yup.object({ interviewId: objectId.required("interviewId is required") }),
   invitationId: yup.object({ invitationId: objectId.required("invitationId is required") }),
   cvId: yup.object({ cvId: objectId.required("cvId is required") }),
+  parseJobId: yup.object({ jobId: objectId.required("jobId is required") }),
   lang: yup.object({ lang: langSegment.required("lang is required") }),
   section: yup.object({ section: safeSegment.required("section is required") }),
   sectionItem: yup.object({
@@ -140,13 +141,31 @@ const schemas = {
     body: bodyObject,
   }),
 
+  interviewBodySchema: yup.object({
+    params: params.interviewId,
+  }),
+
   interviewResponseSchema: yup.object({
     params: params.interviewId,
     body: bodyObject.shape({
       status: text(120),
       response: text(120),
+      action: text(120),
       candidate_note: text(2000),
       note: text(2000),
+    }),
+  }),
+
+  interviewRescheduleSchema: yup.object({
+    params: params.interviewId,
+    body: bodyObject.shape({
+      note: text(2000),
+      candidate_note: text(2000),
+      reason: text(2000),
+      preferred_start_at: text(120),
+      preferred_end_at: text(120),
+      start_at: text(120),
+      end_at: text(120),
     }),
   }),
 
@@ -187,6 +206,8 @@ const schemas = {
       phone: text(60),
       country_id: objectId,
       cv: text(1000),
+      cv_id: objectId,
+      cvId: objectId,
       cover_letter: text(5000),
       source: text(80),
       answers: yup.mixed(),
@@ -204,6 +225,8 @@ const schemas = {
       phone: text(60),
       country_id: objectId,
       cv: text(1000),
+      cv_id: objectId,
+      cvId: objectId,
       cover_letter: text(5000),
       source: text(80),
       answers: yup.mixed(),
@@ -291,6 +314,54 @@ const schemas = {
   cvIdSchema: yup.object({
     params: params.cvId,
     body: bodyObject,
+  }),
+
+  cvParseUploadSchema: yup.object({
+    body: bodyObject.shape({
+      title: text(240),
+      lang: text(16),
+      is_default: boolish,
+    }),
+  }),
+
+  cvParseJobSchema: yup.object({
+    params: params.parseJobId,
+  }),
+
+  cvParseJobActionSchema: yup.object({
+    params: params.parseJobId,
+    body: bodyObject,
+  }),
+
+  cvDuplicateSchema: yup.object({
+    params: params.cvId,
+    body: bodyObject.shape({
+      title: text(240),
+    }),
+  }),
+
+  cvVisibilitySchema: yup.object({
+    params: params.cvId,
+    body: bodyObject.shape({
+      visibility: yup
+        .string()
+        .oneOf(["private", "link", "applications_only", "profile"])
+        .required("visibility is required"),
+    }),
+  }),
+
+  cvCoverLetterSchema: yup.object({
+    params: params.cvId,
+    body: bodyObject.shape({
+      template_key: text(80),
+      key: text(80),
+      job_id: objectId,
+      jobId: objectId,
+      job_title: text(240),
+      role: text(240),
+      company_name: text(240),
+      notes: text(2000),
+    }),
   }),
 
   cvGenerateSchema: yup.object({
@@ -383,6 +454,51 @@ const schemas = {
 
   notificationPreferencesSchema: yup.object({
     body: bodyObject,
+  }),
+
+  communicationPreferencesSchema: yup.object({
+    body: bodyObject.shape({
+      channels: safeObject,
+      categories: safeObject,
+      quiet_hours: safeObject,
+      phone_for_sms: text(60),
+      phoneForSms: text(60),
+      lang: text(16),
+      language: text(16),
+    }),
+  }),
+
+  manualWhatsappLinkSchema: yup.object({
+    body: bodyObject
+      .shape({
+        phone: text(60),
+        recipient: text(60),
+        text: text(1200),
+        message: text(1200),
+        body: text(1200),
+      })
+      .test(
+        "manual-whatsapp-text-present",
+        "Manual WhatsApp text is required",
+        (value = {}) => Boolean(value.text || value.message || value.body),
+      ),
+  }),
+
+  salaryInsightQuerySchema: yup.object({
+    query: queryObject.shape({
+      title: text(180),
+      job_title: text(180),
+      city: text(120),
+      country: text(120),
+      currency_code: text(12),
+      currency: text(12),
+      experience_level_id: objectId,
+      industry_id: objectId,
+    }),
+  }),
+
+  salaryInsightJobSchema: yup.object({
+    params: params.jobId,
   }),
 
   notificationIdSchema: yup.object({

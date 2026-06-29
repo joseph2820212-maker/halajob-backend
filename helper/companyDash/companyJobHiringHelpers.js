@@ -49,6 +49,8 @@ export const INTERVIEW_STATUSES = new Set([
 ]);
 
 export const INTERVIEW_TYPES = new Set(["online", "in_office", "phone", "on_app"]);
+export const MEETING_PROVIDERS = new Set(["manual", "phone", "in_person", "google_meet", "zoom", "teams", "other"]);
+export const CALENDAR_PROVIDERS = new Set(["none", "google", "microsoft", "ical"]);
 export const INVITATION_STATUSES = new Set(["sent", "seen", "accepted", "declined", "expired", "cancelled"]);
 
 export const cleanText = (value = "") => {
@@ -93,6 +95,20 @@ const parseObjectValue = (value, fallback = {}) => {
     }
   }
   return fallback;
+};
+
+const inferMeetingProvider = ({ type, meetLink, oldProvider = "" }) => {
+  const existing = cleanQueryValue(oldProvider);
+  if (MEETING_PROVIDERS.has(existing)) return existing;
+  if (type === "phone") return "phone";
+  if (type === "in_office") return "in_person";
+
+  const link = cleanQueryValue(meetLink).toLowerCase();
+  if (link.includes("meet.google.com")) return "google_meet";
+  if (link.includes("zoom.us")) return "zoom";
+  if (link.includes("teams.microsoft.com")) return "teams";
+  if (link) return "manual";
+  return "manual";
 };
 
 const toBooleanOrNull = (value) => {
@@ -392,6 +408,14 @@ export const buildInterviewPayload = ({ body = {}, companyData, application, old
   const status = cleanQueryValue(body.status || oldInterview?.status || "scheduled");
   if (!INTERVIEW_STATUSES.has(status)) return { error: "invalid_interview_status" };
 
+  const meetLink = cleanText(body.meet_link || body.meetLink || oldInterview?.meet_link || "");
+  const meetingProvider = cleanQueryValue(body.meeting_provider || body.meetingProvider);
+  const resolvedMeetingProvider = MEETING_PROVIDERS.has(meetingProvider)
+    ? meetingProvider
+    : inferMeetingProvider({ type, meetLink, oldProvider: oldInterview?.meeting_provider });
+  const calendarProvider = cleanQueryValue(body.calendar_provider || body.calendarProvider || oldInterview?.calendar_provider || "none");
+  if (!CALENDAR_PROVIDERS.has(calendarProvider)) return { error: "invalid_calendar_provider" };
+
   const payload = {
     application_id: application._id,
     job_id: application.job_id,
@@ -401,7 +425,11 @@ export const buildInterviewPayload = ({ body = {}, companyData, application, old
     type,
     status,
     timezone: cleanText(body.timezone || oldInterview?.timezone || companyData.company?.timezone || "UTC"),
-    meet_link: cleanText(body.meet_link || body.meetLink || oldInterview?.meet_link || ""),
+    meeting_provider: resolvedMeetingProvider,
+    meeting_join_instructions: cleanText(body.meeting_join_instructions || body.meetingJoinInstructions || oldInterview?.meeting_join_instructions || ""),
+    calendar_provider: calendarProvider,
+    calendar_event_id: cleanText(body.calendar_event_id || body.calendarEventId || oldInterview?.calendar_event_id || ""),
+    meet_link: meetLink,
     office_address: cleanText(body.office_address || body.officeAddress || oldInterview?.office_address || ""),
     company_note: cleanText(body.company_note || body.companyNote || oldInterview?.company_note || ""),
     candidate_note: cleanText(body.candidate_note || body.candidateNote || oldInterview?.candidate_note || ""),
@@ -415,6 +443,9 @@ export const buildInterviewPayload = ({ body = {}, companyData, application, old
   if (body.rating !== undefined) payload.rating = toNumber(body.rating, null);
   const scorecard = parseObjectValue(body.scorecard, null);
   if (scorecard) payload.scorecard = scorecard;
+  if (!oldInterview) {
+    payload.candidate_response = { status: "pending", note: "", responded_at: null };
+  }
 
   if (!payload.meet_link && payload.type === "online") {
     const suffix = String(application?._id || Date.now()).slice(-8);

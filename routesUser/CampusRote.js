@@ -48,6 +48,19 @@ router.post("/applications/:id/cancel", campusMobileGuard, upload.none(), valida
 
 router.get("/resources", campusMobileGuard, campusController.resources);
 router.get("/overview", campusMobileGuard, campusController.overview);
+router.get(
+  "/talent-visibility",
+  campusMobileGuard,
+  validate(platformSchemas.campusTalentVisibilitySchema),
+  campusController.getTalentVisibility,
+);
+router.patch(
+  "/talent-visibility",
+  campusMobileGuard,
+  upload.none(),
+  validate(platformSchemas.campusTalentVisibilitySchema),
+  campusController.updateTalentVisibility,
+);
 router.get("/profile", campusMobileGuard, validate(platformSchemas.campusProfileSchema), campusController.profile);
 router.post("/profile", campusMobileGuard, upload.none(), validate(platformSchemas.campusProfileSchema), campusController.updateProfile);
 router.put("/profile", campusMobileGuard, upload.none(), validate(platformSchemas.campusProfileSchema), campusController.updateProfile);

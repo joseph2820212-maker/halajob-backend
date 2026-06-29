@@ -123,6 +123,26 @@ const CompanyPrivacySettingsSchema = new Schema(
   { _id: false }
 );
 
+const CompanyPublicProfileSchema = new Schema(
+  {
+    status: {
+      type: String,
+      enum: ["draft", "pending_review", "published", "rejected"],
+      default: "draft",
+      index: true,
+    },
+    submitted_at: { type: Date, default: null },
+    published_at: { type: Date, default: null },
+    reviewed_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    rejection_reason: { type: String, default: "", trim: true, maxlength: 1000 },
+    seo_title: { type: String, default: "", trim: true, maxlength: 180 },
+    seo_description: { type: String, default: "", trim: true, maxlength: 300 },
+    hiring_process: { type: String, default: "", trim: true, maxlength: 1000 },
+    why_work_with_us: { type: String, default: "", trim: true, maxlength: 1000 },
+  },
+  { _id: false }
+);
+
 const SubscriptionFeatureSnapshotSchema = new Schema(
   {
     can_post_jobs: { type: Boolean, default: true },
@@ -520,6 +540,11 @@ const CompanySchema = new Schema(
       default: () => ({}),
     },
 
+    public_profile: {
+      type: CompanyPublicProfileSchema,
+      default: () => ({}),
+    },
+
     company_contact: {
       type: [String],
       default: [],
@@ -701,6 +726,7 @@ CompanySchema.index({
   is_verified: 1,
   is_hiring: 1,
 });
+CompanySchema.index({ "public_profile.status": 1, accepted: 1, status: 1 });
 
 CompanySchema.index({
   country_id: 1,

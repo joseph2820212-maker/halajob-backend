@@ -39,6 +39,10 @@ AnalyticsEventSchema.index({ group: 1, createdAt: -1 });
 AnalyticsEventSchema.index({ user_id: 1, createdAt: -1 });
 AnalyticsEventSchema.index({ company_id: 1, createdAt: -1 });
 AnalyticsEventSchema.index({ context_type: 1, event: 1, createdAt: -1 });
+AnalyticsEventSchema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: 400 * 24 * 60 * 60, name: "analytics_events_created_at_ttl" }
+);
 
 const AnalyticsEventModel = mongoose.model("analytics_events", AnalyticsEventSchema);
 

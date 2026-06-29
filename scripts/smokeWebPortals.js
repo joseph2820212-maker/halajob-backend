@@ -3,6 +3,7 @@ import puppeteer from "puppeteer";
 
 const baseUrl = process.argv[2] || "http://127.0.0.1:4173";
 const logPath = new URL("../tmp-smoke-web-portals.log", import.meta.url);
+const smokeOrigin = new URL(baseUrl).origin;
 
 const knownBrowserPaths = [
   process.env.PUPPETEER_EXECUTABLE_PATH,
@@ -33,11 +34,44 @@ const routes = [
 ];
 
 const routeActions = {
-  campus: ["opportunities", "applications", "profile", "notifications", "resources", "University portal", "students", "partners", "post internship"],
-  company: ["jobs", "applicants", "pipeline", "invitations", "talent", "reviews", "subscription", "analytics", "support", "members", "library", "profile", "campus"],
-  seeker: ["applications", "interviews", "offers", "saved", "companies", "profile", "notifications", "cv builder"],
-  admin: ["companies", "jobs", "trust", "analytics", "talent", "universities", "subscriptions"],
+  campus: ["opportunities", "applications", "career passport", "resources", "interview prep", "job alerts", "events", "talent visibility", "notifications", "settings", "University portal", "students", "verifications", "partners", "post internship", "members", "events/resources"],
+  company: ["jobs", "applicants", "interviews", "talent pool", "messages/templates", "campus", "salary guidance", "public profile", "billing", "team/settings", "analytics", "support", "reviews"],
+  seeker: ["jobs", "applications", "interviews", "offers", "saved", "job alerts", "cv studio", "resources", "salary insights", "companies", "interview prep", "notifications", "settings"],
+  admin: ["moderation", "users", "companies", "universities", "resource library", "platform settings", "communication logs", "salary insights", "subscriptions", "support/legal"],
 };
+
+const forbiddenRouteButtons = {
+  campus: ["profile"],
+  company: ["pipeline", "invitations", "subscription", "members", "library", "profile"],
+  seeker: ["profile", "cv builder"],
+  admin: ["jobs", "trust", "analytics", "talent"],
+};
+
+const clientSettingsPayload = {
+  data: {
+    features: {
+      ai_tools_enabled: false,
+      cv_parsing_enabled: true,
+      resource_library_enabled: true,
+      salary_insights_enabled: true,
+    },
+    security: { otp_digits: 5 },
+    localization: { default_currency: "SYP" },
+  },
+};
+
+const corsHeadersFor = (request) => ({
+  "Access-Control-Allow-Origin": request.headers().origin || smokeOrigin,
+  "Access-Control-Allow-Credentials": "true",
+  "Access-Control-Allow-Methods": "GET,POST,PATCH,PUT,DELETE,OPTIONS",
+  "Access-Control-Allow-Headers":
+    request.headers()["access-control-request-headers"] ||
+    "authorization,content-type,x-lang,x-requested-with",
+});
+
+const isExpectedBrowserResourceError = (text) =>
+  /Failed to load resource: the server responded with a status of 4\d\d/.test(text) ||
+  text === "Failed to load resource: net::ERR_FAILED";
 
 log(`launch browser ${executablePath || "puppeteer-default"}`);
 const browser = await puppeteer.launch({
@@ -56,6 +90,10 @@ page.setDefaultNavigationTimeout(10000);
 const pageErrors = [];
 const consoleErrors = [];
 const httpErrors = [];
+const fatalHttpErrors = [];
+const requestFailures = [];
+const missingActions = [];
+const forbiddenActions = [];
 
 page.on("pageerror", (error) => {
   pageErrors.push(error.message);
@@ -64,8 +102,13 @@ page.on("pageerror", (error) => {
 
 page.on("console", (message) => {
   if (message.type() === "error") {
-    consoleErrors.push(message.text());
-    log(`console-error ${message.text()}`);
+    const text = message.text();
+    if (isExpectedBrowserResourceError(text)) {
+      log(`console-resource ${text}`);
+      return;
+    }
+    consoleErrors.push(text);
+    log(`console-error ${text}`);
   }
 });
 
@@ -75,7 +118,66 @@ page.on("response", async (response) => {
   const url = response.url();
   const message = `${status} ${url}`;
   httpErrors.push(message);
+  if (status >= 500) fatalHttpErrors.push(message);
   log(`http-error ${message}`);
+});
+
+page.on("requestfailed", (request) => {
+  const failure = request.failure()?.errorText || "request_failed";
+  if (failure === "net::ERR_ABORTED") {
+    log(`request-aborted ${request.url()}`);
+    return;
+  }
+  const message = `${failure} ${request.url()}`;
+  requestFailures.push(message);
+  log(`request-failed ${message}`);
+});
+
+await page.setRequestInterception(true);
+page.on("request", (request) => {
+  const url = new URL(request.url());
+  if (url.hostname === "jobzain.com" && request.method() === "OPTIONS") {
+    log(`stub-options ${url.pathname}`);
+    request.respond({
+      status: 204,
+      headers: corsHeadersFor(request),
+    });
+    return;
+  }
+  if (
+    url.pathname === "/public/v1/client-settings" ||
+    url.pathname === "/public/v1/settings/client"
+  ) {
+    log(`stub ${url.pathname}`);
+    request.respond({
+      status: 200,
+      headers: corsHeadersFor(request),
+      contentType: "application/json",
+      body: JSON.stringify(clientSettingsPayload),
+    });
+    return;
+  }
+  if (url.pathname === "/public/v1/salary-insights") {
+    log(`stub ${url.pathname}`);
+    request.respond({
+      status: 200,
+      headers: corsHeadersFor(request),
+      contentType: "application/json",
+      body: JSON.stringify({ data: [] }),
+    });
+    return;
+  }
+  if (url.hostname === "jobzain.com") {
+    log(`stub-api ${url.pathname}`);
+    request.respond({
+      status: 200,
+      headers: corsHeadersFor(request),
+      contentType: "application/json",
+      body: JSON.stringify({ data: [] }),
+    });
+    return;
+  }
+  request.continue();
 });
 
 await page.evaluateOnNewDocument(() => {
@@ -93,6 +195,7 @@ const clickByText = async (text) => {
   }, text);
   log(`click ${text} ${clicked ? "ok" : "missing"}`);
   await new Promise((resolve) => setTimeout(resolve, 800));
+  return clicked;
 };
 
 try {
@@ -136,9 +239,18 @@ try {
     log("---");
 
     const actions = routeActions[route.name] || [];
+    for (const forbidden of forbiddenRouteButtons[route.name] || []) {
+      if (buttons.includes(forbidden)) {
+        const message = `${route.name}:${forbidden}`;
+        forbiddenActions.push(message);
+        log(`forbidden-action ${message}`);
+      }
+    }
+
     for (const action of actions) {
       const errorStart = httpErrors.length;
-      await clickByText(action);
+      const clicked = await clickByText(action);
+      if (!clicked) missingActions.push(`${route.name}:${action}`);
       const actionText = await page.evaluate(() =>
         (document.querySelector("main")?.textContent || document.body.textContent || "")
           .replace(/\s+/g, " ")
@@ -159,6 +271,31 @@ try {
   }
   if (httpErrors.length) {
     log(`http-errors ${JSON.stringify(httpErrors)}`);
+  }
+  if (fatalHttpErrors.length) {
+    log(`fatal-http-errors ${JSON.stringify(fatalHttpErrors)}`);
+  }
+  if (requestFailures.length) {
+    log(`request-failures ${JSON.stringify(requestFailures)}`);
+  }
+  if (missingActions.length) {
+    log(`missing-actions ${JSON.stringify(missingActions)}`);
+  }
+  if (forbiddenActions.length) {
+    log(`forbidden-actions ${JSON.stringify(forbiddenActions)}`);
+  }
+
+  const fatalFailures = [
+    ...pageErrors.map((message) => `pageerror: ${message}`),
+    ...consoleErrors.map((message) => `console-error: ${message}`),
+    ...fatalHttpErrors.map((message) => `http-error: ${message}`),
+    ...requestFailures.map((message) => `request-failed: ${message}`),
+    ...missingActions.map((message) => `missing-action: ${message}`),
+    ...forbiddenActions.map((message) => `forbidden-action: ${message}`),
+  ];
+
+  if (fatalFailures.length) {
+    throw new Error(`web_portal_smoke_failed\n${fatalFailures.join("\n")}`);
   }
 } finally {
   log("closing browser");

@@ -130,6 +130,27 @@ const cvUrlFromRecord = (cv = {}) => {
   return file.startsWith("/") || /^https?:\/\//i.test(file) ? file : `/${file.replace(/\\/g, "/")}`;
 };
 
+const cvFileNameFromRecord = (cv = {}) => {
+  const file = cleanText(cv.fileName || cv.file_name || cv.title || cv.pdf_file || cv.url || cv.file || cv.path);
+  return file.split(/[\\/]/).filter(Boolean).pop() || "cv.pdf";
+};
+
+const buildApplicationCvSnapshot = (cv = {}) => {
+  const url = cvUrlFromRecord(cv);
+  if (!url) return null;
+  return {
+    id: getId(cv._id || cv.id || cv.cv_id) || null,
+    title: cleanText(cv.title || cv.fileName || "CV"),
+    file_name: cvFileNameFromRecord(cv),
+    file_path: url,
+    template_key: cleanText(cv.template_key),
+    source: cleanText(cv.source || "employee_cv"),
+    visibility: cleanText(cv.visibility || ""),
+    version: Number.isFinite(Number(cv.version)) ? Number(cv.version) : null,
+    attached_at: new Date(),
+  };
+};
+
 const getActiveCv = (employee = {}) => {
   const cvs = Array.isArray(employee.cvs) ? employee.cvs : [];
   const active =
@@ -158,6 +179,11 @@ const getEmployee = async (userId) => {
       _id: savedCv._id,
       status: savedCv.is_default ? "active" : "saved",
       title: savedCv.title,
+      template_key: savedCv.template_key,
+      source: savedCv.source,
+      visibility: savedCv.visibility,
+      version: savedCv.version,
+      _employee_cv_model: true,
       url: cvUrlFromRecord(savedCv),
     }],
   };
@@ -177,8 +203,8 @@ const getEmployeeCountryId = (employee = {}, user = {}, job = {}) => {
   return toObjectId(getId(fromEmployee) || getId(fromUser) || getId(fromJob));
 };
 
-const buildProfileApplySummary = (employee = {}, user = {}, job = {}) => {
-  const activeCv = getActiveCv(employee);
+const buildProfileApplySummary = (employee = {}, user = {}, job = {}, options = {}) => {
+  const activeCv = options.activeCvOverride || getActiveCv(employee);
 
   const existing = [];
   const missing = [];
@@ -269,15 +295,56 @@ const buildProfileApplySummary = (employee = {}, user = {}, job = {}) => {
       (job.is_cv_required === false || Boolean(activeCv)),
     active_cv: activeCv
       ? {
-          id: activeCv._id || null,
+          id: activeCv.id || activeCv._id || null,
           url: activeCv.url,
-          fileName: activeCv.fileName || activeCv.title || "",
+          fileName: activeCv.fileName || activeCv.file_name || activeCv.title || "",
+          title: activeCv.title || activeCv.fileName || "",
+          source: activeCv.source || "",
           status: activeCv.status || "",
         }
       : null,
     existing_items: existing,
     missing_items: missing,
     missing_count: missing.length,
+  };
+};
+
+const resolveApplicationCvSelection = async ({ req, employee }) => {
+  const requestedCvId = cleanText(req.body?.cv_id || req.body?.cvId);
+  if (requestedCvId) {
+    if (!mongoose.isValidObjectId(requestedCvId)) {
+      return { error: { status: 400, message: "Invalid CV id." } };
+    }
+
+    const selected = await EmployeeCvModel.findOne({
+      _id: requestedCvId,
+      employee_id: employee._id,
+      status: { $ne: "archived" },
+    }).lean();
+
+    const snapshot = buildApplicationCvSnapshot(selected || {});
+    if (!selected || !snapshot) {
+      return { error: { status: 404, message: "Selected CV was not found or is not exportable." } };
+    }
+
+    return {
+      activeCv: {
+        ...selected,
+        id: selected._id,
+        url: snapshot.file_path,
+        fileName: snapshot.file_name,
+      },
+      snapshot,
+      recordId: selected._id,
+    };
+  }
+
+  const activeCv = getActiveCv(employee);
+  const snapshot = buildApplicationCvSnapshot(activeCv || {});
+  return {
+    activeCv,
+    snapshot,
+    recordId: activeCv?._employee_cv_model ? snapshot?.id || null : null,
   };
 };
 
@@ -495,8 +562,20 @@ const applyJob = async (req, res, next) => {
       });
     }
 
-    const profile = buildProfileApplySummary(employee, user, job);
+    const cvSelection = await resolveApplicationCvSelection({ req, employee });
+    if (cvSelection.error) {
+      return ReturnAppData.getError({
+        res,
+        status: cvSelection.error.status,
+        message: msg(req, "معرف السيرة الذاتية غير صالح.", cvSelection.error.message),
+      });
+    }
+
+    const profile = buildProfileApplySummary(employee, user, job, {
+      activeCvOverride: cvSelection.activeCv,
+    });
     const activeCv = profile.active_cv;
+    const cvSnapshot = cvSelection.snapshot || buildApplicationCvSnapshot(activeCv || {});
     const countryId = getEmployeeCountryId(employee, user, job);
 
     if (!profile.can_apply) {
@@ -573,7 +652,9 @@ const applyJob = async (req, res, next) => {
 
       answers,
       cover_letter: coverLetter,
-      cv: activeCv?.url || "",
+      cv: cvSnapshot?.file_path || activeCv?.url || "",
+      cv_id: cvSelection.recordId || null,
+      cv_snapshot: cvSnapshot || undefined,
 
       source: "app",
       status: initialStatus,
@@ -666,6 +747,12 @@ const applyJob = async (req, res, next) => {
             { upsert: true, setDefaultsOnInsert: true }
           )
         : null,
+      cvSelection.recordId
+        ? EmployeeCvModel.updateOne(
+            { _id: cvSelection.recordId, employee_id: employee._id },
+            { $inc: { attached_application_count: 1 } }
+          )
+        : null,
     ]);
 
     job_applied_notification(job, created).catch?.(console.error);
@@ -683,6 +770,7 @@ const applyJob = async (req, res, next) => {
         ats_score: atsResult.score,
         match_score: matchResult?.score ?? null,
         has_knockout_failure: Boolean(atsResult.questions.knockout.has_failed),
+        cv_id: cvSelection.recordId ? String(cvSelection.recordId) : "",
       },
     }).catch(() => null);
 
@@ -794,6 +882,8 @@ const getAppliedJobs = async (req, res, next) => {
                 filter_result: 1,
                 source: 1,
                 cv: 1,
+                cv_id: 1,
+                cv_snapshot: 1,
                 cover_letter: 1,
                 answers: 1,
                 job: {

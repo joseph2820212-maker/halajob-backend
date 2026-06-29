@@ -150,6 +150,39 @@ export const markRead = async (req, res, next) => {
   }
 };
 
+export const markUnread = async (req, res, next) => {
+  try {
+    const userId = userIdFrom(req);
+    const id = toObjectId(req.params.id || req.body.notification_id || req.body.id || req.query.notification_id || req.query.id);
+    if (!id) return res.status(400).json({ status: false, message: "invalid_notification_id" });
+
+    const item = await NotificationModel.findOneAndUpdate(
+      { _id: id, user_id: userId },
+      { $set: { read: false } },
+      { new: true }
+    ).lean();
+
+    if (!item) return res.status(404).json({ status: false, message: "notification_not_found" });
+    return res.json({ status: true, message: "notification_marked_unread", data: normalizeNotification(item) });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const remove = async (req, res, next) => {
+  try {
+    const userId = userIdFrom(req);
+    const id = toObjectId(req.params.id || req.body.notification_id || req.body.id || req.query.notification_id || req.query.id);
+    if (!id) return res.status(400).json({ status: false, message: "invalid_notification_id" });
+
+    const item = await NotificationModel.findOneAndDelete({ _id: id, user_id: userId }).lean();
+    if (!item) return res.status(404).json({ status: false, message: "notification_not_found" });
+    return res.json({ status: true, message: "notification_deleted", data: normalizeNotification(item) });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const registerDeviceToken = FcmTokenController.registerToken;
 
 export const deleteDeviceToken = async (req, res, next) => {
@@ -193,6 +226,8 @@ export default {
   getPreferences,
   updatePreferences,
   markRead,
+  markUnread,
+  remove,
   registerDeviceToken,
   deleteDeviceToken,
 };

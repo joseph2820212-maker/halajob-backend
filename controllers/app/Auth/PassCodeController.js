@@ -10,6 +10,7 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
 import { syncAccountContextsForUser } from "../../../services/accountContext.service.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
+import { setRefreshCookie, webAuthScope } from "../../../services/authCookie.service.js";
 
 const MAX_PASSCODE_ATTEMPTS = 5;
 
@@ -177,6 +178,7 @@ export const passcodeVerify = async (req, res, next) => {
       user.last_login_at = new Date();
       await user.save();
       const authPayload = await buildAuthPayload(user, dev);
+      setRefreshCookie(req, res, authPayload.tokens?.refreshToken, webAuthScope(req, "seeker"));
       recordAnalyticsEvent({
         req,
         event: "login_completed",
@@ -224,6 +226,7 @@ export const passcodeVerify = async (req, res, next) => {
       user.last_login_at = new Date();
       await user.save();
       const authPayload = await buildAuthPayload(user, dev);
+      setRefreshCookie(req, res, authPayload.tokens?.refreshToken, webAuthScope(req, "seeker"));
       if (wasSignupCompletion) {
         recordAnalyticsEvent({
           req,

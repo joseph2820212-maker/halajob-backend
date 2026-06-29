@@ -6,6 +6,8 @@ const ChannelPreferenceSchema = new mongoose.Schema(
     push: { type: Boolean, default: true },
     email: { type: Boolean, default: false },
     sms: { type: Boolean, default: false },
+    manual_whatsapp: { type: Boolean, default: false },
+    whatsapp_business: { type: Boolean, default: false },
   },
   { _id: false }
 );
@@ -40,6 +42,10 @@ const NotificationPreferenceSchema = new mongoose.Schema(
     channels: { type: ChannelPreferenceSchema, default: () => ({}) },
     categories: { type: CategoryPreferenceSchema, default: () => ({}) },
     quiet_hours: { type: QuietHoursSchema, default: () => ({}) },
+    phone_for_sms: { type: String, default: "", trim: true },
+    sms_opted_in_at: { type: Date, default: null },
+    sms_opted_out_at: { type: Date, default: null },
+    manual_whatsapp_opted_in_at: { type: Date, default: null },
     lang: { type: String, enum: ["ar", "en"], default: "en" },
     updated_by: { type: mongoose.Schema.Types.ObjectId, ref: "users", default: null },
   },

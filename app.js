@@ -85,6 +85,12 @@ const corsOptions = {
     "Accept",
     "lan",
     "x-language",
+    "X-Refresh-Token",
+    "x-refresh-token",
+    "X-Web-Client",
+    "x-web-client",
+    "X-Web-Auth-Scope",
+    "x-web-auth-scope",
     "X-Active-Context-Id",
     "active_context_id",
   ],
@@ -220,17 +226,28 @@ const safeAttachmentName = (filePath) => path.basename(filePath).replace(/["\\]/
 const generatedCvRecordPath = (fileName) => path.posix.join("cv", "generated", fileName);
 const generatedCvTokenFromRequest = (req) =>
   String(req.query.token || req.get("x-cv-download-token") || "").trim();
+const allowUntrackedGeneratedCvDownloads =
+  !isProduction &&
+  String(process.env.ALLOW_UNTRACKED_GENERATED_CV_DOWNLOADS || "")
+    .trim()
+    .toLowerCase() === "true";
 
 const verifyGeneratedCvPublicAccess = async (req, fileName) => {
-  if (mongoose.connection.readyState !== 1) return;
+  if (mongoose.connection.readyState !== 1) {
+    throw new ApiError(503, "cv_access_temporarily_unavailable", "CV");
+  }
 
   const cv = await EmployeeCvModel.findOne({ pdf_file: generatedCvRecordPath(fileName) })
-    .select("+public_download_token public_download_expires_at")
+    .select("pdf_file +public_download_token public_download_expires_at")
     .lean();
 
   if (!cv) {
-    if (isProduction) throw new ApiError(404, "cv_not_found", "CV");
-    return;
+    if (allowUntrackedGeneratedCvDownloads) return;
+    throw new ApiError(404, "cv_not_found", "CV");
+  }
+
+  if (String(cv.pdf_file || "") !== generatedCvRecordPath(fileName)) {
+    throw new ApiError(403, "invalid_cv_public_link_token", "CV");
   }
 
   const expectedToken = String(cv.public_download_token || "").trim();
@@ -238,13 +255,13 @@ const verifyGeneratedCvPublicAccess = async (req, fileName) => {
     throw new ApiError(403, "cv_public_link_token_required", "CV");
   }
 
-  if (generatedCvTokenFromRequest(req) !== expectedToken) {
-    throw new ApiError(403, "invalid_cv_public_link_token", "CV");
-  }
-
   const expiresAt = cv.public_download_expires_at ? new Date(cv.public_download_expires_at).getTime() : 0;
   if (!expiresAt || expiresAt <= Date.now()) {
     throw new ApiError(410, "cv_public_link_expired", "CV");
+  }
+
+  if (generatedCvTokenFromRequest(req) !== expectedToken) {
+    throw new ApiError(403, "invalid_cv_public_link_token", "CV");
   }
 };
 

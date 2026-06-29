@@ -9,6 +9,11 @@ import {
   rotateRefreshToken,
   verifyRefreshToken,
 } from '../../services/tokenService.js';
+import {
+  clearRefreshCookie,
+  refreshTokenFromRequest,
+  setRefreshCookie,
+} from '../../services/authCookie.service.js';
 
 const msg = (lan, ar, en) => (lan === 'ar' ? ar : en);
 const normEmail = (email) => String(email || '').trim().toLowerCase();
@@ -259,6 +264,7 @@ const login = async (req, res) => {
     await user.save();
 
     const authPayload = await buildAuthPayload(user, authDevice);
+    setRefreshCookie(req, res, authPayload.tokens?.refreshToken, 'admin');
     await auditAdminAuth(req, {
       action: 'admin_login_succeeded',
       user,
@@ -299,7 +305,7 @@ const me = async (req, res) => {
 const refresh = async (req, res) => {
   const lan = req.get('lan') || 'en';
   try {
-    const refreshToken = req.body?.refreshToken || req.body?.refresh_token || req.get('x-refresh-token');
+    const refreshToken = refreshTokenFromRequest(req, 'admin');
 
     if (!refreshToken) {
       return ReturnAppData.createError({
@@ -326,12 +332,15 @@ const refresh = async (req, res) => {
 
     if (!user || user.role_id?.log_to !== 'dash' || !user.status) {
       await clearRefreshToken(refreshToken);
+      clearRefreshCookie(req, res, 'admin');
       return ReturnAppData.createError({
         res,
         status: 403,
         message: msg(lan, 'جلسة غير صالحة.', 'Invalid session.'),
       });
     }
+
+    setRefreshCookie(req, res, tokens.refreshToken, 'admin');
 
     return ReturnAppData.createData({
       res,
@@ -343,6 +352,7 @@ const refresh = async (req, res) => {
       },
     });
   } catch (err) {
+    clearRefreshCookie(req, res, 'admin');
     return ReturnAppData.createError({
       res,
       status: 403,
@@ -353,7 +363,7 @@ const refresh = async (req, res) => {
 
 const logout = async (req, res) => {
   const lan = req.get('lan') || 'en';
-  const refreshToken = req.body?.refreshToken || req.body?.refresh_token || req.get('x-refresh-token');
+  const refreshToken = refreshTokenFromRequest(req, 'admin');
   if (!refreshToken) {
     return ReturnAppData.createError({
       res,
@@ -362,6 +372,7 @@ const logout = async (req, res) => {
     });
   }
   await clearRefreshToken(refreshToken);
+  clearRefreshCookie(req, res, 'admin');
   return ReturnAppData.deleteData({
     res,
     status: 200,

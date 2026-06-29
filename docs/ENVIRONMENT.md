@@ -70,6 +70,13 @@ Scope: backend runtime and handover reference. Values in this file are descripti
 
 | Variable | Required | Purpose |
 |---|---:|---|
+| `FEATURE_AI_TOOLS_ENABLED` | Optional | Backend/mobile launch flag for optional AI UI. Default `false`; pass mobile `-EnableAiTools` for tester APK review builds. |
+| `VITE_FEATURE_AI_TOOLS_ENABLED` | Optional | Web launch flag for optional AI UI. Default `false`. |
+| `FEATURE_CV_PARSING_ENABLED` | Optional | Public/client feature flag for CV parsing. Default `true` for the Syria launch plan. |
+| `FEATURE_RESOURCE_LIBRARY_ENABLED` | Optional | Public/client feature flag for the student resource library. Default `true`. |
+| `FEATURE_SALARY_INSIGHTS_ENABLED` | Optional | Public/client feature flag for salary insights. Default `true`. |
+| `FEATURE_MANUAL_WHATSAPP_SHARE_ENABLED` | Optional | Allows manual WhatsApp copy/deep-link helpers. Default `true`. |
+| `FEATURE_OFFICIAL_WHATSAPP_PROVIDER_ENABLED` | Optional | Future provider flag. Keep `false` unless operations explicitly enables official WhatsApp. |
 | `HALA_AI_PROVIDER` | If AI enabled | Provider key such as mock/real adapter. |
 | `HALA_AI_MODEL` | If AI enabled | Model name. |
 | `HALA_AI_API_KEY` | If AI enabled | Backend-only provider key. |
@@ -78,6 +85,37 @@ Scope: backend runtime and handover reference. Values in this file are descripti
 | `HALA_AI_TEMPERATURE` | Optional | Generation temperature. |
 | `HALA_AI_INPUT_COST_PER_1M_TOKENS` | Optional | Cost tracking. |
 | `HALA_AI_OUTPUT_COST_PER_1M_TOKENS` | Optional | Cost tracking. |
+
+## CV Parsing
+
+| Variable | Required | Purpose |
+|---|---:|---|
+| `CV_PARSER_PROVIDER` | Optional | CV parser provider selector. Use `manual` for the Syria MVP unless a real parser provider is configured. |
+| `CV_PARSER_API_KEY` | If external parser enabled | Provider key for a future parser integration. Do not commit real values. |
+| `CV_PARSER_API_URL` | If external parser enabled | Provider API base URL for a future parser integration. |
+| `CV_PARSE_JOB_TTL_DAYS` | Optional | Retention window for parser job data. Default `30`. |
+
+## Syria-Safe Communication
+
+| Variable | Required | Purpose |
+|---|---:|---|
+| `SMS_PROVIDER` | Optional | SMS provider selector. Default `disabled`. |
+| `SMS_API_KEY` | If SMS enabled | Provider API key. Do not commit real values. |
+| `SMS_API_URL` | If SMS enabled | Provider API base URL. |
+| `SMS_SENDER_ID` | Optional | SMS sender label used if SMS is enabled. |
+| `COMMUNICATION_LOG_RETENTION_DAYS` | Optional | Delivery-log retention period. Default `180`. |
+| `WHATSAPP_BUSINESS_ENABLED` | Optional | Enables official WhatsApp provider flow only when explicitly `true`. |
+| `OFFICIAL_WHATSAPP_ENABLED` | Optional | Backward-compatible official WhatsApp flag. Keep `false` for Syria MVP unless operations approves it. |
+
+## Salary Insights / Public Links
+
+| Variable | Required | Purpose |
+|---|---:|---|
+| `SALARY_INSIGHTS_MIN_SAMPLE_SIZE` | Optional | Minimum sample size before showing stronger confidence. Default `3`. |
+| `SALARY_INSIGHTS_CACHE_TTL_SECONDS` | Optional | Cache window for salary aggregates. Default `3600`. |
+| `SALARY_INSIGHTS_DEFAULT_CURRENCY` | Optional | Display default for Syria launch. Default `SYP`; USD-normalized fields are still stored for comparison. |
+| `PUBLIC_COMPANY_PROFILE_BASE_URL` | Optional | Public company profile deep-link base once production public domains are final. |
+| `PUBLIC_CV_SHARE_BASE_URL` | Optional | Public CV share deep-link base once production public domains are final. |
 
 ## Payments
 
@@ -99,6 +137,7 @@ before implementation. Do not store real payment secrets in Git.
 | `SCHEDULED_JOB_NOTIFICATION_CONCURRENCY` | Optional | Notification concurrency. |
 | `JOB_REMINDER_MAX_SAVED_USERS_PER_JOB` | Optional | Reminder safety cap. |
 | `JOB_CLOSE_MAX_APPLICANTS_PER_JOB` | Optional | Job-close notification cap. |
+| `SAVED_SEARCH_ALERTS_LIMIT` | Optional | Saved-search alert batch limit. |
 | `CAMPUS_EVENT_REMINDER_BATCH_SIZE` | Optional | Campus reminder batch size. |
 | `CAMPUS_EVENT_REMINDER_WINDOW_HOURS` | Optional | Campus reminder window. |
 

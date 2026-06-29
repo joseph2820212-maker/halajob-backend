@@ -340,6 +340,17 @@ async function main() {
     "public generated CV download should not be cached"
   );
 
+  await mongoose.disconnect();
+  await expectErrorMessage(
+    request(baseUrl, "GET", `/cv/generated/${ownFileName}?token=${ownPublicToken}`),
+    503,
+    /cv_access_temporarily_unavailable/,
+    "public generated CV download fails closed when DB is unavailable"
+  );
+  await mongoose.connect(process.env.CONNECTION_URL, {
+    serverSelectionTimeoutMS: 10000,
+  });
+
   await expectStatus(
     request(baseUrl, "GET", `/employee/v1/cv/download/${ownCv._id}`),
     401,
@@ -441,7 +452,7 @@ async function main() {
     "saved CV download missing file"
   );
 
-  console.log("Employee CV download integration verified for upload MIME/size rejection, public token policy, auth, ownership, invalid IDs, unsafe paths, and missing files.");
+  console.log("Employee CV download integration verified for upload MIME/size rejection, public token policy, DB fail-closed behavior, auth, ownership, invalid IDs, unsafe paths, and missing files.");
 
   await Promise.all(cleanupPaths.map((file) => fs.unlink(file).catch(() => null)));
 }

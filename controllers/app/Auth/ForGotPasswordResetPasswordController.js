@@ -9,6 +9,7 @@ import {
   serializeEmployee,
 } from "../../../services/appAccount.service.js";
 import bcryptjs from "bcryptjs";
+import { setRefreshCookie, webAuthScope } from "../../../services/authCookie.service.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
@@ -161,6 +162,7 @@ export const resetPassword = async (req, res, next) => {
 
     // Issue fresh tokens
     const tokens = await generateAuthTokens(user, incomingDevice);
+    setRefreshCookie(req, res, tokens.refreshToken, webAuthScope(req, "seeker"));
 
     const account = await resolveAppAccount(user, { createMissingEmployee: true });
     const userDto = buildUserDto(user);

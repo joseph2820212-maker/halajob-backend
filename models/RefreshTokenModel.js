@@ -1,14 +1,17 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 
 const refreshTokenSchema = new mongoose.Schema({
   userRef: {
-    type: String,
-    ref: 'users',                      //The $ref field holds the name of the collection where the referenced document resides.
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users',
     required: true,
     index: true,
   },
   loginTime: {
+    type: Date,
+    required: true,
+  },
+  expiresAt: {
     type: Date,
     required: true,
   },
@@ -22,6 +25,8 @@ const refreshTokenSchema = new mongoose.Schema({
     index: true,
   },
 }, { timestamps: true });
+
+refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const RefreshTokenModel = mongoose.model('RefreshToken', refreshTokenSchema);
 

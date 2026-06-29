@@ -119,7 +119,7 @@ async function main() {
     import("../services/tokenService.js"),
   ]);
 
-  const { AuditLogModel, FcmTokenModel, RoleModel, UserModel } = models;
+  const { AuditLogModel, CompanyModel, FcmTokenModel, RoleModel, UserModel } = models;
   const { generateAuthTokens } = tokenService;
 
   await mongoose.connect(process.env.CONNECTION_URL, {
@@ -129,7 +129,7 @@ async function main() {
   const suffix = nowToken();
   const phoneSeed = suffix.slice(-8);
 
-  const [dashRole, employeeRole] = await RoleModel.create([
+  const [dashRole, employeeRole, companyRole] = await RoleModel.create([
     {
       log_to: "dash",
       name: `admin-resource-redaction-dash-${suffix}`,
@@ -145,6 +145,15 @@ async function main() {
       role_number: 4,
       title_ar: "Employee",
       title_en: "Employee",
+      status: true,
+      is_system: true,
+    },
+    {
+      log_to: "company",
+      name: `admin-resource-redaction-company-${suffix}`,
+      role_number: 3,
+      title_ar: "Company",
+      title_en: "Company",
       status: true,
       is_system: true,
     },
@@ -302,13 +311,15 @@ async function main() {
   assert.ok(createAudit, "generic admin resource create should be audited");
   assert.equal(createAudit.entity_type, "user");
   assert.equal(createAudit.new_value.password, "[REDACTED]");
-  assert.equal(createAudit.new_value.passcode, "[REDACTED]");
-  assert.equal(createAudit.new_value.another_device_code, "[REDACTED]");
+  assert.equal(createAudit.new_value.passcode, undefined);
+  assert.equal(createAudit.new_value.another_device_code, undefined);
+  assert.equal(createAudit.new_value.pending_device, undefined);
 
   const updatedUserPayload = await expectStatus(
     request(baseUrl, "PATCH", `/dash/v1/resources/users/${sensitiveUser._id}`, {
       token: adminTokens.accessToken,
       body: {
+        first_name: "Updated",
         password: "PlainUpdatePassword123!",
         passcode: "222222",
         another_device_code: "333333",
@@ -332,9 +343,11 @@ async function main() {
   }).lean();
   assert.ok(updateAudit, "generic admin resource update should be audited");
   assert.equal(updateAudit.entity_type, "user");
-  assert.equal(updateAudit.new_value.password, "[REDACTED]");
-  assert.equal(updateAudit.new_value.passcode, "[REDACTED]");
-  assert.equal(updateAudit.new_value.another_device_code, "[REDACTED]");
+  assert.equal(updateAudit.new_value.first_name, "Updated");
+  assert.equal(updateAudit.new_value.password, undefined);
+  assert.equal(updateAudit.new_value.passcode, undefined);
+  assert.equal(updateAudit.new_value.another_device_code, undefined);
+  assert.equal(updateAudit.new_value.pending_device, undefined);
 
   const [bulkUserOne, bulkUserTwo] = await UserModel.create([
     userSeed({
@@ -358,6 +371,7 @@ async function main() {
       token: adminTokens.accessToken,
       body: {
         ids: [bulkUserOne._id, bulkUserTwo._id],
+        first_name: "BulkRenamed",
         status: false,
         passcode: "444444",
         another_device_code: "555555",
@@ -368,21 +382,85 @@ async function main() {
   );
   const bulkUpdatedUsers = await UserModel.find({ _id: { $in: [bulkUserOne._id, bulkUserTwo._id] } }).lean();
   assert.equal(bulkUpdatedUsers.length, 2, "bulk users should still exist");
-  bulkUpdatedUsers.forEach((user) => assert.equal(user.status, false, "generic bulk update should apply status"));
+  bulkUpdatedUsers.forEach((user) => {
+    assert.equal(user.first_name, "BulkRenamed", "generic bulk update should apply allowed fields");
+    assert.equal(user.status, true, "generic bulk update should not apply protected status");
+  });
   const bulkAudit = await AuditLogModel.findOne({
     action: "admin_resource_bulk_updated",
     "metadata.resource": "users",
   }).sort({ createdAt: -1 }).lean();
   assert.ok(bulkAudit, "generic admin resource bulk update should be audited");
   assert.equal(bulkAudit.entity_type, "user");
-  assert.equal(bulkAudit.new_value.passcode, "[REDACTED]");
-  assert.equal(bulkAudit.new_value.another_device_code, "[REDACTED]");
+  assert.equal(bulkAudit.new_value.first_name, "BulkRenamed");
+  assert.equal(bulkAudit.new_value.status, undefined);
+  assert.equal(bulkAudit.new_value.passcode, undefined);
+  assert.equal(bulkAudit.new_value.another_device_code, undefined);
   assert.equal(bulkAudit.metadata.matched, 2);
   assert.equal(bulkAudit.metadata.modified, 2);
   assert.deepEqual(
     bulkAudit.metadata.ids.map((id) => String(id)).sort(),
     [String(bulkUserOne._id), String(bulkUserTwo._id)].sort()
   );
+
+  const protectedCompany = await CompanyModel.create({
+    company_name: `Protected Company ${suffix}`,
+    slug: `protected-company-${suffix.toLowerCase()}`,
+    company_email: `protected.company.${suffix}@example.com`,
+    owner_user_id: seekerUser._id,
+    role_id: companyRole._id,
+    accepted: false,
+    status: false,
+    is_verified: false,
+    can_upload: false,
+  });
+
+  await expectStatus(
+    request(baseUrl, "PATCH", `/dash/v1/resources/companies/${protectedCompany._id}`, {
+      token: adminTokens.accessToken,
+      body: {
+        company_name: `Renamed Protected Company ${suffix}`,
+        accepted: true,
+        status: true,
+        is_verified: true,
+        can_upload: true,
+      },
+    }),
+    200,
+    "admin generic company update strips protected trust fields"
+  );
+  const genericUpdatedCompany = await CompanyModel.findById(protectedCompany._id).lean();
+  assert.equal(
+    genericUpdatedCompany.company_name,
+    `Renamed Protected Company ${suffix}`,
+    "generic company update should apply allowed fields"
+  );
+  assert.equal(genericUpdatedCompany.accepted, false, "generic company update must not approve company");
+  assert.equal(genericUpdatedCompany.status, false, "generic company update must not activate company");
+  assert.equal(genericUpdatedCompany.is_verified, false, "generic company update must not verify company");
+  assert.equal(genericUpdatedCompany.can_upload, false, "generic company update must not alter upload permission");
+  const companyUpdateAudit = await AuditLogModel.findOne({
+    action: "admin_resource_updated",
+    entity_id: protectedCompany._id,
+    "metadata.resource": "companies",
+  }).lean();
+  assert.ok(companyUpdateAudit, "generic company update should be audited");
+  assert.equal(companyUpdateAudit.new_value.company_name, `Renamed Protected Company ${suffix}`);
+  assert.equal(companyUpdateAudit.new_value.accepted, undefined);
+  assert.equal(companyUpdateAudit.new_value.status, undefined);
+  assert.equal(companyUpdateAudit.new_value.is_verified, undefined);
+  assert.equal(companyUpdateAudit.new_value.can_upload, undefined);
+
+  await expectStatus(
+    request(baseUrl, "POST", `/dash/v1/resources/companies/${protectedCompany._id}/approve`, {
+      token: adminTokens.accessToken,
+    }),
+    200,
+    "admin approves a company through dedicated generic approval route"
+  );
+  const approvedCompany = await CompanyModel.findById(protectedCompany._id).lean();
+  assert.equal(approvedCompany.accepted, true, "dedicated company approve should set accepted");
+  assert.equal(approvedCompany.status, true, "dedicated company approve should activate company");
 
   await expectStatus(
     request(baseUrl, "POST", `/dash/v1/resources/users/${bulkUserOne._id}/approve`, {

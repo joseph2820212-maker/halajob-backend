@@ -1,6 +1,7 @@
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { UserModel } from "../../../models/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
+import { setRefreshCookie, webAuthScope } from "../../../services/authCookie.service.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 
@@ -111,6 +112,7 @@ export const verifyNewDevice = async (req, res) => {
     await user.save();
 
     const tokens = await generateAuthTokens(user, verifiedDevice);
+    setRefreshCookie(req, res, tokens.refreshToken, webAuthScope(req, "seeker"));
 
     return ReturnAppData.createData({
       res, status: 200,

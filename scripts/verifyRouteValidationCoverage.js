@@ -24,8 +24,26 @@ const CORE_AUTH_ACCOUNT_WRITES = new Set([
   "POST /user/v1/auth/update-image",
   "POST /user/v1/auth/update-profile",
   "POST /user/v1/me/active-context",
+  "PUT /user/v1/settings",
+  "PATCH /user/v1/settings",
   "POST /user/v1/account/delete-request",
   "POST /user/v1/account/delete-request/cancel",
+  "POST /company/v1/auth/login",
+  "POST /company/v1/auth/logout",
+  "POST /company/v1/auth/logout-all",
+  "POST /company/v1/auth/refresh",
+  "POST /company/v1/auth/refresh-token",
+  "POST /company/v1/auth/forgot-password",
+  "POST /company/v1/auth/passcode-forgot-password",
+  "POST /company/v1/auth/resetPassword",
+  "POST /company/v1/auth/reset-password",
+  "DELETE /company/v1/auth/sessions/:sessionId",
+  "PUT /company/v1/settings",
+  "PATCH /company/v1/settings",
+  "PUT /university/v1/settings",
+  "PATCH /university/v1/settings",
+  "PUT /dash/v1/platform/settings",
+  "PATCH /dash/v1/platform/settings",
 ]);
 
 const isPublicOrSystemEndpoint = ({ method, path: routePath }) => {
@@ -41,8 +59,16 @@ const moduleForPath = (routePath) => {
   if (routePath.startsWith("/company/v1")) return "company";
   if (routePath.startsWith("/employee/v1")) return "seeker";
   if (routePath.startsWith("/user/v1/auth")) return "auth";
-  if (routePath.startsWith("/user/v1/me") || routePath.startsWith("/user/v1/account")) return "account";
-  if (routePath.startsWith("/user/v1/campus") || routePath.startsWith("/campus/v1")) return "campus";
+  if (
+    routePath.startsWith("/user/v1/me") ||
+    routePath.startsWith("/user/v1/account")
+  )
+    return "account";
+  if (
+    routePath.startsWith("/user/v1/campus") ||
+    routePath.startsWith("/campus/v1")
+  )
+    return "campus";
   if (routePath.startsWith("/university/v1")) return "university";
   if (routePath.startsWith("/ai/v1")) return "ai";
   if (routePath.startsWith("/analytics/v1")) return "analytics";
@@ -73,17 +99,28 @@ for (const endpoint of listEndpoints(app)) {
   }
 }
 
-records.sort((a, b) => a.module.localeCompare(b.module) || a.path.localeCompare(b.path) || a.method.localeCompare(b.method));
+records.sort(
+  (a, b) =>
+    a.module.localeCompare(b.module) ||
+    a.path.localeCompare(b.path) ||
+    a.method.localeCompare(b.method),
+);
 
 const publicOrSystem = records.filter((record) => record.publicOrSystem);
 const readOnlyAllowedWithoutBodyValidator = records.filter(
-  (record) => !record.isWrite && !record.publicOrSystem && !record.hasValidator
+  (record) => !record.isWrite && !record.publicOrSystem && !record.hasValidator,
 );
-const writeEndpoints = records.filter((record) => record.isWrite && !record.publicOrSystem);
-const writeWithValidator = writeEndpoints.filter((record) => record.hasValidator);
-const writeMissingValidator = writeEndpoints.filter((record) => !record.hasValidator);
+const writeEndpoints = records.filter(
+  (record) => record.isWrite && !record.publicOrSystem,
+);
+const writeWithValidator = writeEndpoints.filter(
+  (record) => record.hasValidator,
+);
+const writeMissingValidator = writeEndpoints.filter(
+  (record) => !record.hasValidator,
+);
 const coreAuthAccountMissing = writeEndpoints.filter(
-  (record) => CORE_AUTH_ACCOUNT_WRITES.has(record.key) && !record.hasValidator
+  (record) => CORE_AUTH_ACCOUNT_WRITES.has(record.key) && !record.hasValidator,
 );
 
 const byModule = new Map();
@@ -113,14 +150,17 @@ const report = {
   totals: {
     totalEndpoints: records.length,
     publicSystemEndpoints: publicOrSystem.length,
-    readOnlyEndpointsAllowedWithoutBodyValidator: readOnlyAllowedWithoutBodyValidator.length,
+    readOnlyEndpointsAllowedWithoutBodyValidator:
+      readOnlyAllowedWithoutBodyValidator.length,
     writeUpdateDeleteEndpoints: writeEndpoints.length,
     writeUpdateDeleteEndpointsWithValidator: writeWithValidator.length,
     writeUpdateDeleteEndpointsMissingValidator: writeMissingValidator.length,
     writeValidationCoveragePercent: coveragePercent,
     coreAuthAccountMissingValidators: coreAuthAccountMissing.length,
   },
-  modules: [...byModule.values()].sort((a, b) => a.module.localeCompare(b.module)),
+  modules: [...byModule.values()].sort((a, b) =>
+    a.module.localeCompare(b.module),
+  ),
   coreAuthAccountMissing: coreAuthAccountMissing.map((record) => ({
     method: record.method,
     path: record.path,
@@ -134,11 +174,15 @@ const report = {
   })),
 };
 
-const table = (headers, rows) => [
-  `| ${headers.join(" | ")} |`,
-  `| ${headers.map(() => "---").join(" | ")} |`,
-  ...rows.map((row) => `| ${row.map((cell) => String(cell ?? "").replace(/\|/g, "\\|")).join(" | ")} |`),
-].join("\n");
+const table = (headers, rows) =>
+  [
+    `| ${headers.join(" | ")} |`,
+    `| ${headers.map(() => "---").join(" | ")} |`,
+    ...rows.map(
+      (row) =>
+        `| ${row.map((cell) => String(cell ?? "").replace(/\|/g, "\\|")).join(" | ")} |`,
+    ),
+  ].join("\n");
 
 const moduleRows = report.modules.map((item) => [
   item.module,
@@ -148,12 +192,14 @@ const moduleRows = report.modules.map((item) => [
   item.writesMissingValidator,
 ]);
 
-const missingRows = report.writeMissingValidator.slice(0, 150).map((record) => [
-  record.method,
-  record.path,
-  record.module,
-  record.middlewares.join(", "),
-]);
+const missingRows = report.writeMissingValidator
+  .slice(0, 150)
+  .map((record) => [
+    record.method,
+    record.path,
+    record.module,
+    record.middlewares.join(", "),
+  ]);
 
 const markdown = `# Route Validation Coverage
 
@@ -201,16 +247,28 @@ if (writeReport) {
 console.log(`Total endpoints: ${report.totals.totalEndpoints}`);
 console.log(`Public/system endpoints: ${report.totals.publicSystemEndpoints}`);
 console.log(
-  `Read-only endpoints allowed without body validator: ${report.totals.readOnlyEndpointsAllowedWithoutBodyValidator}`
+  `Read-only endpoints allowed without body validator: ${report.totals.readOnlyEndpointsAllowedWithoutBodyValidator}`,
 );
-console.log(`Write/update/delete endpoints: ${report.totals.writeUpdateDeleteEndpoints}`);
-console.log(`Write/update/delete endpoints with validator: ${report.totals.writeUpdateDeleteEndpointsWithValidator}`);
-console.log(`Write/update/delete endpoints missing validator: ${report.totals.writeUpdateDeleteEndpointsMissingValidator}`);
-console.log(`Write validation coverage: ${report.totals.writeValidationCoveragePercent}%`);
-console.log(`Core auth/account missing validators: ${report.totals.coreAuthAccountMissingValidators}`);
+console.log(
+  `Write/update/delete endpoints: ${report.totals.writeUpdateDeleteEndpoints}`,
+);
+console.log(
+  `Write/update/delete endpoints with validator: ${report.totals.writeUpdateDeleteEndpointsWithValidator}`,
+);
+console.log(
+  `Write/update/delete endpoints missing validator: ${report.totals.writeUpdateDeleteEndpointsMissingValidator}`,
+);
+console.log(
+  `Write validation coverage: ${report.totals.writeValidationCoveragePercent}%`,
+);
+console.log(
+  `Core auth/account missing validators: ${report.totals.coreAuthAccountMissingValidators}`,
+);
 
 if (coreAuthAccountMissing.length) {
-  console.error("Core auth/account write routes are missing route-level validators:");
+  console.error(
+    "Core auth/account write routes are missing route-level validators:",
+  );
   for (const record of coreAuthAccountMissing) console.error(`- ${record.key}`);
   process.exit(1);
 }

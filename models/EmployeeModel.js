@@ -12,7 +12,7 @@ const ExperienceSchema = new Schema(
     is_until_now: { type: Boolean, default: false },
     details: { type: String, trim: true, default: "" },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
 );
 
 const EducationSchema = new Schema(
@@ -30,7 +30,7 @@ const EducationSchema = new Schema(
     end_date: { type: Date, default: null },
     is_until_now: { type: Boolean, default: false },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
 );
 
 const SkillEmployeeSchema = new Schema(
@@ -45,7 +45,7 @@ const SkillEmployeeSchema = new Schema(
     years: { type: Number, default: 0, min: 0 },
     level: { type: Number, min: 1, max: 5, default: 3 },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
 );
 
 const LanguageEmployeeSchema = new Schema(
@@ -58,7 +58,7 @@ const LanguageEmployeeSchema = new Schema(
     },
     level: { type: Number, min: 1, max: 5, default: 1 },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
 );
 
 const SimpleCertificateSchema = new Schema(
@@ -67,9 +67,8 @@ const SimpleCertificateSchema = new Schema(
     end_in: { type: Date, default: null },
     is_for_ever: { type: Boolean, default: false },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
 );
-
 
 const StudentProjectSchema = new Schema(
   {
@@ -79,18 +78,51 @@ const StudentProjectSchema = new Schema(
     technologies: { type: [String], default: [] },
     url: { type: String, trim: true, default: "" },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
+);
+
+const CampusVisibilitySchema = new Schema(
+  {
+    talent_pool_opt_in: { type: Boolean, default: false, index: true },
+    visible_to_partner_companies: { type: Boolean, default: false, index: true },
+    visible_fields: {
+      contact: { type: Boolean, default: false },
+      cv: { type: Boolean, default: false },
+      projects: { type: Boolean, default: true },
+      gpa: { type: Boolean, default: false },
+    },
+    opted_in_at: { type: Date, default: null },
+    opted_out_at: { type: Date, default: null },
+  },
+  { _id: false },
 );
 
 const StudentProfileSchema = new Schema(
   {
     university: { type: String, trim: true, default: "" },
-    university_id: { type: Schema.Types.ObjectId, ref: "universities", default: null, index: true },
+    university_id: {
+      type: Schema.Types.ObjectId,
+      ref: "universities",
+      default: null,
+      index: true,
+    },
     specialty: { type: String, trim: true, default: "" },
     sub_specialty: { type: String, trim: true, default: "" },
     academic_year: {
       type: String,
-      enum: ["first", "second", "third", "fourth", "fifth", "sixth", "diploma", "postgraduate", "internship", "graduated", ""],
+      enum: [
+        "first",
+        "second",
+        "third",
+        "fourth",
+        "fifth",
+        "sixth",
+        "diploma",
+        "postgraduate",
+        "internship",
+        "graduated",
+        "",
+      ],
       default: "",
     },
     gpa: { type: String, trim: true, default: "" },
@@ -106,12 +138,33 @@ const StudentProfileSchema = new Schema(
     technical_skills: { type: [SkillEmployeeSchema], default: [] },
     soft_skills: { type: [SkillEmployeeSchema], default: [] },
     projects: { type: [StudentProjectSchema], default: [] },
-    work_readiness: { type: String, enum: ["immediately", "within_week", "within_month", ""], default: "" },
+    work_readiness: {
+      type: String,
+      enum: ["immediately", "within_week", "within_month", ""],
+      default: "",
+    },
     preferred_work_location: { type: String, trim: true, default: "" },
     mini_cv_ready: { type: Boolean, default: false },
     readiness_score: { type: Number, default: 0, min: 0, max: 100 },
+    campus_discovery_visibility: {
+      type: String,
+      enum: ["partner_companies", "public_talent_pool", "hidden"],
+      default: "partner_companies",
+      index: true,
+    },
+    contact_visibility: {
+      type: String,
+      enum: ["hidden", "partner_companies", "public"],
+      default: "hidden",
+    },
+    cv_visibility: {
+      type: String,
+      enum: ["hidden", "partner_companies", "public"],
+      default: "hidden",
+    },
+    campus_visibility: { type: CampusVisibilitySchema, default: () => ({}) },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const LinkSchema = new Schema(
@@ -119,7 +172,7 @@ const LinkSchema = new Schema(
     title: { type: String, trim: true, default: "" },
     url: { type: String, trim: true, default: "" },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
 );
 const EmployeeCvFileSchema = new Schema(
   {
@@ -138,7 +191,7 @@ const EmployeeCvFileSchema = new Schema(
 
     created_from_builder: { type: Boolean, default: true },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
 );
 const ExpectedSalarySchema = new Schema(
   {
@@ -173,7 +226,7 @@ const ExpectedSalarySchema = new Schema(
     min_base: { type: Number, default: null, min: 0, index: true },
     max_base: { type: Number, default: null, min: 0, index: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const JobAlertSchema = new Schema(
@@ -194,7 +247,7 @@ const JobAlertSchema = new Schema(
     },
     is_active: { type: Boolean, default: true, index: true },
   },
-  { _id: true, timestamps: true }
+  { _id: true, timestamps: true },
 );
 
 const SearchFiltersSchema = new Schema(
@@ -308,10 +361,15 @@ const SearchFiltersSchema = new Schema(
         default: null,
         index: true,
       },
-      currency_code: { type: String, default: "", uppercase: true, index: true },
+      currency_code: {
+        type: String,
+        default: "",
+        uppercase: true,
+        index: true,
+      },
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const EmployeeSchema = new Schema(
@@ -355,8 +413,18 @@ const EmployeeSchema = new Schema(
     about_me: { type: String, default: "", trim: true },
     profile_completion: { type: Number, default: 0, min: 0, max: 100 },
     birthday: { type: Date, default: null, index: true },
-    current_country_id: { type: Schema.Types.ObjectId, ref: "countries", default: null, index: true },
-    current_city_id: { type: Schema.Types.ObjectId, ref: "cities", default: null, index: true },
+    current_country_id: {
+      type: Schema.Types.ObjectId,
+      ref: "countries",
+      default: null,
+      index: true,
+    },
+    current_city_id: {
+      type: Schema.Types.ObjectId,
+      ref: "cities",
+      default: null,
+      index: true,
+    },
     current_country: { type: String, trim: true, default: "" },
     current_city: { type: String, trim: true, default: "" },
 
@@ -430,7 +498,7 @@ const EmployeeSchema = new Schema(
 
     search_filters: { type: SearchFiltersSchema, default: () => ({}) },
   },
-  { collection: "employees", timestamps: true }
+  { collection: "employees", timestamps: true },
 );
 
 EmployeeSchema.index({ "expected_salary.min_base": 1 });
@@ -443,7 +511,10 @@ EmployeeSchema.index({ preferred_countries: 1 });
 EmployeeSchema.index({ job_names: 1 });
 EmployeeSchema.index({ job_types: 1 });
 EmployeeSchema.index({ preferred_work_modes: 1 });
-EmployeeSchema.index({ "search_filters.career.accepted": 1, "search_filters.career.status": 1 });
+EmployeeSchema.index({
+  "search_filters.career.accepted": 1,
+  "search_filters.career.status": 1,
+});
 EmployeeSchema.index({ "search_filters.career.is_free_for_work": 1 });
 EmployeeSchema.index({ "search_filters.career.candidate_stage": 1 });
 EmployeeSchema.index({ "search_filters.career.experience_years": 1 });

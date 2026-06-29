@@ -74,6 +74,18 @@ jobs:
       - name: Backend route validation contract
         run: npm run test:route-validation
 
+      - name: Critical launch blocker guard
+        run: npm run test:critical-launch-blockers
+
+      - name: OTP length contract
+        run: npm run test:otp-contract
+
+      - name: UI action wiring contract
+        run: npm run test:ui-actions
+
+      - name: Mobile UI contract
+        run: npm run test:mobile-ui-contract
+
       - name: Backend response-code contract
         run: npm run test:response-codes
 
@@ -82,6 +94,9 @@ jobs:
 
       - name: Backend mixed-field register
         run: npm run test:mixed-fields
+
+      - name: Backend data-retention contract
+        run: npm run test:data-retention
 
       - name: Backend global launch contract
         run: npm run test:global-launch-contract
@@ -98,6 +113,9 @@ jobs:
       - name: Web tests
         run: npm --prefix web test
 
+      - name: Web/backend API wiring contract
+        run: npm run check:web-routes
+
       - name: Web portal smoke
         run: npm --prefix web run e2e
 
@@ -105,6 +123,23 @@ jobs:
         env:
           CONNECTION_URL: mongodb://localhost:27017/halajob_ci_test
         run: npm run test:integration:auth-context
+
+      - name: Backend integration tests (critical workflows)
+        env:
+          CONNECTION_URL: mongodb://localhost:27017/halajob_ci_test
+        run: |
+          npm run test:object-authorization
+          npm run test:audit-logging
+          npm run test:integration:job-mutations
+          npm run test:integration:hiring-workflows
+          npm run test:integration:subscriptions
+          npm run test:integration:company-permissions
+          npm run test:integration:admin-resources
+
+      - name: Backend integration tests (Syria product completion)
+        env:
+          CONNECTION_URL: mongodb://localhost:27017/halajob_ci_test
+        run: npm run test:integration:syria-product
 
       - name: Secret scan
         run: npm run check:secrets
@@ -174,7 +209,7 @@ jobs:
           APP_VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}')
           APP_BUILD_NAME="${APP_VERSION%%+*}"
           APP_BUILD_NUMBER="${APP_VERSION##*+}"
-          flutter build apk --release --build-name="$APP_BUILD_NAME" --build-number="$APP_BUILD_NUMBER" --dart-define=HALA_DEFAULT_BASE_URL=https://jobzain.com --dart-define=HALA_ENABLE_REMOTE_CAMPUS_AUTH=false --dart-define=HALA_APP_BUILD_MODE=ci-tester --dart-define=HALA_APP_BUILD_COMMIT=${{ github.sha }}
+          flutter build apk --release --build-name="$APP_BUILD_NAME" --build-number="$APP_BUILD_NUMBER" --dart-define=HALA_DEFAULT_BASE_URL=https://jobzain.com --dart-define=HALA_ENABLE_REMOTE_CAMPUS_AUTH=false --dart-define=FEATURE_AI_TOOLS_ENABLED=true --dart-define=HALA_APP_BUILD_MODE=ci-tester --dart-define=HALA_APP_BUILD_COMMIT=${{ github.sha }}
 
       - name: Upload campus-tester APK
         if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/flutter-seeker-campus'

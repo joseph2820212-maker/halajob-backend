@@ -61,9 +61,10 @@ const generateToken = async (userId, loginTime, expires, type) => {
   return sign(payload, process.env.JWT_SECRET);
 };
 
-const saveRefreshToken = async (userId, loginTime, token, device = {}) => {
+const saveRefreshToken = async (userId, loginTime, token, device = {}, expiresAt) => {
   const normalizedDevice = normalizeDevice(device);
   const deviceFingerprint = buildDeviceFingerprint(normalizedDevice);
+  const tokenExpiresAt = expiresAt ? new Date(expiresAt.valueOf ? expiresAt.valueOf() : expiresAt) : new Date(Date.now() + Number(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || 30) * 24 * 60 * 60 * 1000);
 
   await RefreshTokenModel.findOneAndUpdate(
     buildDeviceQuery(userId, normalizedDevice),
@@ -71,6 +72,7 @@ const saveRefreshToken = async (userId, loginTime, token, device = {}) => {
       $set: {
         userRef: userId,
         loginTime: new Date(loginTime.valueOf()),
+        expiresAt: tokenExpiresAt,
         token,
         device: normalizedDevice,
         device_fingerprint: deviceFingerprint,
@@ -95,6 +97,9 @@ const clearRefreshToken = async (token) => {
 
 const generateAuthTokens = async (user, device = {}) => {
   const loginTime = moment();
+  const refreshTokenExpiresAt = loginTime
+    .clone()
+    .add(Number(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || 30), 'days');
 
   const accessToken = await generateToken(
     user._id,
@@ -106,11 +111,11 @@ const generateAuthTokens = async (user, device = {}) => {
   const refreshToken = await generateToken(
     user._id,
     loginTime,
-    loginTime.clone().add(Number(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || 30), 'days'),
+    refreshTokenExpiresAt,
     tokenTypes.REFRESH
   );
 
-  await saveRefreshToken(user._id, loginTime, refreshToken, device);
+  await saveRefreshToken(user._id, loginTime, refreshToken, device, refreshTokenExpiresAt);
 
   return {
     accessToken,

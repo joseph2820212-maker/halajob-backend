@@ -3,7 +3,9 @@ import listEndpoints from "express-list-endpoints";
 import app from "../app.js";
 
 const endpoints = listEndpoints(app);
-const endpointByPath = new Map(endpoints.map((endpoint) => [endpoint.path, endpoint]));
+const endpointByPath = new Map(
+  endpoints.map((endpoint) => [endpoint.path, endpoint]),
+);
 
 const requiredEndpoints = [
   ["POST", "/user/v1/auth/register"],
@@ -64,6 +66,9 @@ const requiredEndpoints = [
   ["GET", "/university/v1/dashboard"],
   ["GET", "/university/v1/dashboard/overview"],
   ["GET", "/university/v1/overview"],
+  ["GET", "/university/v1/settings"],
+  ["PUT", "/university/v1/settings"],
+  ["PATCH", "/university/v1/settings"],
   ["GET", "/university/v1/students"],
   ["GET", "/university/v1/students/:studentId/career-passport"],
   ["GET", "/university/v1/verifications"],
@@ -112,6 +117,9 @@ const requiredEndpoints = [
   ["GET", "/user/v1/notifications/preferences"],
   ["PUT", "/user/v1/notifications/preferences"],
   ["PATCH", "/user/v1/notifications/preferences"],
+  ["GET", "/user/v1/settings"],
+  ["PUT", "/user/v1/settings"],
+  ["PATCH", "/user/v1/settings"],
   ["POST", "/user/v1/notifications/read-all"],
   ["PATCH", "/user/v1/notifications/read-all"],
   ["POST", "/user/v1/notifications/:id/read"],
@@ -238,7 +246,19 @@ const requiredEndpoints = [
   ["POST", "/employee/v1/cv/generate/download-url"],
 
   ["POST", "/company/v1/auth/login"],
+  ["POST", "/company/v1/auth/refresh"],
+  ["POST", "/company/v1/auth/refresh-token"],
   ["POST", "/company/v1/auth/logout"],
+  ["POST", "/company/v1/auth/logout-all"],
+  ["GET", "/company/v1/auth/sessions"],
+  ["DELETE", "/company/v1/auth/sessions/:sessionId"],
+  ["POST", "/company/v1/auth/forgot-password"],
+  ["POST", "/company/v1/auth/passcode-forgot-password"],
+  ["POST", "/company/v1/auth/resetPassword"],
+  ["POST", "/company/v1/auth/reset-password"],
+  ["GET", "/company/v1/settings"],
+  ["PUT", "/company/v1/settings"],
+  ["PATCH", "/company/v1/settings"],
   ["POST", "/dash/v1/auth/logout"],
   ["GET", "/company/v1/global"],
   ["GET", "/company/v1/global/profile"],
@@ -298,7 +318,10 @@ const requiredEndpoints = [
   ["POST", "/company/v1/global/applications/:applicationId/rate"],
   ["PATCH", "/company/v1/jobs/hiring/applications/:applicationId/restore"],
   ["POST", "/company/v1/jobs/hiring/applications/:applicationId/messages"],
-  ["PATCH", "/company/v1/jobs/hiring/applications/:applicationId/block-applicant"],
+  [
+    "PATCH",
+    "/company/v1/jobs/hiring/applications/:applicationId/block-applicant",
+  ],
   ["GET", "/company/v1/jobs/hiring/applications/:applicationId/cv"],
   ["POST", "/company/v1/jobs/hiring/applications/bulk-cv"],
   ["POST", "/company/v1/jobs/hiring/applications/bulk-export"],
@@ -439,45 +462,67 @@ const missingEndpoints = requiredEndpoints
   .filter(([method, path]) => !hasEndpoint(method, path))
   .map(([method, path]) => `${method} ${path}`);
 
-assert.deepEqual(missingEndpoints, [], "Express app is missing mobile endpoints");
+assert.deepEqual(
+  missingEndpoints,
+  [],
+  "Express app is missing mobile endpoints",
+);
 
 const missingCampusGuards = requiredCampusStudentPaths.filter((path) => {
   const middlewares = endpointByPath.get(path)?.middlewares || [];
-  return !middlewares.includes("authUser") || !middlewares.includes("requireCampusStudent");
+  return (
+    !middlewares.includes("authUser") ||
+    !middlewares.includes("requireCampusStudent")
+  );
 });
 
-assert.deepEqual(missingCampusGuards, [], "Campus mobile endpoints must require a signed-in campus student");
+assert.deepEqual(
+  missingCampusGuards,
+  [],
+  "Campus mobile endpoints must require a signed-in campus student",
+);
 
-const missingUniversityAdminGuards = requiredUniversityAdminPaths.filter((path) => {
-  const middlewares = endpointByPath.get(path)?.middlewares || [];
-  return !middlewares.includes("authUser") || !middlewares.includes("activeContextGuard");
-});
+const missingUniversityAdminGuards = requiredUniversityAdminPaths.filter(
+  (path) => {
+    const middlewares = endpointByPath.get(path)?.middlewares || [];
+    return (
+      !middlewares.includes("authUser") ||
+      !middlewares.includes("activeContextGuard")
+    );
+  },
+);
 
 assert.deepEqual(
   missingUniversityAdminGuards,
   [],
-  "University admin mobile endpoints must require an active university_admin or super_admin context"
+  "University admin mobile endpoints must require an active university_admin or super_admin context",
 );
 
-const missingLegacyEmployeeGuards = requiredLegacyEmployeeMobilePaths.filter((path) => {
-  const middlewares = endpointByPath.get(path)?.middlewares || [];
-  return !middlewares.includes("authUser");
-});
+const missingLegacyEmployeeGuards = requiredLegacyEmployeeMobilePaths.filter(
+  (path) => {
+    const middlewares = endpointByPath.get(path)?.middlewares || [];
+    return !middlewares.includes("authUser");
+  },
+);
 
 assert.deepEqual(
   missingLegacyEmployeeGuards,
   [],
-  "Legacy employee mobile compatibility endpoints must require a signed-in user"
+  "Legacy employee mobile compatibility endpoints must require a signed-in user",
 );
 
-const sharedCareerPassportEndpoint = endpointByPath.get("/user/v1/career-passport/share/:token");
+const sharedCareerPassportEndpoint = endpointByPath.get(
+  "/user/v1/career-passport/share/:token",
+);
 assert.ok(
   sharedCareerPassportEndpoint?.methods.includes("GET"),
-  "Shared Career Passport token endpoint must be mounted"
+  "Shared Career Passport token endpoint must be mounted",
 );
 assert.ok(
   !sharedCareerPassportEndpoint.middlewares.includes("authUser"),
-  "Shared Career Passport token endpoint must stay public and token-gated"
+  "Shared Career Passport token endpoint must stay public and token-gated",
 );
 
-console.log(`Mobile route mounts verified (${requiredEndpoints.length} method/path checks).`);
+console.log(
+  `Mobile route mounts verified (${requiredEndpoints.length} method/path checks).`,
+);

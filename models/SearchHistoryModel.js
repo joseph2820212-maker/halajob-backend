@@ -15,5 +15,9 @@ const SearchHistorySchema = new Schema(
 );
 SearchHistorySchema.index({ user_id: 1, type: 1, createdAt: -1 });
 SearchHistorySchema.index({ query_norm: 1, createdAt: -1 });
+SearchHistorySchema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: 180 * 24 * 60 * 60, name: "search_history_created_at_ttl" }
+);
 const SearchHistoryModel = mongoose.model("search_history", SearchHistorySchema);
 export default SearchHistoryModel;

@@ -68,6 +68,7 @@ import {
 } from "../../../services/subscriptions/companySubscription.service.js";
 import { writeAuditLog } from "../../../services/auditLog.service.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
+import { sendCommunicationEvent } from "../../../services/communication/communication.service.js";
 
 
 const failSubscription = (res, check) => fail(res, check.message || "subscription_not_allowed", check.status || 403, {
@@ -104,6 +105,14 @@ const recordCompanyHiringAnalytics = ({
 
 const companyActorType = (req) =>
   req.companyAccess?.role === "owner" ? "company_owner" : "company_member";
+
+const companyInterviewPopulate = [
+  { path: "job_id", select: "job_name city salary company_id" },
+  { path: "application_id", select: "first_name last_name email phone_code phone_national status visible_status" },
+  { path: "employee_user_id", select: "first_name mid_name last_name email image phone_code phone_national" },
+  { path: "scheduled_by", select: "first_name mid_name last_name email image" },
+  { path: "feedback.submitted_by", select: "first_name mid_name last_name email image" },
+];
 
 const parseIntBounded = (value, fallback, min, max) => {
   const n = Number.parseInt(String(value ?? ""), 10);
@@ -248,6 +257,34 @@ const parsePlainObjectBody = (value, fallback = {}) => {
   }
   return fallback;
 };
+
+const resetInterviewCandidateResponse = (interview) => {
+  interview.candidate_response = {
+    ...(interview.candidate_response || {}),
+    status: "pending",
+    note: "",
+    responded_at: null,
+  };
+};
+
+const reminderBucketForBody = (body = {}) => {
+  const value = cleanText(body.kind || body.reminder_kind || body.reminderKind || body.type).toLowerCase();
+  if (["day_before", "24h", "day"].includes(value)) return "day_before_sent_at";
+  if (["hour_before", "1h", "hour"].includes(value)) return "hour_before_sent_at";
+  return "hour_before_sent_at";
+};
+
+const interviewReminderVariables = ({ interview, job = null, body = {} }) => ({
+  job_name: job?.job_name || "",
+  interview_id: String(interview._id),
+  start_at: interview.start_at,
+  end_at: interview.end_at || null,
+  timezone: interview.timezone || "UTC",
+  meeting_provider: interview.meeting_provider || "manual",
+  meet_link: interview.meet_link || "",
+  office_address: interview.office_address || "",
+  note: cleanText(body.note || interview.candidate_note || interview.company_note || ""),
+});
 
 const applicationCvFiles = (application) => sanitizeCvEntries(collectApplicationCvEntries(application));
 
@@ -628,15 +665,31 @@ export const getInterviews = async (req, res, next) => {
 
     const result = await paginate(InterviewModel, filter, req, {
       sort: { start_at: req.query.upcoming === "true" ? 1 : -1, _id: -1 },
-      populate: [
-        { path: "job_id", select: "job_name city salary" },
-        { path: "application_id", select: "first_name last_name email phone_code phone_national status" },
-        { path: "employee_user_id", select: "first_name mid_name last_name email image" },
-      ],
+      populate: companyInterviewPopulate,
       lean: true,
     });
 
     return success(res, result.items.map(normalizeInterview), "interviews", 200, result.meta);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getInterviewDetails = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const interview = await InterviewModel.findOne({
+      _id: req.params.interviewId,
+      company_id: companyData.company._id,
+    })
+      .populate(companyInterviewPopulate)
+      .lean();
+
+    if (!interview) return fail(res, "interview_not_found", 404);
+
+    return success(res, normalizeInterview(interview), "interview_details");
   } catch (error) {
     next(error);
   }
@@ -662,6 +715,7 @@ export const updateInterview = async (req, res, next) => {
     if (willReschedule) {
       interview.status = "rescheduled";
       interview.reschedule_count = Number(interview.reschedule_count || 0) + 1;
+      resetInterviewCandidateResponse(interview);
     }
 
     await interview.save();
@@ -730,7 +784,8 @@ export const updateInterview = async (req, res, next) => {
       office_address: interview.office_address,
     }).catch?.(console.error);
 
-    return success(res, normalizeInterview(interview), "interview_updated");
+    const populated = await InterviewModel.findById(interview._id).populate(companyInterviewPopulate).lean();
+    return success(res, normalizeInterview(populated || interview), "interview_updated");
   } catch (error) {
     next(error);
   }
@@ -824,6 +879,134 @@ export const changeInterviewStatus = async (req, res, next) => {
     }
 
     return success(res, normalizeInterview(interview), "interview_status_updated");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelInterview = async (req, res, next) => {
+  req.body = req.body || {};
+  req.body.status = "cancelled";
+  req.body.cancelled_reason = req.body.cancelled_reason || req.body.reason || req.body.note || "";
+  return changeInterviewStatus(req, res, next);
+};
+
+export const submitInterviewFeedback = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const interview = await getOwnedInterviewOrFail(req, res, companyData.company._id, req.params.interviewId);
+    if (!interview) return;
+
+    const body = req.body || {};
+    const oldFeedback = interview.feedback?.toObject?.() || interview.feedback || {};
+    const scorecardPatch = parsePlainObjectBody(body.scorecard, null);
+    if (scorecardPatch) interview.scorecard = { ...(interview.scorecard || {}), ...scorecardPatch };
+    if (body.rating !== undefined) interview.rating = toNumber(body.rating, null);
+    if (body.result_note !== undefined || body.note !== undefined) {
+      interview.result_note = cleanText(body.result_note || body.note);
+    }
+    interview.feedback = {
+      ...(interview.feedback || {}),
+      submitted_by: companyData.userId,
+      submitted_at: new Date(),
+      strengths: cleanText(body.strengths || interview.feedback?.strengths || ""),
+      concerns: cleanText(body.concerns || interview.feedback?.concerns || ""),
+      next_step: cleanText(body.next_step || body.nextStep || interview.feedback?.next_step || ""),
+    };
+    await interview.save();
+
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: "interview_feedback_submitted",
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      oldValue: { feedback: oldFeedback },
+      newValue: { feedback: interview.feedback, rating: interview.rating ?? null, scorecard: interview.scorecard || null },
+      note: cleanText(body.note || body.result_note || ""),
+    });
+    recordCompanyHiringAnalytics({
+      req,
+      event: "interview_feedback_submitted",
+      companyData,
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      metadata: {
+        rating: interview.rating ?? null,
+        next_step: interview.feedback?.next_step || "",
+      },
+    });
+
+    const populated = await InterviewModel.findById(interview._id).populate(companyInterviewPopulate).lean();
+    return success(res, normalizeInterview(populated || interview), "interview_feedback_saved");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const markInterviewNoShow = async (req, res, next) => {
+  req.body = req.body || {};
+  req.body.status = "no_show";
+  req.body.result_note = req.body.result_note || req.body.note || "candidate_no_show";
+  return changeInterviewStatus(req, res, next);
+};
+
+export const sendInterviewReminder = async (req, res, next) => {
+  try {
+    const companyData = await getCompanyUserIdOrFail(req, res);
+    if (!companyData) return;
+
+    const interview = await getOwnedInterviewOrFail(req, res, companyData.company._id, req.params.interviewId);
+    if (!interview) return;
+
+    const body = req.body || {};
+    const job = await jobsModel.findById(interview.job_id).select("_id job_name").lean().catch(() => null);
+    const communication = await sendCommunicationEvent({
+      userId: interview.employee_user_id,
+      companyId: companyData.company._id,
+      eventKey: "interview_reminder",
+      category: "interviews",
+      channels: body.channels || body.channel || ["in_app", "email"],
+      templateKey: "interview_reminder",
+      variables: interviewReminderVariables({ interview, job, body }),
+      route: {
+        key: "interviews.detail",
+        path: `applications/interviews/${interview._id}`,
+      },
+      respectPreferences: body.respect_preferences !== false && body.respectPreferences !== false,
+    });
+
+    const reminderKey = reminderBucketForBody(body);
+    interview.reminders = {
+      ...(interview.reminders || {}),
+      [reminderKey]: new Date(),
+    };
+    await interview.save();
+
+    await writeAuditLog({
+      req,
+      companyId: companyData.company._id,
+      actorUserId: companyData.userId,
+      actorType: companyActorType(req),
+      action: "interview_reminder_sent",
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      newValue: { reminder: reminderKey, communication },
+      note: cleanText(body.note || ""),
+    });
+
+    const populated = await InterviewModel.findById(interview._id).populate(companyInterviewPopulate).lean();
+    return success(res, { interview: normalizeInterview(populated || interview), communication }, "interview_reminder_sent");
   } catch (error) {
     next(error);
   }
@@ -1514,8 +1697,13 @@ export default {
   blockApplicationApplicant,
   createInterview,
   getInterviews,
+  getInterviewDetails,
   updateInterview,
   changeInterviewStatus,
+  cancelInterview,
+  submitInterviewFeedback,
+  markInterviewNoShow,
+  sendInterviewReminder,
   sendJobInvitation,
   getJobInvitations,
   getJobInvitationDetails,

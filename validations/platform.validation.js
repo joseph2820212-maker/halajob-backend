@@ -24,7 +24,7 @@ const safeObject = yup
   .test(
     "safe-object-keys",
     "Payload contains unsafe field names",
-    (value) => !hasUnsafePayloadKey(value)
+    (value) => !hasUnsafePayloadKey(value),
   );
 
 const bodyObject = yup
@@ -32,7 +32,7 @@ const bodyObject = yup
   .test(
     "safe-payload-keys",
     "Payload contains unsafe field names",
-    (value) => !hasUnsafePayloadKey(value)
+    (value) => !hasUnsafePayloadKey(value),
   );
 
 const boolish = yup
@@ -53,7 +53,7 @@ const boolish = yup
       value === "yes" ||
       value === "no" ||
       value === "on" ||
-      value === "off"
+      value === "off",
   );
 
 const jobIdParam = yup.object({
@@ -70,6 +70,14 @@ const idParam = yup.object({
 
 const memberIdParam = yup.object({
   memberId: objectId.required("memberId is required"),
+});
+
+const partnerIdParam = yup.object({
+  partnerId: objectId.required("partnerId is required"),
+});
+
+const studentIdParam = yup.object({
+  studentId: objectId.required("studentId is required"),
 });
 
 const eventIdParam = yup.object({
@@ -97,11 +105,16 @@ const deviceTokenIdentifierQuery = yup.object({
   device_id: yup.string().trim().max(180),
 });
 
-const translationText = yup.mixed().test(
-  "valid-translation-text",
-  "translated text must be an object or string",
-  (value) => value === undefined || typeof value === "string" || (value && typeof value === "object")
-);
+const translationText = yup
+  .mixed()
+  .test(
+    "valid-translation-text",
+    "translated text must be an object or string",
+    (value) =>
+      value === undefined ||
+      typeof value === "string" ||
+      (value && typeof value === "object"),
+  );
 
 const schemas = {
   aiRequestSchema: yup.object({
@@ -133,6 +146,10 @@ const schemas = {
     body: bodyObject,
   }),
 
+  settingsUpdateSchema: yup.object({
+    body: bodyObject,
+  }),
+
   notificationMarkReadSchema: yup.object({
     params: optionalIdParam,
     query: yup.object({
@@ -153,10 +170,12 @@ const schemas = {
       model_id: yup.string().trim().max(180),
       build_id: yup.string().trim().max(180),
       is_default: boolish,
-      topics: yup.mixed().test("valid-topics", "topics must be an array", (value) => {
-        if (value === undefined) return true;
-        return Array.isArray(value);
-      }),
+      topics: yup
+        .mixed()
+        .test("valid-topics", "topics must be an array", (value) => {
+          if (value === undefined) return true;
+          return Array.isArray(value);
+        }),
     }),
   }),
 
@@ -289,6 +308,27 @@ const schemas = {
     }),
   }),
 
+  campusTalentVisibilitySchema: yup.object({
+    body: bodyObject.shape({
+      talent_pool_opt_in: boolish,
+      opt_in: boolish,
+      enabled: boolish,
+      visible_to_partner_companies: boolish,
+      partner_companies: boolish,
+      visible_to_partners: boolish,
+      contact_visible: boolish,
+      cv_visible: boolish,
+      projects_visible: boolish,
+      gpa_visible: boolish,
+      visible_fields: bodyObject.shape({
+        contact: boolish,
+        cv: boolish,
+        projects: boolish,
+        gpa: boolish,
+      }),
+    }),
+  }),
+
   campusVerificationStartSchema: yup.object({
     body: bodyObject.shape({
       university_id: objectId,
@@ -358,10 +398,12 @@ const schemas = {
       role: yup.string().trim().max(80),
       member_role: yup.string().trim().max(80),
       status: yup.string().trim().max(80),
-      permissions: yup.mixed().test("valid-permissions", "permissions must be an array", (value) => {
-        if (value === undefined) return true;
-        return Array.isArray(value);
-      }),
+      permissions: yup
+        .mixed()
+        .test("valid-permissions", "permissions must be an array", (value) => {
+          if (value === undefined) return true;
+          return Array.isArray(value);
+        }),
     }),
   }),
 
@@ -371,15 +413,38 @@ const schemas = {
       role: yup.string().trim().max(80),
       member_role: yup.string().trim().max(80),
       status: yup.string().trim().max(80),
-      permissions: yup.mixed().test("valid-permissions", "permissions must be an array", (value) => {
-        if (value === undefined) return true;
-        return Array.isArray(value);
-      }),
+      permissions: yup
+        .mixed()
+        .test("valid-permissions", "permissions must be an array", (value) => {
+          if (value === undefined) return true;
+          return Array.isArray(value);
+        }),
     }),
   }),
 
   universityMemberDeleteSchema: yup.object({
     params: memberIdParam,
+  }),
+
+  universityStudentDetailSchema: yup.object({
+    params: studentIdParam,
+  }),
+
+  universityPartnerActionSchema: yup.object({
+    params: partnerIdParam,
+    body: bodyObject.shape({
+      note: yup.string().trim().max(2000),
+      reason: yup.string().trim().max(2000),
+      university_note: yup.string().trim().max(2000),
+      access_level: yup
+        .string()
+        .trim()
+        .oneOf(["jobs_only", "applicants_only", "talent_pool_limited"]),
+      expires_at: yup.string().trim().max(120),
+      allowed_departments: yup.mixed(),
+      allowed_programs: yup.mixed(),
+      allowed_campuses: yup.mixed(),
+    }),
   }),
 
   universityOpportunityRequestSchema: yup.object({

@@ -592,6 +592,8 @@ const findOwnedInterview = async (employeeData, interviewId) => {
   return InterviewModel.findOne({ _id: interviewId, employee_user_id: employeeData.userId });
 };
 
+const candidateResponseStatusFor = (status) => (status === "rejected" ? "declined" : status);
+
 const findOwnedInvitation = async (employeeData, invitationId) => {
   if (!isValidObjectId(invitationId)) return null;
   return JobInvitationModel.findOne({ _id: invitationId, user_id: employeeData.userId });
@@ -831,6 +833,21 @@ export const myInterviews = async (req, res, next) => {
   }
 };
 
+export const getMyInterviewDetails = async (req, res, next) => {
+  try {
+    const employeeData = await getEmployeeUserIdOrFail(req, res);
+    if (!employeeData) return;
+
+    const interview = await findOwnedInterview(employeeData, req.params.interviewId);
+    if (!interview) return fail(res, "interview_not_found", 404);
+
+    const populated = await InterviewModel.findById(interview._id).populate(interviewPopulateForEmployee).lean();
+    return success(res, normalizeInterviewForEmployee(populated || interview), "my_interview_details");
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const respondToInterview = async (req, res, next) => {
   try {
     const employeeData = await getEmployeeUserIdOrFail(req, res);
@@ -839,7 +856,8 @@ export const respondToInterview = async (req, res, next) => {
     const interview = await findOwnedInterview(employeeData, req.params.interviewId);
     if (!interview) return fail(res, "interview_not_found", 404);
 
-    const status = cleanText(req.body.status || req.body.response);
+    const rawStatus = cleanText(req.body.status || req.body.response || req.body.action).toLowerCase();
+    const status = rawStatus === "declined" ? "rejected" : rawStatus;
     if (!EMPLOYEE_INTERVIEW_STATUSES.has(status) || !["accepted", "rejected"].includes(status)) {
       return fail(res, "invalid_interview_response", 422);
     }
@@ -849,10 +867,17 @@ export const respondToInterview = async (req, res, next) => {
     }
 
     const oldInterviewStatus = interview.status;
+    const note = cleanText(req.body.candidate_note || req.body.note || "");
     interview.status = status;
     if (req.body.candidate_note !== undefined || req.body.note !== undefined) {
-      interview.candidate_note = cleanText(req.body.candidate_note || req.body.note);
+      interview.candidate_note = note;
     }
+    interview.candidate_response = {
+      ...(interview.candidate_response || {}),
+      status: candidateResponseStatusFor(status),
+      note,
+      responded_at: new Date(),
+    };
     await interview.save();
 
     const populated = await InterviewModel.findById(interview._id).populate(interviewPopulateForEmployee).lean();
@@ -906,6 +931,89 @@ export const respondToInterview = async (req, res, next) => {
       }).catch?.(console.error);
     }
     return success(res, normalizeInterviewForEmployee(populated || interview), "interview_response_saved");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const requestInterviewReschedule = async (req, res, next) => {
+  try {
+    const employeeData = await getEmployeeUserIdOrFail(req, res);
+    if (!employeeData) return;
+
+    const interview = await findOwnedInterview(employeeData, req.params.interviewId);
+    if (!interview) return fail(res, "interview_not_found", 404);
+
+    if (!["scheduled", "rescheduled", "accepted"].includes(interview.status)) {
+      return fail(res, "interview_cannot_be_rescheduled", 422);
+    }
+
+    const body = req.body || {};
+    const note = cleanText(body.note || body.candidate_note || body.reason || "");
+    interview.candidate_note = note || interview.candidate_note || "";
+    interview.candidate_response = {
+      ...(interview.candidate_response || {}),
+      status: "reschedule_requested",
+      note,
+      responded_at: new Date(),
+    };
+    await interview.save();
+
+    const application = await UserApplyingJobModel.findOne({ _id: interview.application_id, user_id: employeeData.userId });
+    if (application) {
+      await createEmployeeStatusHistory({
+        application,
+        oldStatus: application.status,
+        newStatus: application.status,
+        employeeData,
+        note: note || "interview_reschedule_requested",
+        action: "interview_reschedule_requested_by_candidate",
+        visibleToCandidate: true,
+        metadata: {
+          interview_id: interview._id,
+          preferred_start_at: body.preferred_start_at || body.start_at || null,
+          preferred_end_at: body.preferred_end_at || body.end_at || null,
+        },
+      });
+    }
+
+    const job = await jobsModel.findById(interview.job_id).select("_id job_name user_id company_id").lean().catch(() => null);
+    await writeAuditLog({
+      req,
+      companyId: interview.company_id || job?.company_id || null,
+      actorUserId: employeeData.userId,
+      actorType: "employee",
+      action: "interview_reschedule_requested_by_candidate",
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      newValue: { candidate_response: interview.candidate_response },
+      note,
+    });
+    await recordAnalyticsEvent({
+      req,
+      event: "interview_reschedule_requested",
+      userId: employeeData.userId,
+      companyId: interview.company_id || job?.company_id || null,
+      entityType: "interview",
+      entityId: interview._id,
+      jobId: interview.job_id,
+      applicationId: interview.application_id,
+      metadata: {
+        has_note: Boolean(note),
+      },
+    }).catch(() => null);
+    if (job) {
+      interview_response_company_notification({
+        interview,
+        job,
+        candidate: employeeData.employee?.user_id || employeeData.employee || {},
+      }).catch?.(console.error);
+    }
+
+    const populated = await InterviewModel.findById(interview._id).populate(interviewPopulateForEmployee).lean();
+    return success(res, normalizeInterviewForEmployee(populated || interview), "interview_reschedule_requested");
   } catch (error) {
     next(error);
   }
@@ -1141,7 +1249,9 @@ export default {
   cancelMyApplication,
   addApplicationMessage,
   myInterviews,
+  getMyInterviewDetails,
   respondToInterview,
+  requestInterviewReschedule,
   myJobInvitations,
   getMyJobInvitationDetails,
   respondToJobInvitation,

@@ -66,6 +66,20 @@ export const sanitizeCvMeta = (entry = {}) => ({
 export const collectApplicationCvEntries = (application = {}) => {
   const entries = [];
 
+  if (application?.cv_snapshot?.file_path || application?.cv_snapshot?.file_name || application?.cv_snapshot?.fileName) {
+    const snapshot = application.cv_snapshot || {};
+    entries.push({
+      id: String(snapshot.id || application.cv_id || "application_snapshot"),
+      source: snapshot.source || "application_cv_snapshot",
+      title: snapshot.title || "Application CV",
+      fileName: safeFileName(snapshot.file_name || snapshot.fileName || snapshot.file_path || "cv.pdf"),
+      raw: snapshot.file_path || snapshot.fileName || "",
+      template_key: snapshot.template_key || "",
+      status: "active",
+      createdAt: snapshot.attached_at || application.createdAt || null,
+    });
+  }
+
   if (application?.cv) {
     entries.push({
       id: "application",

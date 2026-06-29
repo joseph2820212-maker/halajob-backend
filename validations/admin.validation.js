@@ -6,7 +6,10 @@ const safeKeyRe = /^[A-Za-z0-9_.-]+$/;
 const unsafeKeys = new Set(["__proto__", "prototype", "constructor"]);
 
 const objectId = yup.string().trim().matches(objectIdRe, "Invalid ObjectId");
-const resource = yup.string().trim().matches(resourceRe, "Invalid resource name");
+const resource = yup
+  .string()
+  .trim()
+  .matches(resourceRe, "Invalid resource name");
 
 const boolish = yup
   .mixed()
@@ -26,15 +29,13 @@ const boolish = yup
       value === "yes" ||
       value === "no" ||
       value === "on" ||
-      value === "off"
+      value === "off",
   );
 
-const dateish = yup
-  .mixed()
-  .test("valid-date", "Invalid date", (value) => {
-    if (value === undefined || value === null || value === "") return true;
-    return !Number.isNaN(new Date(value).getTime());
-  });
+const dateish = yup.mixed().test("valid-date", "Invalid date", (value) => {
+  if (value === undefined || value === null || value === "") return true;
+  return !Number.isNaN(new Date(value).getTime());
+});
 
 const hasUnsafePayloadKey = (value) => {
   if (!value || typeof value !== "object") return false;
@@ -54,7 +55,7 @@ const bodyObject = yup
   .test(
     "safe-payload-keys",
     "Payload contains unsafe field names",
-    (value) => !hasUnsafePayloadKey(value)
+    (value) => !hasUnsafePayloadKey(value),
   );
 
 const safeObject = yup
@@ -62,7 +63,7 @@ const safeObject = yup
   .test(
     "safe-object-keys",
     "Payload contains unsafe field names",
-    (value) => !hasUnsafePayloadKey(value)
+    (value) => !hasUnsafePayloadKey(value),
   );
 
 const paramsWithOptionalResource = yup.object({
@@ -122,7 +123,7 @@ const listQuery = yup
   .test(
     "safe-query-keys",
     "Query contains unsafe field names",
-    (value) => !hasUnsafePayloadKey(value)
+    (value) => !hasUnsafePayloadKey(value),
   );
 
 const bulkIds = yup
@@ -151,7 +152,7 @@ const forceDelete = yup
       value === true ||
       value === false ||
       value === "true" ||
-      value === "false"
+      value === "false",
   );
 
 const idList = yup
@@ -188,17 +189,25 @@ const dashboardUserBody = bodyObject.shape({
   phone_code: yup.string().trim().max(8),
   phone_country: yup.string().trim().max(8),
   phone_national: yup.string().trim().max(32),
-  permissions: yup.mixed().test("valid-permissions", "permissions must be an array", (value) => {
-    if (value === undefined) return true;
-    return Array.isArray(value);
-  }),
+  permissions: yup
+    .mixed()
+    .test("valid-permissions", "permissions must be an array", (value) => {
+      if (value === undefined) return true;
+      return Array.isArray(value);
+    }),
   status: boolish,
 });
 
 const aiLimitBody = bodyObject.shape({
   feature: yup.string().trim().max(100),
-  scope_type: yup.string().trim().oneOf(["global", "user", "context", "company", "university"]),
-  scopeType: yup.string().trim().oneOf(["global", "user", "context", "company", "university"]),
+  scope_type: yup
+    .string()
+    .trim()
+    .oneOf(["global", "user", "context", "company", "university"]),
+  scopeType: yup
+    .string()
+    .trim()
+    .oneOf(["global", "user", "context", "company", "university"]),
   scope_id: yup.string().trim().max(120),
   scopeId: yup.string().trim().max(120),
   enabled: boolish,
@@ -238,13 +247,81 @@ const notificationBody = bodyObject.shape({
   dedupeKey: yup.string().trim().max(180),
 });
 
+const communicationChannels = new Set([
+  "in_app",
+  "push",
+  "email",
+  "sms",
+  "manual_whatsapp",
+  "whatsapp_business",
+  "whatsapp",
+]);
+
+const communicationStatus = ["queued", "sent", "skipped", "failed", "delivered", "read"];
+
+const communicationTemplateBody = bodyObject.shape({
+  key: yup.string().trim().max(160),
+  category: yup.string().trim().max(120),
+  subject: safeObject,
+  preheader: safeObject,
+  bodyBlocks: yup.mixed(),
+  variables: yup.mixed(),
+  fromName: yup.string().trim().max(160),
+  replyTo: yup.string().trim().email().max(254),
+  isMarketing: boolish,
+  status: yup.string().trim().oneOf(["draft", "review", "published", "archived"]),
+  version: yup.string().trim().max(40),
+});
+
+const communicationChannelsInput = yup.mixed().test(
+  "valid-communication-channels",
+  "Invalid communication channel",
+  (value) => {
+    if (value === undefined || value === null || value === "") return true;
+    if (typeof value === "string") {
+      return value
+        .split(/[,\s]+/)
+        .filter(Boolean)
+        .every((item) => communicationChannels.has(item));
+    }
+    if (Array.isArray(value)) {
+      return value.every((item) => communicationChannels.has(String(item || "")));
+    }
+    if (typeof value === "object") {
+      return Object.keys(value).every((key) => communicationChannels.has(key));
+    }
+    return false;
+  },
+);
+
+const communicationTestSendBody = bodyObject.shape({
+  user_id: objectId,
+  userId: objectId,
+  recipient_id: objectId,
+  company_id: objectId,
+  companyId: objectId,
+  event_key: yup.string().trim().max(120),
+  event: yup.string().trim().max(120),
+  category: yup.string().trim().max(80),
+  channels: communicationChannelsInput,
+  template_key: yup.string().trim().max(160),
+  templateKey: yup.string().trim().max(160),
+  variables: safeObject,
+  params: safeObject,
+  route: safeObject,
+  respect_preferences: boolish,
+  respectPreferences: boolish,
+});
+
 const supportStatusBody = bodyObject.shape({
   status: yup.string().trim().max(64).required("status is required"),
   priority: yup.string().trim().max(64),
-  assigned_to: yup.mixed().test("valid-assigned-to", "assigned_to must be an ObjectId", (value) => {
-    if (value === undefined || value === null || value === "") return true;
-    return objectIdRe.test(String(value).trim());
-  }),
+  assigned_to: yup
+    .mixed()
+    .test("valid-assigned-to", "assigned_to must be an ObjectId", (value) => {
+      if (value === undefined || value === null || value === "") return true;
+      return objectIdRe.test(String(value).trim());
+    }),
   admin_note: yup.string().trim().max(2000),
   note: yup.string().trim().max(2000),
 });
@@ -432,7 +509,7 @@ const schemas = {
     body: refreshBody.test(
       "refresh-token-present",
       "Refresh token is required",
-      (value = {}) => Boolean(value.refreshToken || value.refresh_token)
+      (value = {}) => Boolean(value.refreshToken || value.refresh_token),
     ),
   }),
 
@@ -440,7 +517,7 @@ const schemas = {
     body: refreshBody.test(
       "refresh-token-present",
       "Refresh token is required",
-      (value = {}) => Boolean(value.refreshToken || value.refresh_token)
+      (value = {}) => Boolean(value.refreshToken || value.refresh_token),
     ),
   }),
 
@@ -448,7 +525,7 @@ const schemas = {
     body: dashboardUserBody.test(
       "role-present",
       "role_id or role_name is required",
-      (value = {}) => Boolean(value.role_id || value.role_name)
+      (value = {}) => Boolean(value.role_id || value.role_name),
     ),
   }),
 
@@ -463,6 +540,10 @@ const schemas = {
     body: aiLimitBody,
   }),
 
+  platformSettingsSchema: yup.object({
+    body: bodyObject,
+  }),
+
   idOnlySchema: yup.object({
     params: idParam,
   }),
@@ -472,9 +553,82 @@ const schemas = {
       "notification-target-and-content",
       "Notification recipients and content are required",
       (value = {}) =>
-        Boolean(value.user_ids || value.users || value.recipients || value.user_id || value.recipient_id) &&
-        Boolean(value.event_key || value.event || (value.title && (value.body || value.message)))
+        Boolean(
+          value.user_ids ||
+          value.users ||
+          value.recipients ||
+          value.user_id ||
+          value.recipient_id,
+        ) &&
+        Boolean(
+          value.event_key ||
+          value.event ||
+          (value.title && (value.body || value.message)),
+        ),
     ),
+  }),
+
+  communicationLogListSchema: yup.object({
+    query: listQuery.shape({
+      channel: yup.string().trim().oneOf([...communicationChannels]),
+      status: yup.string().trim().oneOf(communicationStatus),
+      event_key: yup.string().trim().max(120),
+      category: yup.string().trim().max(80),
+      template_key: yup.string().trim().max(160),
+      provider: yup.string().trim().max(120),
+      user_id: objectId,
+      company_id: objectId,
+    }),
+  }),
+
+  communicationTemplateListSchema: yup.object({
+    query: listQuery.shape({
+      key: yup.string().trim().max(160),
+      category: yup.string().trim().max(120),
+      status: yup.string().trim().oneOf(["draft", "review", "published", "archived"]),
+    }),
+  }),
+
+  communicationTemplateCreateSchema: yup.object({
+    body: communicationTemplateBody.shape({
+      key: yup.string().trim().max(160).required("key is required"),
+      subject: safeObject.required("subject is required"),
+    }),
+  }),
+
+  communicationTemplateUpdateSchema: yup.object({
+    params: idParam,
+    body: communicationTemplateBody,
+  }),
+
+  communicationTestSendSchema: yup.object({
+    body: communicationTestSendBody.test(
+      "communication-test-target",
+      "user_id and at least one channel are required",
+      (value = {}) => Boolean(value.user_id || value.userId || value.recipient_id) && Boolean(value.channels),
+    ),
+  }),
+
+  salaryInsightListSchema: yup.object({
+    query: listQuery.shape({
+      title: yup.string().trim().max(180),
+      job_title: yup.string().trim().max(180),
+      city: yup.string().trim().max(120),
+      country: yup.string().trim().max(120),
+      currency_code: yup.string().trim().max(12),
+      currency: yup.string().trim().max(12),
+      experience_level_id: objectId,
+      industry_id: objectId,
+    }),
+  }),
+
+  salaryInsightRebuildSchema: yup.object({
+    query: yup.object({
+      limit: yup.number().integer().min(1).max(1000),
+    }),
+    body: bodyObject.shape({
+      limit: yup.number().integer().min(1).max(1000),
+    }),
   }),
 
   supportTicketStatusSchema: yup.object({
@@ -538,7 +692,7 @@ const schemas = {
       (value = {}) =>
         Boolean(value.name || value.name_en) &&
         Boolean(value.email_domain) &&
-        Boolean(value.career_center_email)
+        Boolean(value.career_center_email),
     ),
   }),
 
@@ -564,12 +718,29 @@ const schemas = {
   keywordUpdateSchema: yup.object({
     params: idParam,
     body: bodyObject.shape({
-      inputs: yup.array().of(keywordInput).min(1).required("inputs are required"),
+      inputs: yup
+        .array()
+        .of(keywordInput)
+        .min(1)
+        .required("inputs are required"),
     }),
   }),
 
   importUploadSchema: yup.object({
     body: bodyObject,
+  }),
+
+  companyPublicProfileListSchema: yup.object({
+    query: listQuery,
+    body: bodyObject,
+  }),
+
+  companyPublicProfileActionSchema: yup.object({
+    params: companyIdParam,
+    body: bodyObject.shape({
+      reason: yup.string().trim().max(1000),
+      rejection_reason: yup.string().trim().max(1000),
+    }),
   }),
 };
 

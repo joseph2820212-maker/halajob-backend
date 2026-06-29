@@ -1,11 +1,30 @@
 import bcryptjs from "bcryptjs";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
-import { CompanyModel, RoleModel, UserModel } from "../../../models/index.js";
-import { clearRefreshToken, generateAuthTokens } from "../../../services/tokenService.js";
+import {
+  CompanyMemberModel,
+  CompanyModel,
+  RefreshTokenModel,
+  RoleModel,
+  UserModel,
+} from "../../../models/index.js";
+import {
+  clearRefreshToken,
+  generateAuthTokens,
+  rotateRefreshToken,
+} from "../../../services/tokenService.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
+import {
+  clearAllRefreshCookies,
+  clearRefreshCookie,
+  refreshTokenFromRequest,
+  setRefreshCookie,
+} from "../../../services/authCookie.service.js";
 
 const msg = (lan, ar, en) => (lan === "ar" ? ar : en);
-const normEmail = (email) => String(email || "").trim().toLowerCase();
+const normEmail = (email) =>
+  String(email || "")
+    .trim()
+    .toLowerCase();
 const safeStr = (value) => String(value || "").trim();
 
 function ensureDeviceArray(user) {
@@ -85,7 +104,9 @@ function roleAllowsCompanyLogin(role) {
 
   if (directMatch) return true;
 
-  const rolePermissions = Array.isArray(role.permissions) ? role.permissions : [];
+  const rolePermissions = Array.isArray(role.permissions)
+    ? role.permissions
+    : [];
 
   return rolePermissions.some((permission) => {
     const value = normalizeRoleText(
@@ -94,7 +115,7 @@ function roleAllowsCompanyLogin(role) {
         permission?.code ||
         permission?.title_en ||
         permission?.title_ar ||
-        permission
+        permission,
     );
 
     return (
@@ -120,7 +141,9 @@ async function buildAuthPayload(user, device) {
     first_name: user.first_name,
     mid_name: user.mid_name,
     last_name: user.last_name,
-    image: user.image ? buildPublicUrl(process.env.PUBLIC_BASE_URL, user.image) : null,
+    image: user.image
+      ? buildPublicUrl(process.env.PUBLIC_BASE_URL, user.image)
+      : null,
     phone_code: user.phone_code,
     phone: user.phone_national,
     gender: user.gender,
@@ -149,7 +172,7 @@ const login = async (req, res, next) => {
         message: msg(
           lan,
           "البريد وكلمة المرور مطلوبة.",
-          "Email and password are required."
+          "Email and password are required.",
         ),
       });
     }
@@ -157,8 +180,12 @@ const login = async (req, res, next) => {
     const identifier = String(email).trim();
 
     const user = identifier.includes("@")
-      ? await UserModel.findOne({ email: normEmail(identifier) }).populate("role_id")
-      : await UserModel.findOne({ phone_national: identifier }).populate("role_id");
+      ? await UserModel.findOne({ email: normEmail(identifier) }).populate(
+          "role_id",
+        )
+      : await UserModel.findOne({ phone_national: identifier }).populate(
+          "role_id",
+        );
 
     if (!user) {
       return ReturnAppData.createError({
@@ -167,7 +194,7 @@ const login = async (req, res, next) => {
         message: msg(
           lan,
           "البيانات المرسلة غير صحيحة.",
-          "The data sent is incorrect."
+          "The data sent is incorrect.",
         ),
       });
     }
@@ -181,7 +208,7 @@ const login = async (req, res, next) => {
         message: msg(
           lan,
           "البيانات المرسلة غير صحيحة.",
-          "The data sent is incorrect."
+          "The data sent is incorrect.",
         ),
       });
     }
@@ -197,7 +224,7 @@ const login = async (req, res, next) => {
       .populate("role_id")
       .populate(
         "owner_user_id",
-        "-password -passcode -another_device_code -pending_device"
+        "-password -passcode -another_device_code -pending_device",
       );
 
     if (!company) {
@@ -207,7 +234,7 @@ const login = async (req, res, next) => {
         message: msg(
           lan,
           "لم يتم العثور على بيانات الشركة المرتبطة بهذا الحساب.",
-          "Company profile linked to this account was not found."
+          "Company profile linked to this account was not found.",
         ),
       });
     }
@@ -241,7 +268,7 @@ const login = async (req, res, next) => {
         message: msg(
           lan,
           "هذا الحساب غير فعال حالياً.",
-          "This account is currently inactive."
+          "This account is currently inactive.",
         ),
       });
     }
@@ -253,7 +280,7 @@ const login = async (req, res, next) => {
         message: msg(
           lan,
           "حساب الشركة بانتظار الموافقة.",
-          "Company account is pending approval."
+          "Company account is pending approval.",
         ),
       });
     }
@@ -300,6 +327,7 @@ const login = async (req, res, next) => {
     await user.save();
 
     const authPayload = await buildAuthPayload(user, authDevice);
+    setRefreshCookie(req, res, authPayload.tokens?.refreshToken, "company");
     recordAnalyticsEvent({
       req,
       event: "login_completed",
@@ -320,11 +348,7 @@ const login = async (req, res, next) => {
         ...authPayload,
         company,
       },
-      message: msg(
-        lan,
-        "تم تسجيل الدخول بنجاح.",
-        "Logged in successfully."
-      ),
+      message: msg(lan, "تم تسجيل الدخول بنجاح.", "Logged in successfully."),
     });
   } catch (err) {
     console.error("company login error:", err);
@@ -332,32 +356,25 @@ const login = async (req, res, next) => {
     return ReturnAppData.createError({
       res,
       status: 500,
-      message: msg(
-        lan,
-        "حدث خطأ غير متوقع.",
-        "An unexpected error occurred."
-      ),
+      message: msg(lan, "حدث خطأ غير متوقع.", "An unexpected error occurred."),
     });
   }
 };
 
 const logout = async (req, res) => {
   const lan = req.get("lan") || "en";
-  const refreshToken = req.body?.refreshToken || req.body?.refresh_token || req.get("x-refresh-token");
+  const refreshToken = refreshTokenFromRequest(req, "company");
 
   if (!refreshToken) {
     return ReturnAppData.createError({
       res,
       status: 400,
-      message: msg(
-        lan,
-        "رمز التحديث مطلوب.",
-        "Refresh token is required."
-      ),
+      message: msg(lan, "رمز التحديث مطلوب.", "Refresh token is required."),
     });
   }
 
   await clearRefreshToken(refreshToken);
+  clearRefreshCookie(req, res, "company");
 
   return ReturnAppData.deleteData({
     res,
@@ -366,4 +383,206 @@ const logout = async (req, res) => {
   });
 };
 
-export default { login, logout };
+const logoutAll = async (req, res, next) => {
+  const lan = req.get("lan") || "en";
+
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return ReturnAppData.createError({
+        res,
+        status: 401,
+        message: msg(lan, "Unauthorized.", "Unauthorized."),
+      });
+    }
+
+    const result = await RefreshTokenModel.deleteMany({ userRef: userId });
+    clearAllRefreshCookies(res);
+
+    return ReturnAppData.createData({
+      res,
+      status: 200,
+      message: msg(
+        lan,
+        "Signed out from all company sessions.",
+        "Signed out from all company sessions.",
+      ),
+      data: { revoked_sessions: result?.deletedCount || 0 },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+const refresh = async (req, res, next) => {
+  const lan = req.get("lan") || "en";
+  const refreshToken = refreshTokenFromRequest(req, "company");
+
+  try {
+    if (!refreshToken) {
+      return ReturnAppData.createError({
+        res,
+        status: 400,
+        message: msg(
+          lan,
+          "Ø±Ù…Ø² Ø§Ù„ØªØ­Ø¯ÙŠØ« Ù…Ø·Ù„ÙˆØ¨.",
+          "Refresh token is required.",
+        ),
+      });
+    }
+
+    const { tokenPayload, tokens } = await rotateRefreshToken(refreshToken);
+    const user = await UserModel.findById(tokenPayload.userId)
+      .populate("role_id")
+      .lean();
+    const ownerCompany = user
+      ? await CompanyModel.findOne({ owner_user_id: user._id })
+          .populate("role_id")
+          .lean()
+      : null;
+    const member = !ownerCompany && user
+      ? await CompanyMemberModel.findOne({
+          user_id: user._id,
+          status: "active",
+        })
+          .populate("company_id")
+          .populate("role_id")
+          .lean()
+      : null;
+    const company = ownerCompany || member?.company_id || null;
+
+    if (
+      !user ||
+      !company ||
+      (member && member.status !== "active") ||
+      user.status === false ||
+      company.status === false ||
+      company.accepted === false
+    ) {
+      await clearRefreshToken(tokens?.refreshToken || refreshToken);
+      clearRefreshCookie(req, res, "company");
+      return ReturnAppData.createError({
+        res,
+        status: 403,
+        message: msg(lan, "Ø¬Ù„Ø³Ø© ØºÙŠØ± ØµØ§Ù„Ø­Ø©.", "Invalid session."),
+      });
+    }
+
+    setRefreshCookie(req, res, tokens.refreshToken, "company");
+
+    return ReturnAppData.createData({
+      res,
+      status: 200,
+      data: {
+        tokens,
+        company,
+        member: member
+          ? {
+              id: member._id,
+              role_id: member.role_id?._id || member.role_id || null,
+              member_role: member.member_role,
+              permissions: member.permissions || [],
+              status: member.status,
+            }
+          : null,
+        user_id: user._id,
+        first_name: user.first_name,
+        mid_name: user.mid_name,
+        last_name: user.last_name,
+      },
+      message: msg(lan, "ØªÙ… ØªØ­Ø¯ÙŠØ« Ø§Ù„Ø¬Ù„Ø³Ø©.", "Session refreshed."),
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+const listSessions = async (req, res, next) => {
+  const lan = req.get("lan") || "en";
+
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return ReturnAppData.createError({
+        res,
+        status: 401,
+        message: msg(lan, "Unauthorized.", "Unauthorized."),
+      });
+    }
+
+    const currentRefreshToken = refreshTokenFromRequest(req, "company");
+    const sessions = await RefreshTokenModel.find({ userRef: userId })
+      .sort({ updatedAt: -1, loginTime: -1 })
+      .select("_id loginTime expiresAt device createdAt updatedAt token")
+      .lean();
+
+    return ReturnAppData.createData({
+      res,
+      status: 200,
+      data: sessions.map((session) => ({
+        id: session._id,
+        loginTime: session.loginTime,
+        expiresAt: session.expiresAt,
+        device: session.device || null,
+        createdAt: session.createdAt,
+        updatedAt: session.updatedAt,
+        current: Boolean(
+          currentRefreshToken && session.token === currentRefreshToken,
+        ),
+      })),
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+const revokeSession = async (req, res, next) => {
+  const lan = req.get("lan") || "en";
+
+  try {
+    const userId = req.user?._id;
+    const sessionId = req.params?.sessionId;
+    if (!userId) {
+      return ReturnAppData.createError({
+        res,
+        status: 401,
+        message: msg(lan, "Unauthorized.", "Unauthorized."),
+      });
+    }
+
+    const session = await RefreshTokenModel.findOneAndDelete({
+      _id: sessionId,
+      userRef: userId,
+    }).lean();
+
+    if (!session) {
+      return ReturnAppData.createError({
+        res,
+        status: 404,
+        message: msg(lan, "Session not found.", "Session not found."),
+      });
+    }
+
+    const currentRefreshToken = refreshTokenFromRequest(req, "company");
+    if (currentRefreshToken && session.token === currentRefreshToken) {
+      clearRefreshCookie(req, res, "company");
+    }
+
+    return ReturnAppData.deleteData({
+      res,
+      status: 200,
+      message: msg(lan, "Session revoked.", "Session revoked."),
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export default {
+  login,
+  logout,
+  logoutAll,
+  refresh,
+  listSessions,
+  revokeSession,
+};

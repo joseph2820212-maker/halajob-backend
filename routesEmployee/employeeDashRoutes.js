@@ -55,7 +55,9 @@ router.get("/applications/rejected", jobsController.myRejectedApplications);
 
 /* Interviews */
 router.get("/applications/interviews", jobsController.myInterviews);
+router.get("/applications/interviews/:interviewId", validate(seekerSchemas.interviewBodySchema), jobsController.getMyInterviewDetails);
 router.patch("/applications/interviews/:interviewId/respond", upload.none(), validate(seekerSchemas.interviewResponseSchema), jobsController.respondToInterview);
+router.post("/applications/interviews/:interviewId/reschedule-request", upload.none(), validate(seekerSchemas.interviewRescheduleSchema), jobsController.requestInterviewReschedule);
 
 /* Job invitations / offers */
 router.get("/applications/offers", jobsController.myJobInvitations);

@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-06-28T09:24:07.994Z",
+  "generatedAt": "2026-06-29T00:45:52.936Z",
   "totals": {
-    "totalEndpoints": 3831,
+    "totalEndpoints": 3990,
     "publicSystemEndpoints": 5,
-    "readOnlyEndpointsAllowedWithoutBodyValidator": 297,
-    "writeUpdateDeleteEndpoints": 2430,
-    "writeUpdateDeleteEndpointsWithValidator": 2429,
-    "writeUpdateDeleteEndpointsMissingValidator": 1,
+    "readOnlyEndpointsAllowedWithoutBodyValidator": 305,
+    "writeUpdateDeleteEndpoints": 2526,
+    "writeUpdateDeleteEndpointsWithValidator": 2526,
+    "writeUpdateDeleteEndpointsMissingValidator": 0,
     "writeValidationCoveragePercent": 100,
     "coreAuthAccountMissingValidators": 0
   },
@@ -20,9 +20,9 @@
     },
     {
       "module": "admin",
-      "total": 3290,
-      "writes": 2174,
-      "writesWithValidator": 2174,
+      "total": 3321,
+      "writes": 2192,
+      "writesWithValidator": 2192,
       "writesMissingValidator": 0
     },
     {
@@ -48,16 +48,16 @@
     },
     {
       "module": "campus",
-      "total": 61,
-      "writes": 34,
-      "writesWithValidator": 34,
+      "total": 69,
+      "writes": 39,
+      "writesWithValidator": 39,
       "writesMissingValidator": 0
     },
     {
       "module": "company",
-      "total": 134,
-      "writes": 65,
-      "writesWithValidator": 65,
+      "total": 181,
+      "writes": 99,
+      "writesWithValidator": 99,
       "writesMissingValidator": 0
     },
     {
@@ -69,30 +69,30 @@
     },
     {
       "module": "legacy-user",
-      "total": 154,
-      "writes": 51,
-      "writesWithValidator": 50,
-      "writesMissingValidator": 1
+      "total": 184,
+      "writes": 66,
+      "writesWithValidator": 66,
+      "writesMissingValidator": 0
     },
     {
       "module": "notifications",
-      "total": 16,
-      "writes": 12,
-      "writesWithValidator": 12,
+      "total": 20,
+      "writes": 16,
+      "writesWithValidator": 16,
       "writesMissingValidator": 0
     },
     {
       "module": "other",
-      "total": 19,
+      "total": 26,
       "writes": 6,
       "writesWithValidator": 6,
       "writesMissingValidator": 0
     },
     {
       "module": "seeker",
-      "total": 94,
-      "writes": 45,
-      "writesWithValidator": 45,
+      "total": 110,
+      "writes": 56,
+      "writesWithValidator": 56,
       "writesMissingValidator": 0
     },
     {
@@ -104,22 +104,12 @@
     },
     {
       "module": "university",
-      "total": 20,
-      "writes": 7,
-      "writesWithValidator": 7,
+      "total": 36,
+      "writes": 16,
+      "writesWithValidator": 16,
       "writesMissingValidator": 0
     }
   ],
   "coreAuthAccountMissing": [],
-  "writeMissingValidator": [
-    {
-      "method": "POST",
-      "path": "/user/v1/support/tickets",
-      "module": "legacy-user",
-      "middlewares": [
-        "authUser",
-        "listMyTickets"
-      ]
-    }
-  ]
+  "writeMissingValidator": []
 }

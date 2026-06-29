@@ -7,11 +7,36 @@ const UniversityPartnerSchema = new Schema(
     company_id: { type: Schema.Types.ObjectId, ref: "companies", required: true, index: true },
     status: {
       type: String,
-      enum: ["active", "pending", "rejected"],
+      enum: ["pending", "active", "rejected", "suspended", "expired"],
       default: "pending",
       index: true,
     },
     note: { type: String, trim: true, default: "" },
+    requested_by_user_id: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
+      default: null,
+      index: true,
+    },
+    reviewed_by_user_id: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
+      default: null,
+      index: true,
+    },
+    reviewed_at: { type: Date, default: null },
+    expires_at: { type: Date, default: null, index: true },
+    allowed_departments: { type: [String], default: [] },
+    allowed_programs: { type: [String], default: [] },
+    allowed_campuses: { type: [String], default: [] },
+    access_level: {
+      type: String,
+      enum: ["jobs_only", "applicants_only", "talent_pool_limited"],
+      default: "talent_pool_limited",
+      index: true,
+    },
+    company_note: { type: String, trim: true, default: "" },
+    university_note: { type: String, trim: true, default: "" },
   },
   { _id: true, timestamps: true }
 );

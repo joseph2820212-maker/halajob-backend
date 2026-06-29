@@ -1,0 +1,431 @@
+{
+  "version": 1,
+  "description": "Critical UI actions that must stay wired to the intended backend route or canonical entry point.",
+  "files": [
+    {
+      "path": "web/src/public/screens.tsx",
+      "mustContain": [
+        "publicService.companyProfile(companyId)",
+        "PublicCompanyProfilePanel",
+        "onSearch(query.trim())"
+      ],
+      "mustNotContain": [
+        "selected && go(\"company\")"
+      ]
+    },
+    {
+      "path": "web/src/shared/api.ts",
+      "mustContain": [
+        "/public/v1/client-settings",
+        "/public/v1/companies/",
+        "/dash/v1/support-tickets",
+        "/employee/v1/cv/download/",
+        "/user/v1/campus/applications"
+      ],
+      "mustNotContain": [
+        "api.get(\"/user/v1/applying-job/get\", scoped(\"campus\"))",
+        "api.get(\"/user/v1/campus/resources\");"
+      ]
+    },
+    {
+      "path": "web/src/App.tsx",
+      "mustContain": [
+        ".clientSettings()",
+        "clientSettings={clientSettings}"
+      ]
+    },
+    {
+      "path": "web/src/shared/featureFlags.ts",
+      "mustContain": [
+        "features.ai_tools_enabled ?? features.ai_tools",
+        "VITE_FEATURE_AI_TOOLS_ENABLED"
+      ]
+    },
+    {
+      "path": "web/src/admin/screens.tsx",
+      "mustContain": [
+        "AdminSupportPanel",
+        "adminService.updateSupportTicketStatus",
+        "adminService.addSupportTicketMessage"
+      ]
+    },
+    {
+      "path": "web/src/company/screens.tsx",
+      "mustContain": [
+        "aiToolsEnabledFromSettings(clientSettings)",
+        "createTemplateFromAi",
+        "createJobFromAi",
+        "copyAiResult",
+        "Save as template",
+        "Create job draft"
+      ],
+      "mustNotContain": [
+        "VITE_FEATURE_AI_TOOLS_ENABLED"
+      ]
+    },
+    {
+      "path": "web/src/seeker/screens.tsx",
+      "mustContain": [
+        "aiToolsEnabledFromSettings(clientSettings)",
+        "employeeService.downloadCv(id)",
+        "CV download opened",
+        "{ui(\"Open\")}"
+      ],
+      "mustNotContain": [
+        "VITE_FEATURE_AI_TOOLS_ENABLED"
+      ]
+    },
+    {
+      "path": "web/src/campus/screens.tsx",
+      "mustContain": [
+        "aiToolsEnabledFromSettings(clientSettings)"
+      ],
+      "mustNotContain": [
+        "VITE_FEATURE_AI_TOOLS_ENABLED"
+      ]
+    },
+    {
+      "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "mustContain": [
+        "key: const ValueKey('dashboard-header-notifications')",
+        "key: const ValueKey('dashboard-header-profile')",
+        "key: const ValueKey('dashboard-header-settings')",
+        "tooltip: loc.t('settings')",
+        "key: ValueKey('bottom-nav-${tab.keyId}')",
+        "static const Set<String> _chromeQuickActionIds",
+        "final showBottomRemoteSync",
+        "keyId: 'campus'",
+        "keyId: 'saved'",
+        "_CampusSegment.saved",
+        "'Saved campus roles'",
+        "label: 'Salary insights'",
+        "id: 'salary_insights'",
+        "SalaryInsightsScreen(baseUrl: widget.apiBaseUrl)"
+      ],
+      "mustNotContain": [
+        "ValueKey('dashboard-account-menu-settings-item')",
+        "_DashboardHeaderAction.settings"
+      ],
+      "occurrences": [
+        {
+          "text": "label: 'Salary insights'",
+          "equals": 1
+        }
+      ],
+      "scopes": [
+        {
+          "start": "List<_QuickActionItem> _moreActions()",
+          "end": "List<_QuickActionItem> _visibleOverviewQuickActions()",
+          "mustContain": [
+            "id: 'career_passport'",
+            "id: 'upload_cv'",
+            "id: 'salary_insights'",
+            "id: 'campus_verification'",
+            "id: 'job_alerts'"
+          ],
+          "mustNotContain": [
+            "id: 'profile'",
+            "id: 'notifications'",
+            "id: 'settings'",
+            "id: 'account_settings'",
+            "label: 'Profile'",
+            "label: 'Notifications'",
+            "label: 'Settings'"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+      "mustContain": [
+        "key: const ValueKey('company-header-notifications')",
+        "key: const ValueKey('company-header-account-menu')",
+        "key: const ValueKey('company-account-menu-profile-settings')",
+        "key: const ValueKey('company-account-menu-account-settings')",
+        "key: const ValueKey('company-account-menu-sign-out')",
+        "key: const ValueKey('company-account-sign-out-button')",
+        "title: HalaJobLocalizations.of(context).t('accountAndSettings')",
+        "loc.t('accountAndSettings')",
+        "title: 'AI hiring tools'",
+        "moduleSection('AI tools', aiModules)",
+        "moduleSection('Company workspace', workspaceModules)",
+        "moduleSection('Team and templates', teamModules)",
+        "subtitle: 'Saved candidates, TES scores, and searchable profiles'",
+        "title: 'Campus recruiting'"
+      ],
+      "mustNotContain": [
+        "ValueKey('company-header-profile')",
+        "ValueKey('company-header-settings')",
+        "ValueKey('company-account-menu-company-profile-item')",
+        "ValueKey('company-account-menu-account-profile-item')",
+        "ValueKey('company-account-menu-signout-item')",
+        "ValueKey('company-account-menu-settings-item')",
+        "_CompanyHeaderAction.settings",
+        "title: 'Profile settings'",
+        "Smart matches, TES scores, and searchable candidates"
+      ],
+      "occurrences": [
+        {
+          "text": "title: 'AI hiring tools'",
+          "equals": 1
+        },
+        {
+          "text": "key: const ValueKey('company-header-account-menu')",
+          "equals": 1
+        },
+        {
+          "text": "key: const ValueKey('company-account-menu-profile-settings')",
+          "equals": 1
+        },
+        {
+          "text": "key: const ValueKey('company-account-menu-account-settings')",
+          "equals": 1
+        },
+        {
+          "text": "key: const ValueKey('company-account-menu-sign-out')",
+          "equals": 1
+        },
+        {
+          "text": "title: 'Talent help'",
+          "equals": 1
+        },
+        {
+          "text": "title: 'Campus recruiting'",
+          "equals": 1
+        }
+      ],
+      "scopes": [
+        {
+          "start": "class _CompanyApplicantsPanel extends StatelessWidget",
+          "end": "class _CompanyMorePanel extends StatelessWidget",
+          "mustContain": [
+            "HalaJobLocalizations.of(context).ui('Hiring operations')",
+            "title: 'Interviews'",
+            "title: 'Hiring pipeline'",
+            "title: 'Reviews'"
+          ]
+        },
+        {
+          "start": "class _CompanyMorePanel extends StatelessWidget",
+          "end": "class _CompanySectionCard extends StatelessWidget",
+          "mustContain": [
+            "moduleSection('AI tools', aiModules)",
+            "moduleSection('Company workspace', workspaceModules)",
+            "moduleSection('Team and templates', teamModules)"
+          ],
+          "mustNotContain": [
+            "title: 'Talent pool'",
+            "title: 'Talent help'",
+            "title: 'Campus recruiting'",
+            "title: 'Interviews'",
+            "title: 'Hiring pipeline'",
+            "title: 'Invitations'",
+            "title: 'Reviews'",
+            "title: 'Account profile'",
+            "title: 'Company profile settings'",
+            "title: 'Sign out'",
+            "moduleSection('Hiring operations'"
+          ]
+        },
+        {
+          "start": "class _CompanyTalentPanel extends StatelessWidget",
+          "end": "class _CompanyModuleCardData",
+          "mustContain": [
+            "title: 'Talent pool'",
+            "title: 'Invitations'",
+            "title: 'Talent help'",
+            "title: 'Campus recruiting'"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "mobile/lib/src/features/university/university_dashboard_screen.dart",
+      "mustContain": [
+        "key: const ValueKey('university-header-profile')",
+        "key: const ValueKey('university-header-settings')",
+        "tooltip: loc.t('settings')"
+      ],
+      "mustNotContain": [
+        "ValueKey('university-account-menu-settings-item')",
+        "_UniversityHeaderAction.settings"
+      ]
+    }
+  ],
+  "routeUiPairs": [
+    {
+      "label": "web seeker CV parse confirmation flow",
+      "route": {
+        "path": "web/src/shared/api.ts",
+        "mustContain": [
+          "/employee/v1/cv/parse/upload",
+          "/employee/v1/cv/parse/jobs/${pathSegment(id)}/preview",
+          "/employee/v1/cv/parse/jobs/${pathSegment(id)}/confirm",
+          "/employee/v1/cv/parse/jobs/${pathSegment(id)}/reject"
+        ]
+      },
+      "ui": {
+        "path": "web/src/seeker/screens.tsx",
+        "mustContain": [
+          "Upload & auto-fill",
+          "Preview parse",
+          "Confirm auto-fill",
+          "Reject parse"
+        ]
+      }
+    },
+    {
+      "label": "web seeker cover letter tools",
+      "route": {
+        "path": "web/src/shared/api.ts",
+        "mustContain": [
+          "/employee/v1/cv/${pathSegment(id)}/cover-letter/preview",
+          "/employee/v1/cv/${pathSegment(id)}/cover-letter/download"
+        ]
+      },
+      "ui": {
+        "path": "web/src/seeker/screens.tsx",
+        "mustContain": [
+          "Cover letter",
+          "Download letter"
+        ]
+      }
+    },
+    {
+      "label": "web campus job alerts placement",
+      "route": {
+        "path": "web/src/shared/api.ts",
+        "mustContain": [
+          "/user/v1/campus/saved-searches"
+        ]
+      },
+      "ui": {
+        "path": "web/src/campus/screens.tsx",
+        "mustContain": [
+          "\"job alerts\"",
+          "JobAlertsPanel scope=\"campus\""
+        ]
+      }
+    },
+    {
+      "label": "web campus talent visibility placement",
+      "route": {
+        "path": "web/src/shared/api.ts",
+        "mustContain": [
+          "/user/v1/campus/talent-visibility"
+        ]
+      },
+      "ui": {
+        "path": "web/src/campus/screens.tsx",
+        "mustContain": [
+          "\"talent visibility\"",
+          "CampusTalentVisibilityPanel"
+        ]
+      }
+    },
+    {
+      "label": "web company interview management placement",
+      "route": {
+        "path": "web/src/shared/api.ts",
+        "mustContain": [
+          "/company/v1/interviews/${pathSegment(id)}/feedback",
+          "/company/v1/interviews/${pathSegment(id)}/mark-no-show",
+          "/company/v1/interviews/${pathSegment(id)}/send-reminder"
+        ]
+      },
+      "ui": {
+        "path": "web/src/company/screens.tsx",
+        "mustContain": [
+          "actions={[\"View\", \"Cancel\", \"Feedback\", \"Mark no-show\", \"Send reminder\"]}",
+          "companyInterviewAction"
+        ]
+      }
+    },
+    {
+      "label": "web company talent pool CRM placement",
+      "route": {
+        "path": "web/src/shared/api.ts",
+        "mustContain": [
+          "/company/v1/talent-pool",
+          "/company/v1/talent-pool/candidates/${pathSegment(id)}/notes",
+          "/company/v1/talent-pool/candidates/${pathSegment(id)}/invite-to-job",
+          "/company/v1/talent-pool/candidates/${pathSegment(id)}/do-not-contact"
+        ]
+      },
+      "ui": {
+        "path": "web/src/company/screens.tsx",
+        "mustContain": [
+          "tab === \"talent pool\"",
+          "CompanyTalentPanel"
+        ]
+      }
+    },
+    {
+      "label": "web company salary guidance placement",
+      "route": {
+        "path": "web/src/shared/api.ts",
+        "mustContain": [
+          "/company/v1/salary-insights/check"
+        ]
+      },
+      "ui": {
+        "path": "web/src/company/screens.tsx",
+        "mustContain": [
+          "tab === \"salary guidance\"",
+          "CompanySalaryGuidanceStandalone"
+        ]
+      }
+    },
+    {
+      "label": "web communication preferences placement",
+      "route": {
+        "path": "web/src/shared/api.ts",
+        "mustContain": [
+          "/notifications/v1/preferences",
+          "/user/v1/communication/preferences",
+          "/user/v1/communication/manual-whatsapp-link"
+        ]
+      },
+      "ui": {
+        "path": "web/src/shared/settings.tsx",
+        "mustContain": [
+          "NotificationSettingsForm",
+          "manual_whatsapp"
+        ]
+      }
+    },
+    {
+      "label": "mobile seeker salary insights placement",
+      "route": {
+        "path": "mobile/lib/src/features/salary_insights/salary_service.dart",
+        "mustContain": [
+          "/public/v1/salary-insights",
+          "/company/v1/salary-insights/check"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+        "mustContain": [
+          "id: 'salary_insights'",
+          "SalaryInsightsScreen(baseUrl: widget.apiBaseUrl)"
+        ]
+      }
+    },
+    {
+      "label": "mobile notification preference placement",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/notifications/v1/preferences"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+        "mustContain": [
+          "settings-notification-manual-whatsapp",
+          "'manual_whatsapp': _manualWhatsappNotifications"
+        ]
+      }
+    }
+  ]
+}

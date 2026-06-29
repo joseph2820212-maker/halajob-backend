@@ -87,12 +87,18 @@ const APPLICATION_STATUSES = new Set([
 ]);
 const INTERVIEW_STATUSES = new Set(["scheduled", "rescheduled", "completed", "cancelled", "no_show", "accepted", "rejected"]);
 const INTERVIEW_TYPES = new Set(["online", "in_office", "phone", "on_app"]);
+const MEETING_PROVIDERS = new Set(["manual", "phone", "in_person", "google_meet", "zoom", "teams", "other"]);
+const CALENDAR_PROVIDERS = new Set(["none", "google", "microsoft", "ical"]);
 const INTERVIEW_PATCH_FIELDS = new Set([
   "type",
   "status",
   "start_at",
   "end_at",
   "timezone",
+  "meeting_provider",
+  "meeting_join_instructions",
+  "calendar_provider",
+  "calendar_event_id",
   "meet_link",
   "office_address",
   "company_note",
@@ -437,25 +443,35 @@ export const scheduleInterview = async (req, res, next) => {
 
     const application = await UserApplyingJobModel.findOne({ _id: application_id, company_id: companyData.company._id, job_id });
     if (!application) return fail(res, "application_not_found", 404);
+    if (String(application.user_id || "") !== String(employee_user_id || "")) return fail(res, "employee_user_id_mismatch", 422);
     const type = req.body.type || "online";
     const status = req.body.status || "scheduled";
+    const meetingProvider = req.body.meeting_provider || (type === "phone" ? "phone" : type === "in_office" ? "in_person" : "manual");
+    const calendarProvider = req.body.calendar_provider || "none";
     if (!INTERVIEW_TYPES.has(type)) return fail(res, "invalid_interview_type", 422);
     if (!INTERVIEW_STATUSES.has(status)) return fail(res, "invalid_interview_status", 422);
+    if (!MEETING_PROVIDERS.has(meetingProvider)) return fail(res, "invalid_meeting_provider", 422);
+    if (!CALENDAR_PROVIDERS.has(calendarProvider)) return fail(res, "invalid_calendar_provider", 422);
 
     const interview = await InterviewModel.create({
       application_id,
       job_id,
       company_id: companyData.company._id,
-      employee_user_id,
+      employee_user_id: application.user_id,
       type,
       status,
       start_at,
       end_at,
       timezone: req.body.timezone || companyData.company.timezone || "UTC",
+      meeting_provider: meetingProvider,
+      meeting_join_instructions: req.body.meeting_join_instructions || "",
+      calendar_provider: calendarProvider,
+      calendar_event_id: req.body.calendar_event_id || "",
       meet_link: req.body.meet_link || "",
       office_address: req.body.office_address || "",
       company_note: req.body.company_note || "",
       candidate_note: req.body.candidate_note || "",
+      candidate_response: { status: "pending", note: "", responded_at: null },
     });
 
     const oldStatus = application.status;
@@ -494,7 +510,7 @@ export const scheduleInterview = async (req, res, next) => {
 
     const job = await jobsModel.findById(job_id).select("_id job_name").lean().catch(() => null);
     SendInterViewNotification({
-      user_id: employee_user_id,
+      user_id: application.user_id,
       job_id,
       application_id,
       interview_id: interview._id,
@@ -542,9 +558,15 @@ export const updateInterview = async (req, res, next) => {
     }, {});
     if (patch.type && !INTERVIEW_TYPES.has(patch.type)) return fail(res, "invalid_interview_type", 422);
     if (patch.status && !INTERVIEW_STATUSES.has(patch.status)) return fail(res, "invalid_interview_status", 422);
+    if (patch.meeting_provider && !MEETING_PROVIDERS.has(patch.meeting_provider)) return fail(res, "invalid_meeting_provider", 422);
+    if (patch.calendar_provider && !CALENDAR_PROVIDERS.has(patch.calendar_provider)) return fail(res, "invalid_calendar_provider", 422);
     if (!Object.keys(patch).length) return fail(res, "no_update_fields", 400);
     const update = { $set: patch };
-    if (patch.start_at || patch.end_at) update.$inc = { reschedule_count: 1 };
+    if (patch.start_at || patch.end_at) {
+      update.$inc = { reschedule_count: 1 };
+      update.$set.status = patch.status || "rescheduled";
+      update.$set.candidate_response = { status: "pending", note: "", responded_at: null };
+    }
 
     const interview = await InterviewModel.findOneAndUpdate(
       { _id: interviewId, company_id: companyData.company._id },

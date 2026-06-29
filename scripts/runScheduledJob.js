@@ -2,7 +2,7 @@ import "../config/loadEnv.js";
 
 import mongoose from "mongoose";
 import logger from "../config/logger.js";
-import { runScheduledJobNow } from "../jobs/scheduler.js";
+import { runScheduledJobNow, scheduledJobKeys } from "../jobs/scheduler.js";
 
 const CONNECTION_URL = process.env.CONNECTION_URL;
 const jobKey = process.argv[2];
@@ -14,7 +14,7 @@ if (!CONNECTION_URL) {
 
 if (!jobKey) {
   console.error("Usage: npm run scheduled:run -- <job-key>");
-  console.error("Available keys: close-expired-jobs, send-job-deadline-reminders, sync-company-active-job-counts, send-campus-event-reminders");
+  console.error(`Available keys: ${scheduledJobKeys.join(", ")}`);
   process.exit(1);
 }
 

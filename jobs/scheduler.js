@@ -7,6 +7,8 @@ import {
   syncCompanyActiveJobCounts,
 } from "./jobLifecycle.jobs.js";
 import { sendCampusEventReminders } from "./campusEvent.jobs.js";
+import { runDataRetentionCleanup } from "./dataRetention.jobs.js";
+import { sendSavedSearchJobAlerts } from "./sendSavedSearchJobAlerts.js";
 
 const enabled = () => String(process.env.SCHEDULED_JOBS_ENABLED ?? "true").toLowerCase() !== "false";
 const timezone = () => process.env.SCHEDULED_JOBS_TIMEZONE || "UTC";
@@ -45,7 +47,23 @@ const definitions = [
     lockTtlMs: 50 * 60 * 1000,
     handler: sendCampusEventReminders,
   },
+  {
+    key: "saved-search-alerts",
+    envKey: "SAVED_SEARCH_ALERTS_CRON",
+    defaultCron: "*/15 * * * *",
+    lockTtlMs: 14 * 60 * 1000,
+    handler: sendSavedSearchJobAlerts,
+  },
+  {
+    key: "data-retention-cleanup",
+    envKey: "DATA_RETENTION_CLEANUP_CRON",
+    defaultCron: "35 2 * * *",
+    lockTtlMs: 55 * 60 * 1000,
+    handler: runDataRetentionCleanup,
+  },
 ];
+
+export const scheduledJobKeys = definitions.map((definition) => definition.key);
 
 let scheduledTasks = [];
 let hasStarted = false;

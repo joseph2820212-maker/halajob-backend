@@ -32,6 +32,61 @@ const EmployeeCvSchema = new Schema(
       trim: true,
     },
 
+    source: {
+      type: String,
+      enum: ["builder", "upload", "parsed_upload", "imported", "legacy"],
+      default: "builder",
+      index: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["draft", "active", "archived"],
+      default: "active",
+      index: true,
+    },
+
+    version: {
+      type: Number,
+      default: 1,
+      min: 1,
+    },
+
+    visibility: {
+      type: String,
+      enum: ["private", "link", "applications_only", "profile"],
+      default: "private",
+      index: true,
+    },
+
+    quality_score: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
+
+    quality_checks: {
+      type: Schema.Types.Mixed,
+      default: {},
+    },
+
+    last_exported_at: {
+      type: Date,
+      default: null,
+    },
+
+    last_parsed_at: {
+      type: Date,
+      default: null,
+    },
+
+    attached_application_count: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
     lang: {
       type: String,
       enum: ["ar", "en"],
@@ -105,6 +160,8 @@ const EmployeeCvSchema = new Schema(
 );
 
 EmployeeCvSchema.index({ employee_id: 1, is_default: 1 });
+EmployeeCvSchema.index({ employee_id: 1, status: 1, is_default: -1, createdAt: -1 });
+EmployeeCvSchema.index({ employee_id: 1, visibility: 1, status: 1 });
 
 const EmployeeCvModel = mongoose.model("employee_cvs", EmployeeCvSchema);
 

@@ -10859,6 +10859,72 @@
           }
         },
         {
+          "name": "GET /dash/v1/campus/partners",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/campus/partners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "campus",
+                "partners"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/campus/privacy-audit",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/campus/privacy-audit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "campus",
+                "privacy-audit"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "GET /dash/v1/campus/universities",
           "request": {
             "method": "GET",
@@ -12564,6 +12630,172 @@
           }
         },
         {
+          "name": "GET /dash/v1/communication/logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/communication/logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "communication",
+                "logs"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/communication/templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/communication/templates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "communication",
+                "templates"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/communication/templates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/communication/templates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "communication",
+                "templates"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /dash/v1/communication/templates/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/communication/templates/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "communication",
+                "templates",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/communication/test-send",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/communication/test-send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "communication",
+                "test-send"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "GET /dash/v1/companies",
           "request": {
             "method": "GET",
@@ -14226,6 +14458,107 @@
                 "dash",
                 "v1",
                 "Company"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/company-public-profiles/:companyId/approve",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/company-public-profiles/:companyId/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "company-public-profiles",
+                ":companyId",
+                "approve"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/company-public-profiles/:companyId/reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/company-public-profiles/:companyId/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "company-public-profiles",
+                ":companyId",
+                "reject"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/company-public-profiles/pending",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/company-public-profiles/pending",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "company-public-profiles",
+                "pending"
               ]
             },
             "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
@@ -46892,6 +47225,140 @@
           }
         },
         {
+          "name": "GET /dash/v1/interview-prep/questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/interview-prep/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "interview-prep",
+                "questions"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/interview-prep/questions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/interview-prep/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "interview-prep",
+                "questions"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "DELETE /dash/v1/interview-prep/questions/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/interview-prep/questions/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "interview-prep",
+                "questions",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /dash/v1/interview-prep/questions/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/interview-prep/questions/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "interview-prep",
+                "questions",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "DELETE /dash/v1/Interview/:id",
           "request": {
             "method": "DELETE",
@@ -66444,6 +66911,334 @@
           }
         },
         {
+          "name": "GET /dash/v1/learning-resource-categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resource-categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resource-categories"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/learning-resource-categories",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resource-categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resource-categories"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /dash/v1/learning-resource-categories/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resource-categories/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resource-categories",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/learning-resources",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resources"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/learning-resources",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resources"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "DELETE /dash/v1/learning-resources/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resources/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resources",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/learning-resources/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resources/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resources",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /dash/v1/learning-resources/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resources/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resources",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/learning-resources/:id/archive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resources/:id/archive",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resources",
+                ":id",
+                "archive"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/learning-resources/:id/publish",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/learning-resources/:id/publish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "learning-resources",
+                ":id",
+                "publish"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "GET /dash/v1/legal-reports",
           "request": {
             "method": "GET",
@@ -74892,6 +75687,139 @@
                 "permissions",
                 "update",
                 ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/platform/settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/platform/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "platform",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /dash/v1/platform/settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/platform/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "platform",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PUT /dash/v1/platform/settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/platform/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "platform",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/platform/settings/schema",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/platform/settings/schema",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "platform",
+                "settings",
+                "schema"
               ]
             },
             "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
@@ -85827,6 +86755,104 @@
                 "roles",
                 "update",
                 ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/salary-insights",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/salary-insights",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "salary-insights"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/salary-insights/health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/salary-insights/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "salary-insights",
+                "health"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/salary-insights/rebuild",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/salary-insights/rebuild",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "salary-insights",
+                "rebuild"
               ]
             },
             "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
@@ -112533,6 +113559,209 @@
           }
         },
         {
+          "name": "GET /user/v1/campus/saved-searches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/campus/saved-searches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "campus",
+                "saved-searches"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus Student. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /user/v1/campus/saved-searches",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/campus/saved-searches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "campus",
+                "saved-searches"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus Student. Guard source: explicit."
+          }
+        },
+        {
+          "name": "DELETE /user/v1/campus/saved-searches/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/campus/saved-searches/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "campus",
+                "saved-searches",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus Student. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/campus/saved-searches/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/campus/saved-searches/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "campus",
+                "saved-searches",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus Student. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /user/v1/campus/saved-searches/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/campus/saved-searches/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "campus",
+                "saved-searches",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus Student. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /user/v1/campus/saved-searches/:id/run-now",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/campus/saved-searches/:id/run-now",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "campus",
+                "saved-searches",
+                ":id",
+                "run-now"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus Student. Guard source: explicit."
+          }
+        },
+        {
           "name": "POST /user/v1/campus/student-verifications",
           "request": {
             "method": "POST",
@@ -112629,6 +113858,72 @@
                 "campus",
                 "student-verifications",
                 "me"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus Student. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/campus/talent-visibility",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/campus/talent-visibility",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "campus",
+                "talent-visibility"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Campus Student. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /user/v1/campus/talent-visibility",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/campus/talent-visibility",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "campus",
+                "talent-visibility"
               ]
             },
             "description": "Generated from live route inventory. Module: Campus Student. Guard source: explicit."
@@ -112972,6 +114267,35 @@
       "name": "Company",
       "item": [
         {
+          "name": "POST /company/v1/auth/forgot-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
           "name": "POST /company/v1/auth/login",
           "request": {
             "method": "POST",
@@ -113027,6 +114351,251 @@
               ]
             },
             "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/auth/logout-all",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/auth/logout-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "auth",
+                "logout-all"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /company/v1/auth/passcode-forgot-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/auth/passcode-forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "auth",
+                "passcode-forgot-password"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/auth/refresh",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/auth/refresh-token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/auth/refresh-token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "auth",
+                "refresh-token"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/auth/reset-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/auth/resetPassword",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/auth/resetPassword",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "auth",
+                "resetPassword"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /company/v1/auth/sessions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/auth/sessions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "auth",
+                "sessions"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: explicit."
+          }
+        },
+        {
+          "name": "DELETE /company/v1/auth/sessions/:sessionId",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/auth/sessions/:sessionId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "auth",
+                "sessions",
+                ":sessionId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: explicit."
           }
         },
         {
@@ -113195,6 +114764,75 @@
           }
         },
         {
+          "name": "GET /company/v1/campus/partners/:universityId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/campus/partners/:universityId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "campus",
+                "partners",
+                ":universityId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /company/v1/campus/partners/:universityId/cancel-request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/campus/partners/:universityId/cancel-request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "campus",
+                "partners",
+                ":universityId",
+                "cancel-request"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "GET /company/v1/campus/students",
           "request": {
             "method": "GET",
@@ -113222,6 +114860,40 @@
                 "v1",
                 "campus",
                 "students"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /company/v1/campus/students/:employeeId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/campus/students/:employeeId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "campus",
+                "students",
+                ":employeeId"
               ]
             },
             "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
@@ -116241,6 +117913,270 @@
           }
         },
         {
+          "name": "GET /company/v1/interviews",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/interviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "interviews"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/interviews",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/interviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "interviews"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /company/v1/interviews/:interviewId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/interviews/:interviewId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "interviews",
+                ":interviewId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "PATCH /company/v1/interviews/:interviewId",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/interviews/:interviewId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "interviews",
+                ":interviewId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/interviews/:interviewId/cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/interviews/:interviewId/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "interviews",
+                ":interviewId",
+                "cancel"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/interviews/:interviewId/feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/interviews/:interviewId/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "interviews",
+                ":interviewId",
+                "feedback"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/interviews/:interviewId/mark-no-show",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/interviews/:interviewId/mark-no-show",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "interviews",
+                ":interviewId",
+                "mark-no-show"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/interviews/:interviewId/send-reminder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/interviews/:interviewId/send-reminder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "interviews",
+                ":interviewId",
+                "send-reminder"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "PATCH /company/v1/interviews/:interviewId/status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/interviews/:interviewId/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "interviews",
+                ":interviewId",
+                "status"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
           "name": "GET /company/v1/jobs/hiring/:jobId/applicants",
           "request": {
             "method": "GET",
@@ -116803,6 +118739,41 @@
           }
         },
         {
+          "name": "GET /company/v1/jobs/hiring/interviews/:interviewId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/jobs/hiring/interviews/:interviewId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "jobs",
+                "hiring",
+                "interviews",
+                ":interviewId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "PATCH /company/v1/jobs/hiring/interviews/:interviewId",
           "request": {
             "method": "PATCH",
@@ -116832,6 +118803,150 @@
                 "hiring",
                 "interviews",
                 ":interviewId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /company/v1/jobs/hiring/interviews/:interviewId/cancel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/jobs/hiring/interviews/:interviewId/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "jobs",
+                "hiring",
+                "interviews",
+                ":interviewId",
+                "cancel"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /company/v1/jobs/hiring/interviews/:interviewId/feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/jobs/hiring/interviews/:interviewId/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "jobs",
+                "hiring",
+                "interviews",
+                ":interviewId",
+                "feedback"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /company/v1/jobs/hiring/interviews/:interviewId/mark-no-show",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/jobs/hiring/interviews/:interviewId/mark-no-show",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "jobs",
+                "hiring",
+                "interviews",
+                ":interviewId",
+                "mark-no-show"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /company/v1/jobs/hiring/interviews/:interviewId/send-reminder",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/jobs/hiring/interviews/:interviewId/send-reminder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "jobs",
+                "hiring",
+                "interviews",
+                ":interviewId",
+                "send-reminder"
               ]
             },
             "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
@@ -117532,6 +119647,629 @@
               ]
             },
             "description": "Generated from live route inventory. Module: Company. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /company/v1/profile/public",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/profile/public",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "profile",
+                "public"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "PATCH /company/v1/profile/public",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/profile/public",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "profile",
+                "public"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/profile/public/preview",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/profile/public/preview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "profile",
+                "public",
+                "preview"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/profile/public/submit-review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/profile/public/submit-review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "profile",
+                "public",
+                "submit-review"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/salary-insights/check",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/salary-insights/check",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "salary-insights",
+                "check"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /company/v1/salary-insights/suggest",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/salary-insights/suggest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "salary-insights",
+                "suggest"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /company/v1/settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "PATCH /company/v1/settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "PUT /company/v1/settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /company/v1/talent-pool",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/talent-pool/candidates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "DELETE /company/v1/talent-pool/candidates/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /company/v1/talent-pool/candidates/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "PATCH /company/v1/talent-pool/candidates/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/talent-pool/candidates/:id/do-not-contact",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates/:id/do-not-contact",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates",
+                ":id",
+                "do-not-contact"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/talent-pool/candidates/:id/invite-to-job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates/:id/invite-to-job",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates",
+                ":id",
+                "invite-to-job"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /company/v1/talent-pool/candidates/:id/notes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates/:id/notes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates",
+                ":id",
+                "notes"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/talent-pool/candidates/:id/notes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates/:id/notes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates",
+                ":id",
+                "notes"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "POST /company/v1/talent-pool/candidates/:id/tags",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates/:id/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates",
+                ":id",
+                "tags"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "DELETE /company/v1/talent-pool/candidates/:id/tags/:tag",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/candidates/:id/tags/:tag",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "candidates",
+                ":id",
+                "tags",
+                ":tag"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /company/v1/talent-pool/search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/company/v1/talent-pool/search",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "company",
+                "v1",
+                "talent-pool",
+                "search"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Company. Guard source: none."
           }
         }
       ]
@@ -118575,6 +121313,122 @@
           }
         },
         {
+          "name": "POST /user/v1/communication/manual-whatsapp-link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/communication/manual-whatsapp-link",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "communication",
+                "manual-whatsapp-link"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /user/v1/communication/preferences",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/communication/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "communication",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+          }
+        },
+        {
+          "name": "PATCH /user/v1/communication/preferences",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/communication/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "communication",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+          }
+        },
+        {
+          "name": "PUT /user/v1/communication/preferences",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/communication/preferences",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "communication",
+                "preferences"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+          }
+        },
+        {
           "name": "GET /user/v1/company-jobs-profile/job-details/:id",
           "request": {
             "method": "GET",
@@ -118804,6 +121658,36 @@
               ]
             },
             "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/company/public/:companyId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/company/public/:companyId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "company",
+                "public",
+                ":companyId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
           }
         },
         {
@@ -120747,6 +123631,208 @@
               ]
             },
             "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /user/v1/interview-prep",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/interview-prep",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "interview-prep"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /user/v1/interview-prep/checklists/:id/progress",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/interview-prep/checklists/:id/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "interview-prep",
+                "checklists",
+                ":id",
+                "progress"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/interview-prep/jobs/:jobId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/interview-prep/jobs/:jobId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "interview-prep",
+                "jobs",
+                ":jobId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/interview-prep/questions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/interview-prep/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "interview-prep",
+                "questions"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /user/v1/interview-prep/questions/:id/save-note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/interview-prep/questions/:id/save-note",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "interview-prep",
+                "questions",
+                ":id",
+                "save-note"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/job-alerts/logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/job-alerts/logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "job-alerts",
+                "logs"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
           }
         },
         {
@@ -123005,6 +126091,625 @@
           }
         },
         {
+          "name": "GET /user/v1/resources",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "resources"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /user/v1/resources/:id/complete",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/resources/:id/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "resources",
+                ":id",
+                "complete"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /user/v1/resources/:id/progress",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/resources/:id/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "resources",
+                ":id",
+                "progress"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "DELETE /user/v1/resources/:id/save",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/resources/:id/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "resources",
+                ":id",
+                "save"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /user/v1/resources/:id/save",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/resources/:id/save",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "resources",
+                ":id",
+                "save"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/resources/:idOrSlug",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/resources/:idOrSlug",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "resources",
+                ":idOrSlug"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/resources/me/progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/resources/me/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "resources",
+                "me",
+                "progress"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/resources/recommended",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/resources/recommended",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "resources",
+                "recommended"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/salary-insights",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/salary-insights",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "salary-insights"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /user/v1/salary-insights/jobs/:jobId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/salary-insights/jobs/:jobId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "salary-insights",
+                "jobs",
+                ":jobId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /user/v1/saved-searches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/saved-searches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "saved-searches"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /user/v1/saved-searches",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/saved-searches",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "saved-searches"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "DELETE /user/v1/saved-searches/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/saved-searches/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "saved-searches",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/saved-searches/:id",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/saved-searches/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "saved-searches",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /user/v1/saved-searches/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/saved-searches/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "saved-searches",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /user/v1/saved-searches/:id/run-now",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/saved-searches/:id/run-now",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "saved-searches",
+                ":id",
+                "run-now"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /user/v1/settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /user/v1/settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PUT /user/v1/settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
           "name": "GET /user/v1/support/tickets",
           "request": {
             "method": "GET",
@@ -123246,6 +126951,71 @@
           }
         },
         {
+          "name": "DELETE /notifications/v1/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/v1/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "v1",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Notifications. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /notifications/v1/:id/delete",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/v1/:id/delete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "v1",
+                ":id",
+                "delete"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Notifications. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "PATCH /notifications/v1/:id/read",
           "request": {
             "method": "PATCH",
@@ -123306,6 +127076,72 @@
                 "v1",
                 ":id",
                 "read"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Notifications. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /notifications/v1/:id/unread",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/v1/:id/unread",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "v1",
+                ":id",
+                "unread"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Notifications. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /notifications/v1/:id/unread",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/v1/:id/unread",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "v1",
+                ":id",
+                "unread"
               ]
             },
             "description": "Generated from live route inventory. Module: Notifications. Guard source: inferred-parent-mount."
@@ -123735,6 +127571,151 @@
       "name": "Other",
       "item": [
         {
+          "name": "GET /public/v1/client-settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/v1/client-settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "v1",
+                "client-settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Other. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /public/v1/companies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/v1/companies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "v1",
+                "companies"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Other. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /public/v1/companies/:slugOrId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/v1/companies/:slugOrId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "v1",
+                "companies",
+                ":slugOrId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Other. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /public/v1/companies/:slugOrId/jobs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/v1/companies/:slugOrId/jobs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "v1",
+                "companies",
+                ":slugOrId",
+                "jobs"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Other. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /public/v1/companies/:slugOrId/reviews",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/v1/companies/:slugOrId/reviews",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "v1",
+                "companies",
+                ":slugOrId",
+                "reviews"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Other. Guard source: none."
+          }
+        },
+        {
           "name": "GET /public/v1/content/pages",
           "request": {
             "method": "GET",
@@ -123933,6 +127914,92 @@
                 "v1",
                 "legal",
                 ":key"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Other. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /public/v1/salary-insights",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/v1/salary-insights",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "v1",
+                "salary-insights"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Other. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /public/v1/salary-insights/:titleSlug",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/v1/salary-insights/:titleSlug",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "v1",
+                "salary-insights",
+                ":titleSlug"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Other. Guard source: none."
+          }
+        },
+        {
+          "name": "GET /public/v1/settings/client",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/public/v1/settings/client",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "public",
+                "v1",
+                "settings",
+                "client"
               ]
             },
             "description": "Generated from live route inventory. Module: Other. Guard source: none."
@@ -124138,6 +128205,75 @@
                 "v1",
                 "applications",
                 "interviews"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /employee/v1/applications/interviews/:interviewId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/applications/interviews/:interviewId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "applications",
+                "interviews",
+                ":interviewId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /employee/v1/applications/interviews/:interviewId/reschedule-request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/applications/interviews/:interviewId/reschedule-request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "applications",
+                "interviews",
+                ":interviewId",
+                "reschedule-request"
               ]
             },
             "description": "Generated from live route inventory. Module: Seeker. Guard source: explicit."
@@ -124577,6 +128713,247 @@
           }
         },
         {
+          "name": "POST /employee/v1/cv/:cvId/cover-letter/download",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/:cvId/cover-letter/download",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                ":cvId",
+                "cover-letter",
+                "download"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /employee/v1/cv/:cvId/cover-letter/preview",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/:cvId/cover-letter/preview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                ":cvId",
+                "cover-letter",
+                "preview"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /employee/v1/cv/:cvId/cover-letter/templates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/:cvId/cover-letter/templates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                ":cvId",
+                "cover-letter",
+                "templates"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /employee/v1/cv/:cvId/duplicate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/:cvId/duplicate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                ":cvId",
+                "duplicate"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /employee/v1/cv/:cvId/quality-score",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/:cvId/quality-score",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                ":cvId",
+                "quality-score"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /employee/v1/cv/:cvId/set-default",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/:cvId/set-default",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                ":cvId",
+                "set-default"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "PATCH /employee/v1/cv/:cvId/visibility",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/:cvId/visibility",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                ":cvId",
+                "visibility"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "GET /employee/v1/cv/download/:cvId",
           "request": {
             "method": "GET",
@@ -124775,6 +129152,183 @@
                 "cv",
                 "generate",
                 "templates"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /employee/v1/cv/parse/jobs/:jobId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/parse/jobs/:jobId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                "parse",
+                "jobs",
+                ":jobId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /employee/v1/cv/parse/jobs/:jobId/confirm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/parse/jobs/:jobId/confirm",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                "parse",
+                "jobs",
+                ":jobId",
+                "confirm"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /employee/v1/cv/parse/jobs/:jobId/preview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/parse/jobs/:jobId/preview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                "parse",
+                "jobs",
+                ":jobId",
+                "preview"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /employee/v1/cv/parse/jobs/:jobId/reject",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/parse/jobs/:jobId/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                "parse",
+                "jobs",
+                ":jobId",
+                "reject"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /employee/v1/cv/parse/upload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/cv/parse/upload",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "cv",
+                "parse",
+                "upload"
               ]
             },
             "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
@@ -125146,6 +129700,77 @@
                 "global",
                 "applications",
                 "interviews"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /employee/v1/global/applications/interviews/:interviewId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/global/applications/interviews/:interviewId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "global",
+                "applications",
+                "interviews",
+                ":interviewId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /employee/v1/global/applications/interviews/:interviewId/reschedule-request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/employee/v1/global/applications/interviews/:interviewId/reschedule-request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "employee",
+                "v1",
+                "global",
+                "applications",
+                "interviews",
+                ":interviewId",
+                "reschedule-request"
               ]
             },
             "description": "Generated from live route inventory. Module: Seeker. Guard source: inferred-parent-mount."
@@ -127301,6 +131926,105 @@
           }
         },
         {
+          "name": "GET /university/v1/analytics/outcomes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/analytics/outcomes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "analytics",
+                "outcomes"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /university/v1/analytics/readiness",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/analytics/readiness",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "analytics",
+                "readiness"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /university/v1/analytics/resources",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/analytics/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "analytics",
+                "resources"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
           "name": "GET /university/v1/dashboard",
           "request": {
             "method": "GET",
@@ -127656,6 +132380,108 @@
           }
         },
         {
+          "name": "PATCH /university/v1/partners/:partnerId/approve",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/partners/:partnerId/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "partners",
+                ":partnerId",
+                "approve"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /university/v1/partners/:partnerId/reject",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/partners/:partnerId/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "partners",
+                ":partnerId",
+                "reject"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /university/v1/partners/:partnerId/suspend",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/partners/:partnerId/suspend",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "partners",
+                ":partnerId",
+                "suspend"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
           "name": "GET /university/v1/reports/outcomes",
           "request": {
             "method": "GET",
@@ -127689,6 +132515,299 @@
           }
         },
         {
+          "name": "GET /university/v1/resources",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "resources"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /university/v1/resources",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "resources"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "DELETE /university/v1/resources/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/resources/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "resources",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /university/v1/resources/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/resources/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "resources",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /university/v1/resources/:id/assign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/resources/:id/assign",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "resources",
+                ":id",
+                "assign"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /university/v1/resources/analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/resources/analytics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "resources",
+                "analytics"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /university/v1/settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /university/v1/settings",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PUT /university/v1/settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/settings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "settings"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
           "name": "GET /university/v1/students",
           "request": {
             "method": "GET",
@@ -127715,6 +132834,39 @@
                 "university",
                 "v1",
                 "students"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /university/v1/students/:studentId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/students/:studentId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "students",
+                ":studentId"
               ]
             },
             "description": "Generated from live route inventory. Module: University. Guard source: explicit."

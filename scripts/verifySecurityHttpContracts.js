@@ -142,26 +142,12 @@ try {
   );
 
   const generatedCv = await request(baseUrl, "GET", `/cv/generated/${generatedCvName}`);
-  await assertStatus({
+  await assertJsonMessage({
     response: generatedCv,
-    expectedStatus: 200,
-    label: "generated CV valid PDF download",
+    expectedStatus: 503,
+    label: "untracked generated CV download without DB verification",
+    includes: /cv_access_temporarily_unavailable/,
   });
-  assert.match(
-    String(generatedCv.headers.get("content-disposition") || ""),
-    /attachment/i,
-    "generated CV downloads should be attachments"
-  );
-  assert.equal(
-    generatedCv.headers.get("x-content-type-options"),
-    "nosniff",
-    "generated CV downloads should include nosniff"
-  );
-  assert.equal(
-    generatedCv.headers.get("cache-control"),
-    "no-store",
-    "generated CV downloads should not be cached"
-  );
 
   const directPrivateUpload = await request(baseUrl, "GET", `/uploads/files/${privatePdfName}`);
   await assertStatus({

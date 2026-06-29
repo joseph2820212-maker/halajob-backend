@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T15:32:01.554Z",
+  "generatedAt": "2026-06-29T03:48:52.871Z",
   "records": [
     {
       "method": "PATCH",
@@ -5128,6 +5128,38 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/campus/partners",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "adminCampusPartners"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/campus/privacy-audit",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "adminCampusPrivacyAudit"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/dash/v1/campus/universities",
       "module": "Admin",
       "middlewares": [
@@ -5969,6 +6001,88 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/communication/logs",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listDeliveryLogs"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/communication/templates",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listTemplates"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/communication/templates",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listTemplates"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/communication/templates/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "updateTemplate"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/communication/test-send",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "testSend"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/dash/v1/companies",
       "module": "Admin",
       "middlewares": [
@@ -6783,6 +6897,56 @@
         "checkPermissionMiddleware",
         "validateRequest",
         "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/company-public-profiles/:companyId/approve",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "approve"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/company-public-profiles/:companyId/reject",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "reject"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/company-public-profiles/pending",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listPending"
       ],
       "inferredGuards": [
         "inferred:isAdmin"
@@ -22809,6 +22973,72 @@
       "knownPublic": false
     },
     {
+      "method": "GET",
+      "path": "/dash/v1/interview-prep/questions",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listQuestions"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/interview-prep/questions",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listQuestions"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/interview-prep/questions/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "updateQuestion"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/interview-prep/questions/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "updateQuestion"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
       "method": "DELETE",
       "path": "/dash/v1/Interview/:id",
       "module": "Admin",
@@ -32457,6 +32687,169 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/learning-resource-categories",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listCategories"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/learning-resource-categories",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listCategories"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/learning-resource-categories/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "updateCategory"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/learning-resources",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listResources"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/learning-resources",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "listResources"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/dash/v1/learning-resources/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "getResource"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/learning-resources/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "getResource"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/learning-resources/:id",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "getResource"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/learning-resources/:id/archive",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "archiveResource"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/learning-resources/:id/publish",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "publishResource"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/dash/v1/legal-reports",
       "module": "Admin",
       "middlewares": [
@@ -36612,6 +37005,70 @@
         "multerMiddleware",
         "validateRequest",
         "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/platform/settings",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "getPlatformSettings"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/dash/v1/platform/settings",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "getPlatformSettings"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/dash/v1/platform/settings",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "getPlatformSettings"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/platform/settings/schema",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "getPlatformSettingsSchema"
       ],
       "inferredGuards": [
         "inferred:isAdmin"
@@ -41994,6 +42451,55 @@
         "multerMiddleware",
         "validateRequest",
         "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/salary-insights",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "adminList"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/salary-insights/health",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "validateRequest",
+        "adminHealth"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/salary-insights/rebuild",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "adminRebuild"
       ],
       "inferredGuards": [
         "inferred:isAdmin"
@@ -55299,6 +55805,96 @@
       "knownPublic": false
     },
     {
+      "method": "GET",
+      "path": "/user/v1/campus/saved-searches",
+      "module": "Campus Student",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "listSavedSearches"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/campus/saved-searches",
+      "module": "Campus Student",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "listSavedSearches"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/user/v1/campus/saved-searches/:id",
+      "module": "Campus Student",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "getSavedSearch"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/campus/saved-searches/:id",
+      "module": "Campus Student",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "getSavedSearch"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/campus/saved-searches/:id",
+      "module": "Campus Student",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "getSavedSearch"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/campus/saved-searches/:id/run-now",
+      "module": "Campus Student",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "runSavedSearchNow"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
       "method": "POST",
       "path": "/user/v1/campus/student-verifications",
       "module": "Campus Student",
@@ -55335,6 +55931,38 @@
       "middlewares": [
         "authUser",
         "studentVerificationStatus"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/campus/talent-visibility",
+      "module": "Campus Student",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "requireCampusStudent",
+        "validateRequest",
+        "getTalentVisibility"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/campus/talent-visibility",
+      "module": "Campus Student",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "requireCampusStudent",
+        "validateRequest",
+        "getTalentVisibility"
       ],
       "inferredGuards": [],
       "hasAuthGuard": true,
@@ -55484,6 +56112,21 @@
     },
     {
       "method": "POST",
+      "path": "/company/v1/auth/forgot-password",
+      "module": "Company",
+      "middlewares": [
+        "forceCompanyWebAuthScope",
+        "multerMiddleware",
+        "validateRequest",
+        "forgotPassword"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "POST",
       "path": "/company/v1/auth/login",
       "module": "Company",
       "middlewares": [
@@ -55509,6 +56152,127 @@
       "hasAuthGuard": false,
       "guardSource": "none",
       "knownPublic": true
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/auth/logout-all",
+      "module": "Company",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "logoutAll"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/auth/passcode-forgot-password",
+      "module": "Company",
+      "middlewares": [
+        "forceCompanyWebAuthScope",
+        "multerMiddleware",
+        "validateRequest",
+        "passcodeVerify"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/auth/refresh",
+      "module": "Company",
+      "middlewares": [
+        "multerMiddleware",
+        "validateRequest",
+        "refresh"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/auth/refresh-token",
+      "module": "Company",
+      "middlewares": [
+        "multerMiddleware",
+        "validateRequest",
+        "refresh"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/auth/reset-password",
+      "module": "Company",
+      "middlewares": [
+        "forceCompanyWebAuthScope",
+        "multerMiddleware",
+        "validateRequest",
+        "resetPassword"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/auth/resetPassword",
+      "module": "Company",
+      "middlewares": [
+        "forceCompanyWebAuthScope",
+        "multerMiddleware",
+        "validateRequest",
+        "resetPassword"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/auth/sessions",
+      "module": "Company",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "anonymous",
+        "listSessions"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/company/v1/auth/sessions/:sessionId",
+      "module": "Company",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "anonymous",
+        "validateRequest",
+        "revokeSession"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
     },
     {
       "method": "GET",
@@ -55591,11 +56355,61 @@
     },
     {
       "method": "GET",
+      "path": "/company/v1/campus/partners/:universityId",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "validateRequest",
+        "companyPartnerDetail"
+      ],
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/company/v1/campus/partners/:universityId/cancel-request",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "cancelCompanyPartnerRequest"
+      ],
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/company/v1/campus/students",
       "module": "Company",
       "middlewares": [
         "anonymous",
+        "validateRequest",
         "students"
+      ],
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/campus/students/:employeeId",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "validateRequest",
+        "companyStudentDetail"
       ],
       "inferredGuards": [
         "inferred:approvedCompanyGuard"
@@ -57007,6 +57821,141 @@
     },
     {
       "method": "GET",
+      "path": "/company/v1/interviews",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "getInterviews"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/interviews",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "getInterviews"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/interviews/:interviewId",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "getInterviewDetails"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/company/v1/interviews/:interviewId",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "getInterviewDetails"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/interviews/:interviewId/cancel",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "cancelInterview"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/interviews/:interviewId/feedback",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "submitInterviewFeedback"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/interviews/:interviewId/mark-no-show",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "markInterviewNoShow"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/interviews/:interviewId/send-reminder",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "sendInterviewReminder"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/company/v1/interviews/:interviewId/status",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "changeInterviewStatus"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/company/v1/jobs/hiring/:jobId/applicants",
       "module": "Company",
       "middlewares": [
@@ -57272,6 +58221,23 @@
       "knownPublic": false
     },
     {
+      "method": "GET",
+      "path": "/company/v1/jobs/hiring/interviews/:interviewId",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "getInterviewDetails"
+      ],
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
       "method": "PATCH",
       "path": "/company/v1/jobs/hiring/interviews/:interviewId",
       "module": "Company",
@@ -57279,7 +58245,75 @@
         "anonymous",
         "multerMiddleware",
         "validateRequest",
-        "updateInterview"
+        "getInterviewDetails"
+      ],
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/jobs/hiring/interviews/:interviewId/cancel",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "cancelInterview"
+      ],
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/jobs/hiring/interviews/:interviewId/feedback",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "submitInterviewFeedback"
+      ],
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/jobs/hiring/interviews/:interviewId/mark-no-show",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "markInterviewNoShow"
+      ],
+      "inferredGuards": [
+        "inferred:approvedCompanyGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/jobs/hiring/interviews/:interviewId/send-reminder",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "sendInterviewReminder"
       ],
       "inferredGuards": [
         "inferred:approvedCompanyGuard"
@@ -57616,6 +58650,310 @@
       ],
       "hasAuthGuard": true,
       "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/profile/public",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "validateRequest",
+        "getPublicProfile"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/company/v1/profile/public",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "validateRequest",
+        "getPublicProfile"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/profile/public/preview",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "previewPublicProfile"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/profile/public/submit-review",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "submitPublicProfileReview"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/salary-insights/check",
+      "module": "Company",
+      "middlewares": [
+        "jsonParser",
+        "validateRequest",
+        "companyCheck"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/salary-insights/suggest",
+      "module": "Company",
+      "middlewares": [
+        "validateRequest",
+        "companySuggest"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/settings",
+      "module": "Company",
+      "middlewares": [
+        "validateRequest",
+        "getCompanySettings"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/company/v1/settings",
+      "module": "Company",
+      "middlewares": [
+        "validateRequest",
+        "getCompanySettings"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/company/v1/settings",
+      "module": "Company",
+      "middlewares": [
+        "validateRequest",
+        "getCompanySettings"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/talent-pool",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "listTalentPool"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/talent-pool/candidates",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "saveCandidate"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/company/v1/talent-pool/candidates/:id",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "getCandidateDetails"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/talent-pool/candidates/:id",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "getCandidateDetails"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/company/v1/talent-pool/candidates/:id",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "getCandidateDetails"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/talent-pool/candidates/:id/do-not-contact",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "markDoNotContact"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/talent-pool/candidates/:id/invite-to-job",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "inviteCandidateToJob"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/talent-pool/candidates/:id/notes",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "addCandidateNote"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/talent-pool/candidates/:id/notes",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "addCandidateNote"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/company/v1/talent-pool/candidates/:id/tags",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "addCandidateTags"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/company/v1/talent-pool/candidates/:id/tags/:tag",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "removeCandidateTag"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/company/v1/talent-pool/search",
+      "module": "Company",
+      "middlewares": [
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "listTalentPool"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
       "knownPublic": false
     },
     {
@@ -58086,6 +59424,59 @@
       "knownPublic": true
     },
     {
+      "method": "POST",
+      "path": "/user/v1/communication/manual-whatsapp-link",
+      "module": "Legacy User",
+      "middlewares": [
+        "jsonParser",
+        "validateRequest",
+        "createManualWhatsappLink"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/communication/preferences",
+      "module": "Legacy User",
+      "middlewares": [
+        "validateRequest",
+        "getPreferences"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/communication/preferences",
+      "module": "Legacy User",
+      "middlewares": [
+        "validateRequest",
+        "getPreferences"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/user/v1/communication/preferences",
+      "module": "Legacy User",
+      "middlewares": [
+        "validateRequest",
+        "getPreferences"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
       "method": "GET",
       "path": "/user/v1/company-jobs-profile/job-details/:id",
       "module": "Legacy User",
@@ -58179,6 +59570,18 @@
       "inferredGuards": [],
       "hasAuthGuard": true,
       "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/company/public/:companyId",
+      "module": "Legacy User",
+      "middlewares": [
+        "companyDetails"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
       "knownPublic": false
     },
     {
@@ -58998,6 +60401,96 @@
       "hasAuthGuard": false,
       "guardSource": "none",
       "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/interview-prep",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "overview"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/interview-prep/checklists/:id/progress",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "updateChecklistProgress"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/interview-prep/jobs/:jobId",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "jobPrep"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/interview-prep/questions",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "questions"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/interview-prep/questions/:id/save-note",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "saveQuestionNote"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/job-alerts/logs",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "listAlertLogs"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
     },
     {
       "method": "POST",
@@ -59959,6 +61452,284 @@
     },
     {
       "method": "GET",
+      "path": "/user/v1/resources",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "listResources"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/resources/:id/complete",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "completeResource"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/resources/:id/progress",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "updateProgress"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/user/v1/resources/:id/save",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "saveResource"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/resources/:id/save",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "saveResource"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/resources/:idOrSlug",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "getResource"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/resources/me/progress",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "myProgress"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/resources/recommended",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "recommendedResources"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/salary-insights",
+      "module": "Legacy User",
+      "middlewares": [
+        "validateRequest",
+        "userInsight"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/salary-insights/jobs/:jobId",
+      "module": "Legacy User",
+      "middlewares": [
+        "validateRequest",
+        "userJobInsight"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/saved-searches",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "listSavedSearches"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/saved-searches",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "listSavedSearches"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/user/v1/saved-searches/:id",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "getSavedSearch"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/saved-searches/:id",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "getSavedSearch"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/saved-searches/:id",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "getSavedSearch"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/saved-searches/:id/run-now",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "runSavedSearchNow"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/user/v1/settings",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "validateRequest",
+        "getUserSettings"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/user/v1/settings",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "validateRequest",
+        "getUserSettings"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/user/v1/settings",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "validateRequest",
+        "getUserSettings"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/user/v1/support/tickets",
       "module": "Legacy User",
       "middlewares": [
@@ -60058,6 +61829,36 @@
       "knownPublic": false
     },
     {
+      "method": "DELETE",
+      "path": "/notifications/v1/:id",
+      "module": "Notifications",
+      "middlewares": [
+        "validateRequest",
+        "remove"
+      ],
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/notifications/v1/:id/delete",
+      "module": "Notifications",
+      "middlewares": [
+        "validateRequest",
+        "remove"
+      ],
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
       "method": "PATCH",
       "path": "/notifications/v1/:id/read",
       "module": "Notifications",
@@ -60079,6 +61880,36 @@
       "middlewares": [
         "validateRequest",
         "markRead"
+      ],
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/notifications/v1/:id/unread",
+      "module": "Notifications",
+      "middlewares": [
+        "validateRequest",
+        "markUnread"
+      ],
+      "inferredGuards": [
+        "inferred:authUser"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/notifications/v1/:id/unread",
+      "module": "Notifications",
+      "middlewares": [
+        "validateRequest",
+        "markUnread"
       ],
       "inferredGuards": [
         "inferred:authUser"
@@ -60285,6 +62116,66 @@
     },
     {
       "method": "GET",
+      "path": "/public/v1/client-settings",
+      "module": "Other",
+      "middlewares": [
+        "getClientSettings"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/companies",
+      "module": "Other",
+      "middlewares": [
+        "listCompanies"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/companies/:slugOrId",
+      "module": "Other",
+      "middlewares": [
+        "getCompany"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/companies/:slugOrId/jobs",
+      "module": "Other",
+      "middlewares": [
+        "getCompanyJobs"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/companies/:slugOrId/reviews",
+      "module": "Other",
+      "middlewares": [
+        "getCompanyReviews"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
       "path": "/public/v1/content/pages",
       "module": "Other",
       "middlewares": [
@@ -60293,7 +62184,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "GET",
@@ -60305,7 +62196,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "GET",
@@ -60317,7 +62208,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "GET",
@@ -60329,7 +62220,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "GET",
@@ -60341,7 +62232,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "GET",
@@ -60353,7 +62244,7 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
     },
     {
       "method": "GET",
@@ -60365,7 +62256,43 @@
       "inferredGuards": [],
       "hasAuthGuard": false,
       "guardSource": "none",
-      "knownPublic": false
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/salary-insights",
+      "module": "Other",
+      "middlewares": [
+        "publicInsight"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/salary-insights/:titleSlug",
+      "module": "Other",
+      "middlewares": [
+        "publicInsightByTitle"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
+    },
+    {
+      "method": "GET",
+      "path": "/public/v1/settings/client",
+      "module": "Other",
+      "middlewares": [
+        "getClientSettings"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
+      "knownPublic": true
     },
     {
       "method": "GET",
@@ -60451,6 +62378,37 @@
         "authUser",
         "anonymous",
         "myInterviews"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/applications/interviews/:interviewId",
+      "module": "Seeker",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "validateRequest",
+        "getMyInterviewDetails"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/applications/interviews/:interviewId/reschedule-request",
+      "module": "Seeker",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "multerMiddleware",
+        "validateRequest",
+        "requestInterviewReschedule"
       ],
       "inferredGuards": [],
       "hasAuthGuard": true,
@@ -60650,6 +62608,111 @@
       "knownPublic": false
     },
     {
+      "method": "POST",
+      "path": "/employee/v1/cv/:cvId/cover-letter/download",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "downloadCoverLetter"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/:cvId/cover-letter/preview",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "previewCoverLetter"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/cv/:cvId/cover-letter/templates",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "getCoverLetterTemplates"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/:cvId/duplicate",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "duplicateCv"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/:cvId/quality-score",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "scoreCvQuality"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/:cvId/set-default",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "setDefaultCv"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/employee/v1/cv/:cvId/visibility",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "updateVisibility"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
       "method": "GET",
       "path": "/employee/v1/cv/download/:cvId",
       "module": "Seeker",
@@ -60729,6 +62792,82 @@
       "module": "Seeker",
       "middlewares": [
         "getCvTemplatesPublic"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/cv/parse/jobs/:jobId",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "getParseJob"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/parse/jobs/:jobId/confirm",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "confirmParseJob"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/cv/parse/jobs/:jobId/preview",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "previewParseJob"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/parse/jobs/:jobId/reject",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "rejectParseJob"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/parse/upload",
+      "module": "Seeker",
+      "middlewares": [
+        "multerMiddleware",
+        "validateRequest",
+        "parseUpload"
       ],
       "inferredGuards": [
         "inferred:employeeAccountGuard"
@@ -60891,6 +63030,37 @@
       "module": "Seeker",
       "middlewares": [
         "myInterviews"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/global/applications/interviews/:interviewId",
+      "module": "Seeker",
+      "middlewares": [
+        "validateRequest",
+        "getMyInterviewDetails"
+      ],
+      "inferredGuards": [
+        "inferred:employeeAccountGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/global/applications/interviews/:interviewId/reschedule-request",
+      "module": "Seeker",
+      "middlewares": [
+        "multerMiddleware",
+        "validateRequest",
+        "requestInterviewReschedule"
       ],
       "inferredGuards": [
         "inferred:employeeAccountGuard"
@@ -61859,6 +64029,56 @@
     },
     {
       "method": "GET",
+      "path": "/university/v1/analytics/outcomes",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "userUniversityOutcomeReport"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/analytics/readiness",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "userUniversityEmployabilityAnalytics"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/analytics/resources",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "validateRequest",
+        "universityResourceAnalytics"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/university/v1/dashboard",
       "module": "University",
       "middlewares": [
@@ -62046,6 +64266,60 @@
       "knownPublic": false
     },
     {
+      "method": "PATCH",
+      "path": "/university/v1/partners/:partnerId/approve",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/university/v1/partners/:partnerId/reject",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/university/v1/partners/:partnerId/suspend",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
       "method": "GET",
       "path": "/university/v1/reports/outcomes",
       "module": "University",
@@ -62053,6 +64327,168 @@
         "authUser",
         "activeContextGuard",
         "userUniversityOutcomeReport"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/resources",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "validateRequest",
+        "listUniversityResources"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/university/v1/resources",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "validateRequest",
+        "listUniversityResources"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/university/v1/resources/:id",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "multerMiddleware",
+        "validateRequest",
+        "updateUniversityResource"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/university/v1/resources/:id",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "multerMiddleware",
+        "validateRequest",
+        "updateUniversityResource"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/university/v1/resources/:id/assign",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "multerMiddleware",
+        "validateRequest",
+        "assignUniversityResource"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/resources/analytics",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "validateRequest",
+        "universityResourceAnalytics"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/settings",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "validateRequest",
+        "getUniversitySettings"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/university/v1/settings",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "validateRequest",
+        "getUniversitySettings"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PUT",
+      "path": "/university/v1/settings",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "validateRequest",
+        "getUniversitySettings"
       ],
       "inferredGuards": [
         "inferred:universityAdminGuard"
@@ -62079,11 +64515,29 @@
     },
     {
       "method": "GET",
+      "path": "/university/v1/students/:studentId",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "validateRequest",
+        "userUniversityStudentDetail"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
       "path": "/university/v1/students/:studentId/career-passport",
       "module": "University",
       "middlewares": [
         "authUser",
         "activeContextGuard",
+        "validateRequest",
         "userUniversityStudentCareerPassport"
       ],
       "inferredGuards": [

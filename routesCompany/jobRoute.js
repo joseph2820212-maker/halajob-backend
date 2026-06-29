@@ -41,8 +41,13 @@ router.post("/hiring/interviews", requireCompanyPermission("ats.interviews.sched
 router.post("/hiring/applications/:applicationId/interviews", requireCompanyPermission("ats.interviews.schedule"), upload.none(), validate(companySchemas.applicationBodySchema), controllerHiring.createInterview);
 
 router.get("/hiring/interviews", requireCompanyPermission("ats.view"), upload.none(), validate(companySchemas.listSchema), controllerHiring.getInterviews);
+router.get("/hiring/interviews/:interviewId", requireCompanyPermission("ats.view"), upload.none(), validate(companySchemas.interviewBodySchema), controllerHiring.getInterviewDetails);
 router.patch("/hiring/interviews/:interviewId", requireCompanyPermission("ats.interviews.schedule"), upload.none(), validate(companySchemas.interviewBodySchema), controllerHiring.updateInterview);
 router.patch("/hiring/interviews/:interviewId/status", requireCompanyPermission("ats.interviews.schedule"), upload.none(), validate(companySchemas.interviewBodySchema), controllerHiring.changeInterviewStatus);
+router.post("/hiring/interviews/:interviewId/cancel", requireCompanyPermission("ats.interviews.schedule"), upload.none(), validate(companySchemas.interviewBodySchema), controllerHiring.cancelInterview);
+router.post("/hiring/interviews/:interviewId/feedback", requireCompanyPermission("ats.interviews.schedule"), upload.none(), validate(companySchemas.interviewFeedbackSchema), controllerHiring.submitInterviewFeedback);
+router.post("/hiring/interviews/:interviewId/mark-no-show", requireCompanyPermission("ats.interviews.schedule"), upload.none(), validate(companySchemas.interviewBodySchema), controllerHiring.markInterviewNoShow);
+router.post("/hiring/interviews/:interviewId/send-reminder", requireCompanyPermission("ats.interviews.schedule"), upload.none(), validate(companySchemas.interviewReminderSchema), controllerHiring.sendInterviewReminder);
 
 /* =========================
    Job Invitations / Offers

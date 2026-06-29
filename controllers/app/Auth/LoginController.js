@@ -17,6 +17,13 @@ import {
   rotateRefreshToken,
 } from "../../../services/tokenService.js";
 import { syncAccountContextsForUser } from "../../../services/accountContext.service.js";
+import {
+  clearAllRefreshCookies,
+  clearRefreshCookie,
+  refreshTokenFromRequest,
+  setRefreshCookie,
+  webAuthScope,
+} from "../../../services/authCookie.service.js";
 
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
 const normEmail = (e) => (e || "").trim().toLowerCase();
@@ -186,8 +193,8 @@ const logout = async (req, res, next) => {
   const lan = req.get("lan") || "en";
 
   try {
-    const refreshToken =
-      req.body?.refreshToken || req.body?.refresh_token || req.get("x-refresh-token");
+    const scope = webAuthScope(req, "seeker");
+    const refreshToken = refreshTokenFromRequest(req, scope);
 
     if (!refreshToken) {
       return ReturnAppData.createError({
@@ -198,6 +205,7 @@ const logout = async (req, res, next) => {
     }
 
     await clearRefreshToken(refreshToken);
+    clearRefreshCookie(req, res, scope);
 
     return ReturnAppData.createData({
       res,
@@ -230,6 +238,7 @@ const logoutAll = async (req, res, next) => {
     }
 
     const result = await RefreshTokenModel.deleteMany({ userRef: userId });
+    clearAllRefreshCookies(res);
 
     return ReturnAppData.createData({
       res,
@@ -250,7 +259,8 @@ const refreshToken = async (req, res, next) => {
   const lan = req.get("lan") || "en";
 
   try {
-    const { refreshToken } = req.body || {};
+    const scope = webAuthScope(req, "seeker");
+    const refreshToken = refreshTokenFromRequest(req, scope);
 
     if (!refreshToken) {
       return ReturnAppData.createError({
@@ -262,6 +272,7 @@ const refreshToken = async (req, res, next) => {
 
     const { tokenPayload, tokens } = await rotateRefreshToken(refreshToken);
     await verifyUserFromRefreshTokenPayload(tokenPayload);
+    setRefreshCookie(req, res, tokens.refreshToken, scope);
 
     return ReturnAppData.createData({
       res,

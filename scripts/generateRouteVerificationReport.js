@@ -60,6 +60,7 @@ const isKnownPublic = ({ method, path: pathName, middlewares = [] }) => {
   if (pathName.includes("/auth/passcode-forgot-password")) return true;
   if (pathName.includes("/auth/resetPassword")) return true;
   if (pathName === "/user/v1/career-passport/share/:token") return true;
+  if (pathName.startsWith("/public/v1")) return true;
   if (pathName === "/user/v1/campus/universities") return true;
   if (pathName === "/user/v1/campus/universities/:id/campuses") return true;
   if (pathName === "/campus/v1/universities") return true;

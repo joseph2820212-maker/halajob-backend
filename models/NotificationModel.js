@@ -35,6 +35,14 @@ const NotificationSchema = new mongoose.Schema(
 NotificationSchema.index({ user_id: 1, read: 1, createdAt: -1 });
 NotificationSchema.index({ user_id: 1, type: 1, createdAt: -1 });
 NotificationSchema.index(
+  { createdAt: 1 },
+  {
+    expireAfterSeconds: 365 * 24 * 60 * 60,
+    name: "read_notifications_created_at_ttl",
+    partialFilterExpression: { read: true },
+  }
+);
+NotificationSchema.index(
   { user_id: 1, dedupeKey: 1 },
   {
     unique: true,

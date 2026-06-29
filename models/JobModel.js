@@ -680,8 +680,25 @@ JobsSchema.index({ "search_index.filters.languages": 1 });
 JobsSchema.index({ "search_index.filters.services": 1 });
 JobsSchema.index({ "search_index.filters.candidate_target": 1 });
 JobsSchema.index({ "search_index.filters.is_remote": 1 });
-JobsSchema.index({ "search_index.title_norm": "text", "search_index.text_norm": "text" });
-JobsSchema.index({ job_name: "text", description: "text" });
+JobsSchema.index(
+  {
+    job_name: "text",
+    description: "text",
+    "search_index.title_norm": "text",
+    "search_index.text_norm": "text",
+    "search_projection.matching.text": "text",
+  },
+  {
+    name: "jobs_text_search",
+    weights: {
+      job_name: 10,
+      "search_index.title_norm": 8,
+      "search_index.text_norm": 5,
+      description: 4,
+      "search_projection.matching.text": 3,
+    },
+  }
+);
 JobsSchema.index({ "search_projection.company.id": 1 });
 JobsSchema.index({ "search_projection.company.industry_name": 1 });
 JobsSchema.index({ "search_projection.requirements.skills": 1 });
@@ -695,7 +712,6 @@ JobsSchema.index({ "search_projection.requirements.salary_min_usd": 1 });
 JobsSchema.index({ "search_projection.requirements.salary_max_usd": 1 });
 JobsSchema.index({ "search_projection.ranking.total_score": -1 });
 JobsSchema.index({ "search_projection.matching.tokens": 1 });
-JobsSchema.index({ "search_projection.matching.text": "text" });
 JobsSchema.index({ "trust.risk_level": 1, "trust.report_count": -1, updatedAt: -1 });
 JobsSchema.index({ "trust.review_status": 1, updatedAt: -1 });
 

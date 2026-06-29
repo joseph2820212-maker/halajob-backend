@@ -12,6 +12,15 @@ const InterviewSchema = new Schema(
     start_at: { type: Date, required: true, index: true },
     end_at: { type: Date, default: null },
     timezone: { type: String, default: "UTC" },
+    meeting_provider: {
+      type: String,
+      enum: ["manual", "phone", "in_person", "google_meet", "zoom", "teams", "other"],
+      default: "manual",
+      index: true,
+    },
+    meeting_join_instructions: { type: String, default: "", trim: true },
+    calendar_provider: { type: String, enum: ["none", "google", "microsoft", "ical"], default: "none" },
+    calendar_event_id: { type: String, default: "", trim: true, index: true },
     meet_link: { type: String, default: "", trim: true },
     office_address: { type: String, default: "", trim: true },
     longitude: { type: Number, default: null },
@@ -28,6 +37,26 @@ const InterviewSchema = new Schema(
       recommendation: { type: String, enum: ["", "hire", "maybe", "reject"], default: "" },
       notes: { type: String, default: "", trim: true },
     },
+    candidate_response: {
+      status: {
+        type: String,
+        enum: ["pending", "accepted", "declined", "reschedule_requested"],
+        default: "pending",
+      },
+      note: { type: String, default: "", trim: true },
+      responded_at: { type: Date, default: null },
+    },
+    reminders: {
+      day_before_sent_at: { type: Date, default: null },
+      hour_before_sent_at: { type: Date, default: null },
+    },
+    feedback: {
+      submitted_by: { type: Schema.Types.ObjectId, ref: "users", default: null },
+      submitted_at: { type: Date, default: null },
+      strengths: { type: String, default: "", trim: true },
+      concerns: { type: String, default: "", trim: true },
+      next_step: { type: String, default: "", trim: true },
+    },
     completed_at: { type: Date, default: null },
     cancelled_reason: { type: String, default: "", trim: true },
     reschedule_count: { type: Number, default: 0, min: 0 },
@@ -37,5 +66,6 @@ const InterviewSchema = new Schema(
 InterviewSchema.index({ application_id: 1, start_at: -1 });
 InterviewSchema.index({ company_id: 1, status: 1, start_at: 1 });
 InterviewSchema.index({ employee_user_id: 1, status: 1, start_at: 1 });
+InterviewSchema.index({ "candidate_response.status": 1, start_at: 1 });
 const InterviewModel = mongoose.model("interviews", InterviewSchema);
 export default InterviewModel;

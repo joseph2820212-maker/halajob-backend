@@ -443,9 +443,19 @@ const normalizePayload = async (req, config) => {
     if (!payload.gender) payload.gender = 'male';
   }
 
-  // Never accept server-managed credential/OTP fields via admin CRUD (mass-assignment guard).
-  delete payload.passcode;
-  delete payload.another_device_code;
+  // Never accept server-managed credential/OTP/device fields via admin CRUD.
+  [
+    'passcode',
+    'another_device_code',
+    'passcode_expires_at',
+    'another_device_expires_at',
+    'otp_last_sent_at',
+    'pending_device',
+    'device',
+    'can_update_password',
+  ].forEach((field) => {
+    delete payload[field];
+  });
 
   return payload;
 };
@@ -487,6 +497,130 @@ const stripControlFields = (payload = {}) => {
     delete payload[key];
   });
   return payload;
+};
+
+const PROTECTED_USER_UPDATE_FIELDS = new Set([
+  'role',
+  'role_id',
+  'role_number',
+  'permissions',
+  'permission',
+  'status',
+  'password',
+  'passcode',
+  'another_device_code',
+  'passcode_expires_at',
+  'another_device_expires_at',
+  'otp_last_sent_at',
+  'pending_device',
+  'device',
+  'is_admin',
+  'is_super_admin',
+  'admin',
+]);
+
+const PROTECTED_COMPANY_UPDATE_FIELDS = new Set([
+  'owner_user_id',
+  'role_id',
+  'permissions',
+  'accepted',
+  'status',
+  'is_verified',
+  'verified_at',
+  'verified_by',
+  'subscription',
+  'subscription_plan',
+  'subscription_status',
+  'subscription_expires_at',
+  'plan_id',
+  'billing',
+  'can_upload',
+]);
+
+const PROTECTED_EMPLOYEE_UPDATE_FIELDS = new Set([
+  'user_id',
+  'role_id',
+  'permissions',
+  'accepted',
+  'status',
+  'student_profile.student_email_verified',
+  'student_profile.university_id',
+  'campus_talent_opt_in',
+  'campus_talent_visible_to_partners',
+]);
+
+const PROTECTED_UNIVERSITY_UPDATE_FIELDS = new Set([
+  'partners',
+  'verified',
+  'status',
+  'career_center_email',
+]);
+
+const PROTECTED_JOB_UPDATE_FIELDS = new Set([
+  'company_id',
+  'user_id',
+  'created_by',
+  'publish_status',
+  'is_accepted',
+  'reviewed_by',
+  'reviewed_at',
+  'trust',
+  'status',
+]);
+
+const protectedAdminResourceFields = (config) => {
+  if (['users', 'admins'].includes(config?.key) || config?.model === UserModel) {
+    return PROTECTED_USER_UPDATE_FIELDS;
+  }
+  if (config?.model === CompanyModel) return PROTECTED_COMPANY_UPDATE_FIELDS;
+  if (config?.model === EmployeeModel) return PROTECTED_EMPLOYEE_UPDATE_FIELDS;
+  if (config?.model === UniversityModel) return PROTECTED_UNIVERSITY_UPDATE_FIELDS;
+  if (config?.model === jobsModel) return PROTECTED_JOB_UPDATE_FIELDS;
+  return new Set();
+};
+
+const approvalManagedFields = (config) => {
+  if (['users', 'admins'].includes(config?.key) || config?.model === UserModel) {
+    return new Set(['status']);
+  }
+  if (config?.model === CompanyModel) {
+    return new Set(['accepted', 'status', 'can_upload']);
+  }
+  if (config?.model === jobsModel) {
+    return new Set(['is_accepted', 'publish_status', 'status']);
+  }
+  if (config?.model === JobReportModel) {
+    return new Set(['status', 'reviewed_by', 'reviewed_at']);
+  }
+  if (config?.model === CompanyReviewModel || config?.model === UserReviewJobModel) {
+    return new Set(['status']);
+  }
+  return new Set();
+};
+
+const isProtectedFieldPath = (key, protectedFields) => {
+  const normalized = String(key || '').trim();
+  if (!normalized) return false;
+  return Array.from(protectedFields).some(
+    (field) => normalized === field || normalized.startsWith(`${field}.`)
+  );
+};
+
+const stripProtectedAdminUpdateFields = (updatePayload = {}, config, options = {}) => {
+  const protectedFields = protectedAdminResourceFields(config);
+  if (!protectedFields.size) return updatePayload;
+  const activeProtectedFields = new Set(protectedFields);
+  if (options.allowStatus === true) activeProtectedFields.delete('status');
+  if (options.allowApprovalFields === true) {
+    approvalManagedFields(config).forEach((field) => {
+      activeProtectedFields.delete(field);
+    });
+  }
+
+  return Object.entries(updatePayload).reduce((acc, [key, value]) => {
+    if (!isProtectedFieldPath(key, activeProtectedFields)) acc[key] = value;
+    return acc;
+  }, {});
 };
 
 const auditActorId = (req) => req.admin?._id || req.user?._id || null;
@@ -792,7 +926,10 @@ const update = (resourceName) => async (req, res) => {
       if (!payload.publish_status) payload.publish_status = 'published';
     }
 
-    const updatePayload = sanitizeUpdatePayload(payload);
+    const updatePayload = stripProtectedAdminUpdateFields(sanitizeUpdatePayload(payload), config, {
+      allowStatus: ['admin_resource_approved', 'admin_resource_rejected'].includes(req.auditActionOverride),
+      allowApprovalFields: ['admin_resource_approved', 'admin_resource_rejected'].includes(req.auditActionOverride),
+    });
     if (!Object.keys(updatePayload).length) {
       return ReturnDashData.updateError({ res, status: 400, message: 'no_update_fields' });
     }
@@ -888,7 +1025,7 @@ const bulkUpdate = (resourceName) => async (req, res) => {
     if (!ids.length) return ReturnDashData.updateError({ res, status: 400, message: 'ids_required' });
 
     const payload = stripControlFields(await normalizePayload(req, config));
-    const updatePayload = sanitizeUpdatePayload(payload);
+    const updatePayload = stripProtectedAdminUpdateFields(sanitizeUpdatePayload(payload), config);
     if (!Object.keys(updatePayload).length) {
       return ReturnDashData.updateError({ res, status: 400, message: 'no_update_fields' });
     }

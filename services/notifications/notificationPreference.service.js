@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { NotificationPreferenceModel } from "../../models/index.js";
 
 const VALID_LANGS = new Set(["ar", "en"]);
-const CHANNEL_KEYS = ["in_app", "push", "email", "sms"];
+export const CHANNEL_KEYS = ["in_app", "push", "email", "sms", "manual_whatsapp", "whatsapp_business"];
 const CATEGORY_KEYS = ["jobs", "applications", "interviews", "campus", "company", "ai", "system", "marketing"];
 
 export const DEFAULT_NOTIFICATION_PREFERENCES = Object.freeze({
@@ -11,6 +11,8 @@ export const DEFAULT_NOTIFICATION_PREFERENCES = Object.freeze({
     push: true,
     email: false,
     sms: false,
+    manual_whatsapp: false,
+    whatsapp_business: false,
   }),
   categories: Object.freeze({
     jobs: true,
@@ -30,6 +32,12 @@ export const DEFAULT_NOTIFICATION_PREFERENCES = Object.freeze({
   }),
   lang: "en",
 });
+
+export const officialWhatsappBusinessEnabled = () =>
+  ["true", "1", "yes", "on"].includes(
+    clean(process.env.WHATSAPP_BUSINESS_ENABLED || process.env.OFFICIAL_WHATSAPP_ENABLED)
+      .toLowerCase(),
+  );
 
 const clean = (value = "") => String(value || "").trim();
 
@@ -60,6 +68,11 @@ const withDefaults = (preferences = {}) => ({
     ...DEFAULT_NOTIFICATION_PREFERENCES.quiet_hours,
     ...(preferences.quiet_hours || {}),
   },
+  phone_for_sms: clean(preferences.phone_for_sms || preferences.phoneForSms),
+  sms_opted_in_at: preferences.sms_opted_in_at || preferences.smsOptedInAt || null,
+  sms_opted_out_at: preferences.sms_opted_out_at || preferences.smsOptedOutAt || null,
+  manual_whatsapp_opted_in_at:
+    preferences.manual_whatsapp_opted_in_at || preferences.manualWhatsappOptedInAt || null,
   lang: VALID_LANGS.has(preferences.lang) ? preferences.lang : DEFAULT_NOTIFICATION_PREFERENCES.lang,
 });
 
@@ -70,6 +83,10 @@ export const normalizeNotificationPreferences = (preferences = {}) => {
     channels: merged.channels,
     categories: merged.categories,
     quiet_hours: merged.quiet_hours,
+    phone_for_sms: merged.phone_for_sms,
+    sms_opted_in_at: merged.sms_opted_in_at,
+    sms_opted_out_at: merged.sms_opted_out_at,
+    manual_whatsapp_opted_in_at: merged.manual_whatsapp_opted_in_at,
     lang: merged.lang,
     updated_by: preferences.updated_by || null,
     createdAt: preferences.createdAt,
@@ -105,6 +122,10 @@ export const normalizePreferencePatch = (body = {}, current = {}) => {
     channels: mergeBooleanObject(base.channels, body.channels, CHANNEL_KEYS),
     categories: mergeBooleanObject(base.categories, body.categories, CATEGORY_KEYS),
     quiet_hours: normalizeQuietHoursPatch(base.quiet_hours, body.quiet_hours),
+    phone_for_sms: base.phone_for_sms,
+    sms_opted_in_at: base.sms_opted_in_at,
+    sms_opted_out_at: base.sms_opted_out_at,
+    manual_whatsapp_opted_in_at: base.manual_whatsapp_opted_in_at,
     lang: base.lang,
   };
 
@@ -116,13 +137,42 @@ export const normalizePreferencePatch = (body = {}, current = {}) => {
     });
   });
 
+  const legacyWhatsapp = parseBool(body.channels?.whatsapp ?? body.whatsapp ?? body.whatsapp_enabled);
+  if (legacyWhatsapp !== undefined) next.channels.manual_whatsapp = legacyWhatsapp;
+
+  if (!officialWhatsappBusinessEnabled()) {
+    next.channels.whatsapp_business = false;
+  }
+
   CATEGORY_KEYS.forEach((key) => {
     const parsed = parseBool(body[key]);
     if (parsed !== undefined) next.categories[key] = parsed;
   });
 
+  const categoryAliases = {
+    job_alerts: "jobs",
+    application_updates: "applications",
+    offers: "applications",
+  };
+  Object.entries(categoryAliases).forEach(([alias, canonical]) => {
+    const parsed = parseBool(body.categories?.[alias] ?? body[alias]);
+    if (parsed !== undefined) next.categories[canonical] = parsed;
+  });
+
   const lang = clean(body.lang || body.language).toLowerCase();
   if (VALID_LANGS.has(lang)) next.lang = lang;
+
+  const phoneForSms = clean(body.phone_for_sms || body.phoneForSms);
+  if (phoneForSms || Object.prototype.hasOwnProperty.call(body, "phone_for_sms") || Object.prototype.hasOwnProperty.call(body, "phoneForSms")) {
+    next.phone_for_sms = phoneForSms;
+  }
+
+  const now = new Date();
+  if (base.channels.sms !== true && next.channels.sms === true) next.sms_opted_in_at = now;
+  if (base.channels.sms === true && next.channels.sms !== true) next.sms_opted_out_at = now;
+  if (base.channels.manual_whatsapp !== true && next.channels.manual_whatsapp === true) {
+    next.manual_whatsapp_opted_in_at = now;
+  }
 
   return next;
 };
@@ -157,6 +207,7 @@ export const getOrCreateNotificationPreferences = async (userId) => {
         channels: { ...DEFAULT_NOTIFICATION_PREFERENCES.channels },
         categories: { ...DEFAULT_NOTIFICATION_PREFERENCES.categories },
         quiet_hours: { ...DEFAULT_NOTIFICATION_PREFERENCES.quiet_hours },
+        phone_for_sms: "",
         lang: DEFAULT_NOTIFICATION_PREFERENCES.lang,
       },
     },
@@ -176,6 +227,10 @@ export const updateNotificationPreferences = async ({ userId, body = {}, actorUs
         channels: patch.channels,
         categories: patch.categories,
         quiet_hours: patch.quiet_hours,
+        phone_for_sms: patch.phone_for_sms,
+        sms_opted_in_at: patch.sms_opted_in_at,
+        sms_opted_out_at: patch.sms_opted_out_at,
+        manual_whatsapp_opted_in_at: patch.manual_whatsapp_opted_in_at,
         lang: patch.lang,
         updated_by: objectIdOrNull(actorUserId),
       },
@@ -203,12 +258,51 @@ export const notificationDeliveryDecision = async ({ userId, eventKey = "", push
   };
 };
 
+export const communicationChannelAllowed = async ({
+  userId,
+  eventKey = "",
+  category,
+  channel,
+  respectPreferences = true,
+} = {}) => {
+  const preferences = await getOrCreateNotificationPreferences(userId);
+  const resolvedCategory = category || categoryForNotificationEvent(eventKey);
+  const categoryEnabled = preferences.categories?.[resolvedCategory] !== false;
+  const channelEnabled = preferences.channels?.[channel] === true;
+
+  if (channel === "whatsapp_business" && !officialWhatsappBusinessEnabled()) {
+    return {
+      allowed: false,
+      preferences,
+      category: resolvedCategory,
+      reason: "official_whatsapp_disabled",
+    };
+  }
+
+  if (!respectPreferences) {
+    return { allowed: true, preferences, category: resolvedCategory, reason: "" };
+  }
+
+  return {
+    allowed: Boolean(categoryEnabled && channelEnabled),
+    preferences,
+    category: resolvedCategory,
+    reason: !categoryEnabled
+      ? `category_${resolvedCategory}_disabled`
+      : channelEnabled
+        ? ""
+        : `channel_${channel}_disabled`,
+  };
+};
+
 export default {
   DEFAULT_NOTIFICATION_PREFERENCES,
   categoryForNotificationEvent,
   getOrCreateNotificationPreferences,
   normalizeNotificationPreferences,
   normalizePreferencePatch,
+  communicationChannelAllowed,
   notificationDeliveryDecision,
+  officialWhatsappBusinessEnabled,
   updateNotificationPreferences,
 };

@@ -5,10 +5,13 @@
 const validate = (schema) => {
   const validateRequest = async (req, res, next) => {
     try {
-      await schema.validate(
+      const validated = await schema.validate(
         { body: req.body, params: req.params, query: req.query },
         { abortEarly: false, stripUnknown: false }
       );
+      if (Object.prototype.hasOwnProperty.call(validated, 'body')) req.body = validated.body || {};
+      if (Object.prototype.hasOwnProperty.call(validated, 'params')) req.params = validated.params || {};
+      if (Object.prototype.hasOwnProperty.call(validated, 'query')) req.query = validated.query || {};
       return next();
     } catch (err) {
       return next(err);

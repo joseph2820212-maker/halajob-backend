@@ -56,6 +56,8 @@ export const uploadMyCv = async (req, res, next) => {
       title: req.body?.title || req.file?.originalname || "Uploaded CV",
       lang: req.body?.lang === "ar" ? "ar" : "en",
       pdf_file: filePath,
+      source: "upload",
+      status: "active",
       is_default: makeDefault,
     });
 

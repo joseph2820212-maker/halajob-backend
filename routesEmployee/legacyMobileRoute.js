@@ -24,6 +24,12 @@ router.post("/jobs/:jobId/review", employeeAccountGuard, upload.none(), validate
 /* Applications */
 router.get("/applications", employeeAccountGuard, jobsController.myApplications);
 router.get("/applications/interviews", employeeAccountGuard, jobsController.myInterviews);
+router.get(
+  "/applications/interviews/:interviewId",
+  employeeAccountGuard,
+  validate(seekerSchemas.interviewBodySchema),
+  jobsController.getMyInterviewDetails
+);
 router.patch(
   "/applications/interviews/:interviewId/respond",
   employeeAccountGuard,
@@ -37,6 +43,13 @@ router.post(
   upload.none(),
   validate(seekerSchemas.interviewResponseSchema),
   jobsController.respondToInterview
+);
+router.post(
+  "/applications/interviews/:interviewId/reschedule-request",
+  employeeAccountGuard,
+  upload.none(),
+  validate(seekerSchemas.interviewRescheduleSchema),
+  jobsController.requestInterviewReschedule
 );
 router.get("/applications/offers", employeeAccountGuard, jobsController.myJobInvitations);
 router.patch(

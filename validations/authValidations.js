@@ -45,7 +45,8 @@ const schemas = {
 
   refreshTokenSchema: yup.object({
     body: yup.object({
-      refreshToken: yup.string().required(),
+      refreshToken: yup.string().trim(),
+      refresh_token: yup.string().trim(),
     }),
   }),
 

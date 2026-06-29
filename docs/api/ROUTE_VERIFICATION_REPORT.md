@@ -1,17 +1,17 @@
 # Route Verification Report
 
-Generated: 2026-06-28T15:32:01.554Z
+Generated: 2026-06-29T03:48:52.871Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 2410 |
-| Unique method/path endpoints | 3831 |
-| Endpoints with detected auth/role guard | 3730 |
-| Known public/system endpoints | 94 |
-| Unguarded endpoints needing manual classification | 7 |
+| Raw Express endpoint entries | 2535 |
+| Unique method/path endpoints | 3991 |
+| Endpoints with detected auth/role guard | 3839 |
+| Known public/system endpoints | 112 |
+| Unguarded endpoints needing manual classification | 40 |
 
 Full machine-readable inventory:
 
@@ -23,21 +23,21 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 
 | Module | Total | Protected | Known public | Needs classification |
 | --- | --- | --- | --- | --- |
-| Admin | 3297 | 3292 | 5 | 0 |
+| Admin | 3328 | 3323 | 5 | 0 |
 | AI | 12 | 12 | 0 | 0 |
 | Analytics | 5 | 5 | 0 | 0 |
 | Campus | 18 | 16 | 2 | 0 |
-| Campus Student | 43 | 41 | 2 | 0 |
-| Company | 134 | 132 | 2 | 0 |
+| Campus Student | 51 | 49 | 2 | 0 |
+| Company | 181 | 143 | 5 | 33 |
 | Files | 1 | 0 | 1 | 0 |
 | Health | 4 | 0 | 4 | 0 |
 | Jobs | 2 | 2 | 0 | 0 |
-| Legacy User | 174 | 97 | 77 | 0 |
-| Notifications | 16 | 16 | 0 | 0 |
-| Other | 7 | 0 | 0 | 7 |
-| Seeker | 94 | 93 | 1 | 0 |
+| Legacy User | 204 | 120 | 77 | 7 |
+| Notifications | 20 | 20 | 0 | 0 |
+| Other | 15 | 0 | 15 | 0 |
+| Seeker | 110 | 109 | 1 | 0 |
 | Trust | 4 | 4 | 0 | 0 |
-| University | 20 | 20 | 0 | 0 |
+| University | 36 | 36 | 0 | 0 |
 
 ## Guard Detection
 
@@ -64,12 +64,19 @@ activeContextPermissionGuard
 addAdminMessage
 addApplicationMessage
 addApplicationNote
+addCandidateNote
+addCandidateTags
 addMessage
 addTicketMessage
 adminApproveVerification
+adminCampusPartners
+adminCampusPrivacyAudit
 adminCohorts
 adminDownloadStudentVerificationDocument
+adminHealth
+adminList
 adminListVerifications
+adminRebuild
 adminRejectVerification
 adminRequestVerificationInfo
 adminSummary
@@ -80,9 +87,12 @@ applyExternalOpportunity
 applyJob
 applyOutsideJob
 applyToJob
+approve
 approveCompanyRequest
 approveJob
+archiveResource
 assignSubscriptionPlan
+assignUniversityResource
 auditMissingDashboardLoginCredentials
 authUser
 blockApplicationApplicant
@@ -94,7 +104,9 @@ bulkUpdateJobs
 campusRegister
 cancelAccountDeletion
 cancelApplication
+cancelCompanyPartnerRequest
 cancelEventRegistration
+cancelInterview
 cancelJobInvitation
 cancelJobZainTalentRequest
 cancelMyApplication
@@ -111,9 +123,15 @@ companiesFromMyActivity
 companiesFromSavedJobs
 companiesIAppliedTo
 companiesViewedByMe
+companyCheck
 companyData
 companyDetails
 companyOpportunities
+companyPartnerDetail
+companyStudentDetail
+companySuggest
+completeResource
+confirmParseJob
 confirmStudentVerificationEmail
 content
 corsMiddleware
@@ -123,6 +141,7 @@ createAccessibilityRequest
 createCvTemplate
 createDashboardUser
 createInterview
+createManualWhatsappLink
 createMyCvDownloadUrl
 createPrivacyRequest
 createReport
@@ -137,14 +156,17 @@ deleteMyUploadedCv
 deleteToken
 details
 downloadCompanyFile
+downloadCoverLetter
 downloadFile
 downloadMyCv
 downloadSavedCv
 downloadStudentVerificationDocument
+duplicateCv
 educationLevel
 events
 experienceLevel
 exportMyData
+forceCompanyWebAuthScope
 forgotPassword
 generateSmartEmployeesForJob
 get
@@ -160,11 +182,18 @@ getAtsPipeline
 getAuditLogs
 getBillingSummary
 getById
+getCandidateDetails
+getClientSettings
+getCompany
 getCompanyAnalytics
 getCompanyDashboard
 getCompanyInterviews
 getCompanyJobReviews
+getCompanyJobs
+getCompanyReviews
+getCompanySettings
 getCompanySubscription
+getCoverLetterTemplates
 getCreatedJobs
 getCurrencies
 getCvTemplatesPublic
@@ -174,7 +203,9 @@ getFileLinks
 getFilters
 getHelpArticle
 getHiringSummary
+getInterviewDetails
 getInterviewedJobs
+getInterviews
 getJobApplicants
 getJobApplications
 getJobAuditLogs
@@ -197,6 +228,7 @@ getMyCompanyCompletion
 getMyCompanyProfile
 getMyEmployeeCompletion
 getMyEmployeeProfile
+getMyInterviewDetails
 getMyInvoiceDetails
 getMyInvoices
 getMyJobDetails
@@ -206,29 +238,44 @@ getMySection
 getMySubscription
 getMyUploadedCvs
 getPage
+getParseJob
+getPlatformSettings
+getPlatformSettingsSchema
 getPreferences
 getProfileAnalytics
+getPublicProfile
 getRecommendedEmployeesForJob
 getReport
 getRequest
+getResource
 getSavedJob
+getSavedSearch
 getSmartEmployeesForJob
 getTalentPool
+getTalentVisibility
 getTicket
 getTicketDetails
+getUniversitySettings
 getUserJobCounts
+getUserSettings
 globalSearch
 industry
 insert
+inviteCandidateToJob
 isAdmin
+jobPrep
 joinRequest
 jsonParser
 list
+listAlertLogs
 listAuditLogs
+listCategories
+listCompanies
 listCompanyFiles
 listCompanyRequests
 listConsents
 listContexts
+listDeliveryLogs
 listFaq
 listFeatures
 listHelpArticles
@@ -240,8 +287,13 @@ listLimits
 listMembers
 listNotificationLogs
 listPages
+listPending
 listQuestions
 listRequests
+listResources
+listSavedSearches
+listSessions
+listTalentPool
 listTalentRequests
 listTemplates
 listTickets
@@ -250,11 +302,14 @@ listTranslations
 listUniversities
 listUniversityCampuses
 listUniversityMembers
+listUniversityResources
 logKeyword
 login
 logout
 logoutAll
 markAllRead
+markDoNotContact
+markInterviewNoShow
 markJobSafe
 markRead
 markUnread
@@ -264,22 +319,32 @@ multerMiddleware
 myApplications
 myInterviews
 myJobInvitations
+myProgress
 myRejectedApplications
 opportunities
 opportunityDetails
 optionalAuthUser
 overview
+parseUpload
 partners
 passcodeVerify
 permissions
+previewCoverLetter
 previewMyCv
+previewParseJob
+previewPublicProfile
 profile
 protectHealth
+publicInsight
+publicInsightByTitle
+publishResource
+questions
 rateApplicant
 rateJob
 rebuildMyCompanySearchFilters
 rebuildMySearchFilters
 recommendedJobs
+recommendedResources
 recomputeJobRatingBreakdown
 refresh
 refreshScore
@@ -287,15 +352,19 @@ refreshToken
 register
 registerEvent
 registerToken
+reject
 rejectCompanyRequest
 rejectJob
+rejectParseJob
 remove
+removeCandidateTag
 replaceJobNames
 replaceJobTypes
 replaceMinSalary
 reportJob
 requestAccountDeletion
 requestDocuments
+requestInterviewReschedule
 requestJobZainTalentHelp
 requestPlanChange
 requireCampusOpportunity
@@ -310,42 +379,56 @@ resubmitStudentVerification
 reviewCompany
 reviewJob
 reviewQueue
+revokeSession
+runSavedSearchNow
 salaryType
+saveCandidate
 saveCvTranslation
 saveJob
 saveJobTranslation
 saveMyCvSettings
 saveOpportunity
+saveQuestionNote
+saveResource
 savedJobs
+scoreCvQuality
 scoreJob
 searchEmployees
 seedFreePlan
 sendApplicationMessage
+sendInterviewReminder
 sendJobInvitation
 sendNotification
 services
 setActiveContext
 setActiveCv
 setConsent
+setDefaultCv
 share
 shared
 skills
 startStudentVerification
 studentVerificationStatus
 students
+submitInterviewFeedback
 submitJobDocuments
+submitPublicProfileReview
 summary
 suspendJob
+testSend
 toggleSaveJob
 toggleSaveOpportunity
 track
 tracking
 universityLogin
 universityOverview
+universityResourceAnalytics
 unreadCount
 update
 updateAboutMe
 updateApplicationStatus
+updateCategory
+updateChecklistProgress
 updateCompanyAbout
 updateCompanyContact
 updateCompanyLocation
@@ -359,6 +442,7 @@ updateLimit
 updateMember
 updateMyCompanyUserProfile
 updateProfile
+updateProgress
 updateQuestion
 updateSectionItem
 updateTalentRequestStatus
@@ -366,18 +450,23 @@ updateTemplate
 updateTicketStatus
 updateToken
 updateUniversityMember
+updateUniversityResource
 updateUniversityStatus
+updateVisibility
 updateWorkPreferences
 uploadExcel
 uploadFile
 uploadMyCv
 uploadStudentVerificationDocument
+userInsight
+userJobInsight
 userUniversityEmployabilityAnalytics
 userUniversityOpportunities
 userUniversityOutcomeReport
 userUniversityOverview
 userUniversityPartners
 userUniversityStudentCareerPassport
+userUniversityStudentDetail
 userUniversityStudents
 validateRequest
 whatIsMyRole
@@ -404,13 +493,46 @@ These endpoints do not expose one of the known guard middleware names, do not ma
 
 | Method | Path | Module | Middlewares |
 | --- | --- | --- | --- |
-| GET | /public/v1/content/pages | Other | listPages |
-| GET | /public/v1/content/pages/:key | Other | getPage |
-| GET | /public/v1/faq | Other | listFaq |
-| GET | /public/v1/help/articles | Other | listHelpArticles |
-| GET | /public/v1/help/articles/:key | Other | getHelpArticle |
-| GET | /public/v1/help/categories | Other | listHelpCategories |
-| GET | /public/v1/legal/:key | Other | getPage |
+| POST | /company/v1/auth/refresh | Company | multerMiddleware, validateRequest, refresh |
+| POST | /company/v1/auth/refresh-token | Company | multerMiddleware, validateRequest, refresh |
+| POST | /company/v1/auth/reset-password | Company | forceCompanyWebAuthScope, multerMiddleware, validateRequest, resetPassword |
+| GET | /company/v1/interviews | Company | anonymous, multerMiddleware, validateRequest, getInterviews |
+| POST | /company/v1/interviews | Company | anonymous, multerMiddleware, validateRequest, getInterviews |
+| GET | /company/v1/interviews/:interviewId | Company | anonymous, multerMiddleware, validateRequest, getInterviewDetails |
+| PATCH | /company/v1/interviews/:interviewId | Company | anonymous, multerMiddleware, validateRequest, getInterviewDetails |
+| POST | /company/v1/interviews/:interviewId/cancel | Company | anonymous, multerMiddleware, validateRequest, cancelInterview |
+| POST | /company/v1/interviews/:interviewId/feedback | Company | anonymous, multerMiddleware, validateRequest, submitInterviewFeedback |
+| POST | /company/v1/interviews/:interviewId/mark-no-show | Company | anonymous, multerMiddleware, validateRequest, markInterviewNoShow |
+| POST | /company/v1/interviews/:interviewId/send-reminder | Company | anonymous, multerMiddleware, validateRequest, sendInterviewReminder |
+| PATCH | /company/v1/interviews/:interviewId/status | Company | anonymous, multerMiddleware, validateRequest, changeInterviewStatus |
+| GET | /company/v1/profile/public | Company | anonymous, validateRequest, getPublicProfile |
+| PATCH | /company/v1/profile/public | Company | anonymous, validateRequest, getPublicProfile |
+| POST | /company/v1/profile/public/preview | Company | anonymous, multerMiddleware, validateRequest, previewPublicProfile |
+| POST | /company/v1/profile/public/submit-review | Company | anonymous, multerMiddleware, validateRequest, submitPublicProfileReview |
+| POST | /company/v1/salary-insights/check | Company | jsonParser, validateRequest, companyCheck |
+| GET | /company/v1/salary-insights/suggest | Company | validateRequest, companySuggest |
+| GET | /company/v1/settings | Company | validateRequest, getCompanySettings |
+| PATCH | /company/v1/settings | Company | validateRequest, getCompanySettings |
+| PUT | /company/v1/settings | Company | validateRequest, getCompanySettings |
+| GET | /company/v1/talent-pool | Company | anonymous, multerMiddleware, validateRequest, listTalentPool |
+| POST | /company/v1/talent-pool/candidates | Company | anonymous, multerMiddleware, validateRequest, saveCandidate |
+| DELETE | /company/v1/talent-pool/candidates/:id | Company | anonymous, multerMiddleware, validateRequest, getCandidateDetails |
+| GET | /company/v1/talent-pool/candidates/:id | Company | anonymous, multerMiddleware, validateRequest, getCandidateDetails |
+| PATCH | /company/v1/talent-pool/candidates/:id | Company | anonymous, multerMiddleware, validateRequest, getCandidateDetails |
+| POST | /company/v1/talent-pool/candidates/:id/do-not-contact | Company | anonymous, multerMiddleware, validateRequest, markDoNotContact |
+| POST | /company/v1/talent-pool/candidates/:id/invite-to-job | Company | anonymous, multerMiddleware, validateRequest, inviteCandidateToJob |
+| GET | /company/v1/talent-pool/candidates/:id/notes | Company | anonymous, multerMiddleware, validateRequest, addCandidateNote |
+| POST | /company/v1/talent-pool/candidates/:id/notes | Company | anonymous, multerMiddleware, validateRequest, addCandidateNote |
+| POST | /company/v1/talent-pool/candidates/:id/tags | Company | anonymous, multerMiddleware, validateRequest, addCandidateTags |
+| DELETE | /company/v1/talent-pool/candidates/:id/tags/:tag | Company | anonymous, multerMiddleware, validateRequest, removeCandidateTag |
+| GET | /company/v1/talent-pool/search | Company | anonymous, multerMiddleware, validateRequest, listTalentPool |
+| POST | /user/v1/communication/manual-whatsapp-link | Legacy User | jsonParser, validateRequest, createManualWhatsappLink |
+| GET | /user/v1/communication/preferences | Legacy User | validateRequest, getPreferences |
+| PATCH | /user/v1/communication/preferences | Legacy User | validateRequest, getPreferences |
+| PUT | /user/v1/communication/preferences | Legacy User | validateRequest, getPreferences |
+| GET | /user/v1/company/public/:companyId | Legacy User | companyDetails |
+| GET | /user/v1/salary-insights | Legacy User | validateRequest, userInsight |
+| GET | /user/v1/salary-insights/jobs/:jobId | Legacy User | validateRequest, userJobInsight |
 
 
 

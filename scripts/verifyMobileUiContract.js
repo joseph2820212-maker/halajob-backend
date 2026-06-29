@@ -1,0 +1,378 @@
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+
+const app = read("mobile/lib/src/app.dart");
+const cards = read("mobile/lib/src/widgets/hala_cards.dart");
+const company = read(
+  "mobile/lib/src/features/company/company_dashboard_screen.dart",
+);
+const dashboard = read(
+  "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+);
+const university = read(
+  "mobile/lib/src/features/university/university_dashboard_screen.dart",
+);
+const authScreen = read("mobile/lib/src/features/auth/auth_screen.dart");
+const authService = read("mobile/lib/src/features/auth/auth_service.dart");
+const appShell = read("mobile/lib/src/app.dart");
+const buildAndroid = read("mobile/scripts/build-android.ps1");
+const mobileCi = read(".github/workflows/flutter-mobile-ci.yml");
+const plist = read("mobile/ios/Runner/Info.plist");
+
+function assertContains(source, needle, label) {
+  assert.ok(source.includes(needle), `${label} missing: ${needle}`);
+}
+
+function assertNotContains(source, needle, label) {
+  assert.ok(!source.includes(needle), `${label} should not contain: ${needle}`);
+}
+
+function extractClass(source, className) {
+  const index = source.indexOf(`class ${className}`);
+  assert.ok(index >= 0, `missing class ${className}`);
+  const nextClass = source.indexOf("\nclass ", index + 1);
+  return nextClass >= 0 ? source.slice(index, nextClass) : source.slice(index);
+}
+
+const header = extractClass(cards, "HalaNativeHeader");
+const iconButton = extractClass(cards, "HalaHeaderIconButton");
+const menuButton = extractClass(cards, "HalaHeaderMenuButton");
+const brand = extractClass(cards, "_HalaHeaderBrand");
+const bottomNav = extractClass(cards, "HalaBottomNav");
+const bottomNavItem = extractClass(cards, "_HalaBottomNavItem");
+const companyHeader = extractClass(company, "_CompanyHeader");
+const normalizedDashboard = dashboard.replace(/\r\n/g, "\n");
+
+assertContains(
+  app,
+  "_AdaptiveOrientationPolicy",
+  "mobile app orientation policy",
+);
+assertContains(
+  app,
+  "shortestSide >= _tabletShortestSide",
+  "tablet breakpoint policy",
+);
+assertContains(app, "DeviceOrientation.values", "tablet landscape policy");
+assertNotContains(
+  app,
+  "await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);",
+  "mobile app startup",
+);
+assertContains(
+  plist,
+  "UIInterfaceOrientationLandscapeLeft",
+  "iPad orientation plist",
+);
+assertContains(
+  plist,
+  "UIInterfaceOrientationLandscapeRight",
+  "iPad orientation plist",
+);
+
+assertContains(
+  cards,
+  "const double halaHeaderBrandMarkSize = 22;",
+  "section 3 header constants",
+);
+assertContains(
+  cards,
+  "const double halaHeaderActionSize = 36;",
+  "section 3 header constants",
+);
+assertContains(header, "color: halaSurface", "HalaNativeHeader");
+assertContains(
+  header,
+  "halaBorder.withValues(alpha: 0.82)",
+  "HalaNativeHeader",
+);
+assertContains(
+  iconButton,
+  "this.size = halaHeaderActionSize",
+  "HalaHeaderIconButton",
+);
+assertContains(
+  iconButton,
+  ": halaSurfaceTint",
+  "HalaHeaderIconButton",
+);
+assertContains(iconButton, "? halaNavy", "HalaHeaderIconButton");
+assertContains(
+  menuButton,
+  "this.size = halaHeaderActionSize",
+  "HalaHeaderMenuButton",
+);
+assertContains(
+  menuButton,
+  "child: Icon(icon, color: halaNavy",
+  "HalaHeaderMenuButton",
+);
+assertContains(brand, "size: halaHeaderBrandMarkSize", "header brand");
+assertContains(brand, "leftColor: halaNavy", "header brand");
+
+assertContains(
+  cards,
+  "class HalaBottomNav extends StatelessWidget",
+  "shared bottom nav",
+);
+assertContains(
+  bottomNavItem,
+  "color: active ? halaOrange : Colors.transparent",
+  "bottom nav selected indicator",
+);
+assertNotContains(
+  dashboard,
+  "class _HalaBottomNavItem",
+  "dashboard duplicate nav item",
+);
+assertNotContains(
+  company,
+  "class _CompanyBottomNavItem",
+  "company duplicate nav item",
+);
+assertNotContains(
+  university,
+  "class _UniversityBottomNavItem",
+  "university duplicate nav item",
+);
+assertContains(
+  dashboard,
+  "const _DashboardTab({",
+  "dashboard stable tab model",
+);
+assertContains(
+  dashboard,
+  "required this.keyId",
+  "dashboard stable tab model",
+);
+assertContains(
+  dashboard,
+  "key: ValueKey('bottom-nav-${tab.keyId}')",
+  "dashboard stable bottom nav keys",
+);
+assertContains(dashboard, "keyId: 'home'", "dashboard stable tab keys");
+assertContains(dashboard, "keyId: 'jobs'", "dashboard stable tab keys");
+assertContains(dashboard, "keyId: 'campus'", "dashboard stable tab keys");
+assertContains(dashboard, "keyId: 'saved'", "dashboard stable tab keys");
+assertContains(dashboard, "keyId: 'applied'", "dashboard stable tab keys");
+assertContains(dashboard, "keyId: 'more'", "dashboard stable tab keys");
+assertContains(
+  dashboard,
+  "key: const ValueKey('dashboard-header-notifications')",
+  "dashboard header",
+);
+assertContains(
+  dashboard,
+  "static const Set<String> _chromeQuickActionIds",
+  "dashboard chrome quick action filter",
+);
+assertContains(
+  dashboard,
+  "_chromeQuickActionIds.contains(_normalizedQuickActionId(action))",
+  "dashboard overview chrome quick action filter",
+);
+assertContains(
+  dashboard,
+  "final showBottomRemoteSync",
+  "dashboard sync placement",
+);
+assertContains(
+  normalizedDashboard,
+  "_buildPanel(context),\n                            if (showBottomRemoteSync)",
+  "dashboard sync placement",
+);
+assertNotContains(
+  dashboard,
+  "showInlineSyncFeedback",
+  "dashboard sync placement",
+);
+assertContains(
+  dashboard,
+  "_CampusSegment.saved",
+  "campus saved tab segment",
+);
+assertContains(
+  dashboard,
+  "'Saved campus roles'",
+  "campus saved tab title",
+);
+
+assertContains(
+  companyHeader,
+  "key: const ValueKey('company-header-notifications')",
+  "company header",
+);
+assertContains(
+  companyHeader,
+  "tooltip: loc.t('notifications')",
+  "company header",
+);
+assertContains(
+  companyHeader,
+  "key: const ValueKey('company-header-account-menu')",
+  "company header",
+);
+assertContains(
+  companyHeader,
+  "key: const ValueKey('company-account-menu-profile-settings')",
+  "company header",
+);
+assertContains(
+  companyHeader,
+  "key: const ValueKey('company-account-menu-account-settings')",
+  "company header",
+);
+assertContains(
+  companyHeader,
+  "key: const ValueKey('company-account-menu-sign-out')",
+  "company header",
+);
+assertNotContains(companyHeader, "ValueKey('company-header-profile')", "company header");
+assertNotContains(companyHeader, "ValueKey('company-header-settings')", "company header");
+assertNotContains(
+  companyHeader,
+  "ValueKey('company-account-menu-settings-item')",
+  "company header account menu",
+);
+assertNotContains(
+  companyHeader,
+  "_CompanyHeaderAction.settings",
+  "company header account menu",
+);
+assertContains(
+  company,
+  "title: HalaJobLocalizations.of(context).t('accountAndSettings')",
+  "company account settings title",
+);
+assertContains(
+  company,
+  "loc.t('accountAndSettings')",
+  "company account settings screen",
+);
+assertContains(
+  company,
+  "key: const ValueKey('company-account-sign-out-button')",
+  "company account settings sign out",
+);
+assertContains(
+  company,
+  "target.contains('company_profile')",
+  "company notification target routing",
+);
+assertContains(
+  company,
+  "target.contains('account_setting')",
+  "company notification target routing",
+);
+
+assertContains(authScreen, "resizeToAvoidBottomInset: true", "auth keyboard layout");
+assertContains(
+  authScreen,
+  "const _passcodeLength = 5;",
+  "auth OTP length",
+);
+assertContains(
+  authScreen,
+  "ValueKey('verification-code-input')",
+  "auth OTP input",
+);
+assertContains(authScreen, "Positioned.fill", "auth OTP input overlay");
+assertContains(
+  authScreen,
+  "FilteringTextInputFormatter.digitsOnly",
+  "auth OTP digit formatter",
+);
+assertContains(
+  authScreen,
+  "LengthLimitingTextInputFormatter(_passcodeLength)",
+  "auth OTP length formatter",
+);
+assertContains(
+  authScreen,
+  "'login-identifier-${_selectedRole.id}-${_usesLocalCampusAuth ? 'local' : 'remote'}'",
+  "auth login identifier field key",
+);
+assertContains(
+  authScreen,
+  "'login-password-${_selectedRole.id}-${_usesLocalCampusAuth ? 'local' : 'remote'}'",
+  "auth login password field key",
+);
+assertContains(authScreen, "style: halaInputTextStyle", "auth editable text style");
+
+assertContains(
+  authService,
+  "role == AppRole.company",
+  "mobile company auth routing",
+);
+assertContains(
+  authService,
+  "'/company/v1/auth/logout'",
+  "mobile company logout routing",
+);
+assertContains(
+  authService,
+  "'/company/v1/auth/forgot-password'",
+  "mobile company recovery routing",
+);
+assertContains(
+  authService,
+  "'/company/v1/auth/passcode-forgot-password'",
+  "mobile company recovery routing",
+);
+assertContains(
+  authService,
+  "'/company/v1/auth/resetPassword'",
+  "mobile company recovery routing",
+);
+assertContains(
+  authService,
+  "'/public/v1/client-settings'",
+  "mobile canonical public client settings route",
+);
+assertContains(
+  authService,
+  "'/public/v1/settings/client'",
+  "mobile legacy public client settings fallback",
+);
+assertContains(
+  authService,
+  "features['ai_tools_enabled'] ?? features['ai_tools']",
+  "mobile AI flag should prefer DB-backed enabled key",
+);
+assertContains(appShell, "role: session.role", "mobile role-aware logout");
+assertContains(buildAndroid, "[switch]$EnableAiTools", "mobile AI tester build flag");
+assertContains(
+  buildAndroid,
+  "--dart-define=FEATURE_AI_TOOLS_ENABLED=$($EnableAiTools.IsPresent.ToString().ToLowerInvariant())",
+  "mobile AI tester build flag",
+);
+assertContains(buildAndroid, "aiToolsEnabled = $AiToolsEnabled", "mobile AI APK metadata");
+assertContains(
+  mobileCi,
+  "--dart-define=FEATURE_AI_TOOLS_ENABLED=true --dart-define=HALA_APP_BUILD_MODE=ci-tester",
+  "mobile CI tester AI build flag",
+);
+
+const sourceFiles = [
+  "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+  "mobile/lib/src/features/company/company_dashboard_screen.dart",
+  "mobile/lib/src/features/university/university_dashboard_screen.dart",
+];
+const directUiText =
+  /Text\(\s*['"](?:Settings|Profile|Notifications|Sign out|Switch account|Account settings|Save settings|Refresh|Back|Close)['"]/;
+for (const file of sourceFiles) {
+  const source = read(file);
+  assert.ok(
+    !directUiText.test(source),
+    `${file} has direct hardcoded chrome text; use HalaJobLocalizations`,
+  );
+  assertNotContains(source, "AppLocalizations", file);
+}
+
+console.log(
+  "Mobile UI contract verified for tablet orientation, Gate A cream header chrome, shared bottom nav, and localized chrome strings.",
+);

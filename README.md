@@ -42,6 +42,26 @@ Read these before handoff or new launch work:
 - `docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md`
 - `docs/one-phase-launch-scope.md`
 - `docs/launch-hardening-status.md`
+- `docs/SYRIA_LAUNCH_PRODUCT_QA.md`
+- `docs/OPERATOR_GUIDE.md`
+
+## Syria-First Product Modules
+
+The current completion plan is Syria-first and extends existing systems rather
+than creating duplicates. Module references:
+
+- `docs/CV_STUDIO.md`
+- `docs/CV_PARSING.md`
+- `docs/RESOURCE_LIBRARY.md`
+- `docs/INTERVIEW_PREP.md`
+- `docs/SAVED_SEARCHES_JOB_ALERTS.md`
+- `docs/COMMUNICATION_HUB_SYRIA.md`
+- `docs/SALARY_INSIGHTS.md`
+- `docs/CAMPUS_CAREER_CENTER.md`
+- `docs/INTERVIEW_SCHEDULING.md`
+- `docs/COMPANY_TALENT_POOL.md`
+- `docs/EMPLOYER_BRANDING.md`
+- `docs/PLATFORM_SETTINGS.md`
 
 ## Backend Setup
 
@@ -107,6 +127,7 @@ npm run test:route-validation
 npm run test:response-codes
 npm run test:model-integrity
 npm run test:mixed-fields
+npm run test:integration:syria-product
 npm --prefix web run build
 npm --prefix web test
 npm --prefix web run e2e

@@ -11,12 +11,19 @@ const JobInvitationSchema = new Schema(
     message: { type: String, default: "", trim: true },
     salary_offer: { type: String, default: "", trim: true },
     starts_at: { type: Date, default: null },
-    expires_at: { type: Date, default: null, index: true },
+    expires_at: { type: Date, default: null },
     responded_at: { type: Date, default: null },
   },
   { collection: "job_invitations", timestamps: true }
 );
 JobInvitationSchema.index({ job_id: 1, employee_id: 1 }, { unique: true });
 JobInvitationSchema.index({ company_id: 1, status: 1, createdAt: -1 });
+JobInvitationSchema.index(
+  { expires_at: 1 },
+  {
+    expireAfterSeconds: 730 * 24 * 60 * 60,
+    name: "closed_invitations_expires_at_ttl",
+  }
+);
 const JobInvitationModel = mongoose.model("job_invitations", JobInvitationSchema);
 export default JobInvitationModel;

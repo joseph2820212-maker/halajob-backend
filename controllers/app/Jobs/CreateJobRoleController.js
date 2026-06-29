@@ -3,6 +3,7 @@ import { buildCompanyOwnerQuery } from "../../../services/appAccount.service.js"
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 
 const whatIsMyRole=async(req,res,next)=>{
+ try {
    const user = req.user;
     const lan = (req.get("lan") || "en").toLowerCase();
     const company=await CompanyModel.findOne({
@@ -48,6 +49,9 @@ const whatIsMyRole=async(req,res,next)=>{
     {key:"questions",type:"array<object>",helper_url:null,required:false,max:5},
    ]
      return ReturnAppData.getData({res,data})
+ } catch (err) {
+   return next(err);
+ }
 }
 
 export default {whatIsMyRole}

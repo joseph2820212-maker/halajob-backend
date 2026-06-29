@@ -18,6 +18,10 @@ const EmailLogSchema = new Schema(
 );
 
 EmailLogSchema.index({ status: 1, createdAt: -1 });
+EmailLogSchema.index(
+  { createdAt: 1 },
+  { expireAfterSeconds: 365 * 24 * 60 * 60, name: "email_logs_created_at_ttl" }
+);
 
 const EmailLogModel = mongoose.model("email_logs", EmailLogSchema);
 export default EmailLogModel;

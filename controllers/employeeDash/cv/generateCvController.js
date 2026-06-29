@@ -119,7 +119,11 @@ export const createMyCvDownloadUrl = async (req, res, next) => {
     const publicPath = path.posix.join("cv", "generated", fileName);
     const publicDownloadToken = randomBytes(24).toString("hex");
     const publicDownloadExpiresAt = new Date(Date.now() + PUBLIC_CV_URL_TTL_MINUTES * 60 * 1000);
+    const makeDefault = Boolean(req.body?.is_default);
     await fs.promises.writeFile(filePath, pdf);
+    if (makeDefault) {
+      await EmployeeCvModel.updateMany({ employee_id: context.employee._id }, { $set: { is_default: false } });
+    }
 
     const cv = await EmployeeCvModel.create({
       employee_id: context.employee._id,
@@ -131,9 +135,12 @@ export const createMyCvDownloadUrl = async (req, res, next) => {
       font: context.font,
       sections: req.body?.sections || {},
       pdf_file: publicPath,
+      source: "builder",
+      status: "active",
+      last_exported_at: new Date(),
       public_download_token: publicDownloadToken,
       public_download_expires_at: publicDownloadExpiresAt,
-      is_default: Boolean(req.body?.is_default),
+      is_default: makeDefault,
     });
     const publicDownloadUrl = `/${cv.pdf_file}?token=${publicDownloadToken}`;
     const ownerDownloadUrl = `/employee/v1/cv/download/${cv._id}`;
@@ -214,6 +221,8 @@ export const saveMyCvSettings = async (req, res, next) => {
       },
       sections: req.body?.sections || {},
       section_order: req.body?.section_order,
+      source: "builder",
+      status: "draft",
       is_default: makeDefault,
     });
 

@@ -6,6 +6,7 @@ import multer from '../utils/multerFiles.js';
 import multerTow from '../utils/multer.js';
 import CreateCompanyController from '../controllers/app/Company/CreateCompanyController.js';
 import CompanyController from '../controllers/app/Company/CompanyController.js';
+import companiesController from "../controllers/employeeDash/employeeWithCompanies/employeeWithCompaniesController.js";
 
 
 // إعداد التخزين للملفات
@@ -15,6 +16,8 @@ const upload = multer; // تكوين Multer
 const uploadImage = multerTow; // تكوين Multer
 
 const router = express.Router();
+
+router.get("/public/:companyId", companiesController.companyDetails);
 
 // رفع ملف واحد مع البيانات
 router.post('/join-request',authUser, upload.none(), validate(seekerSchemas.companyBodySchema), CreateCompanyController.joinRequest);

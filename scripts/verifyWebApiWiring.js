@@ -1,12 +1,15 @@
-// check:web-routes — verifies every backend API endpoint the WEBSITE calls
-// actually exists in the backend route inventory (i.e. the web ↔ backend wiring).
+// check:web-routes - verifies every backend API endpoint the WEBSITE calls
+// actually exists in the backend route inventory (i.e. the web/backend wiring).
 //
 // It scans web/src for paths passed to the axios `api` client (those starting
 // with a known API version prefix), normalizes path params, and matches each
 // against docs/api/HALAJOB_ROUTE_INVENTORY.json (regenerate with
 // `npm run docs:route-report` first so the inventory is current).
 //
-// Exit non-zero if any web call has no matching backend route.
+// Direct axios calls are method-checked. Other API-looking strings stay
+// path-only so helper wrappers such as formPost(url) are still covered.
+//
+// Exit non-zero if any web call has no matching backend route/method.
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -21,75 +24,88 @@ const prefixRe = new RegExp(`^/(${API_PREFIXES.join("|")})/v1(/|$)`);
 
 // Collect all .ts/.tsx files under web/src.
 const walk = (dir) =>
-  fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
-    const full = path.join(dir, e.name);
-    if (e.isDirectory()) return walk(full);
-    return /\.(ts|tsx)$/.test(e.name) ? [full] : [];
+  fs.readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) return walk(full);
+    return /\.(ts|tsx)$/.test(entry.name) ? [full] : [];
   });
 
 // Normalize a path: drop query/trailing slash, turn ${...} and :param into ":p".
-const normalize = (p) =>
-  p
+const normalize = (value) =>
+  value
     .replace(/\?.*$/, "")
     .replace(/\/$/, "")
     .split("/")
-    .map((seg) => (seg.includes("${") || seg.startsWith(":") ? ":p" : seg))
+    .map((segment) => (segment.includes("${") || segment.startsWith(":") ? ":p" : segment))
     .join("/");
 
-// Extract candidate API paths from a file's source.
-const extractPaths = (src) => {
-  const found = new Set();
-  // string and template literals beginning with "/"
-  const re = /["'`](\/[A-Za-z0-9_./:${}-]+)["'`]/g;
-  let m;
-  while ((m = re.exec(src))) {
-    const raw = m[1];
-    if (prefixRe.test(raw)) found.add(raw);
-  }
-  return found;
+const addCall = (calls, method, raw) => {
+  if (!prefixRe.test(raw)) return;
+  calls.set(`${method} ${raw}`, { method, raw });
 };
 
-const webPaths = new Set();
+const extractCalls = (src) => {
+  const found = new Map();
+  const directRe = /\bapi\.(get|post|put|patch|delete)(?:<[^(\n]+>)?\(\s*(["'`])(\/[^"'`]+)\2/g;
+  let match;
+  while ((match = directRe.exec(src))) {
+    addCall(found, match[1].toUpperCase(), match[3]);
+  }
+
+  const literalRe = /["'`](\/[^"'`]+)["'`]/g;
+  while ((match = literalRe.exec(src))) {
+    const raw = match[1];
+    const alreadyMethodChecked = [...found.values()].some((call) => call.raw === raw);
+    if (!alreadyMethodChecked) addCall(found, "ANY", raw);
+  }
+  return found.values();
+};
+
+const webCalls = new Map();
 for (const file of walk(WEB_SRC)) {
   const src = fs.readFileSync(file, "utf8");
-  for (const p of extractPaths(src)) webPaths.add(p);
+  for (const call of extractCalls(src)) {
+    webCalls.set(`${call.method} ${call.raw}`, call);
+  }
 }
 
 const inventory = JSON.parse(fs.readFileSync(INVENTORY, "utf8"));
 const backend = inventory.records
-  .filter((r) => r.method !== "OPTIONS" && r.path && r.path !== "*")
-  .map((r) => ({ method: r.method, norm: normalize(r.path), raw: r.path }));
+  .filter((record) => record.method !== "OPTIONS" && record.path && record.path !== "*")
+  .map((record) => ({ method: record.method, norm: normalize(record.path), raw: record.path }));
 
 // Segment-aware match: same length; backend param matches anything,
 // otherwise literals must be equal (a web param never matches a backend literal).
-const segMatch = (wSegs, bSegs) => {
-  if (wSegs.length !== bSegs.length) return false;
-  for (let i = 0; i < wSegs.length; i++) {
-    const b = bSegs[i];
-    const w = wSegs[i];
-    if (b === ":p") continue;
-    if (w === ":p" || w !== b) return false;
+const segMatch = (webSegments, backendSegments) => {
+  if (webSegments.length !== backendSegments.length) return false;
+  for (let index = 0; index < webSegments.length; index += 1) {
+    const backendSegment = backendSegments[index];
+    const webSegment = webSegments[index];
+    if (backendSegment === ":p") continue;
+    if (webSegment === ":p" || webSegment !== backendSegment) return false;
   }
   return true;
 };
 
 const matched = [];
 const unmatched = [];
-for (const wp of [...webPaths].sort()) {
-  const wSegs = normalize(wp).split("/");
-  const hit = backend.find((b) => segMatch(wSegs, b.norm.split("/")));
-  if (hit) matched.push({ wp, hit });
-  else unmatched.push(wp);
+for (const call of [...webCalls.values()].sort((a, b) => `${a.method} ${a.raw}`.localeCompare(`${b.method} ${b.raw}`))) {
+  const webSegments = normalize(call.raw).split("/");
+  const hit = backend.find(
+    (route) => (call.method === "ANY" || route.method === call.method) && segMatch(webSegments, route.norm.split("/")),
+  );
+  if (hit) matched.push({ call, hit });
+  else unmatched.push(call);
 }
 
-console.log(`Web API calls discovered: ${webPaths.size}`);
-console.log(`  matched to a backend route:   ${matched.length}`);
-console.log(`  NOT matched (broken wiring):  ${unmatched.length}`);
+console.log(`Web API calls discovered: ${webCalls.size}`);
+console.log(`  matched to a backend route/method:  ${matched.length}`);
+console.log(`  NOT matched (broken wiring):        ${unmatched.length}`);
 
 if (unmatched.length) {
-  console.error("\n✗ Web calls with NO matching backend route:");
-  for (const u of unmatched) console.error(`  - ${u}`);
+  console.error("\nWeb calls with NO matching backend route/method:");
+  for (const call of unmatched) console.error(`  - ${call.method} ${call.raw}`);
   process.exit(1);
 }
 
-console.log("\n✓ Every website API call maps to an existing backend route.");
+console.log("\nEvery website API call maps to an existing backend route/method.");

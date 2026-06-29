@@ -24,13 +24,22 @@ function authHeaders(token, contextId, extra = {}) {
   };
 }
 
-async function request(baseUrl, method, pathName, { token, contextId, body, headers } = {}) {
+async function request(
+  baseUrl,
+  method,
+  pathName,
+  { token, contextId, body, headers } = {},
+) {
   const hasBody = !["GET", "HEAD"].includes(method);
   return fetch(`${baseUrl}${pathName}`, {
     method,
     headers: token
       ? authHeaders(token, contextId, headers)
-      : { Accept: "application/json", "Content-Type": "application/json", ...headers },
+      : {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          ...headers,
+        },
     ...(hasBody ? { body: JSON.stringify(body || {}) } : {}),
   });
 }
@@ -50,7 +59,7 @@ async function expectStatus(responsePromise, expected, label) {
   assert.equal(
     response.status,
     expected,
-    `${label} should return ${expected}; got ${response.status}; body=${JSON.stringify(payload)}`
+    `${label} should return ${expected}; got ${response.status}; body=${JSON.stringify(payload)}`,
   );
   return payload;
 }
@@ -61,7 +70,7 @@ async function expectRawStatus(responsePromise, expected, label) {
   assert.equal(
     response.status,
     expected,
-    `${label} should return ${expected}; got ${response.status}; body=${text}`
+    `${label} should return ${expected}; got ${response.status}; body=${text}`,
   );
   return { response, text };
 }
@@ -83,7 +92,15 @@ function userSeed({ firstName, lastName, email, roleId, phone }) {
   };
 }
 
-function jobSeed({ company, companyUser, suffix, title, countryId, isExternal = false, isCampus = true }) {
+function jobSeed({
+  company,
+  companyUser,
+  suffix,
+  title,
+  countryId,
+  isExternal = false,
+  isCampus = true,
+}) {
   return {
     job_name: `${title} ${suffix}`,
     ref: `CAMP-${title.replace(/[^A-Za-z0-9]+/g, "-").slice(0, 24)}-${suffix.slice(-10)}`,
@@ -145,6 +162,7 @@ async function main() {
     ApplicationStatusHistoryModel,
     AuditLogModel,
     CampusEventRegistrationModel,
+    CampusOpportunityModel,
     CompanyModel,
     EmployeeModel,
     RoleModel,
@@ -189,7 +207,13 @@ async function main() {
     },
   ]);
 
-  const [studentUser, nonStudentUser, universityUserA, universityUserB, companyUser] = await UserModel.create([
+  const [
+    studentUser,
+    nonStudentUser,
+    universityUserA,
+    universityUserB,
+    companyUser,
+  ] = await UserModel.create([
     userSeed({
       firstName: "Campus",
       lastName: "Student",
@@ -301,7 +325,9 @@ async function main() {
       job_types: [objectId()],
       skills: [{ title: "Communication", level: 4, years: 1 }],
       languages: [{ level: 5 }],
-      education: [{ level: "Bachelor", study: "Business", institution: universityA.name }],
+      education: [
+        { level: "Bachelor", study: "Business", institution: universityA.name },
+      ],
       cvs: [
         {
           title: "Campus CV",
@@ -334,7 +360,13 @@ async function main() {
     },
   ]);
 
-  const [studentContext, nonStudentContext, universityContextA, universityContextB] = await AccountContextModel.create([
+  const [
+    studentContext,
+    nonStudentContext,
+    universityContextA,
+    universityContextB,
+    companyContext,
+  ] = await AccountContextModel.create([
     {
       user_id: studentUser._id,
       context_key: `student:${studentEmployee._id}`,
@@ -343,7 +375,11 @@ async function main() {
       entity_model: "employees",
       display_name: "Campus student",
       status: "active",
-      permissions: ["campus.profile.manage", "campus.opportunities.apply", "campus.events.register"],
+      permissions: [
+        "campus.profile.manage",
+        "campus.opportunities.apply",
+        "campus.events.register",
+      ],
       is_default: true,
     },
     {
@@ -379,27 +415,85 @@ async function main() {
       permissions: ["campus.verifications.manage", "campus.dashboard.view"],
       is_default: true,
     },
+    {
+      user_id: companyUser._id,
+      context_key: `company_admin:${company._id}`,
+      context_type: "company_admin",
+      entity_id: company._id,
+      entity_model: "companies",
+      display_name: company.company_name,
+      status: "active",
+      permissions: ["*"],
+      is_default: true,
+    },
   ]);
 
   await Promise.all([
-    UserModel.updateOne({ _id: studentUser._id }, { $set: { default_context_id: studentContext._id } }),
-    UserModel.updateOne({ _id: nonStudentUser._id }, { $set: { default_context_id: nonStudentContext._id } }),
-    UserModel.updateOne({ _id: universityUserA._id }, { $set: { default_context_id: universityContextA._id } }),
-    UserModel.updateOne({ _id: universityUserB._id }, { $set: { default_context_id: universityContextB._id } }),
+    UserModel.updateOne(
+      { _id: studentUser._id },
+      { $set: { default_context_id: studentContext._id } },
+    ),
+    UserModel.updateOne(
+      { _id: nonStudentUser._id },
+      { $set: { default_context_id: nonStudentContext._id } },
+    ),
+    UserModel.updateOne(
+      { _id: universityUserA._id },
+      { $set: { default_context_id: universityContextA._id } },
+    ),
+    UserModel.updateOne(
+      { _id: universityUserB._id },
+      { $set: { default_context_id: universityContextB._id } },
+    ),
+    UserModel.updateOne(
+      { _id: companyUser._id },
+      { $set: { default_context_id: companyContext._id } },
+    ),
   ]);
 
   const [campusJob, campusExternalJob, nonCampusJob] = await jobsModel.create([
-    jobSeed({ company, companyUser, suffix, title: "Campus Direct Opportunity", countryId }),
-    jobSeed({ company, companyUser, suffix, title: "Campus External Opportunity", countryId, isExternal: true }),
-    jobSeed({ company, companyUser, suffix, title: "Regular Non Campus Job", countryId, isCampus: false }),
+    jobSeed({
+      company,
+      companyUser,
+      suffix,
+      title: "Campus Direct Opportunity",
+      countryId,
+    }),
+    jobSeed({
+      company,
+      companyUser,
+      suffix,
+      title: "Campus External Opportunity",
+      countryId,
+      isExternal: true,
+    }),
+    jobSeed({
+      company,
+      companyUser,
+      suffix,
+      title: "Regular Non Campus Job",
+      countryId,
+      isCampus: false,
+    }),
   ]);
 
-  const device = { brand: "CampusWorkflow", model_name: "Integration", is_device: false };
-  const [studentTokens, nonStudentTokens, universityTokensA, universityTokensB] = await Promise.all([
+  const device = {
+    brand: "CampusWorkflow",
+    model_name: "Integration",
+    is_device: false,
+  };
+  const [
+    studentTokens,
+    nonStudentTokens,
+    universityTokensA,
+    universityTokensB,
+    companyTokens,
+  ] = await Promise.all([
     generateAuthTokens(studentUser, device),
     generateAuthTokens(nonStudentUser, device),
     generateAuthTokens(universityUserA, device),
     generateAuthTokens(universityUserB, device),
+    generateAuthTokens(companyUser, device),
   ]);
 
   server = app.listen(0);
@@ -413,7 +507,7 @@ async function main() {
       contextId: nonStudentContext._id,
     }),
     403,
-    "non-student employee context should not access campus dashboard"
+    "non-student employee context should not access campus dashboard",
   );
 
   const dashboard = await expectStatus(
@@ -422,7 +516,7 @@ async function main() {
       contextId: studentContext._id,
     }),
     200,
-    "student context should access campus dashboard"
+    "student context should access campus dashboard",
   );
   assert.equal(dashboard.data.account.type, "campus");
 
@@ -441,7 +535,7 @@ async function main() {
       },
     }),
     201,
-    "student should register for a campus event"
+    "student should register for a campus event",
   );
 
   await expectStatus(
@@ -451,22 +545,31 @@ async function main() {
       body: { title: "Career Fair" },
     }),
     200,
-    "repeated event registration should be idempotent"
+    "repeated event registration should be idempotent",
   );
 
   assert.equal(
-    await CampusEventRegistrationModel.countDocuments({ user_id: studentUser._id, event_id: eventId }),
+    await CampusEventRegistrationModel.countDocuments({
+      user_id: studentUser._id,
+      event_id: eventId,
+    }),
     1,
-    "event registration should not duplicate"
+    "event registration should not duplicate",
   );
   assert.equal(
-    await AnalyticsEventModel.countDocuments({ event: "event_joined", entity_id: firstRegister.data._id }),
+    await AnalyticsEventModel.countDocuments({
+      event: "event_joined",
+      entity_id: firstRegister.data._id,
+    }),
     1,
-    "event registration analytics should only be recorded once"
+    "event registration analytics should only be recorded once",
   );
   assert.ok(
-    await AuditLogModel.findOne({ action: "campus_event_registered", entity_id: firstRegister.data._id }).lean(),
-    "event registration should be audited"
+    await AuditLogModel.findOne({
+      action: "campus_event_registered",
+      entity_id: firstRegister.data._id,
+    }).lean(),
+    "event registration should be audited",
   );
 
   await expectStatus(
@@ -475,7 +578,7 @@ async function main() {
       contextId: studentContext._id,
     }),
     200,
-    "student should cancel own event registration"
+    "student should cancel own event registration",
   );
   await expectStatus(
     request(baseUrl, "PATCH", `/user/v1/campus/events/${eventId}/cancel`, {
@@ -483,114 +586,207 @@ async function main() {
       contextId: studentContext._id,
     }),
     200,
-    "repeated event cancellation should be idempotent"
+    "repeated event cancellation should be idempotent",
   );
   assert.equal(
-    await AuditLogModel.countDocuments({ action: "campus_event_cancelled", entity_id: firstRegister.data._id }),
+    await AuditLogModel.countDocuments({
+      action: "campus_event_cancelled",
+      entity_id: firstRegister.data._id,
+    }),
     1,
-    "event cancellation should only be audited once"
+    "event cancellation should only be audited once",
   );
 
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/opportunities/${campusJob._id}/save`, {
-      token: studentTokens.accessToken,
-      contextId: studentContext._id,
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/opportunities/${campusJob._id}/save`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+      },
+    ),
     201,
-    "student should save a campus opportunity"
+    "student should save a campus opportunity",
   );
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/opportunities/${campusJob._id}/save`, {
-      token: studentTokens.accessToken,
-      contextId: studentContext._id,
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/opportunities/${campusJob._id}/save`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+      },
+    ),
     201,
-    "repeated campus save should remain idempotent"
+    "repeated campus save should remain idempotent",
   );
   let campusJobAfterSave = await jobsModel.findById(campusJob._id).lean();
-  assert.equal(await UserSavedJobModel.countDocuments({ user_id: studentUser._id, job_id: campusJob._id }), 1);
-  assert.equal(campusJobAfterSave.user_saved, 1, "campus save counter should increment once");
-  assert.equal(campusJobAfterSave.search_index.score_signals.saves, 1, "campus save signal should increment once");
-
-  await UserSavedJobModel.create({ user_id: studentUser._id, job_id: nonCampusJob._id });
-  await expectStatus(
-    request(baseUrl, "DELETE", `/user/v1/campus/opportunities/${nonCampusJob._id}/save`, {
-      token: studentTokens.accessToken,
-      contextId: studentContext._id,
+  assert.equal(
+    await UserSavedJobModel.countDocuments({
+      user_id: studentUser._id,
+      job_id: campusJob._id,
     }),
-    404,
-    "campus unsave should not mutate non-campus saved jobs"
+    1,
   );
   assert.equal(
-    await UserSavedJobModel.countDocuments({ user_id: studentUser._id, job_id: nonCampusJob._id }),
+    campusJobAfterSave.user_saved,
     1,
-    "non-campus saved job should remain untouched"
+    "campus save counter should increment once",
+  );
+  assert.equal(
+    campusJobAfterSave.search_index.score_signals.saves,
+    1,
+    "campus save signal should increment once",
+  );
+
+  await UserSavedJobModel.create({
+    user_id: studentUser._id,
+    job_id: nonCampusJob._id,
+  });
+  await expectStatus(
+    request(
+      baseUrl,
+      "DELETE",
+      `/user/v1/campus/opportunities/${nonCampusJob._id}/save`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+      },
+    ),
+    404,
+    "campus unsave should not mutate non-campus saved jobs",
+  );
+  assert.equal(
+    await UserSavedJobModel.countDocuments({
+      user_id: studentUser._id,
+      job_id: nonCampusJob._id,
+    }),
+    1,
+    "non-campus saved job should remain untouched",
   );
 
   await expectStatus(
-    request(baseUrl, "DELETE", `/user/v1/campus/opportunities/${campusJob._id}/save`, {
-      token: studentTokens.accessToken,
-      contextId: studentContext._id,
-    }),
+    request(
+      baseUrl,
+      "DELETE",
+      `/user/v1/campus/opportunities/${campusJob._id}/save`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+      },
+    ),
     201,
-    "student should unsave a campus opportunity"
+    "student should unsave a campus opportunity",
   );
   campusJobAfterSave = await jobsModel.findById(campusJob._id).lean();
-  assert.equal(campusJobAfterSave.user_saved, 0, "campus unsave counter should clamp to zero");
-  assert.equal(campusJobAfterSave.search_index.score_signals.saves, 0, "campus unsave signal should clamp to zero");
+  assert.equal(
+    campusJobAfterSave.user_saved,
+    0,
+    "campus unsave counter should clamp to zero",
+  );
+  assert.equal(
+    campusJobAfterSave.search_index.score_signals.saves,
+    0,
+    "campus unsave signal should clamp to zero",
+  );
 
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/opportunities/${campusJob._id}/apply`, {
-      token: studentTokens.accessToken,
-      contextId: studentContext._id,
-      body: { cover_letter: "I would like to apply for this campus opportunity." },
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/opportunities/${campusJob._id}/apply`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+        body: {
+          cover_letter: "I would like to apply for this campus opportunity.",
+        },
+      },
+    ),
     201,
-    "student should apply to direct campus opportunity"
+    "student should apply to direct campus opportunity",
   );
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/opportunities/${campusJob._id}/apply`, {
-      token: studentTokens.accessToken,
-      contextId: studentContext._id,
-      body: {},
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/opportunities/${campusJob._id}/apply`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+        body: {},
+      },
+    ),
     409,
-    "duplicate direct campus apply should be blocked"
+    "duplicate direct campus apply should be blocked",
   );
-  const campusApplication = await UserApplyingJobModel.findOne({ user_id: studentUser._id, job_id: campusJob._id }).lean();
+  const campusApplication = await UserApplyingJobModel.findOne({
+    user_id: studentUser._id,
+    job_id: campusJob._id,
+  }).lean();
   assert.ok(campusApplication, "direct campus application should persist");
   assert.ok(
-    await ApplicationStatusHistoryModel.findOne({ application_id: campusApplication._id }).lean(),
-    "direct campus application should create status history"
+    await ApplicationStatusHistoryModel.findOne({
+      application_id: campusApplication._id,
+    }).lean(),
+    "direct campus application should create status history",
   );
 
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/opportunities/${campusExternalJob._id}/apply-external`, {
-      token: studentTokens.accessToken,
-      contextId: studentContext._id,
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/opportunities/${campusExternalJob._id}/apply-external`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+      },
+    ),
     201,
-    "student should record external campus application"
+    "student should record external campus application",
   );
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/opportunities/${campusExternalJob._id}/apply-external`, {
-      token: studentTokens.accessToken,
-      contextId: studentContext._id,
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/opportunities/${campusExternalJob._id}/apply-external`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+      },
+    ),
     409,
-    "duplicate external campus application should be blocked"
+    "duplicate external campus application should be blocked",
   );
-  const campusExternalAfterApply = await jobsModel.findById(campusExternalJob._id).lean();
-  assert.equal(await UserOutSideApplyingJobModel.countDocuments({ user_id: studentUser._id, job_id: campusExternalJob._id }), 1);
-  assert.equal(campusExternalAfterApply.out_side_applying, 1, "campus external apply counter should increment once");
+  const campusExternalAfterApply = await jobsModel
+    .findById(campusExternalJob._id)
+    .lean();
+  assert.equal(
+    await UserOutSideApplyingJobModel.countDocuments({
+      user_id: studentUser._id,
+      job_id: campusExternalJob._id,
+    }),
+    1,
+  );
+  assert.equal(
+    campusExternalAfterApply.out_side_applying,
+    1,
+    "campus external apply counter should increment once",
+  );
   assert.equal(
     campusExternalAfterApply.search_index.score_signals.applies,
     1,
-    "campus external apply signal should increment once"
+    "campus external apply signal should increment once",
   );
   assert.ok(
-    await AnalyticsEventModel.findOne({ event: "job_applied", job_id: campusExternalJob._id }).lean(),
-    "campus external apply should record analytics"
+    await AnalyticsEventModel.findOne({
+      event: "job_applied",
+      job_id: campusExternalJob._id,
+    }).lean(),
+    "campus external apply should record analytics",
   );
 
   const verificationStart = await expectStatus(
@@ -609,79 +805,130 @@ async function main() {
       },
     }),
     202,
-    "student should start campus verification"
+    "student should start campus verification",
   );
   const verificationId = verificationStart.data.verification._id;
   assert.ok(
-    await AuditLogModel.findOne({ action: "campus_verification_started", entity_id: verificationId }).lean(),
-    "verification start should be audited"
+    await AuditLogModel.findOne({
+      action: "campus_verification_started",
+      entity_id: verificationId,
+    }).lean(),
+    "verification start should be audited",
   );
   assert.ok(
-    await AnalyticsEventModel.findOne({ event: "campus_verification_started", entity_id: verificationId }).lean(),
-    "verification start should record analytics"
+    await AnalyticsEventModel.findOne({
+      event: "campus_verification_started",
+      entity_id: verificationId,
+    }).lean(),
+    "verification start should record analytics",
   );
 
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/admin/verifications/${verificationId}/approve`, {
-      token: universityTokensB.accessToken,
-      contextId: universityContextB._id,
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/admin/verifications/${verificationId}/approve`,
+      {
+        token: universityTokensB.accessToken,
+        contextId: universityContextB._id,
+      },
+    ),
     404,
-    "other university admin should not approve this verification"
+    "other university admin should not approve this verification",
   );
 
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/admin/verifications/${verificationId}/request-info`, {
-      token: universityTokensA.accessToken,
-      contextId: universityContextA._id,
-      body: { requested_information: "Please confirm your graduation date." },
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/admin/verifications/${verificationId}/request-info`,
+      {
+        token: universityTokensA.accessToken,
+        contextId: universityContextA._id,
+        body: { requested_information: "Please confirm your graduation date." },
+      },
+    ),
     200,
-    "own university admin should request more information"
+    "own university admin should request more information",
   );
-  assert.equal((await StudentVerificationModel.findById(verificationId).lean()).status, "needs_more_information");
+  assert.equal(
+    (await StudentVerificationModel.findById(verificationId).lean()).status,
+    "needs_more_information",
+  );
   assert.ok(
-    await AuditLogModel.findOne({ action: "campus_verification_more_information_requested", entity_id: verificationId }).lean(),
-    "request-info should be audited"
+    await AuditLogModel.findOne({
+      action: "campus_verification_more_information_requested",
+      entity_id: verificationId,
+    }).lean(),
+    "request-info should be audited",
   );
 
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/student-verifications/${verificationId}/resubmit`, {
-      token: studentTokens.accessToken,
-      contextId: studentContext._id,
-      body: { note: "Graduation year confirmed." },
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/student-verifications/${verificationId}/resubmit`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+        body: { note: "Graduation year confirmed." },
+      },
+    ),
     200,
-    "student should resubmit verification"
+    "student should resubmit verification",
   );
-  assert.equal((await StudentVerificationModel.findById(verificationId).lean()).status, "pending");
+  assert.equal(
+    (await StudentVerificationModel.findById(verificationId).lean()).status,
+    "pending",
+  );
   assert.ok(
-    await AuditLogModel.findOne({ action: "campus_verification_resubmitted", entity_id: verificationId }).lean(),
-    "resubmit should be audited"
+    await AuditLogModel.findOne({
+      action: "campus_verification_resubmitted",
+      entity_id: verificationId,
+    }).lean(),
+    "resubmit should be audited",
   );
 
   await expectStatus(
-    request(baseUrl, "POST", `/user/v1/campus/admin/verifications/${verificationId}/approve`, {
-      token: universityTokensA.accessToken,
-      contextId: universityContextA._id,
-    }),
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/admin/verifications/${verificationId}/approve`,
+      {
+        token: universityTokensA.accessToken,
+        contextId: universityContextA._id,
+      },
+    ),
     200,
-    "own university admin should approve verification"
+    "own university admin should approve verification",
   );
   const [approvedVerification, updatedStudent] = await Promise.all([
     StudentVerificationModel.findById(verificationId).lean(),
     EmployeeModel.findById(studentEmployee._id).lean(),
   ]);
   assert.equal(approvedVerification.status, "verified");
-  assert.equal(updatedStudent.student_profile.student_email_verified, true, "approval should mark student email verified");
-  assert.equal(String(updatedStudent.student_profile.university_id), String(universityA._id));
-  assert.ok(
-    await AuditLogModel.findOne({ action: "campus_verification_approved", entity_id: verificationId }).lean(),
-    "approval should be audited"
+  assert.equal(
+    updatedStudent.student_profile.student_email_verified,
+    true,
+    "approval should mark student email verified",
+  );
+  assert.equal(
+    String(updatedStudent.student_profile.university_id),
+    String(universityA._id),
   );
   assert.ok(
-    await AnalyticsEventModel.findOne({ event: "campus_verification_approved", entity_id: verificationId }).lean(),
-    "approval should record analytics"
+    await AuditLogModel.findOne({
+      action: "campus_verification_approved",
+      entity_id: verificationId,
+    }).lean(),
+    "approval should be audited",
+  );
+  assert.ok(
+    await AnalyticsEventModel.findOne({
+      event: "campus_verification_approved",
+      entity_id: verificationId,
+    }).lean(),
+    "approval should record analytics",
   );
 
   const universityOverview = await expectStatus(
@@ -690,9 +937,276 @@ async function main() {
       contextId: universityContextA._id,
     }),
     200,
-    "university dashboard should load for university admin"
+    "university dashboard should load for university admin",
   );
   assert.equal(universityOverview.data.stats.verified_students, 1);
+
+  const noPartnerStudents = await expectStatus(
+    request(baseUrl, "GET", "/company/v1/campus/students", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+    }),
+    200,
+    "company campus students should require an active university partnership",
+  );
+  assert.equal(noPartnerStudents.data.length, 0);
+  assert.equal(noPartnerStudents.access.requires_active_partnership, true);
+  assert.ok(
+    await AuditLogModel.findOne({
+      company_id: company._id,
+      action: "campus_student_directory_denied",
+    }).lean(),
+    "denied campus student directory access should be audited",
+  );
+
+  await expectStatus(
+    request(baseUrl, "POST", "/company/v1/campus/partners", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+      body: {
+        university_id: universityA._id,
+        note: "integration partner request",
+      },
+    }),
+    201,
+    "company should request a campus partnership",
+  );
+  const universityWithPendingPartner = await UniversityModel.findById(
+    universityA._id,
+  ).lean();
+  const pendingPartner = universityWithPendingPartner.partners.find(
+    (partner) => String(partner.company_id) === String(company._id),
+  );
+  assert.ok(pendingPartner, "pending campus partner should persist");
+
+  await expectStatus(
+    request(
+      baseUrl,
+      "PATCH",
+      `/university/v1/partners/${pendingPartner._id}/approve`,
+      {
+        token: universityTokensA.accessToken,
+        contextId: universityContextA._id,
+        body: {
+          access_level: "talent_pool_limited",
+          university_note: "Approved for integration test",
+        },
+      },
+    ),
+    200,
+    "university admin should approve a campus partner",
+  );
+
+  const optedOutPartnerStudents = await expectStatus(
+    request(baseUrl, "GET", "/company/v1/campus/students", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+    }),
+    200,
+    "active campus partner should not see opted-out students",
+  );
+  assert.equal(optedOutPartnerStudents.data.length, 0);
+
+  const initialVisibility = await expectStatus(
+    request(baseUrl, "GET", "/user/v1/campus/talent-visibility", {
+      token: studentTokens.accessToken,
+      contextId: studentContext._id,
+    }),
+    200,
+    "student should load campus talent visibility settings",
+  );
+  assert.equal(
+    initialVisibility.data.campus_visibility.talent_pool_opt_in,
+    false,
+  );
+
+  const updatedVisibility = await expectStatus(
+    request(baseUrl, "PATCH", "/user/v1/campus/talent-visibility", {
+      token: studentTokens.accessToken,
+      contextId: studentContext._id,
+      body: {
+        talent_pool_opt_in: true,
+        visible_to_partner_companies: true,
+        visible_fields: {
+          projects: true,
+          gpa: false,
+          cv: false,
+          contact: false,
+        },
+      },
+    }),
+    200,
+    "student should opt into partner campus talent visibility",
+  );
+  assert.equal(
+    updatedVisibility.data.campus_visibility.visible_to_partner_companies,
+    true,
+  );
+
+  const partnerStudents = await expectStatus(
+    request(baseUrl, "GET", "/company/v1/campus/students", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+    }),
+    200,
+    "company campus students should return opted-in verified students from active partner universities",
+  );
+  assert.equal(partnerStudents.data.length, 1);
+  assert.equal(
+    partnerStudents.data[0].student_profile.student_email_verified,
+    true,
+  );
+  assert.equal(
+    partnerStudents.data[0].student_profile.university,
+    universityA.name,
+  );
+  assert.equal(partnerStudents.data[0].privacy.contact_redacted, true);
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(
+      partnerStudents.data[0].user_id || {},
+      "email",
+    ),
+    false,
+  );
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(
+      partnerStudents.data[0].student_profile || {},
+      "student_email",
+    ),
+    false,
+  );
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(partnerStudents.data[0], "cvs"),
+    false,
+  );
+  assert.ok(
+    await AuditLogModel.findOne({
+      company_id: company._id,
+      action: "campus_student_directory_viewed",
+    }).lean(),
+    "allowed campus student directory access should be audited",
+  );
+
+  const partnerStudentDetail = await expectStatus(
+    request(
+      baseUrl,
+      "GET",
+      `/company/v1/campus/students/${studentEmployee._id}`,
+      {
+        token: companyTokens.accessToken,
+        contextId: companyContext._id,
+      },
+    ),
+    200,
+    "company should view only opted-in partner student detail",
+  );
+  assert.equal(String(partnerStudentDetail.data._id), String(studentEmployee._id));
+
+  await expectStatus(
+    request(
+      baseUrl,
+      "PATCH",
+      `/university/v1/partners/${pendingPartner._id}/suspend`,
+      {
+        token: universityTokensA.accessToken,
+        contextId: universityContextA._id,
+        body: { university_note: "Suspended for integration test" },
+      },
+    ),
+    200,
+    "university admin should suspend a campus partner",
+  );
+  const suspendedPartnerStudents = await expectStatus(
+    request(baseUrl, "GET", "/company/v1/campus/students", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+    }),
+    200,
+    "suspended campus partner should lose talent pool access",
+  );
+  assert.equal(suspendedPartnerStudents.data.length, 0);
+
+  await expectStatus(
+    request(
+      baseUrl,
+      "PATCH",
+      `/university/v1/partners/${pendingPartner._id}/approve`,
+      {
+        token: universityTokensA.accessToken,
+        contextId: universityContextA._id,
+        body: { access_level: "talent_pool_limited" },
+      },
+    ),
+    200,
+    "university admin should restore campus partner access",
+  );
+  await EmployeeModel.updateOne(
+    { _id: studentEmployee._id },
+    { $addToSet: { blocked_companies: company._id } },
+  );
+  const blockedPartnerStudents = await expectStatus(
+    request(baseUrl, "GET", "/company/v1/campus/students", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+    }),
+    200,
+    "blocked company should not see opted-in campus student",
+  );
+  assert.equal(blockedPartnerStudents.data.length, 0);
+  await EmployeeModel.updateOne(
+    { _id: studentEmployee._id },
+    { $pull: { blocked_companies: company._id } },
+  );
+
+  const companyOpportunity = await expectStatus(
+    request(baseUrl, "POST", "/company/v1/campus/opportunities", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+      body: {
+        title: "Fresh graduate rotational program",
+        description:
+          "Company-created campus request should use the campus opportunity domain.",
+        target: "fresh_graduates",
+        requested_count: 7,
+        city: "Campus",
+        required_skills: ["Communication", "Analysis"],
+      },
+    }),
+    202,
+    "company admin should create a campus opportunity request",
+  );
+  assert.equal(companyOpportunity.data.target, "fresh_graduates");
+  assert.equal(companyOpportunity.data.source, "company_request");
+  assert.equal(
+    await CampusOpportunityModel.countDocuments({
+      company_id: company._id,
+    }),
+    1,
+  );
+  assert.ok(
+    await AuditLogModel.findOne({
+      action: "company_campus_opportunity_request_created",
+      entity_id: companyOpportunity.data._id,
+    }).lean(),
+    "company campus opportunity request should be audited",
+  );
+
+  const companyOpportunityList = await expectStatus(
+    request(baseUrl, "GET", "/company/v1/campus/opportunities", {
+      token: companyTokens.accessToken,
+      contextId: companyContext._id,
+    }),
+    200,
+    "company campus opportunity list should include campus opportunity domain records",
+  );
+  assert.ok(
+    companyOpportunityList.data.some(
+      (opportunity) =>
+        String(opportunity._id) === String(companyOpportunity.data._id) &&
+        opportunity.source === "campus_opportunity",
+    ),
+    "company campus opportunity list should expose newly created campus opportunities",
+  );
 
   const opportunityRequest = await expectStatus(
     request(baseUrl, "POST", "/university/v1/opportunities", {
@@ -706,15 +1220,20 @@ async function main() {
       },
     }),
     202,
-    "university admin should create opportunity request"
+    "university admin should create opportunity request",
   );
-  assert.equal(await UniversityOpportunityRequestModel.countDocuments({ university_id: universityA._id }), 1);
+  assert.equal(
+    await UniversityOpportunityRequestModel.countDocuments({
+      university_id: universityA._id,
+    }),
+    1,
+  );
   assert.ok(
     await AuditLogModel.findOne({
       action: "university_opportunity_request_created",
       entity_id: opportunityRequest.data._id,
     }).lean(),
-    "university opportunity request should be audited"
+    "university opportunity request should be audited",
   );
 
   const { response: csvResponse, text: csvText } = await expectRawStatus(
@@ -723,14 +1242,17 @@ async function main() {
       contextId: universityContextA._id,
     }),
     200,
-    "university outcome CSV report should export"
+    "university outcome CSV report should export",
   );
   assert.match(csvResponse.headers.get("content-type") || "", /text\/csv/i);
-  assert.match(csvResponse.headers.get("content-disposition") || "", /attachment/i);
+  assert.match(
+    csvResponse.headers.get("content-disposition") || "",
+    /attachment/i,
+  );
   assert.match(csvText, /registered_students/);
 
   console.log(
-    "Campus workflow integration verified for student-only campus access, event lifecycle, opportunity save/apply, verification review, university requests, reports, counters, audit logs, and analytics."
+    "Campus workflow integration verified for student-only campus access, event lifecycle, opportunity save/apply, verification review, opt-in campus talent privacy gating, partner moderation, university requests, reports, counters, audit logs, and analytics.",
   );
 }
 
