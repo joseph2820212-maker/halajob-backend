@@ -2,9 +2,9 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: current `codex/gate-a-mobile-ui-lock` worktree after `8562da4`
+Commit tested: current `codex/gate-a-mobile-ui-lock` worktree after `a3ce4af`
 Environment: local Codex workspace
-Latest update: route-level validation is enforced for all write/update/delete routes, response-code/model/Mixed-field contracts are under CI, UI-action/source launch guards are under CI, regenerated API/OpenAPI/Postman/route artifacts reflect 3991 endpoints with zero unclassified unguarded endpoints, and the Syria product aggregate is documented as the launch-product integration gate.
+Latest update: route-level validation is enforced for all write/update/delete routes, response-code/model/Mixed-field contracts are under CI, UI-action/source launch guards are under CI, bilingual web/mobile UI payload protection is under a named gate, regenerated API/OpenAPI/Postman/route artifacts reflect 3991 endpoints with zero unclassified unguarded endpoints, and the Syria product aggregate is documented as the launch-product integration gate.
 
 ## Passed Commands
 
@@ -23,6 +23,7 @@ Latest update: route-level validation is enforced for all write/update/delete ro
 | `npm run test:mixed-fields` | Passed, 60 explicitly allowed `Schema.Types.Mixed` fields after classifying settings section bags, CV parser snapshots, CV quality details, and redacted communication payloads |
 | `npm run test:critical-launch-blockers` | Passed |
 | `npm run test:ui-actions` | Passed, 11 files and 15 route/UI pairs |
+| `npm run test:bilingual-ui-payload` | Passed, covering English/Arabic-only launch scope, web language headers, web RTL/persistence proof, mobile critical localization key parity, mobile persisted locale controls, and mobile request language headers |
 | `npm run test:integration:syria-product` | Passed, covering CV Studio, CV parsing, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy, interview scheduling, talent pool CRM, and company branding |
 | `npm run test:integration:company-branding` | Passed, including legacy `/user/v1/company/public/:companyId` safe-field regression coverage |
 | `npm run test:security-http` | Passed, including private `/uploads/files/*` static denial, generated-CV invalid/traversal rejection, and valid generated-CV attachment/no-store headers |

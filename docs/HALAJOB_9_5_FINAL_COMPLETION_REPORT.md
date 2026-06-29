@@ -2,7 +2,7 @@
 
 ## Source
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Commit: current `codex/gate-a-mobile-ui-lock` branch after `8562da4`; APK source remains `ff1c2db`
+- Commit: current `codex/gate-a-mobile-ui-lock` branch after `a3ce4af`; APK source remains `ff1c2db`
 - Date: 2026-06-29
 - Mobile version: `1.0.2+22`
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -14,7 +14,7 @@
 | Mobile UI/UX | 9.0 | Auth keeps the owner-approved cream/minimal screen, while authenticated headers now follow the rendered handout navy shell with cream title/subtitle, subtle border, orange accent state, and one account menu for non-notification actions across seeker/campus, company, and university. APK `1.0.2+22` includes a visible one-tap campus tester entry, captures compact campus home/feed proof, and verifies seeker/company text input in the emulator. Owner real-phone approval is still pending. |
 | Backend/API correctness | 9.25 | 3991 endpoints inventoried; 2526/2526 write/update/delete endpoints have validation; route verification now has zero unclassified unguarded endpoints; response-code, model-integrity, Mixed-field, auth/context, object-authorization, campus, hiring, subscription, admin, trust, AI, analytics, notification, translation, file/export, Syria-product, and public-company safe-field suites passed locally. |
 | Security/privacy/permissions | 9.1 | OTP/hardening, route guards, fine-grained admin permissions, audit redaction, private document download tests, upload rejection tests, HSTS/Helmet, and secret scan passed. Production admin audit and secret rotation remain owner-controlled. |
-| Web frontend | 9.0 | Web build passed, 4 Vitest files/9 tests passed, and `npm --prefix web run e2e` / `npm run test:web-smoke` walked home/campus/company/seeker/admin routes through a local Vite preview. |
+| Web frontend | 9.0 | Web build passed, 4 Vitest files/9 tests passed, `npm --prefix web run e2e` / `npm run test:web-smoke` walked home/campus/company/seeker/admin routes through a local Vite preview, and `npm run test:bilingual-ui-payload` now protects English/Arabic UI payload and language-header behavior across web/mobile. |
 | Docs/handover | 9.4 | Required handover package files exist, generated API/OpenAPI/Postman/database docs were refreshed, and `CODEX.md`, `CLAUDE.md`, `CONTRIBUTING.md`, payment decision, testing, deployment, and handover docs are current. |
 | Operations/deployment | 8.4 | Deployment, environment, backup/restore, health, CI, and rollback docs exist; live provider checks, production smoke, and restore proof require owner accounts. |
 | Business readiness/payments | 8.0 | Manual/admin subscriptions are implemented and tested. Online checkout/payment-provider webhooks are intentionally not claimed until the owner selects a provider and supplies merchant setup. |
@@ -58,6 +58,7 @@
 | `npm run test:model-integrity` | Passed | Model reference integrity check passed earlier in branch proof batch. |
 | `npm run test:mixed-fields` | Passed | 60 explicitly classified Mixed fields; settings bags, parser snapshots, CV quality output, and redacted communication payloads are registered. |
 | `npm run test:integration:syria-product` | Passed | CV Studio, CV parsing, resources, interview prep, saved searches, communication hub, salary insights, campus privacy, interview scheduling, talent pool CRM, and company branding. |
+| `npm run test:bilingual-ui-payload` | Passed | New gate covers English/Arabic-only scope, web language headers, web RTL/persistence proof, mobile critical localization key parity, mobile persisted locale controls, and mobile request language headers. |
 | `npm run test:integration:company-branding` | Passed | Public company profile moderation plus legacy `/user/v1/company/public/:companyId` safe-field regression. |
 | `npm run test:integration:subscriptions` | Passed | Fresh run on 2026-06-28; company billing permissions, invoice ownership, support ticket, admin assignment, and missing-plan failure verified. |
 | `npm --prefix web run build` | Passed | Fresh run on 2026-06-28; Vite built 89 modules and prerendered 6 routes. |

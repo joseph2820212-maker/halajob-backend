@@ -48,6 +48,7 @@
     "test:integration:auth-context": "node scripts/verifyAuthContextIntegration.js",
     "test:otp-contract": "node scripts/verifyOtpContract.js",
     "test:ui-actions": "node scripts/verifyUiActionContracts.js",
+    "test:bilingual-ui-payload": "node scripts/verifyBilingualUiPayloadContract.js",
     "test:integration:trust-documents": "node scripts/verifyTrustDocumentWorkflowIntegration.js",
     "test:object-authorization": "node scripts/verifyObjectAuthorizationIntegration.js",
     "test:audit-logging": "node scripts/verifyAuditLoggingIntegration.js",

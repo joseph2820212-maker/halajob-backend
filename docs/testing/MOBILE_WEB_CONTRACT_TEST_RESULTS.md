@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: current branch after `8562da4`
+Commit tested: current branch after `a3ce4af`
 
 ## Passed Coverage
 
@@ -22,11 +22,11 @@ Commit tested: current branch after `8562da4`
 | Web production build and SEO prerender | `npm --prefix web run build` |
 | Web API/auth/i18n/smoke tests | `npm --prefix web test` passed 4 test files / 9 tests, including 401 scoped logout, dynamic path encoding, i18n, and home/jobs/campus/company/seeker/admin smoke navigation |
 | UI action wiring | `npm run test:ui-actions` passed 11 source files and 15 route/UI pairs |
+| Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
 
 ## Remaining Required Tests
 
 - Real browser E2E against a deployed backend with approved seeker/company/campus/admin test accounts.
 - Fresh mobile APK flow test from the final source commit for seeker and campus student.
-- Arabic/English UI route and payload check across mobile and web.
 - File upload/download tests with production-like storage.
 - Push notification tap-routing tests on a real Android device.
