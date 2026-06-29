@@ -433,6 +433,32 @@ const webSettings = read("web/src/shared/settings.tsx");
 assert.match(webSettings, /ai_tools:\s*["']false["']/);
 assert.match(webSettings, /default_currency:\s*["']SYP["']/);
 
+const webFeatureFlags = read("web/src/shared/featureFlags.ts");
+assert.match(webFeatureFlags, /clientFeatureEnabledFromSettings/);
+[
+  "cv_studio_enabled",
+  "resource_library_enabled",
+  "interview_prep_enabled",
+  "saved_searches_enabled",
+  "salary_insights_enabled",
+  "campus_career_center_enabled",
+  "video_interviews_enabled",
+  "talent_pool_crm_enabled",
+  "employer_branding_enabled",
+].forEach((featureKey) => {
+  assert.ok(
+    webFeatureFlags.includes(featureKey),
+    `Web client settings helper must understand ${featureKey}.`,
+  );
+});
+
+const seekerWebSource = read("web/src/seeker/screens.tsx");
+const campusWebSource = read("web/src/campus/screens.tsx");
+const companyWebSource = read("web/src/company/screens.tsx");
+assert.match(seekerWebSource, /clientFeatureEnabledFromSettings/);
+assert.match(campusWebSource, /clientFeatureEnabledFromSettings/);
+assert.match(companyWebSource, /clientFeatureEnabledFromSettings/);
+
 const syriaFirstUiFiles = [
   "web/src/shared/settings.tsx",
   "web/src/company/screens.tsx",
