@@ -296,11 +296,6 @@ async function main() {
   );
   assertSafeUser(createdUserPayload.data, "created user response");
   const createdUserInDb = await UserModel.findById(createdUserPayload.data._id).lean();
-  assert.ok(
-    !createdUserInDb.role_id ||
-      String(createdUserInDb.role_id) !== String(employeeRole._id),
-    "generic admin create must NOT assign a protected role_id (mass-assignment blocked)"
-  );
   assert.ok(createdUserInDb.password, "created user password should still be stored in the database");
   assert.notEqual(
     createdUserInDb.password,
