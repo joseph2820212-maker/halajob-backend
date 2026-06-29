@@ -364,6 +364,27 @@
       }
     },
     {
+      "label": "mobile company talent pool CRM placement",
+      "route": {
+        "path": "mobile/lib/src/features/company/company_dashboard_service.dart",
+        "mustContain": [
+          "/company/v1/talent-pool",
+          "/company/v1/talent-pool/candidates/${Uri.encodeComponent(id)}/notes",
+          "/company/v1/talent-pool/candidates/${Uri.encodeComponent(id)}/invite-to-job",
+          "/company/v1/talent-pool/candidates/${Uri.encodeComponent(id)}/do-not-contact"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+        "mustContain": [
+          "company-talent-add-note-button",
+          "company-talent-add-tags-button",
+          "company-talent-invite-button",
+          "company-talent-do-not-contact-button"
+        ]
+      }
+    },
+    {
       "label": "web company salary guidance placement",
       "route": {
         "path": "web/src/shared/api.ts",
