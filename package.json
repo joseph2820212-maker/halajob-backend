@@ -101,7 +101,8 @@
     "test:launch-gate:web": "npm --prefix web ci --ignore-scripts && npm --prefix web run build && npm --prefix web test && npm --prefix web run e2e",
     "test:launch-gate:mobile": "cd mobile && flutter pub get && flutter analyze && flutter test",
     "test:launch-gate:ui-contracts": "npm run check:web-routes && npm run test:ui-actions && npm run test:mobile-routes && npm run test:mobile-ui-contract && npm run test:bilingual-ui-payload",
-    "test:launch-gate": "npm run test:launch-gate:backend && npm run test:launch-gate:web && npm run test:launch-gate:ui-contracts"
+    "test:launch-gate": "npm run test:launch-gate:backend && npm run test:launch-gate:web && npm run test:launch-gate:ui-contracts",
+    "check:permissions": "node scripts/verifyPermissionCatalog.js"
   },
   "keywords": [],
   "author": "",

@@ -74,6 +74,9 @@ jobs:
       - name: Backend route validation contract
         run: npm run test:route-validation
 
+      - name: Backend permission catalog guard
+        run: npm run check:permissions
+
       - name: Critical launch blocker guard
         run: npm run test:critical-launch-blockers
 
