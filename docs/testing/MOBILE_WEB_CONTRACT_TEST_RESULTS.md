@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: source contracts through `c18d9a9`; APK build from `7c2365b`
+Commit tested: source contracts through `fab3b09`; APK build from `7c2365b`
 
 ## Passed Coverage
 
@@ -23,7 +23,8 @@ Commit tested: source contracts through `c18d9a9`; APK build from `7c2365b`
 | Web Settings fixed-choice controls | `npm --prefix web test -- settings` passed 1 file / 3 tests, proving no `<select>` for fixed choices and checkbox/radio serialization compatibility |
 | Web job-alert filter contract | `npm --prefix web test -- jobAlerts` passed 1 file / 2 tests after the shared saved-search filter type update |
 | Web CV Studio hierarchy | `npm --prefix web test -- seeker` passed 1 file / 2 tests, proving current-CV-first hierarchy, parser-disabled honesty, no dropdowns, and radio visibility payloads |
-| Full web test suite | `npm --prefix web test` passed 12 files / 42 tests |
+| Web admin company queue | `npm --prefix web test -- admin` passed 1 file / 2 tests, proving analytics fixed choices plus company queue detail loading and confirmation-gated approve actions |
+| Full web test suite | `npm --prefix web test` passed 12 files / 43 tests |
 | Backend saved-search filter contract | `npm run test:integration:saved-search-alerts` passed after adding API round-trip/run-now proof for skills, education level, salary minimum, and currency filters |
 | Mobile expanded job filters | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` and `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` passed, proving skills, education level, salary minimum, alert frequency, and saved-search persistence |
 | UI action wiring | `npm run test:ui-actions` passed 11 source files and 15 route/UI pairs |
@@ -33,7 +34,7 @@ Commit tested: source contracts through `c18d9a9`; APK build from `7c2365b`
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed, proving external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Flutter analyzer | `flutter analyze` passed from `mobile/` with no issues |
-| Current APK emulator smoke | A debug APK from `7c2365b` installed on `emulator-5554` and proved auth screen, visible Campus tester entry, Campus tester dashboard, seeker/company text-field input, password masking, and current navy/cream/orange chrome. SHA-256 `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`. Commits through `c18d9a9` do not change mobile app code, so no APK rebuild was needed for mobile app behavior. |
+| Current APK emulator smoke | A debug APK from `7c2365b` installed on `emulator-5554` and proved auth screen, visible Campus tester entry, Campus tester dashboard, seeker/company text-field input, password masking, and current navy/cream/orange chrome. SHA-256 `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`. Commits through `fab3b09` do not change mobile app code, so no APK rebuild was needed for mobile app behavior. |
 
 ## Remaining Required Tests
 

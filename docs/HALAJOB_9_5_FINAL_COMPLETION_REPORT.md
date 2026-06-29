@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed source commit: `c18d9a9`
+- Current reviewed source commit: `fab3b09`
 - Current APK build commit: `7c2365b` (docs/proof commit after `c39b191`; app code unchanged)
 - Date: 2026-06-29
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Commit | Summary |
 |---|---|
+| `fab3b09` | Admin web tests now prove company queue detail loading and confirmation-gated approve actions, including the cancelled-confirmation path. |
 | `c18d9a9` | Web CV Studio now has focused tests for current-CV-first hierarchy, parser-disabled honesty, and radio visibility choices that preserve backend payloads. |
 | `11f3988` | Integration Mongo setup now has a fast helper contract, clearer failure guidance, and launch-gate wiring before the DB-backed aggregate suites. |
 | `1dd5c20` | Mobile source contracts now explicitly guard canonical More placement for seeker/campus/company, including company More not duplicating Jobs/Applicants/Talent primary-tab cards. |
@@ -43,9 +44,10 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Command | Result | Notes |
 |---|---|---|
-| `npm --prefix web test -- seeker` | Passed | 2 CV Studio tests cover current CV hierarchy, parser-disabled copy, no dropdowns, and visibility payloads. |
-| `npm --prefix web test` | Passed | Full Vitest suite passed: 12 files / 42 tests. |
+| `npm --prefix web test -- admin` | Passed | 2 admin tests cover analytics fixed choices, company queue detail loading, and confirmation-gated approve actions. |
+| `npm --prefix web test` | Passed | Full Vitest suite passed: 12 files / 43 tests. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed. |
+| `npm --prefix web test -- seeker` | Passed | 2 CV Studio tests cover current CV hierarchy, parser-disabled copy, no dropdowns, and visibility payloads. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
 | `npm run check:syntax --silent` | Passed | Full JS syntax pass after the integration helper change. |
 | `npm run check:imports --silent` | Passed | Relative import guard passed. |
@@ -63,7 +65,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 ## APK Status
 
-A fresh debug APK was built and installed on 2026-06-29 from commit `7c2365b`, after the latest mobile app-code change in this proof set. Later commits through `c18d9a9` do not change mobile app code, so the APK remains current for mobile app behavior.
+A fresh debug APK was built and installed on 2026-06-29 from commit `7c2365b`, after the latest mobile app-code change in this proof set. Later commits through `fab3b09` do not change mobile app code, so the APK remains current for mobile app behavior.
 
 - Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-latest-codex-gate-a-mobile-ui-lock-debug.apk`
 - SHA-256: `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`
@@ -86,7 +88,7 @@ This APK is current for the app code reviewed here. Rebuild again after the next
 | Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency; backend create/update/run-now now preserves and matches skills, education, salary, and currency. |
 | Seeker/Campus More cleanup | Improved: grouped More sections and guarded against primary-flow duplication. |
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
-| Web/admin/company fixed choices | Improved with focused tests across settings, resources, admin analytics, company choices, and interview prep. |
+| Web/admin/company fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin company queue confirmations/details, company choices, and interview prep. |
 | Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, and a fast helper contract; full clean-checkout release replay remains required. |
 | Docs freshness | Improved by this report; must be refreshed again after the final commit and final APK build. |
 

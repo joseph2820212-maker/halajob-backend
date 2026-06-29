@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Current reviewed source commit: `c18d9a9` (`Guard web CV Studio hierarchy`)
+Current reviewed source commit: `fab3b09` (`Guard admin queue confirmations`)
 
 ## Current Position
 
@@ -16,6 +16,7 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 | Commit | Summary |
 |---|---|
+| `fab3b09` | Admin web tests now prove company queue detail loading and confirmation-gated approve actions, including the cancelled-confirmation path. |
 | `c18d9a9` | Web CV Studio now has focused tests for current-CV-first hierarchy, parser-disabled honesty, and radio visibility choices that preserve backend payloads. |
 | `11f3988` | Integration tests now have a fast Mongo helper contract and clearer fallback/preflight guidance for `CONNECTION_URL`, `MONGOMS_SYSTEM_BINARY`, or cached `mongodb-memory-server` binaries. |
 | `1dd5c20` | Mobile inventory and launch UI-contract guards now explicitly prevent seeker/campus More from duplicating primary flows and company More from reintroducing Jobs/Applicants/Talent dashboard cards. |
@@ -35,13 +36,14 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 ## Proof From The Latest Work
 
-Latest focused proof after `c18d9a9`:
+Latest focused proof after `fab3b09`:
 
 | Command | Result |
 |---|---|
-| `npm --prefix web test -- seeker` | Passed; 2 CV Studio tests cover current CV hierarchy, parser-disabled copy, no dropdowns, and visibility payloads. |
-| `npm --prefix web test` | Passed; 12 files / 42 tests. |
+| `npm --prefix web test -- admin` | Passed; 2 tests cover analytics fixed choices plus company queue detail and confirmation-gated approve action. |
+| `npm --prefix web test` | Passed; 12 files / 43 tests. |
 | `npm --prefix web run build` | Passed; Vite build and SEO prerender completed. |
+| `npm --prefix web test -- seeker` | Passed; 2 CV Studio tests cover current CV hierarchy, parser-disabled copy, no dropdowns, and visibility payloads. |
 | `npm run test:integration-mongo-helper --silent` | Passed; proves external Mongo URI scoping and the clear memory-server fallback error path without requiring a binary download. |
 | `npm run check:syntax --silent` | Passed |
 | `npm run check:imports --silent` | Passed |
@@ -61,7 +63,7 @@ The web Settings requirement is already covered by `web/src/shared/settings.test
 
 ## APK Status
 
-A fresh debug tester APK was built and installed on 2026-06-29 from commit `7c2365b`, after the `c39b191` saved-search contract work. This is still current for mobile app behavior after `c18d9a9` because later commits did not change mobile app code.
+A fresh debug tester APK was built and installed on 2026-06-29 from commit `7c2365b`, after the `c39b191` saved-search contract work. This is still current for mobile app behavior after `fab3b09` because later commits did not change mobile app code.
 
 - Output APK: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-latest-codex-gate-a-mobile-ui-lock-debug.apk`
 - SHA-256: `FB491C24760896BBDF0942431359F9647608458D77D082DDEF385765FA69C07A`
@@ -78,6 +80,7 @@ Rebuild again after the next app-code commit before making a new "latest APK" cl
 - Mobile Settings is a grouped settings center with drill-in panels.
 - Mobile Settings fixed choices no longer use dropdown concepts in source.
 - Web Settings booleans and small fixed choices use checkbox/radio rows and have tests.
+- Admin web company queues have tests for detail panels and confirmation-gated approve actions.
 - Mobile and web CV surfaces now emphasize current CV, library, build-from-profile, and honest parser-disabled state.
 - Web CV Studio has focused regression tests for the current CV hero, disabled parser state, and radio visibility choices.
 - Job filters now include keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency with mobile persistence plus backend API round-trip/run-now coverage.
