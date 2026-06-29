@@ -148,6 +148,24 @@ jobs:
             exit 1
           fi
 
+      - name: Guard navy header design lock (v19)
+        run: |
+          # The recurring regression was the app header rendering cream/white. The shared
+          # header (HalaNativeHeader) must stay navy via the halaHeaderBg token.
+          if ! grep -q "halaHeaderBg = halaNavy" mobile/lib/src/theme/app_theme.dart; then
+            echo "Design lock: halaHeaderBg must equal halaNavy in app_theme.dart."
+            exit 1
+          fi
+          if ! grep -q "color: halaHeaderBg" mobile/lib/src/widgets/hala_cards.dart; then
+            echo "Design lock: HalaNativeHeader must use halaHeaderBg (navy) — header reverted to cream?"
+            exit 1
+          fi
+          # No white surfaces anywhere in the mobile UI (cream/navy only).
+          if git grep -n -E 'backgroundColor:\s*Colors\.white' -- mobile/lib; then
+            echo "Design lock: white surface background found. Use the cream/navy tokens."
+            exit 1
+          fi
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
