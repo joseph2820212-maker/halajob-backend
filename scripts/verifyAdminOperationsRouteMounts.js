@@ -7,14 +7,16 @@ const endpoints = listEndpoints(app);
 const endpointByPath = new Map(endpoints.map((endpoint) => [endpoint.path, endpoint]));
 const routeSource = fs.readFileSync(new URL("../routes/index.js", import.meta.url), "utf8");
 const controllerSource = fs.readFileSync(new URL("../controllers/dash/adminOperationsController.js", import.meta.url), "utf8");
+const escapeRegex = (value = "") =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const requiredEndpoints = [
-  ["GET", "/dash/v1/audit-logs", "router.get('/audit-logs'"],
-  ["GET", "/dash/v1/operations/audit-logs", "router.get('/operations/audit-logs'"],
-  ["GET", "/dash/v1/translations", "router.get('/translations'"],
-  ["GET", "/dash/v1/translation-logs", "router.get('/translation-logs'"],
-  ["GET", "/dash/v1/notifications/logs", "router.get('/notifications/logs'"],
-  ["GET", "/dash/v1/notification-logs", "router.get('/notification-logs'"],
+  ["GET", "/dash/v1/audit-logs", "/audit-logs"],
+  ["GET", "/dash/v1/operations/audit-logs", "/operations/audit-logs"],
+  ["GET", "/dash/v1/translations", "/translations"],
+  ["GET", "/dash/v1/translation-logs", "/translation-logs"],
+  ["GET", "/dash/v1/notifications/logs", "/notifications/logs"],
+  ["GET", "/dash/v1/notification-logs", "/notification-logs"],
 ];
 
 const missingEndpoints = requiredEndpoints
@@ -26,9 +28,17 @@ assert.deepEqual(missingEndpoints, [], "Express app is missing dashboard operati
 const adminGuardIndex = routeSource.indexOf("router.use(isAdmin)");
 assert.ok(adminGuardIndex >= 0, "Dashboard routes must mount the isAdmin guard");
 
+const routeIndexFor = (method, routePath) =>
+  routeSource.search(
+    new RegExp(
+      `router\\.${method.toLowerCase()}\\(\\s*["']${escapeRegex(routePath)}["']`,
+      "m"
+    )
+  );
+
 const unguardedRoutes = requiredEndpoints
-  .filter(([, , routeNeedle]) => {
-    const routeIndex = routeSource.indexOf(routeNeedle);
+  .filter(([method, , routePath]) => {
+    const routeIndex = routeIndexFor(method, routePath);
     return routeIndex < 0 || routeIndex < adminGuardIndex;
   })
   .map(([, path]) => path);

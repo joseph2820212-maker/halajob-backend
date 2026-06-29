@@ -8,6 +8,8 @@ const endpointByPath = new Map(endpoints.map((endpoint) => [endpoint.path, endpo
 
 const readSource = (path) =>
   fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8").replace(/\r\n/g, "\n");
+const escapeRegex = (value = "") =>
+  String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const appSource = readSource("app.js");
 const trustSource = readSource("routesTrust/index.js");
 const trustAdminSource = readSource("routesTrust/admin.js");
@@ -85,17 +87,35 @@ assert.deepEqual(
   "routesTrust/admin.js is missing admin trust guards"
 );
 
+const dashAdminGuardIndex = dashSource.indexOf("router.use(isAdmin)");
+assert.ok(dashAdminGuardIndex >= 0, "routes/index.js is missing dashboard isAdmin guard");
+assert.ok(dashSource.includes("TrustAdminController"), "routes/index.js is missing TrustAdminController import/use");
+
 const requiredDashRoutes = [
-  "router.use(isAdmin)",
-  "TrustAdminController",
-  "router.get('/trust/review-queue'",
-  "router.post('/trust/jobs/:jobId/mark-safe'",
-  "router.post('/trust/jobs/:jobId/suspend'",
-  "router.post('/trust/jobs/:jobId/request-documents'",
+  ["GET", "/trust/review-queue"],
+  ["POST", "/trust/jobs/:jobId/mark-safe"],
+  ["PATCH", "/trust/jobs/:jobId/mark-safe"],
+  ["POST", "/trust/jobs/:jobId/suspend"],
+  ["PATCH", "/trust/jobs/:jobId/suspend"],
+  ["POST", "/trust/jobs/:jobId/request-documents"],
+  ["PATCH", "/trust/jobs/:jobId/request-documents"],
 ];
 
+const dashRouteIndex = (method, routePath) =>
+  dashSource.search(
+    new RegExp(
+      `router\\.${method.toLowerCase()}\\(\\s*["']${escapeRegex(routePath)}["']`,
+      "m"
+    )
+  );
+
 assert.deepEqual(
-  requiredDashRoutes.filter((snippet) => !dashSource.includes(snippet)),
+  requiredDashRoutes
+    .filter(([method, routePath]) => {
+      const routeIndex = dashRouteIndex(method, routePath);
+      return routeIndex < 0 || routeIndex < dashAdminGuardIndex;
+    })
+    .map(([method, routePath]) => `${method} ${routePath}`),
   [],
   "routes/index.js is missing dashboard trust aliases"
 );

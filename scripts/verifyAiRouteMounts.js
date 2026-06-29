@@ -48,15 +48,15 @@ const missingGuards = requiredEndpoints
 assert.deepEqual(missingGuards, [], "AI endpoints must require auth and account guards");
 
 const requiredAdminEndpoints = [
-  ["GET", "/dash/v1/ai/features", "router.get('/ai/features'"],
-  ["GET", "/dash/v1/ai/limits", "router.get('/ai/limits'"],
-  ["POST", "/dash/v1/ai/limits", "router.post('/ai/limits'"],
-  ["PATCH", "/dash/v1/ai/limits/:id", "router.patch('/ai/limits/:id'"],
-  ["DELETE", "/dash/v1/ai/limits/:id", "router.delete('/ai/limits/:id'"],
-  ["GET", "/dash/v1/ai/requests", "router.get('/ai/requests'"],
-  ["GET", "/dash/v1/ai/requests/:id", "router.get('/ai/requests/:id'"],
-  ["GET", "/dash/v1/ai/summary", "router.get('/ai/summary'"],
-  ["GET", "/dash/v1/ai/usage/summary", "router.get('/ai/usage/summary'"],
+  ["GET", "/dash/v1/ai/features", "/ai/features"],
+  ["GET", "/dash/v1/ai/limits", "/ai/limits"],
+  ["POST", "/dash/v1/ai/limits", "/ai/limits"],
+  ["PATCH", "/dash/v1/ai/limits/:id", "/ai/limits/:id"],
+  ["DELETE", "/dash/v1/ai/limits/:id", "/ai/limits/:id"],
+  ["GET", "/dash/v1/ai/requests", "/ai/requests"],
+  ["GET", "/dash/v1/ai/requests/:id", "/ai/requests/:id"],
+  ["GET", "/dash/v1/ai/summary", "/ai/summary"],
+  ["GET", "/dash/v1/ai/usage/summary", "/ai/usage/summary"],
 ];
 
 const missingAdminEndpoints = requiredAdminEndpoints
@@ -68,9 +68,17 @@ assert.deepEqual(missingAdminEndpoints, [], "Express app is missing dashboard AI
 const adminGuardIndex = dashboardRouteSource.indexOf("router.use(isAdmin)");
 assert.ok(adminGuardIndex >= 0, "Dashboard routes must mount the isAdmin guard");
 
+const dashboardRouteIndex = (method, routePath) =>
+  dashboardRouteSource.search(
+    new RegExp(
+      `router\\.${method.toLowerCase()}\\(\\s*["']${escapeRegex(routePath)}["']`,
+      "m"
+    )
+  );
+
 const unguardedAdminRoutes = requiredAdminEndpoints
-  .filter(([, , routeNeedle]) => {
-    const routeIndex = dashboardRouteSource.indexOf(routeNeedle);
+  .filter(([method, , routePath]) => {
+    const routeIndex = dashboardRouteIndex(method, routePath);
     return routeIndex < 0 || routeIndex < adminGuardIndex;
   })
   .map(([, path]) => path);

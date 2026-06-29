@@ -77,12 +77,21 @@ npm run test:integration:interview-scheduling
 npm run test:integration:talent-pool-crm
 npm run test:integration:company-branding
 npm run test:integration:syria-product
+npm run test:integration:launch-critical
 ```
 
 The aggregate `npm run test:integration:syria-product` is the launch-product
 gate for CV Studio/parsing, learning resources, interview prep, saved searches,
 communication hub, salary insights, campus privacy, interview scheduling,
 talent pool CRM, and employer branding.
+
+The aggregate `npm run test:integration:launch-critical` is the regression
+guard for auth context isolation, trust documents, object authorization, audit
+logging, file exports, upload/download security, student verification
+documents, employee CV downloads, AI disabled/enabled safety behavior,
+notifications, analytics, subscriptions, company/university membership,
+admin permissions/support/resources, translations, job mutations, hiring
+workflows, and campus workflows.
 
 ## Web Checks
 
@@ -156,9 +165,11 @@ requests into `flutter-seeker-campus`, and manual dispatch.
 
 Current CI includes backend syntax/import/secret/i18n checks, route validation,
 response-code contract, model integrity, Mixed-field register, global launch
-contract, mobile route contract, web build/tests/e2e, auth-context integration,
-security HTTP contract, Flutter analyze/tests, Android release smoke build, and
-campus tester APK artifact creation.
+contract, mobile route contract, web build/tests/e2e, launch-critical
+integration coverage, Syria product integration coverage, security HTTP
+contract, Flutter analyze/tests, and mobile palette protection. Android release
+smoke builds and campus tester APK artifacts run on manual dispatch or the
+release branch to control Actions minutes.
 
 ## Production-Only Proof
 

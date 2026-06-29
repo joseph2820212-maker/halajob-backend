@@ -12,6 +12,7 @@ npm run test:launch-gate:backend
 npm run test:launch-gate:web
 npm run test:launch-gate:ui-contracts
 npm run test:launch-gate:mobile
+npm run test:integration:launch-critical
 npm run test:integration:syria-product
 npm run test:syria-docs
 ```
@@ -23,11 +24,12 @@ requires Flutter on PATH; CI installs Flutter and runs the same `flutter pub get
 `flutter analyze`, and `flutter test` commands.
 
 The backend gate includes the critical-launch-blocker guard, OTP contract,
-response-code contract, data-retention contract, object authorization, audit
-logging, auth context isolation, company workflow integrations, admin
-permission/resource protections, employee CV download security, campus
-workflows, the Syria documentation/env handover contract, and the Syria product
-aggregate.
+response-code contract, data-retention contract, AI safety, route-mount
+contracts, auth context isolation, object authorization, audit logging, file
+export/upload/download protections, notifications, analytics, subscriptions,
+company and university membership workflows, admin permissions/support/resource
+protections, translations, job mutation and hiring workflows, campus workflows,
+the Syria documentation/env handover contract, and the Syria product aggregate.
 
 The Syria product aggregate covers:
 
@@ -64,8 +66,15 @@ npm run test:model-integrity
 npm run test:mixed-fields
 npm run test:data-retention
 npm run test:global-launch-contract
-npm run test:object-authorization
-npm run test:audit-logging
+npm run test:ai-safety
+npm run test:trust-routes
+npm run test:notification-routes
+npm run test:analytics-routes
+npm run test:translation-routes
+npm run test:admin-operations-routes
+npm run test:career-passport
+npm run test:integration:launch-critical
+npm run test:integration:syria-product
 npm run check:web-routes
 npm run test:launch-gate:web
 npm run test:launch-gate:ui-contracts

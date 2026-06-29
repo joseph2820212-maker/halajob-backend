@@ -119,22 +119,10 @@ jobs:
       - name: Web portal smoke
         run: npm --prefix web run e2e
 
-      - name: Backend integration tests (auth/context isolation)
+      - name: Backend integration tests (critical launch workflows)
         env:
           CONNECTION_URL: mongodb://localhost:27017/halajob_ci_test
-        run: npm run test:integration:auth-context
-
-      - name: Backend integration tests (critical workflows)
-        env:
-          CONNECTION_URL: mongodb://localhost:27017/halajob_ci_test
-        run: |
-          npm run test:object-authorization
-          npm run test:audit-logging
-          npm run test:integration:job-mutations
-          npm run test:integration:hiring-workflows
-          npm run test:integration:subscriptions
-          npm run test:integration:company-permissions
-          npm run test:integration:admin-resources
+        run: npm run test:integration:launch-critical
 
       - name: Backend integration tests (Syria product completion)
         env:

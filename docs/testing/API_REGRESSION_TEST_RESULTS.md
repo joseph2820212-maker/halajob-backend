@@ -2,9 +2,9 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: current `codex/gate-a-mobile-ui-lock` worktree after `a3ce4af`
+Commit tested: current `codex/gate-a-mobile-ui-lock` worktree after launch-gate coverage hardening
 Environment: local Codex workspace
-Latest update: route-level validation is enforced for all write/update/delete routes, response-code/model/Mixed-field contracts are under CI, UI-action/source launch guards are under CI, bilingual web/mobile UI payload protection is under a named gate, regenerated API/OpenAPI/Postman/route artifacts reflect 3991 endpoints with zero unclassified unguarded endpoints, and the Syria product aggregate is documented as the launch-product integration gate.
+Latest update: route-level validation is enforced for all write/update/delete routes, response-code/model/Mixed-field contracts are under CI, UI-action/source launch guards are under CI, bilingual web/mobile UI payload protection is under a named gate, regenerated API/OpenAPI/Postman/route artifacts reflect 3991 endpoints with zero unclassified unguarded endpoints, `test:integration:launch-critical` is now wired into `test:launch-gate:backend`, and the backend launch gate now includes AI/trust/notification/analytics/translation/admin-operations route contracts plus the critical and Syria product integration aggregates.
 
 ## Passed Commands
 
@@ -24,7 +24,9 @@ Latest update: route-level validation is enforced for all write/update/delete ro
 | `npm run test:critical-launch-blockers` | Passed |
 | `npm run test:ui-actions` | Passed, 11 files and 15 route/UI pairs |
 | `npm run test:bilingual-ui-payload` | Passed, covering English/Arabic-only launch scope, web language headers, web RTL/persistence proof, mobile critical localization key parity, mobile persisted locale controls, and mobile request language headers |
+| `npm run test:integration:launch-critical` | Passed, covering auth context isolation, trust documents, object authorization, audit logging, file exports, upload/download security, student verification documents, employee CV downloads, AI runtime safety, notifications, analytics, subscriptions, company/university members, admin permissions/support/resources, translations, job mutations, hiring workflows, and campus workflows |
 | `npm run test:integration:syria-product` | Passed, covering CV Studio, CV parsing, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy, interview scheduling, talent pool CRM, and company branding |
+| `npm run test:launch-gate:backend` | Passed with expanded static contracts, `test:integration:launch-critical`, and `test:integration:syria-product` wired into the command |
 | `npm run test:integration:company-branding` | Passed, including legacy `/user/v1/company/public/:companyId` safe-field regression coverage |
 | `npm run test:security-http` | Passed, including private `/uploads/files/*` static denial, generated-CV invalid/traversal rejection, and valid generated-CV attachment/no-store headers |
 | `npm run test:integration:student-verification-documents` | Passed, including upload MIME/size rejection, no mutation on rejected uploads, private student verification document storage, direct public denial, owner-only student download, university-scoped admin download, attachment/no-store/nosniff headers, and upload/download audit logs |
@@ -81,3 +83,4 @@ Latest update: route-level validation is enforced for all write/update/delete ro
 - These are local contract/regression checks, not a production live-smoke test.
 - Production live smoke still requires deployed API credentials and approved test accounts.
 - The 2026-06-28 proof batch initially exposed stale test expectations for campus verification approval status and encoded web trust URLs; those scripts were updated and rerun successfully.
+- The 2026-06-29 launch-gate hardening exposed stale single-quote assumptions in AI, trust, and admin-operations route-mount verifiers; those verifiers now check method/path declarations after `router.use(isAdmin)` across quote styles.
