@@ -39,8 +39,30 @@ npm run test:mobile-ui-contract
 
 ## Seeded Integration Checks
 
-Some integration checks use `mongodb-memory-server` locally. In CI, the Linux
-job uses a MongoDB 7 service container for the DB-backed suites.
+The seeded integration checks prefer an externally supplied MongoDB when
+`CONNECTION_URL` is set. Each script rewrites that URI to a unique disposable
+database name before connecting, so the same MongoDB server can be reused across
+the launch suites without sharing test data. When `CONNECTION_URL` is unset,
+the scripts fall back to `mongodb-memory-server`.
+
+For fresh-checkout local runs, start MongoDB 7 locally or in Docker and export a
+base URL before the aggregate gates:
+
+```bash
+docker run --rm -p 27017:27017 mongo:7
+CONNECTION_URL=mongodb://127.0.0.1:27017/halajob_local_test npm run test:integration:launch-critical
+CONNECTION_URL=mongodb://127.0.0.1:27017/halajob_local_test npm run test:integration:syria-product
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:CONNECTION_URL = "mongodb://127.0.0.1:27017/halajob_local_test"
+npm run test:integration:launch-critical
+npm run test:integration:syria-product
+```
+
+CI uses the same path with a MongoDB 7 service container.
 
 ```bash
 npm run test:integration:auth-context

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { IntegrationMongoServer as MongoMemoryServer } from "./utils/integrationMongo.js";
 
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET ||= "auth-context-integration-secret";
@@ -64,20 +64,12 @@ async function expectRefreshTokenCleared(RefreshTokenModel, token, label) {
 }
 
 async function main() {
-  // Prefer an externally provided Mongo (CI service container / local mongod)
-  // for speed and reliability; fall back to in-memory only when unset.
-  if (process.env.CONNECTION_URL) {
-    console.log(
-      "[auth-context] using external CONNECTION_URL for integration DB",
-    );
-  } else {
-    mongo = await MongoMemoryServer.create({
-      instance: {
-        dbName: `halajob-auth-context-${nowIso()}`,
-      },
-    });
-    process.env.CONNECTION_URL = mongo.getUri();
-  }
+  mongo = await MongoMemoryServer.create({
+    instance: {
+      dbName: `halajob-auth-context-${nowIso()}`,
+    },
+  });
+  process.env.CONNECTION_URL = mongo.getUri();
 
   const [{ default: app }, models, tokenService, jwtHelpers] =
     await Promise.all([

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { IntegrationMongoServer as MongoMemoryServer } from "./utils/integrationMongo.js";
 
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET ||= "cv-studio-integration-secret";

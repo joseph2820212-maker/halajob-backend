@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "fs/promises";
 import path from "path";
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { IntegrationMongoServer as MongoMemoryServer } from "./utils/integrationMongo.js";
 
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET ||= "student-verification-document-security-secret";

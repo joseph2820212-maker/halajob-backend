@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import bcryptjs from "bcryptjs";
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { IntegrationMongoServer as MongoMemoryServer } from "./utils/integrationMongo.js";
 
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET ||= "audit-logging-integration-secret";
