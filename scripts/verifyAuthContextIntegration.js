@@ -94,6 +94,7 @@ async function main() {
     CompanyModel,
     EmployeeModel,
     PlatformSettingsModel,
+    PermissionModel,
     RefreshTokenModel,
     RoleModel,
     UniversitySettingsModel,
@@ -110,7 +111,22 @@ async function main() {
   });
 
   const suffix = nowIso();
-  const [employeeRole, companyRole, dashRole] = await RoleModel.create([
+  const dashboardViewPermission = await PermissionModel.findOneAndUpdate(
+    { key: "dashboard.view" },
+    {
+      $setOnInsert: {
+        key: "dashboard.view",
+        group: "dashboard",
+        action: "view",
+        title_ar: "Dashboard view",
+        title_en: "Dashboard view",
+        status: true,
+      },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true },
+  );
+
+  const [employeeRole, companyRole, dashRole, dashboardOnlyRole] = await RoleModel.create([
     {
       log_to: "employee",
       name: `integration-employee-${suffix}`,
@@ -138,6 +154,16 @@ async function main() {
       status: true,
       is_system: true,
     },
+    {
+      log_to: "dash",
+      name: `integration-dashboard-only-${suffix}`,
+      role_number: 910003,
+      title_ar: "Dashboard only",
+      title_en: "Dashboard only",
+      permissions: [dashboardViewPermission._id],
+      status: true,
+      is_system: false,
+    },
   ]);
 
   const phoneSeed = suffix.slice(-8);
@@ -148,6 +174,7 @@ async function main() {
     otherCompanyUser,
     pendingCompanyUser,
     adminUser,
+    dashboardOnlyAdminUser,
   ] = await UserModel.create([
     {
       first_name: "Seed",
@@ -226,6 +253,19 @@ async function main() {
       phone_country: "US",
       phone_code: "+1",
       phone_national: `555${phoneSeed}06`,
+    },
+    {
+      first_name: "Seed",
+      last_name: "DashboardOnlyAdmin",
+      email: `seed.dashboard.only.${suffix}@example.com`,
+      gender: "female",
+      role_id: dashboardOnlyRole._id,
+      password: "not-used",
+      status: true,
+      phone_e164: `+1555${phoneSeed}07`,
+      phone_country: "US",
+      phone_code: "+1",
+      phone_national: `555${phoneSeed}07`,
     },
   ]);
 
@@ -443,12 +483,14 @@ async function main() {
     universityTokens,
     pendingCompanyTokens,
     adminTokens,
+    dashboardOnlyAdminTokens,
   ] = await Promise.all([
     generateAuthTokens(seekerUser, device),
     generateAuthTokens(companyUser, device),
     generateAuthTokens(universityUser, device),
     generateAuthTokens(pendingCompanyUser, device),
     generateAuthTokens(adminUser, device),
+    generateAuthTokens(dashboardOnlyAdminUser, device),
   ]);
 
   const expiredAt = Math.floor(Date.now() / 1000) - 60;
@@ -787,6 +829,28 @@ async function main() {
     adminDashboard.status,
     true,
     "admin dashboard response should be successful",
+  );
+
+  await expectStatus(
+    request(baseUrl, "GET", "/dash/v1/dashboard", {
+      token: dashboardOnlyAdminTokens.accessToken,
+    }),
+    200,
+    "dashboard-only admin should access the dashboard",
+  );
+  await expectStatus(
+    request(baseUrl, "GET", "/dash/v1/platform/settings", {
+      token: dashboardOnlyAdminTokens.accessToken,
+    }),
+    403,
+    "dashboard-only admin should not read full platform settings",
+  );
+  await expectStatus(
+    request(baseUrl, "GET", "/dash/v1/platform/settings/schema", {
+      token: dashboardOnlyAdminTokens.accessToken,
+    }),
+    403,
+    "dashboard-only admin should not read the platform settings schema",
   );
 
   const userSettingsPayload = await expectStatus(

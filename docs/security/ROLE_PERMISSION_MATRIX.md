@@ -74,6 +74,8 @@ Runtime verifier: `npm run test:integration:university-members` proves role-base
 | Permission | Current use |
 |---|---|
 | `dashboard.view` | Dashboard/statistics/project-status summaries and tracking/activity aliases. |
+| `settings.view` | Read full admin platform settings and settings schema. |
+| `settings.manage` | Update admin platform settings and launch feature flags. |
 | `dashboard.search` | Dashboard global search. |
 | `ai.view` | Admin AI feature, limit, request, and usage summary reads. |
 | `ai.manage` | Admin AI limit create/update/deactivate actions. |

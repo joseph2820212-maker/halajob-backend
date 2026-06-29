@@ -11,6 +11,8 @@ Platform settings centralize feature flags and launch controls. AI tools are opt
 - Public client route: `GET /public/v1/client-settings`.
 - Compatibility alias: `GET /public/v1/settings/client` for older mobile/web clients.
 - User/company/university settings use role-scoped permissions.
+- Full admin platform settings require `settings.view` or `settings.manage`;
+  `dashboard.view` alone can read dashboard summaries but not launch controls.
 
 Use `loadPlatformSettings()`, `getPlatformSetting()`, and
 `isFeatureEnabled()` for new launch-gated behavior. Do not copy platform

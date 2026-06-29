@@ -326,6 +326,28 @@ assert.match(userRoutes, /router\.use\(['"]\/settings['"]/);
 assert.match(companyRoutes, /router\.use\(["']\/settings["']/);
 assert.match(universityRoutes, /["']\/settings["']/);
 assert.match(adminRoutes, /["']\/platform\/settings["']/);
+const platformSettingsRouteBlock =
+  adminRoutes.match(
+    /router\.get\(\s*["']\/platform\/settings["'][\s\S]*?SettingsCenterController\.getPlatformSettings,\s*\);/,
+  )?.[0] || "";
+const platformSettingsSchemaRouteBlock =
+  adminRoutes.match(
+    /router\.get\(\s*["']\/platform\/settings\/schema["'][\s\S]*?SettingsCenterController\.getPlatformSettingsSchema,\s*\);/,
+  )?.[0] || "";
+assert.match(platformSettingsRouteBlock, /settings\.view/);
+assert.match(platformSettingsRouteBlock, /settings\.manage/);
+assert.doesNotMatch(
+  platformSettingsRouteBlock,
+  /dashboard\.view/,
+  "Dashboard-only admins must not read full platform launch settings.",
+);
+assert.match(platformSettingsSchemaRouteBlock, /settings\.view/);
+assert.match(platformSettingsSchemaRouteBlock, /settings\.manage/);
+assert.doesNotMatch(
+  platformSettingsSchemaRouteBlock,
+  /dashboard\.view/,
+  "Dashboard-only admins must not read platform settings schema.",
+);
 assert.match(publicRoutes, /["']\/client-settings["']/);
 assert.match(publicRoutes, /["']\/settings\/client["']/);
 assert.match(publicRoutes, /getClientSettings/);

@@ -176,13 +176,13 @@ router.post(
 /* ----------------------------- Platform settings ----------------------------- */
 router.get(
   "/platform/settings",
-  can(["settings.view", "settings.manage", "dashboard.view"]),
+  can(["settings.view", "settings.manage"]),
   validate(adminSchemas.platformSettingsSchema),
   SettingsCenterController.getPlatformSettings,
 );
 router.get(
   "/platform/settings/schema",
-  can(["settings.view", "settings.manage", "dashboard.view"]),
+  can(["settings.view", "settings.manage"]),
   validate(adminSchemas.platformSettingsSchema),
   SettingsCenterController.getPlatformSettingsSchema,
 );
