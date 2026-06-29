@@ -1,6 +1,6 @@
 # Testing Guide
 
-Date: 2026-06-28
+Date: 2026-06-29
 Scope: backend, web, mobile, generated docs, and launch proof commands currently
 available in the repo.
 
@@ -32,6 +32,9 @@ npm run test:analytics-routes
 npm run test:translation-routes
 npm run test:admin-operations-routes
 npm run test:career-passport
+npm run test:critical-launch-blockers
+npm run test:ui-actions
+npm run test:mobile-ui-contract
 ```
 
 ## Seeded Integration Checks
@@ -62,7 +65,24 @@ npm run test:integration:translations
 npm run test:integration:job-mutations
 npm run test:integration:hiring-workflows
 npm run test:integration:campus-workflows
+npm run test:integration:cv-studio
+npm run test:integration:cv-parsing
+npm run test:integration:learning-resources
+npm run test:integration:interview-prep
+npm run test:integration:saved-search-alerts
+npm run test:integration:communication-hub
+npm run test:integration:salary-insights
+npm run test:integration:campus-privacy
+npm run test:integration:interview-scheduling
+npm run test:integration:talent-pool-crm
+npm run test:integration:company-branding
+npm run test:integration:syria-product
 ```
+
+The aggregate `npm run test:integration:syria-product` is the launch-product
+gate for CV Studio/parsing, learning resources, interview prep, saved searches,
+communication hub, salary insights, campus privacy, interview scheduling,
+talent pool CRM, and employer branding.
 
 ## Web Checks
 

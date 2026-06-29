@@ -1,10 +1,10 @@
 # API Regression Test Results
 
-Date: 2026-06-28
+Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: `9b17a3b`
+Commit tested: `6d5dbcf` plus the current Mixed-field register sync in this worktree
 Environment: local Codex workspace
-Latest update: route-level validation is now enforced for all write/update/delete routes, response-code/model/Mixed-field contracts are under CI, web build/tests are under CI, regenerated API/OpenAPI/Postman/database/route artifacts reflect 3401 endpoints, and the 2026-06-28 security/role/admin/campus/trust proof batch passed after stale assertions were updated.
+Latest update: route-level validation is enforced for all write/update/delete routes, response-code/model/Mixed-field contracts are under CI, UI-action/source launch guards are under CI, regenerated API/OpenAPI/Postman/database/route artifacts reflect 3401 endpoints, and the Syria product aggregate is documented as the launch-product integration gate.
 
 ## Passed Commands
 
@@ -20,7 +20,10 @@ Latest update: route-level validation is now enforced for all write/update/delet
 | `npm run test:route-validation` | Passed, enforced 2149/2149 write/update/delete endpoints with route-level validators and 0 core auth/account gaps |
 | `npm run test:response-codes` | Passed |
 | `npm run test:model-integrity` | Passed |
-| `npm run test:mixed-fields` | Passed, 24 explicitly allowed `Schema.Types.Mixed` fields |
+| `npm run test:mixed-fields` | Passed, 60 explicitly allowed `Schema.Types.Mixed` fields after classifying settings section bags, CV parser snapshots, CV quality details, and redacted communication payloads |
+| `npm run test:critical-launch-blockers` | Passed |
+| `npm run test:ui-actions` | Passed, 11 files and 15 route/UI pairs |
+| `npm run test:integration:syria-product` | Passed, covering CV Studio, CV parsing, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy, interview scheduling, talent pool CRM, and company branding |
 | `npm run test:security-http` | Passed, including private `/uploads/files/*` static denial, generated-CV invalid/traversal rejection, and valid generated-CV attachment/no-store headers |
 | `npm run test:integration:student-verification-documents` | Passed, including upload MIME/size rejection, no mutation on rejected uploads, private student verification document storage, direct public denial, owner-only student download, university-scoped admin download, attachment/no-store/nosniff headers, and upload/download audit logs |
 | `npm run test:audit-logging` | Passed, including admin auth audit rows, admin creation audit rows, and central audit redaction of password/passcode/token/secret/cookie/OTP/API-key/private-key/device-code fields |
