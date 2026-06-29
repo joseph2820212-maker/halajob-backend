@@ -62,7 +62,18 @@ npm run test:integration:launch-critical
 npm run test:integration:syria-product
 ```
 
+If you cannot run Docker or a local MongoDB service, set
+`MONGOMS_SYSTEM_BINARY` to a preinstalled `mongod` binary so
+`mongodb-memory-server` does not need to download one during the test run.
+Without either `CONNECTION_URL`, `MONGOMS_SYSTEM_BINARY`, or network access to
+the MongoDB binary cache/download host, the shared integration helper now fails
+with a preflight-style message that names those choices directly.
+
 CI uses the same path with a MongoDB 7 service container.
+
+```bash
+npm run test:integration-mongo-helper
+```
 
 ```bash
 npm run test:integration:auth-context
