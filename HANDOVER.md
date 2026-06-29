@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Current reviewed source commit: `4a135c7` (`Guard campus fixed choice forms`)
+Current reviewed source commit: `839cae6` (`Guard admin workspace reachability`)
 
 ## Current Position
 
@@ -16,6 +16,7 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 | Commit | Summary |
 |---|---|
+| `839cae6` | Admin web audit and interview-prep workspaces are now reachable from the sidebar and protected by tests. |
 | `4a135c7` | Campus web signup and campus opportunity target forms now use fixed choice rows instead of dropdowns, with tests proving registration and university/company opportunity payloads plus async refresh callbacks. |
 | `a809a37` | Company web job posting now uses fixed choice rows for work mode, job type, work time, salary type, and candidate target, with create-payload regression proof. |
 | `4d87d14` | Company web support tickets now have tested create/reply flows, fixed choice rows, queue view actions, and a form-reset/refresh fix. |
@@ -39,16 +40,16 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 ## Proof From The Latest Work
 
-Latest focused proof after `4a135c7`:
+Latest focused proof after `839cae6`:
 
 | Command | Result |
 |---|---|
+| `npm --prefix web test -- admin` | Passed; 3 admin tests cover analytics choices, company queue confirmation/detail behavior, and audit/interview-prep sidebar reachability. |
 | `npm --prefix web test -- campus` | Passed; 3 campus tests cover signup gender choice rows, university opportunity target payloads, company campus target payloads, and async refresh callbacks. |
 | `npm --prefix web test -- company` | Passed; 5 company tests cover applicant actions, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
-| `npm --prefix web test` | Passed; 13 files / 48 tests. |
+| `npm --prefix web test` | Passed; 13 files / 49 tests. |
 | `npm --prefix web run build` | Passed; Vite build and SEO prerender completed. |
 | `npm run test:launch-gate:ui-contracts --silent` | Passed; web API wiring 317/317, UI actions, mobile routes/UI contract, and bilingual payload contracts all passed. |
-| `npm --prefix web test -- admin` | Passed; 2 tests cover analytics fixed choices plus company queue detail and confirmation-gated approve action. |
 | `npm --prefix web test -- seeker` | Passed; 2 CV Studio tests cover current CV hierarchy, parser-disabled copy, no dropdowns, and visibility payloads. |
 | `npm run test:integration-mongo-helper --silent` | Passed; proves external Mongo URI scoping and the clear memory-server fallback error path without requiring a binary download. |
 | `npm run check:syntax --silent` | Passed |
@@ -68,7 +69,7 @@ The web Settings requirement is already covered by `web/src/shared/settings.test
 
 ## APK Status
 
-A fresh debug tester APK was built and installed on 2026-06-29 from commit `4d87d14`. Later commits through `4a135c7` change only web code/tests and docs, so the APK remains current for mobile app behavior.
+A fresh debug tester APK was built and installed on 2026-06-29 from commit `4d87d14`. Later commits through `839cae6` change only web code/tests and docs, so the APK remains current for mobile app behavior.
 
 - Output APK: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-codex-gate-a-mobile-ui-lock-4d87d14-debug.apk`
 - SHA-256: `B065B19DD28EF8FA081B130A3BA6C9CBB2FB438C317DF755047D19BB1FDA1F08`
@@ -87,6 +88,7 @@ Rebuild again after the next app-code commit before making a new "latest APK" cl
 - Web Settings booleans and small fixed choices use checkbox/radio rows and have tests.
 - Campus web signup and campus opportunity target choices use radio rows with payload tests.
 - Admin web company queues have tests for detail panels and confirmation-gated approve actions.
+- Admin audit and interview-prep workspaces are reachable from the sidebar and covered by tests.
 - Company web support tickets and job posting now have focused tests for fixed choices, create/reply/posting payloads, and refresh behavior.
 - Mobile and web CV surfaces now emphasize current CV, library, build-from-profile, and honest parser-disabled state.
 - Web CV Studio has focused regression tests for the current CV hero, disabled parser state, and radio visibility choices.

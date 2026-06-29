@@ -3,8 +3,8 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed source commit: `4a135c7`
-- Current APK build commit: `4d87d14` (later commits through `4a135c7` change only web code/tests and docs)
+- Current reviewed source commit: `839cae6`
+- Current APK build commit: `4d87d14` (later commits through `839cae6` change only web code/tests and docs)
 - Date: 2026-06-29
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Commit | Summary |
 |---|---|
+| `839cae6` | Admin web audit and interview-prep workspaces are now reachable from the sidebar and protected by tests. |
 | `4a135c7` | Campus web signup and campus opportunity target forms now use fixed choice rows instead of dropdowns, with tests proving registration and university/company opportunity payloads plus async refresh callbacks. |
 | `a809a37` | Company web job posting now uses fixed choice rows for work mode, job type, work time, salary type, and candidate target, with create-payload regression proof. |
 | `4d87d14` | Company web support tickets now have tested create/reply flows, fixed choice rows, queue view actions, and a form-reset/refresh fix. |
@@ -47,12 +48,12 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Command | Result | Notes |
 |---|---|---|
+| `npm --prefix web test -- admin` | Passed | 3 admin tests cover analytics choices, company queue confirmation/detail behavior, and audit/interview-prep sidebar reachability. |
 | `npm --prefix web test -- campus` | Passed | 3 campus tests cover signup gender choice rows, university opportunity target payloads, company campus target payloads, and async refresh callbacks. |
 | `npm --prefix web test -- company` | Passed | 5 company tests cover applicant actions, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
-| `npm --prefix web test` | Passed | Full Vitest suite passed: 13 files / 48 tests. |
+| `npm --prefix web test` | Passed | Full Vitest suite passed: 13 files / 49 tests. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed. |
 | `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 317/317, UI actions, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed. |
-| `npm --prefix web test -- admin` | Passed | 2 admin tests cover analytics fixed choices, company queue detail loading, and confirmation-gated approve actions. |
 | `npm --prefix web test -- seeker` | Passed | 2 CV Studio tests cover current CV hierarchy, parser-disabled copy, no dropdowns, and visibility payloads. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
 | `npm run check:syntax --silent` | Passed | Full JS syntax pass after the integration helper change. |
@@ -70,7 +71,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 ## APK Status
 
-A fresh debug APK was built and installed on 2026-06-29 from commit `4d87d14`. Later commits through `4a135c7` change only web code/tests and docs, so the APK remains current for mobile app behavior.
+A fresh debug APK was built and installed on 2026-06-29 from commit `4d87d14`. Later commits through `839cae6` change only web code/tests and docs, so the APK remains current for mobile app behavior.
 
 - Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-codex-gate-a-mobile-ui-lock-4d87d14-debug.apk`
 - SHA-256: `B065B19DD28EF8FA081B130A3BA6C9CBB2FB438C317DF755047D19BB1FDA1F08`
@@ -93,7 +94,7 @@ This APK is current for the app code reviewed here. Rebuild again after the next
 | Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency; backend create/update/run-now now preserves and matches skills, education, salary, and currency. |
 | Seeker/Campus More cleanup | Improved: grouped More sections and guarded against primary-flow duplication. |
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
-| Web/admin/company/campus fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin company queue confirmations/details, company applicant/member/library/support workflows, company job posting choices, campus signup/opportunity choices, and interview prep. |
+| Web/admin/company/campus fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, campus signup/opportunity choices, and interview prep. |
 | Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, and a fast helper contract; full clean-checkout release replay remains required. |
 | Docs freshness | Improved by this report; must be refreshed again after the final commit and final APK build. |
 

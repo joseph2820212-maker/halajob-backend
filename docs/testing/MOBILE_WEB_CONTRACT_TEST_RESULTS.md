@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: source contracts through `4a135c7`; APK build from `4d87d14`
+Commit tested: source contracts through `839cae6`; APK build from `4d87d14`
 
 ## Passed Coverage
 
@@ -24,9 +24,9 @@ Commit tested: source contracts through `4a135c7`; APK build from `4d87d14`
 | Web job-alert filter contract | `npm --prefix web test -- jobAlerts` passed 1 file / 2 tests after the shared saved-search filter type update |
 | Web CV Studio hierarchy | `npm --prefix web test -- seeker` passed 1 file / 2 tests, proving current-CV-first hierarchy, parser-disabled honesty, no dropdowns, and radio visibility payloads |
 | Web campus fixed-choice forms | `npm --prefix web test -- campus` passed 1 file / 3 tests, proving no dropdowns for campus signup gender or campus opportunity target choices, plus registration and university/company opportunity payloads |
-| Web admin company queue | `npm --prefix web test -- admin` passed 1 file / 2 tests, proving analytics fixed choices plus company queue detail loading and confirmation-gated approve actions |
+| Web admin workspaces | `npm --prefix web test -- admin` passed 1 file / 3 tests, proving analytics fixed choices, company queue detail loading, confirmation-gated approve actions, and audit/interview-prep sidebar reachability |
 | Web company employer tasks | `npm --prefix web test -- company` passed 1 file / 5 tests, proving applicant actions, member/library choices, support ticket create/reply, and company job posting fixed-choice payloads |
-| Full web test suite | `npm --prefix web test` passed 13 files / 48 tests |
+| Full web test suite | `npm --prefix web test` passed 13 files / 49 tests |
 | Backend saved-search filter contract | `npm run test:integration:saved-search-alerts` passed after adding API round-trip/run-now proof for skills, education level, salary minimum, and currency filters |
 | Mobile expanded job filters | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` and `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` passed, proving skills, education level, salary minimum, alert frequency, and saved-search persistence |
 | UI action wiring | `npm run test:ui-actions` passed 11 source files and 15 route/UI pairs |
@@ -36,7 +36,7 @@ Commit tested: source contracts through `4a135c7`; APK build from `4d87d14`
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed, proving external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Flutter analyzer | `flutter analyze` passed from `mobile/` with no issues |
-| Current APK emulator smoke | A debug APK from `4d87d14` installed on `emulator-5554` after fresh uninstall/reinstall and proved app launch, visible Campus role entry, and current navy/cream/orange auth chrome. SHA-256 `B065B19DD28EF8FA081B130A3BA6C9CBB2FB438C317DF755047D19BB1FDA1F08`. Later commits through `4a135c7` change only web code/tests and docs, so no APK rebuild was needed for mobile app behavior. |
+| Current APK emulator smoke | A debug APK from `4d87d14` installed on `emulator-5554` after fresh uninstall/reinstall and proved app launch, visible Campus role entry, and current navy/cream/orange auth chrome. SHA-256 `B065B19DD28EF8FA081B130A3BA6C9CBB2FB438C317DF755047D19BB1FDA1F08`. Later commits through `839cae6` change only web code/tests and docs, so no APK rebuild was needed for mobile app behavior. |
 
 ## Remaining Required Tests
 
