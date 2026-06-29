@@ -1,70 +1,85 @@
-# Hala Job — Handover (for the next AI / developer)
+# Hala Job Current Handover
 
-Date: 2026-06-26. All work is on branch **`claude/launch-plan-ux`** (cut from the latest `flutter-seeker-campus`). Nothing was pushed to `flutter-seeker-campus` directly.
+Date: 2026-06-29
+Branch: `codex/gate-a-mobile-ui-lock`
+Current HEAD: `fb2cc30` (`Polish mobile settings choice controls`)
 
----
+## Current Position
 
-## 1. The single most important finding: why "nothing ever changes"
+This branch is the active Codex 9.5 polish branch. It is not a final 9.5/public-launch certification yet, but it is well past the older Claude handover state and the older `dc251c6` audit package.
 
-Your UI fixes were real in source but never reached the installed app. Three compounding causes:
+The strongest current areas are backend route/validation/security proof, web build/test coverage, mobile locked theme/chrome, Settings IA, CV Manager hierarchy, richer job filters, company profile/settings split, and regression guards.
 
-1. **The tester APK was hand-built and only *zipped***. `mobile/scripts/export-latest-apk-zip.ps1` does NOT run `flutter build` — it zips an already-existing local `.apk`. So testers installed an old binary.
-2. **The previous AI (Codex) could not build.** Its own note (`docs/launch-hardening-status.md`): *"flutter is not on this process PATH."* It edited Dart, committed, but never produced a new binary.
-3. **Your CI could not build the app either.** The workflow pinned **Flutter 3.35.3**, but `mobile/pubspec.yaml` requires Dart **^3.12.2** (Flutter **3.44.4**). So `flutter pub get` failed and the APK build never ran. A "palette guard" step also false-failed on the English word "green" in docs.
+The remaining 9.5 gap is mostly proof and final product polish: clean full-gate replay from a fresh checkout, owner real-device approval, production/provider smoke, production Android signing, and continued UI/IA review for any confusing or duplicated flows.
 
-**Net effect:** correct source + stale/again-uncompilable binary = the illusion that fixes do nothing. This is now fixed (see §4).
+## Latest Relevant Commits
 
-## 2. Repository reality (was very confusing)
+| Commit | Summary |
+|---|---|
+| `fb2cc30` | Mobile Settings small fixed choices now use explicit ticked choice rows, and the mobile inventory guard blocks settings dropdown regression. |
+| `c727f65` | Web interview-prep choices use fixed choice controls with tests. |
+| `dc568dd` | Web resource type/visibility/status choices use fixed choice controls with tests. |
+| `117a79e` | Admin analytics grouping uses fixed choice controls. |
+| `66c0b95` | Company member/library choices use fixed choice controls with tests. |
+| `5e4b682` | Company applicant/interview/action choices use fixed choice controls with tests. |
+| `6b2942d` | Web job alerts use canonical backend filters and tests. |
+| `89dbc89` | Web CV Studio hierarchy is polished around current CV, library, and parser honesty. |
+| `be07bc2` | Mobile CV Manager hierarchy is polished around current CV, library, and parser honesty. |
+| `c8d2d53` | Mobile/product gates were refreshed. |
+| `f0bdb99` | Company mobile chrome and More IA were aligned. |
 
-- There are **TWO disjoint git histories** (two `git init`s of the same code):
-  - **Family A** (root `ee49d96`, messy "update"/"Yjgfj" commits): `main`, `fix-critical-issues` (Codex's backend hardening), `campus-backend-mode` — a **dead parallel copy**. Codex hardened this; it can never merge into the real app.
-  - **Family B** (root `cb27656`, clean commits): `flutter-seeker-campus`, `flutter-mobile-only`, `website-implementation` — the **real product**.
-- **Trunk = `flutter-seeker-campus`**: latest (2026-06-26), only branch with all 3 layers (backend 242 files + web + mobile), a superset of every other backend, and the branch named in ChatGPT's own handout.
-- **Recommendation:** retire `main` / `fix-critical-issues` / `campus-backend-mode` (legacy). Check `flutter-mobile-only` / `website-implementation` for any unique work, then retire.
+## Proof From The Latest Work
 
-## 3. Deep-scan audit result (full detail in `REVIEW.md`)
+Latest focused proof after `fb2cc30`:
 
-Overall **6.0/10**, 125 findings, serious ones adversarially verified. Ratings:
+| Command | Result |
+|---|---|
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed |
+| `flutter analyze` from `mobile/` using `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat` | Passed, no issues |
+| `npm run test:launch-gate:ui-contracts --silent` | Passed |
+| `npm --prefix web test -- settings` | Passed, 3 tests |
+| `git diff --check` | Passed |
 
-| Area | Rating |
-|---|:--:|
-| Backend Security & Auth | 7 |
-| Backend Architecture | 5 |
-| Backend API & Validation | 5 |
-| Data Models & Integrity | 6 |
-| Backend Services | 6 |
-| Web Frontend | 6 |
-| Flutter Mobile | 7 |
-| Testing & CI/CD | 6 |
-| Docs & Hygiene | 6 |
+The web Settings requirement is already covered by `web/src/shared/settings.test.tsx`: no `<select>` is rendered for fixed choices, booleans serialize as checkboxes, and platform launch modes render as radio/ticked choices.
 
-Top verified issues: ~97% of controllers lack input validation; `city_id` references the wrong collection; `Schema.Types.Mixed` on core Job fields; no cascade-delete; non-standard HTTP codes (202/203); no real backend/web test suite; web has no 401/403 refresh interceptor; mobile has no cert pinning / token refresh; duplicate lockfiles; `uploads/` committed; `jobs/` vs `jops/` duplicate dirs.
+## APK Status
 
-## 4. What I changed (all committed on `claude/launch-plan-ux`, all verified)
+A debug tester APK was built and installed earlier on 2026-06-29 from commit `c727f65`, with `LocalCampusAuth=true` and `AI tools enabled=true`.
 
-Environment note: I installed Flutter **3.44.4** at `/opt/flutter` so every edit is compile-checked. `flutter analyze` is clean and **all 410 mobile tests pass**.
+- Output APK: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-latest-codex-gate-a-mobile-ui-lock-debug.apk`
+- SHA-256: `DA788AA7EC3A1C7257F0497286EDC98B25C8140C4AC416DABB5BB80229FE3A9E`
+- Emulator proof: installed and launched on `emulator-5554`
+- Verified: auth screen, Campus tester entry, login text-field input, and Campus dashboard.
 
-| Commit theme | What | Verified |
-|---|---|---|
-| `REVIEW.md` | Full 125-finding audit tracker | — |
-| `LAUNCH_PLAN.md` | Combined goal (handouts + audit) → 9+/10, phased | — |
-| Cream palette | `mobile/lib/src/theme/app_theme.dart`: `halaCream` F3E6D3→F8F0E2, `halaCreamDeep` E5D0B1→EBDAC2, `halaNavyBg` to match (owner: "cream a little lighter") | analyze + tests |
-| Login hero | `auth_screen.dart`: new `_AuthHero` (logo + localized welcome title + mode-aware subtitle + RTL-aware compact language switch); bilingual strings added to `hala_job_localizations.dart` | analyze + tests |
-| CI fix #1 | `flutter-mobile-ci.yml`: build + upload **fresh release APK** (`halajob-mobile-fresh-apk`) on push; trigger on `claude/**` | YAML valid |
-| CI fix #2 | Narrowed "palette guard" to green *color values* (was matching the word "green" in docs) | passes in CI |
-| CI fix #3 | **Bumped Flutter pin 3.35.3 → 3.44.4** so `pub get`/build actually run | CI run #419 |
-| Screenshot tool | `mobile/test/screenshot_capture_test.dart` renders screens to PNG locally (skips in CI) | passes |
+Because `fb2cc30` was committed after that APK build, this APK is now historical proof, not a current-HEAD binary. Rebuild from `fb2cc30` or later before handing out a "latest" APK.
 
-**Already-true in source (you were seeing the stale APK):** company/seeker/university actions already open as **native screens with a back button** (`_CompanyWorkflowPage` + `HalaNativeHeader`, 0 modal sheets, 47 `Navigator.push`); external links already open in the device browser; the auth language-switch visibility bug is already fixed (segmented control).
+## What Is Done Against The Current 9.5 Handout
 
-## 5. How the next AI should continue (do this first)
+- Locked navy/cream/orange mobile theme remains in place and guarded.
+- Mobile Settings is a grouped settings center with drill-in panels.
+- Mobile Settings fixed choices no longer use dropdown concepts in source.
+- Web Settings booleans and small fixed choices use checkbox/radio rows and have tests.
+- Mobile and web CV surfaces now emphasize current CV, library, build-from-profile, and honest parser-disabled state.
+- Job filters are broader and saved-search persistence has focused coverage.
+- Seeker/Campus More is grouped and avoids primary-tab duplication.
+- Company mobile separates profile/settings header actions and keeps sign out in account settings.
+- Company AI hiring tools are grouped and gated instead of scattered.
+- Launch UI contracts, mobile inventory, and focused web tests are green for the latest slice.
 
-1. **Get a real build to look at:** download the **`halajob-mobile-fresh-apk`** artifact from the latest green GitHub Actions run on `claude/launch-plan-ux` (CI run #419+). Install THAT — it reflects current source. Do not use the old zipped APK.
-2. **Toolchain for verifying mobile edits:** install Flutter 3.44.4, then in `mobile/`: `flutter pub get && flutter analyze && flutter test`. Keep both green. `flutter analyze` fails on info-level lints, so keep it spotless.
-3. **Watch the brittle guard:** `mobile/scripts/assert-mobile-screen-inventory.ps1` does exact-string matching (e.g. requires `HalaBrandMark(size: 74, label: 'Hala Job')`). Update it whenever you change those literals or it fails CI.
-4. **Branch/push:** all work is on `claude/launch-plan-ux`. Pushing to `flutter-seeker-campus` was blocked by guardrails in my environment — open a PR from `claude/launch-plan-ux` into `flutter-seeker-campus` to merge.
-5. **Follow `LAUNCH_PLAN.md`** phases to reach 9+/10: Phase 0 UX polish → Phase 1 backend (validation layer, async error wrapper, status codes) → Phase 2 data-model integrity → Phase 3 real tests + CI → Phase 4 services/web/i18n/hygiene. Track status in `REVIEW.md`.
+## Still Required Before Calling This 9.5
 
-## 6. Honest status
+- Rebuild a fresh APK from current HEAD and smoke it after the latest commit.
+- Run the full backend/web/mobile release gate list from a clean checkout.
+- Re-run full Flutter tests after any more mobile UI edits.
+- Complete real Android device review for seeker, campus, and company.
+- Complete production smoke with owner-approved backend URL and test accounts.
+- Confirm production secrets, SMTP, Firebase, storage, signing, backups, and provider settings.
+- Decide production Android package/signing/distribution path.
+- Keep docs updated after the final commit so APK/build proof is not stale.
 
-I delivered: the diagnosis, the audit, the plan, a verified login/cream polish, and a CI that can finally produce a fresh installable. I did **not** complete the full launch-readiness work, and I lost time waiting on CI/idle between turns. The foundation and the map are in place; the bulk of Phases 1–4 remain.
+## Recommended Next Work
+
+1. Continue the 9.5 handout by auditing any remaining mobile/company duplicated flows in runtime or widget tests.
+2. Re-run full mobile widget tests after the next mobile UI slice.
+3. Rebuild a current APK only when the owner needs another UI review binary.
+4. Do not call manual payments online payments, mock/provider-disabled AI real AI, or the CV parser ready without a real configured adapter and tests.
