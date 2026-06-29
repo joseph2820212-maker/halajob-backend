@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Current HEAD: `dce2c03` (`Expand mobile job filters`)
+Current reviewed implementation commit: `c39b191` (`Harden saved search filter contract`)
 
 ## Current Position
 
@@ -16,6 +16,7 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 | Commit | Summary |
 |---|---|
+| `c39b191` | Backend saved-search filters now preserve and match skills, education level, SYP salary minimum, and currency; integration proof covers create/update/run-now and mobile summary rendering handles list skills cleanly. |
 | `dce2c03` | Mobile job filters now include skills, education level, SYP minimum salary, canonical date/job/experience/deadline choices, and saved-alert frequency, with widget and source-inventory coverage. |
 | `fb2cc30` | Mobile Settings small fixed choices now use explicit ticked choice rows, and the mobile inventory guard blocks settings dropdown regression. |
 | `c727f65` | Web interview-prep choices use fixed choice controls with tests. |
@@ -31,12 +32,13 @@ The remaining 9.5 gap is mostly proof and final product polish: clean full-gate 
 
 ## Proof From The Latest Work
 
-Latest focused proof after `dce2c03`:
+Latest focused proof after `c39b191`:
 
 | Command | Result |
 |---|---|
+| `npm run test:integration:saved-search-alerts` | Passed; proves the backend saved-search API accepts, normalizes, stores, lists, updates, and runs richer filters including skills, education level, salary minimum, and currency. |
 | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed |
-| `flutter analyze` from `mobile/` using `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat` | Passed, no issues |
+| `flutter analyze` from `mobile/` using `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\tools\flutter\bin\flutter.bat` | Passed, no issues |
 | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` | Passed |
 | `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` | Passed |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "creates, runs, updates, and deletes saved searches through app routes"` | Passed |
@@ -57,7 +59,7 @@ A debug tester APK was built and installed earlier on 2026-06-29 from commit `c7
 - Emulator proof: installed and launched on `emulator-5554`
 - Verified: auth screen, Campus tester entry, login text-field input, and Campus dashboard.
 
-Because `dce2c03` was committed after that APK build, this APK is now historical proof, not a current-HEAD binary. Rebuild from `dce2c03` or later before handing out a "latest" APK.
+Because `c39b191` was committed after that APK build, this APK is now historical proof, not a current-HEAD binary. Rebuild from `c39b191` or later before handing out a "latest" APK.
 
 ## What Is Done Against The Current 9.5 Handout
 
@@ -66,7 +68,7 @@ Because `dce2c03` was committed after that APK build, this APK is now historical
 - Mobile Settings fixed choices no longer use dropdown concepts in source.
 - Web Settings booleans and small fixed choices use checkbox/radio rows and have tests.
 - Mobile and web CV surfaces now emphasize current CV, library, build-from-profile, and honest parser-disabled state.
-- Job filters now include keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency with persistence coverage.
+- Job filters now include keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency with mobile persistence plus backend API round-trip/run-now coverage.
 - Seeker/Campus More is grouped and avoids primary-tab duplication.
 - Company mobile separates profile/settings header actions and keeps sign out in account settings.
 - Company AI hiring tools are grouped and gated instead of scattered.
@@ -74,7 +76,7 @@ Because `dce2c03` was committed after that APK build, this APK is now historical
 
 ## Still Required Before Calling This 9.5
 
-- Rebuild a fresh APK from current HEAD and smoke it after the latest commit.
+- Rebuild a fresh APK from `c39b191` or later and smoke it after the latest commit.
 - Run the full backend/web/mobile release gate list from a clean checkout.
 - Re-run full Flutter tests after any more mobile UI edits.
 - Complete real Android device review for seeker, campus, and company.

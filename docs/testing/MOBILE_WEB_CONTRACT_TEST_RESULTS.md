@@ -2,7 +2,7 @@
 
 Date: 2026-06-29
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: current branch after `dce2c03`
+Commit tested: current branch after `c39b191`
 
 ## Passed Coverage
 
@@ -22,13 +22,14 @@ Commit tested: current branch after `dce2c03`
 | Web production build and SEO prerender | `npm --prefix web run build` |
 | Web Settings fixed-choice controls | `npm --prefix web test -- settings` passed 1 file / 3 tests, proving no `<select>` for fixed choices and checkbox/radio serialization compatibility |
 | Web job-alert filter contract | `npm --prefix web test -- jobAlerts` passed 1 file / 2 tests after the shared saved-search filter type update |
+| Backend saved-search filter contract | `npm run test:integration:saved-search-alerts` passed after adding API round-trip/run-now proof for skills, education level, salary minimum, and currency filters |
 | Mobile expanded job filters | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` and `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` passed, proving skills, education level, salary minimum, alert frequency, and saved-search persistence |
 | UI action wiring | `npm run test:ui-actions` passed 11 source files and 15 route/UI pairs |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
 | Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed web routes, UI actions, mobile routes, mobile UI contract, and bilingual payload contracts |
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows plus expanded opportunity filter groups against regression |
 | Flutter analyzer | `flutter analyze` passed from `mobile/` with no issues |
-| Historical APK emulator smoke | A debug APK from `c727f65` installed on `emulator-5554` and proved auth, username/password text entry, Campus tester entry, and Campus Tester home. This is not current-HEAD binary proof after `dce2c03`; rebuild before distribution or owner approval. |
+| Historical APK emulator smoke | A debug APK from `c727f65` installed on `emulator-5554` and proved auth, username/password text entry, Campus tester entry, and Campus Tester home. This is not current-HEAD binary proof after `c39b191`; rebuild before distribution or owner approval. |
 
 ## Remaining Required Tests
 

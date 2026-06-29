@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed source commit: `dce2c03`
+- Current reviewed source commit: `c39b191`
 - Date: 2026-06-29
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -20,6 +20,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Commit | Summary |
 |---|---|
+| `c39b191` | Backend saved-search filter contract now preserves skills, education level, salary minimum, and currency through create/update/run-now, with API integration proof and mobile list-summary compatibility. |
 | `dce2c03` | Mobile job filters now include skills, education level, SYP minimum salary, canonical date/job/experience/deadline choices, and saved-alert frequency, with widget and source-inventory coverage. |
 | `fb2cc30` | Mobile Settings fixed choices now use explicit ticked rows instead of dropdown concepts, with an inventory guard to prevent regression. |
 | `c727f65` | Web interview-prep choices use fixed choice controls with regression tests. |
@@ -38,8 +39,9 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Command | Result | Notes |
 |---|---|---|
+| `npm run test:integration:saved-search-alerts` | Passed | Proves saved-search create/list/get/update/delete, ownership isolation, richer filter normalization, run-now matching, duplicate suppression, scheduler dispatch, logs, and legacy employee alert migration. |
 | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Protects mobile screen inventory, locked chrome, More placement, company header actions, AI single-entry rules, Settings fixed-choice source, and expanded opportunity filter source. |
-| `flutter analyze` | Passed | Run from `mobile/` with `C:\Users\Admin\Documents\Codex\tools\flutter\bin\flutter.bat`; no issues found. |
+| `flutter analyze` | Passed | Run from `mobile/` with `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\tools\flutter\bin\flutter.bat`; no issues found. |
 | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` | Passed | Proves the mobile filter sheet exposes skills, salary minimum, education level, alert frequency, and the existing filter groups. |
 | `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` | Passed | Proves expanded filters persist to saved-search payloads, including skills, education level, salary minimum, currency, work mode, student/fresh-grad, verified employer, and alert frequency. |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "creates, runs, updates, and deletes saved searches through app routes"` | Passed | Proves saved-search app routes still work with filter payloads. |
@@ -51,7 +53,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 ## APK Status
 
-A fresh debug APK was built and installed earlier on 2026-06-29 from commit `c727f65`, before the latest `dce2c03` filter-source commit.
+A fresh debug APK was built and installed earlier on 2026-06-29 from commit `c727f65`, before the latest `c39b191` saved-search contract commit.
 
 - Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-latest-codex-gate-a-mobile-ui-lock-debug.apk`
 - SHA-256: `DA788AA7EC3A1C7257F0497286EDC98B25C8140C4AC416DABB5BB80229FE3A9E`
@@ -59,7 +61,7 @@ A fresh debug APK was built and installed earlier on 2026-06-29 from commit `c72
 - Emulator proof: installed and launched on `emulator-5554`
 - Verified screens: auth screen, Campus tester entry, text-field input, and Campus dashboard.
 
-This is now historical APK proof, not current-HEAD APK proof. Rebuild from `dce2c03` or later before distribution, owner visual approval, or any "latest APK" claim.
+This is now historical APK proof, not current-HEAD APK proof. Rebuild from `c39b191` or later before distribution, owner visual approval, or any "latest APK" claim.
 
 ## Current Handout Status
 
@@ -70,7 +72,7 @@ This is now historical APK proof, not current-HEAD APK proof. Rebuild from `dce2
 | Settings fixed choices | Done for mobile and web; mobile source guard and web tests prevent dropdown regression. |
 | CV Manager / CV Studio | Improved: current CV hero, library, build-from-profile, parser-disabled honesty, and visibility choice flow are in place. |
 | CV parser honesty | Done for launch: parser defaults disabled unless configured; UI does not call it ready. |
-| Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency, with persistence coverage. |
+| Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency; backend create/update/run-now now preserves and matches skills, education, salary, and currency. |
 | Seeker/Campus More cleanup | Improved: grouped More sections and no full duplicate primary Campus cards. |
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, and guarded header actions. |
 | Web/admin/company fixed choices | Improved with focused tests across settings, resources, admin analytics, company choices, and interview prep. |
