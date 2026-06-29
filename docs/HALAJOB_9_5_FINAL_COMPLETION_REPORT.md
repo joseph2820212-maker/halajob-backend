@@ -3,26 +3,31 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code commit: `c0d3232` (docs-only readiness updates may follow)
+- Current reviewed code commit: `f0bdb99`
 - Date: 2026-06-29
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: locally improved and proof-green for the focused gates below, but not a final 9.5/public-launch certification.
 
 ## Current Verdict
 
-The project is materially stronger than the earlier Gate A package, but this file must not be read as a final 9.5 completion certificate. The branch now has cleaner settings controls, honest CV parsing defaults, broader job-filter coverage, stronger Campus More placement, admin web fixed-choice controls, company AI gating tests, and web code splitting that removes the Vite large-chunk warning.
+The project is materially stronger than the earlier Gate A package, but this file must not be read as a final 9.5 completion certificate. The branch now has cleaner settings controls, honest CV parsing defaults, broader job-filter coverage, stronger seeker/campus More placement, company mobile profile/settings chrome split, admin web fixed-choice controls, company AI gating tests, and web code splitting that removes the Vite large-chunk warning.
 
-Current rating: 8.6/10 source readiness.
+Current rating: 8.7/10 source readiness.
 
-The remaining gap to 9.5 is proof and owner-controlled launch readiness: fresh APK from the current commit, full release gate replay, production smoke, production secrets/provider checks, production signing, and owner real-device approval.
+The remaining gap to 9.5 is proof and owner-controlled launch readiness: full release gate replay from a clean checkout, production smoke, production secrets/provider checks, production signing, and owner real-device approval.
 
 ## Recent Codex 9.5 Polish Commits
 
 | Commit | Summary |
 |---|---|
+| `f0bdb99` | Splits company mobile header into visible notifications/profile/settings actions, keeps sign out in account settings, and groups company More into AI tools, company files, support, account, and team/templates. |
+| `cbe4c51` | Groups seeker/campus More actions and removes duplicate primary campus tab shortcuts from More. |
+| `af7f923` | Polishes web CV visibility choices with radio/ticked rows and adds CV Studio regression coverage. |
+| `be4d8ca` | Polishes mobile CV visibility selection and related CV manager hierarchy. |
+| `0126e83` | Refreshes 9.5 readiness status without claiming final launch certification. |
 | `c0d3232` | Guards company web AI hiring tools behind the launch feature flag. |
 | `f4eac53` | Replaces admin fixed-choice dropdowns with ticked/radio rows, adds web smoke coverage, and lazy-loads heavy web role surfaces to remove the build chunk warning. |
-| `713f878` | Restores Campus More shortcuts for Campus feed, Events, Resources, Applications, Job alerts, Passport, Verification, and Account status while keeping profile/settings/notifications out of More. |
+| `713f878` | Aligns Campus More inventory with the then-current IA guard; later commits tightened More further to avoid primary-tab duplication. |
 | `5e062db` | Adds regression coverage proving expanded mobile job-alert filters persist company/category/work-mode/student/fresh-grad/verified-employer filters. |
 | `2476e3e` | Defaults CV parsing off until a real parser adapter is configured and shows honest parser-disabled UI on mobile and web. |
 | `4030114` | Replaces small web settings/support dropdowns with ticked choices and tests serialization. |
@@ -32,22 +37,35 @@ The remaining gap to 9.5 is proof and owner-controlled launch readiness: fresh A
 
 | Command | Result | Notes |
 |---|---|---|
-| `flutter test test/widget_test.dart --plain-name "campus more"` | Passed | Campus More cards and destinations now match the inventory contract. |
-| `flutter test test/widget_test.dart --plain-name "company header exposes universal account actions"` | Passed | Company mobile header keeps notifications plus account menu, not duplicate profile/settings buttons. |
+| `flutter test test/widget_test.dart --plain-name "campus more tab exposes student function cards"` | Passed | Campus More no longer duplicates primary Campus tab feed/events/resources/application cards. |
+| `flutter test test/widget_test.dart --plain-name "campus more actions open their launch destinations"` | Passed | Remaining Campus More actions open native destinations. |
+| `flutter test test/widget_test.dart --plain-name "signs into a company account and opens company dashboard"` | Passed | Company dashboard smoke path covers More without duplicated applicant workflow cards. |
+| `flutter test test/widget_test.dart --plain-name "company header exposes universal account actions"` | Passed | Company mobile header exposes separate notifications, profile, and settings actions. Profile opens company profile settings; settings opens account settings with sign out. |
+| `flutter test test/widget_test.dart --plain-name "company AI hiring tools are grouped under More when enabled"` | Passed | AI hiring tools appear once under More only when enabled and open the AI tools screen. |
+| `flutter test test/widget_test.dart --plain-name "company IA places workflows in owning tabs"` | Passed | Applicants/interviews/reviews stay in Applicants, talent/campus recruiting stay in Talent, and More keeps secondary tools. |
+| `flutter test test/widget_test.dart --plain-name "company account profile screen updates owner settings"` | Passed | Company settings path updates account owner details and keeps sign out visible. |
 | `flutter analyze` | Passed | Run with the local Flutter 3.44.4 SDK. |
-| `powershell.exe -ExecutionPolicy Bypass -File mobile/scripts/assert-mobile-screen-inventory.ps1` | Passed | Mobile screen inventory now protects the current Campus More and company header contracts. |
+| `powershell.exe -ExecutionPolicy Bypass -File mobile/scripts/assert-mobile-screen-inventory.ps1` | Passed | Mobile screen inventory now protects current More placement, company profile/settings header split, and AI single-entry rules. |
+| `flutter build apk --debug` | Passed | Built debug APK from commit `f0bdb99`; Gradle emitted only the existing file_picker Kotlin plugin migration warning. |
+| `adb -s emulator-5554 install -r build/app/outputs/flutter-apk/app-debug.apk` | Passed | Fresh APK installed on Android emulator `emulator-5554`. |
 | `npm --prefix web test` | Passed | 30 Vitest tests passed. |
 | `npm --prefix web run build` | Passed | Web role surfaces are code-split; no large-chunk warning after lazy-loading admin/campus/company/seeker screens. |
 | `npm run check:syntax` | Passed | JavaScript syntax check passed. |
-| `npm run check:web-routes` | Passed | 313/313 web API calls matched backend routes. |
+| `npm run check:web-routes` | Passed | 315/315 web API calls matched backend routes. |
 | `npm run test:launch-gate:ui-contracts` | Passed | Web routes, UI actions, mobile routes, mobile UI contract, and bilingual payload contracts passed. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
 
-No fresh APK has been built after reviewed code commit `c0d3232`.
+Fresh debug APK proof now exists for reviewed code commit `f0bdb99`.
 
-Previous APK proof for `1.0.6+27` is historical only. It was useful to prove text input, local campus tester entry, and emulator install at that earlier source point, but the mobile source changed after that proof. Do not distribute or describe that APK as current without rebuilding from the current commit and recording the new SHA, version metadata, install proof, and screenshots.
+- Built artifact: `mobile/build/app/outputs/flutter-apk/app-debug.apk`
+- Copied review artifact: `outputs/halajob-f0bdb99-debug.apk`
+- Size: 187,248,350 bytes
+- Emulator install: passed on `emulator-5554`
+- Current auth screenshot: `outputs/halajob-f0bdb99-auth.png`
+
+This is a debug/test APK, not a production-signed Android release. Production APK/AAB signing, versioning, package ID decisions, and store/distribution proof remain owner-controlled launch work.
 
 ## Web Status
 
@@ -63,8 +81,10 @@ Previous APK proof for `1.0.6+27` is historical only. It was useful to prove tex
 - Settings has been refactored into grouped drill-in panels.
 - CV parser UI is honest while parsing is disabled by default.
 - Job filters and saved-search persistence have focused regression coverage.
-- Campus More now matches the current screen inventory and avoids profile/settings/notification duplicates.
-- A fresh APK from the current commit is still required before owner visual review.
+- Seeker/Campus More is grouped and avoids profile/settings/notification duplicates; Campus primary tab shortcuts are no longer duplicated as full More cards.
+- Company header now uses separate profile and settings actions. Profile opens company profile settings; settings opens account settings where sign out is visible.
+- Company More groups AI tools, company files, support, account, and team/templates; AI hiring tools remain hidden unless enabled.
+- A fresh debug APK from the current commit has been built and installed on the emulator for owner visual review.
 
 ## Integration Test Reproducibility
 
@@ -91,6 +111,6 @@ This branch can be called 9.5 only after:
 2. DB-backed integration gates pass with external MongoDB or a documented binary path.
 3. Web build/tests/e2e pass without the chunk warning returning.
 4. Flutter analyze/test pass.
-5. A fresh APK/AAB is built from the current commit and installed/smoked.
+5. A fresh APK/AAB is built from the final review commit and installed/smoked.
 6. Owner-controlled production/provider/security blockers are either proven or explicitly accepted as launch exclusions.
 7. This report is updated with the final commit, command outputs, APK metadata, and remaining blockers.

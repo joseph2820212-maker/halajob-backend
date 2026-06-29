@@ -146,16 +146,17 @@
       "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
       "mustContain": [
         "key: const ValueKey('company-header-notifications')",
-        "key: const ValueKey('company-header-account-menu')",
-        "key: const ValueKey('company-account-menu-profile-settings')",
-        "key: const ValueKey('company-account-menu-account-settings')",
-        "key: const ValueKey('company-account-menu-sign-out')",
+        "key: const ValueKey('company-header-profile')",
+        "key: const ValueKey('company-header-settings')",
+        "key: const ValueKey('company-header-switch-account')",
         "key: const ValueKey('company-account-sign-out-button')",
         "title: HalaJobLocalizations.of(context).t('accountAndSettings')",
         "loc.t('accountAndSettings')",
         "title: 'AI hiring tools'",
         "moduleSection('AI tools', aiModules)",
-        "moduleSection('Company workspace', workspaceModules)",
+        "moduleSection('Company files', fileModules)",
+        "moduleSection('Support', supportModules)",
+        "moduleSection('Account', accountModules)",
         "moduleSection('Team and templates', teamModules)",
         "key: const ValueKey('company-job-salary-check-button')",
         "key: const ValueKey('company-job-salary-guidance-card')",
@@ -164,8 +165,10 @@
         "title: 'Campus recruiting'"
       ],
       "mustNotContain": [
-        "ValueKey('company-header-profile')",
-        "ValueKey('company-header-settings')",
+        "ValueKey('company-header-account-menu')",
+        "ValueKey('company-account-menu-profile-settings')",
+        "ValueKey('company-account-menu-account-settings')",
+        "ValueKey('company-account-menu-sign-out')",
         "ValueKey('company-account-menu-company-profile-item')",
         "ValueKey('company-account-menu-account-profile-item')",
         "ValueKey('company-account-menu-signout-item')",
@@ -180,19 +183,19 @@
           "equals": 1
         },
         {
-          "text": "key: const ValueKey('company-header-account-menu')",
+          "text": "key: const ValueKey('company-header-notifications')",
           "equals": 1
         },
         {
-          "text": "key: const ValueKey('company-account-menu-profile-settings')",
+          "text": "key: const ValueKey('company-header-profile')",
           "equals": 1
         },
         {
-          "text": "key: const ValueKey('company-account-menu-account-settings')",
+          "text": "key: const ValueKey('company-header-settings')",
           "equals": 1
         },
         {
-          "text": "key: const ValueKey('company-account-menu-sign-out')",
+          "text": "key: const ValueKey('company-header-switch-account')",
           "equals": 1
         },
         {
@@ -220,7 +223,9 @@
           "end": "class _CompanySectionCard extends StatelessWidget",
           "mustContain": [
             "moduleSection('AI tools', aiModules)",
-            "moduleSection('Company workspace', workspaceModules)",
+            "moduleSection('Company files', fileModules)",
+            "moduleSection('Support', supportModules)",
+            "moduleSection('Account', accountModules)",
             "moduleSection('Team and templates', teamModules)"
           ],
           "mustNotContain": [

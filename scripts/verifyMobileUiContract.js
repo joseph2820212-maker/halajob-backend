@@ -249,26 +249,49 @@ assertContains(
 );
 assertContains(
   companyHeader,
-  "key: const ValueKey('company-header-account-menu')",
+  "key: const ValueKey('company-header-profile')",
   "company header",
 );
 assertContains(
   companyHeader,
-  "key: const ValueKey('company-account-menu-profile-settings')",
+  "tooltip: loc.t('profile')",
   "company header",
 );
 assertContains(
   companyHeader,
-  "key: const ValueKey('company-account-menu-account-settings')",
+  "key: const ValueKey('company-header-settings')",
   "company header",
 );
 assertContains(
   companyHeader,
-  "key: const ValueKey('company-account-menu-sign-out')",
+  "tooltip: loc.t('settings')",
   "company header",
 );
-assertNotContains(companyHeader, "ValueKey('company-header-profile')", "company header");
-assertNotContains(companyHeader, "ValueKey('company-header-settings')", "company header");
+assertContains(
+  companyHeader,
+  "key: const ValueKey('company-header-switch-account')",
+  "company header",
+);
+assertNotContains(
+  companyHeader,
+  "ValueKey('company-header-account-menu')",
+  "company header",
+);
+assertNotContains(
+  companyHeader,
+  "ValueKey('company-account-menu-profile-settings')",
+  "company header",
+);
+assertNotContains(
+  companyHeader,
+  "ValueKey('company-account-menu-account-settings')",
+  "company header",
+);
+assertNotContains(
+  companyHeader,
+  "ValueKey('company-account-menu-sign-out')",
+  "company header",
+);
 assertNotContains(
   companyHeader,
   "ValueKey('company-account-menu-settings-item')",
