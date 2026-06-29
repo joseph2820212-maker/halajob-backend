@@ -97,8 +97,10 @@
     "test:integration:interview-scheduling": "node scripts/verifyInterviewSchedulingIntegration.js",
     "test:integration:syria-product": "npm run test:integration:cv-studio && npm run test:integration:cv-parsing && npm run test:integration:learning-resources && npm run test:integration:interview-prep && npm run test:integration:saved-search-alerts && npm run test:integration:communication-hub && npm run test:integration:salary-insights && npm run test:integration:campus-privacy && npm run test:integration:interview-scheduling && npm run test:integration:talent-pool-crm && npm run test:integration:company-branding",
     "test:launch-gate:backend": "npm run check:syntax && npm run check:imports && npm run check:secrets && npm run check:i18n && npm run test:syria-docs && npm run smoke:import && npm run smoke:http && npm run smoke:cors && npm run test:critical-launch-blockers && npm run test:otp-contract && npm run test:security-http && npm run test:route-validation && npm run test:response-codes && npm run test:model-integrity && npm run test:mixed-fields && npm run test:data-retention && npm run test:global-launch-contract && npm run test:object-authorization && npm run test:audit-logging && npm run test:integration:auth-context && npm run test:integration:job-mutations && npm run test:integration:hiring-workflows && npm run test:integration:subscriptions && npm run test:integration:company-permissions && npm run test:integration:admin-permissions && npm run test:integration:admin-resources && npm run test:integration:employee-cv-downloads && npm run test:integration:campus-workflows && npm run test:integration:syria-product",
+    "test:launch-gate:web": "npm --prefix web ci --ignore-scripts && npm --prefix web run build && npm --prefix web test && npm --prefix web run e2e",
+    "test:launch-gate:mobile": "cd mobile && flutter pub get && flutter analyze && flutter test",
     "test:launch-gate:ui-contracts": "npm run check:web-routes && npm run test:ui-actions && npm run test:mobile-routes && npm run test:mobile-ui-contract && npm run test:bilingual-ui-payload",
-    "test:launch-gate": "npm run test:launch-gate:backend && npm run test:launch-gate:ui-contracts"
+    "test:launch-gate": "npm run test:launch-gate:backend && npm run test:launch-gate:web && npm run test:launch-gate:ui-contracts"
   },
   "keywords": [],
   "author": "",

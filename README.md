@@ -119,7 +119,9 @@ Use `docs/TESTING_GUIDE.md` as the source of truth. Core branch checks include:
 ```bash
 npm run test:launch-gate
 npm run test:launch-gate:backend
+npm run test:launch-gate:web
 npm run test:launch-gate:ui-contracts
+npm run test:launch-gate:mobile
 npm run check:secrets
 npm run check:syntax
 npm run check:imports
@@ -138,14 +140,14 @@ npm run test:object-authorization
 npm run test:audit-logging
 npm run test:integration:syria-product
 npm run check:web-routes
-npm --prefix web run build
-npm --prefix web test
-npm --prefix web run e2e
+npm run test:launch-gate:web
 npm run test:web-smoke
 ```
 
-CI also runs the web build, unit tests, and `npm --prefix web run e2e` on the
-Linux verification job.
+CI also runs the web build, unit tests, `npm --prefix web run e2e`, and Flutter
+`pub get`/`analyze`/`test` on the Linux verification job. Run
+`npm run test:launch-gate:mobile` on a machine with Flutter on PATH before
+calling a mobile release ready.
 
 Regenerate source-of-truth docs after route/model/auth/contract changes:
 
