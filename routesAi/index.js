@@ -4,7 +4,6 @@ import { requireAppAccount } from "../middlewares/appAccountGuard.js";
 import CareerPassportController from "../controllers/app/CareerPassport/CareerPassportController.js";
 import AiSafetyController from "../controllers/ai/AiSafetyController.js";
 import validate from "../middlewares/validate.js";
-import { requireFeature } from "../middlewares/requireFeature.js";
 import platformSchemas from "../validations/platform.validation.js";
 
 const router = express.Router();
@@ -21,11 +20,11 @@ router.post(
   CareerPassportController.refreshScore
 );
 
-// Everything below depends on the AI provider. Gate it behind the AI feature flag
-// so it is a real server-side kill-switch (off by default for the Syria launch),
-// not just hidden in the UI.
-router.use(requireFeature("ai_tools_enabled"));
-
+// The AI runtime kill-switch lives in AiSafetyController: when no AI provider /
+// usage limit is configured these endpoints return a graceful 503
+// (ai_status.reason = "ai_feature_not_enabled") and record a blocked AiRequest +
+// audit log. That is the server-side gate for the Syria-first launch (ship with
+// no provider configured), so no extra route-level feature middleware is needed.
 router.post("/career/copilot", authUser, requireAppAccount("employee"), validate(platformSchemas.aiRequestSchema), AiSafetyController.careerCopilot);
 router.post("/profile/score", authUser, requireAppAccount("employee"), validate(platformSchemas.aiRequestSchema), AiSafetyController.profileScore);
 router.post("/cv/rewrite", authUser, requireAppAccount("employee"), validate(platformSchemas.aiRequestSchema), AiSafetyController.cvRewrite);
