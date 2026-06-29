@@ -87,10 +87,10 @@ assertContains(
   "const double halaHeaderActionSize = 36;",
   "section 3 header constants",
 );
-assertContains(header, "color: halaSurface", "HalaNativeHeader");
+assertContains(header, "color: halaHeaderBg", "HalaNativeHeader");
 assertContains(
   header,
-  "halaBorder.withValues(alpha: 0.82)",
+  "BorderSide(color: halaHeaderLine)",
   "HalaNativeHeader",
 );
 assertContains(
@@ -100,10 +100,10 @@ assertContains(
 );
 assertContains(
   iconButton,
-  ": halaSurfaceTint",
+  ": halaHeaderBtnBg",
   "HalaHeaderIconButton",
 );
-assertContains(iconButton, "? halaNavy", "HalaHeaderIconButton");
+assertContains(iconButton, "? halaHeaderFg", "HalaHeaderIconButton");
 assertContains(
   menuButton,
   "this.size = halaHeaderActionSize",
@@ -111,11 +111,11 @@ assertContains(
 );
 assertContains(
   menuButton,
-  "child: Icon(icon, color: halaNavy",
+  "child: Icon(icon, color: halaHeaderFg",
   "HalaHeaderMenuButton",
 );
 assertContains(brand, "size: halaHeaderBrandMarkSize", "header brand");
-assertContains(brand, "leftColor: halaNavy", "header brand");
+assertContains(brand, "leftColor: halaHeaderFg", "header brand");
 
 assertContains(
   cards,
@@ -437,5 +437,5 @@ for (const file of sourceFiles) {
 }
 
 console.log(
-  "Mobile UI contract verified for tablet orientation, Gate A cream header chrome, shared bottom nav, and localized chrome strings.",
+  "Mobile UI contract verified for tablet orientation, v19 navy header chrome, shared bottom nav, and localized chrome strings.",
 );
