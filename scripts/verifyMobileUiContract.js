@@ -213,6 +213,41 @@ assertContains(
 );
 assertContains(
   dashboard,
+  "static const Set<String> _morePrimaryFlowActionIds = {",
+  "dashboard More primary flow filter",
+);
+[
+  "'browse_jobs'",
+  "'saved_jobs'",
+  "'applications'",
+  "'campus_feed'",
+  "'campus_events'",
+  "'campus_resources'",
+].forEach((id) =>
+  assertContains(dashboard, id, "dashboard More primary flow filter"),
+);
+assertContains(
+  dashboard,
+  "if (_morePrimaryFlowActionIds.contains(actionId))",
+  "dashboard More primary flow filter",
+);
+assertContains(
+  dashboard,
+  "'Career tools': <_QuickActionItem>[]",
+  "dashboard More canonical sections",
+);
+assertContains(
+  dashboard,
+  "'Account': <_QuickActionItem>[]",
+  "dashboard More canonical sections",
+);
+assertContains(
+  dashboard,
+  "'Support & legal': <_QuickActionItem>[]",
+  "dashboard More canonical sections",
+);
+assertContains(
+  dashboard,
   "final showBottomRemoteSync",
   "dashboard sync placement",
 );
@@ -304,6 +339,21 @@ assertNotContains(
 );
 assertContains(
   company,
+  "1 => _CompanyJobsPanel(",
+  "company canonical tab panels",
+);
+assertContains(
+  company,
+  "2 => _CompanyApplicantsPanel(",
+  "company canonical tab panels",
+);
+assertContains(
+  company,
+  "? _CompanyTalentPanel(",
+  "company canonical tab panels",
+);
+assertContains(
+  company,
   "title: HalaJobLocalizations.of(context).t('accountAndSettings')",
   "company account settings title",
 );
@@ -331,6 +381,29 @@ assertContains(
   companyMorePanel,
   "moduleSection('AI tools', aiModules)",
   "company AI tools stay grouped when enabled",
+);
+[
+  "moduleSection('Company files', fileModules)",
+  "moduleSection('Support', supportModules)",
+  "moduleSection('Account', accountModules)",
+  "moduleSection('Team and templates', teamModules)",
+].forEach((needle) =>
+  assertContains(companyMorePanel, needle, "company More canonical sections"),
+);
+[
+  "title: 'Hiring dashboard'",
+  "title: 'Recent jobs'",
+  "title: 'Recent applicants'",
+  "title: 'Hiring pipeline'",
+  "title: 'Talent pool'",
+  "title: 'Invitations'",
+  "title: 'Talent help'",
+].forEach((needle) =>
+  assertNotContains(
+    companyMorePanel,
+    needle,
+    "company More should not duplicate primary tabs",
+  ),
 );
 assertNotContains(
   companyMorePanel,
