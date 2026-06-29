@@ -29,6 +29,8 @@ const filterKeys = [
   "date_posted",
   "job_type",
   "experience",
+  "education_level",
+  "skills",
   "salary",
   "work_mode",
   "deadline",
@@ -48,6 +50,8 @@ const filterKeys = [
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object || {}, key);
 const hasProvided = (object, key) => hasOwn(object, key) && object[key] !== undefined;
+const hasListText = (value) =>
+  Array.isArray(value) ? value.some((item) => cleanText(item)) : Boolean(cleanText(value));
 
 const parsePagination = (query = {}) => {
   const page = Math.max(1, Number.parseInt(query.page, 10) || 1);
@@ -85,6 +89,8 @@ const hasActiveFilter = (filters = {}) =>
       cleanText(filters.date_posted) ||
       cleanText(filters.job_type) ||
       cleanText(filters.experience) ||
+      cleanText(filters.education_level) ||
+      hasListText(filters.skills) ||
       cleanText(filters.salary) ||
       cleanText(filters.work_mode) ||
       cleanText(filters.deadline) ||
@@ -106,6 +112,8 @@ const defaultNameForFilters = (filters = {}) =>
   cleanText(filters.keyword) ||
   cleanText(filters.company) ||
   cleanText(filters.category) ||
+  cleanText(filters.education_level) ||
+  (Array.isArray(filters.skills) ? cleanText(filters.skills[0]) : cleanText(filters.skills)) ||
   cleanText(filters.city) ||
   cleanText(filters.country) ||
   "Saved job search";
@@ -144,6 +152,8 @@ export const listSavedSearches = async (req, res, next) => {
         { "filters.country": regex },
         { "filters.company": regex },
         { "filters.category": regex },
+        { "filters.education_level": regex },
+        { "filters.skills": regex },
       ];
     }
 

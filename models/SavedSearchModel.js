@@ -12,6 +12,8 @@ const SavedSearchFiltersSchema = new Schema(
     date_posted: { type: String, trim: true, default: "" },
     job_type: { type: String, trim: true, default: "" },
     experience: { type: String, trim: true, default: "" },
+    education_level: { type: String, trim: true, default: "" },
+    skills: { type: [String], default: [] },
     salary: { type: String, trim: true, default: "" },
     work_mode: { type: String, trim: true, default: "" },
     deadline: { type: String, trim: true, default: "" },
@@ -63,6 +65,7 @@ const SavedSearchSchema = new Schema(
 SavedSearchSchema.index({ user_id: 1, is_active: 1, frequency: 1, last_checked_at: 1 });
 SavedSearchSchema.index({ employee_id: 1, created_from: 1 });
 SavedSearchSchema.index({ "filters.keyword": 1, "filters.city": 1, "filters.country": 1 });
+SavedSearchSchema.index({ "filters.education_level": 1, "filters.skills": 1 });
 SavedSearchSchema.index(
   { user_id: 1, employee_id: 1, legacy_alert_id: 1 },
   {

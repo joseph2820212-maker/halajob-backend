@@ -25,6 +25,28 @@ const numberOrNull = (value) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 };
+const textList = (value) => {
+  const raw = Array.isArray(value)
+    ? value
+    : typeof value === "string"
+      ? value.split(/[,;\n]/)
+      : value === undefined || value === null
+        ? []
+        : [value];
+  const seen = new Set();
+  return raw
+    .map(cleanText)
+    .filter(Boolean)
+    .filter((item) => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+};
+const appendAnd = (query, condition) => {
+  query.$and = [...(query.$and || []), condition];
+};
 
 export const normalizeFilters = (input = {}) => ({
   keyword: cleanText(input.keyword || input.q || input.search),
@@ -35,6 +57,8 @@ export const normalizeFilters = (input = {}) => ({
   date_posted: cleanText(input.date_posted),
   job_type: cleanText(input.job_type),
   experience: cleanText(input.experience),
+  education_level: cleanText(input.education_level),
+  skills: textList(input.skills),
   salary: cleanText(input.salary),
   work_mode: cleanText(input.work_mode),
   deadline: cleanText(input.deadline),
@@ -155,6 +179,24 @@ export const buildJobQueryForSavedSearch = (search = {}, { since = null } = {}) 
   if (filters.work_mode_id) query.work_mode_id = filters.work_mode_id;
   if (filters.experience_level_id) query.experience_level_id = filters.experience_level_id;
   if (filters.company_id) query.company_id = filters.company_id;
+  if (filters.education_level) {
+    const regex = new RegExp(escapeRegex(filters.education_level), "i");
+    appendAnd(query, {
+      $or: [
+        { "search_index.filters.education_level": regex },
+        { "search_projection.requirements.education_level": regex },
+      ],
+    });
+  }
+  if (Array.isArray(filters.skills) && filters.skills.length) {
+    const skillPatterns = filters.skills.map((skill) => new RegExp(escapeRegex(skill), "i"));
+    appendAnd(query, {
+      $or: [
+        { "search_index.filters.skills": { $in: skillPatterns } },
+        { "search_projection.requirements.skills": { $in: skillPatterns } },
+      ],
+    });
+  }
   if (filters.currency_code) query["salary.currency_code"] = filters.currency_code;
   if (filters.salary_min !== null && filters.salary_min !== undefined) {
     query["salary.max"] = { ...(query["salary.max"] || {}), $gte: filters.salary_min };
@@ -194,7 +236,7 @@ export const buildJobQueryForSavedSearch = (search = {}, { since = null } = {}) 
       { "search_index.title_norm": regex },
     ];
     if (query.$or) {
-      query.$and = [{ $or: query.$or }, { $or: keywordOr }];
+      query.$and = [...(query.$and || []), { $or: query.$or }, { $or: keywordOr }];
       delete query.$or;
     } else {
       query.$or = keywordOr;

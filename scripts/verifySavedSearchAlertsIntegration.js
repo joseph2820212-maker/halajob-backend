@@ -71,7 +71,18 @@ function userSeed({ firstName, lastName, email, roleId, phone }) {
   };
 }
 
-function jobSeed({ suffix, userId, companyId, title, keyword, city = "Damascus", country = "Syria" }) {
+function jobSeed({
+  suffix,
+  userId,
+  companyId,
+  title,
+  keyword,
+  city = "Damascus",
+  country = "Syria",
+  educationLevel = "Bachelor",
+  salaryMin = 1000000,
+  salaryMax = 1500000,
+}) {
   const lookupId = () => new mongoose.Types.ObjectId();
   return {
     job_name: title,
@@ -90,6 +101,12 @@ function jobSeed({ suffix, userId, companyId, title, keyword, city = "Damascus",
       title_norm: title.toLowerCase(),
       text_norm: `${title} ${keyword}`.toLowerCase(),
     },
+    education_level_id: lookupId(),
+    education_level_info: {
+      _id: lookupId(),
+      title: educationLevel,
+      title_en: educationLevel,
+    },
     work_mode_id: lookupId(),
     job_type_id: lookupId(),
     job_time_id: lookupId(),
@@ -98,8 +115,8 @@ function jobSeed({ suffix, userId, companyId, title, keyword, city = "Damascus",
       currency_id: lookupId(),
       currency_code: "SYP",
       currency_rate_snapshot: 1,
-      min: 1000000,
-      max: 1500000,
+      min: salaryMin,
+      max: salaryMax,
     },
     skills_required: [{ title: keyword, level: 4, years: 2 }],
     company_id: companyId,
@@ -304,6 +321,10 @@ async function main() {
           keyword: "python",
           city: "Damascus",
           country: "Syria",
+          education_level: "Bachelor",
+          skills: ["python", "APIs", "python"],
+          salary_min: 1000000,
+          currency_code: "syp",
         },
         frequency: "daily",
         channels: { in_app: true, push: true },
@@ -314,6 +335,10 @@ async function main() {
   );
   const savedSearchId = created.payload.data.id;
   assert.equal(created.payload.data.filters.keyword, "python");
+  assert.deepEqual(created.payload.data.filters.skills, ["python", "APIs"]);
+  assert.equal(created.payload.data.filters.education_level, "Bachelor");
+  assert.equal(created.payload.data.filters.salary_min, 1000000);
+  assert.equal(created.payload.data.filters.currency_code, "SYP");
   assert.equal(created.payload.data.scope, "seeker");
 
   const richFilters = await expectStatus(
@@ -327,6 +352,8 @@ async function main() {
           date_posted: "week",
           job_type: "internship",
           experience: "fresh_grad",
+          education_level: "Customer-facing training",
+          skills: "Documentation, Arabic",
           salary: "listed",
           work_mode: "hybrid",
           deadline: "soon",
@@ -341,6 +368,8 @@ async function main() {
   );
   assert.equal(richFilters.payload.data.filters.company, "Hala Job");
   assert.equal(richFilters.payload.data.filters.work_mode, "hybrid");
+  assert.equal(richFilters.payload.data.filters.education_level, "Customer-facing training");
+  assert.deepEqual(richFilters.payload.data.filters.skills, ["Documentation", "Arabic"]);
   assert.equal(richFilters.payload.data.filters.easy_apply, true);
   assert.equal(richFilters.payload.data.filters.verified_employer, true);
 
@@ -377,6 +406,10 @@ async function main() {
   assert.equal(preserved.frequency, "weekly");
   assert.equal(preserved.filters.keyword, "python");
   assert.equal(preserved.filters.city, "Damascus");
+  assert.equal(preserved.filters.education_level, "Bachelor");
+  assert.deepEqual(preserved.filters.skills, ["python", "APIs"]);
+  assert.equal(preserved.filters.salary_min, 1000000);
+  assert.equal(preserved.filters.currency_code, "SYP");
 
   const matchingJob = await jobsModel.create(
     jobSeed({
