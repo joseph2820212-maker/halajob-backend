@@ -278,6 +278,27 @@
       }
     },
     {
+      "label": "mobile seeker CV parse confirmation flow",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/employee/v1/cv/parse/upload",
+          "/employee/v1/cv/parse/jobs/${Uri.encodeComponent(normalizedJobId)}/preview",
+          "/employee/v1/cv/parse/jobs/${Uri.encodeComponent(normalizedJobId)}/confirm",
+          "/employee/v1/cv/parse/jobs/${Uri.encodeComponent(normalizedJobId)}/reject"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+        "mustContain": [
+          "cv-parse-upload",
+          "cv-parse-preview",
+          "cv-parse-confirm",
+          "cv-parse-reject"
+        ]
+      }
+    },
+    {
       "label": "web seeker cover letter tools",
       "route": {
         "path": "web/src/shared/api.ts",
