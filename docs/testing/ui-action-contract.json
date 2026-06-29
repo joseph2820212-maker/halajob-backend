@@ -150,6 +150,9 @@
         "moduleSection('AI tools', aiModules)",
         "moduleSection('Company workspace', workspaceModules)",
         "moduleSection('Team and templates', teamModules)",
+        "key: const ValueKey('company-job-salary-check-button')",
+        "key: const ValueKey('company-job-salary-guidance-card')",
+        "widget.salaryService.checkCompanySalary",
         "subtitle: 'Saved candidates, TES scores, and searchable profiles'",
         "title: 'Campus recruiting'"
       ],
@@ -408,6 +411,26 @@
         "mustContain": [
           "id: 'salary_insights'",
           "SalaryInsightsScreen(baseUrl: widget.apiBaseUrl)"
+        ]
+      }
+    },
+    {
+      "label": "mobile company salary guidance placement",
+      "route": {
+        "path": "mobile/lib/src/features/salary_insights/salary_service.dart",
+        "mustContain": [
+          "/company/v1/salary-insights/check",
+          "Future<SalaryCompetitiveness> checkCompanySalary"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+        "mustContain": [
+          "widget.salaryService.checkCompanySalary",
+          "key: const ValueKey('company-job-salary-check-button')",
+          "key: const ValueKey('company-job-salary-guidance-card')",
+          "'country': 'Syria'",
+          "'currency_code': _currencyCode"
         ]
       }
     },
