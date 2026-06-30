@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T09:46:08.705Z",
+  "generatedAt": "2026-06-30T19:15:03.095Z",
   "records": [
     {
       "method": "PATCH",
@@ -40108,6 +40108,23 @@
     {
       "method": "POST",
       "path": "/dash/v1/resources/:resource/:id/approve",
+      "module": "Admin",
+      "middlewares": [
+        "checkResourcePermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/resources/:resource/:id/legal-review",
       "module": "Admin",
       "middlewares": [
         "checkResourcePermissionMiddleware",
