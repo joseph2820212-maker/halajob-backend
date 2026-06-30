@@ -32,6 +32,11 @@ concurrency:
   group: flutter-mobile-ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Needed so manual builds can publish the tester APK as a GitHub Release asset
+# (a direct .apk download link, instead of a zipped Actions artifact).
+permissions:
+  contents: write
+
 jobs:
   verify-linux:
     runs-on: ubuntu-latest
@@ -268,6 +273,34 @@ jobs:
           if-no-files-found: error
           retention-days: 14
           path: mobile/build/app/outputs/flutter-apk/app-release.apk
+
+      # Publish the tester APK as a fixed-tag GitHub Release so reviewers get a
+      # stable, direct .apk download link (no Actions login / unzip needed).
+      - name: Publish tester APK as a release (manual builds)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK_SRC="mobile/build/app/outputs/flutter-apk/app-release.apk"
+          APK_OUT="halajob-tester-${GITHUB_SHA::7}.apk"
+          cp "$APK_SRC" "$APK_OUT"
+          TAG="tester-apk-latest"
+          NOTES="Sideload tester build (NOT for production).
+          Commit: ${GITHUB_SHA}
+          Backend: ${{ github.event.inputs.base_url }}
+          Built: $(date -u '+%Y-%m-%d %H:%M UTC')
+          Install: download the .apk on your Android phone, open it, allow install from unknown sources."
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "Hala Job tester APK (latest)" --notes "$NOTES" --target "$GITHUB_SHA"
+            gh release upload "$TAG" "$APK_OUT" --clobber
+          else
+            gh release create "$TAG" "$APK_OUT" \
+              --title "Hala Job tester APK (latest)" \
+              --notes "$NOTES" \
+              --target "$GITHUB_SHA" \
+              --prerelease
+          fi
+          echo "APK published to release tag $TAG as $APK_OUT"
 
   verify-windows:
     runs-on: windows-latest
