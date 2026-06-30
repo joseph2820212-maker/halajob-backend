@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `ff5b8ba` clean full launch gate; current route/UI contract proof through `f63140b`; current mobile launch gate through `4898355`; current APK proof through `4898355`
+Source contracts tested through: `ff5b8ba` clean full launch gate; current backend proof through `7113eb8`; current route/UI contract proof through `f63140b`; current mobile launch gate through `4898355`; current APK proof through `4898355`
 Latest APK source build commit: `4898355`
 
 ## Passed Coverage
@@ -11,6 +11,7 @@ Latest APK source build commit: `4898355`
 |---|---|
 | Mobile Settings drill-in panels | `flutter test test\widget_test.dart --plain-name "settings"` passed 9 Settings-related widget tests after `e2611c3`, proving grouped Settings index rows, hidden detail controls until drill-in, switch-based notification payloads, Data rights export/delete placement, delete confirmation, account save/upload/relogin, and logout-all confirmation |
 | Full launch gate | `npm run test:launch-gate` passed from detached clean worktree `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe-clean-ff5b8ba` at source commit `ff5b8ba`, covering backend aggregate gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/450 Flutter tests, and UI contract route/action/mobile/bilingual guards. A first clean run stopped transiently during subscription integration; `npm run test:integration:subscriptions` passed by itself and the full aggregate rerun passed end to end. |
+| Current backend launch gate | `npm run test:launch-gate:backend --silent` passed on current branch commit `7113eb8`, covering syntax/import/secrets/i18n, smoke checks, security HTTP, OTP, route validation, response codes, model/Mixed/data-retention contracts, Mongo helper, global launch, AI/trust/notification/analytics/translation/admin-operation/career-passport route contracts, and the full launch-critical plus Syria product DB aggregates. |
 | Mobile route mounts | `npm run test:mobile-routes` |
 | Mobile UI contract | `npm run test:mobile-ui-contract` |
 | Campus student routes | `npm run test:mobile-routes` |
