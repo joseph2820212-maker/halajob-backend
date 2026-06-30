@@ -64,7 +64,9 @@ npm run test:integration:syria-product
 
 If you cannot run Docker or a local MongoDB service, set
 `MONGOMS_SYSTEM_BINARY` to a preinstalled `mongod` binary so
-`mongodb-memory-server` does not need to download one during the test run.
+`mongodb-memory-server` does not need to download one during the test run. The
+shared helper checks that the configured path exists before running the
+DB-backed suites, so typos fail with a clear setup message.
 Without either `CONNECTION_URL`, `MONGOMS_SYSTEM_BINARY`, or network access to
 the MongoDB binary cache/download host, the shared integration helper now fails
 with a preflight-style message that names those choices directly.

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { fileURLToPath } from "node:url";
 
 import {
   buildIntegrationMongoHelp,
@@ -31,6 +32,43 @@ try {
   await externalHandle.stop();
 
   delete process.env.CONNECTION_URL;
+  delete process.env.MONGOMS_SYSTEM_BINARY;
+  process.env.MONGOMS_SYSTEM_BINARY = "__missing_mongod_binary__";
+  await assert.rejects(
+    () =>
+      createMemoryMongoHandle(
+        {},
+        {
+          async create() {
+            throw new Error("factory should not run for missing system binary");
+          },
+        },
+      ),
+    (error) => {
+      assert.match(error.message, /MONGOMS_SYSTEM_BINARY does not exist/);
+      assert.match(error.message, /Could not start mongodb-memory-server/);
+      return true;
+    },
+  );
+
+  process.env.MONGOMS_SYSTEM_BINARY = fileURLToPath(import.meta.url);
+  const systemBinaryHandle = await createMemoryMongoHandle(
+    { instance: { dbName: "system-binary-proof" } },
+    {
+      async create(options) {
+        assert.equal(options.instance.dbName, "system-binary-proof");
+        return {
+          getUri() {
+            return "mongodb://system-binary-proof";
+          },
+          async stop() {},
+        };
+      },
+    },
+  );
+  assert.equal(systemBinaryHandle.getUri(), "mongodb://system-binary-proof");
+  await systemBinaryHandle.stop();
+
   delete process.env.MONGOMS_SYSTEM_BINARY;
   const expectedDownloadError = new Error("getaddrinfo ENOTFOUND fastdl.mongodb.org");
   await assert.rejects(

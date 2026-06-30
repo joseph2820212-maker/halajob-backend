@@ -1,4 +1,5 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
+import { existsSync } from "node:fs";
 
 const token = () => new Date().toISOString().replace(/[-:.TZ]/g, "");
 const CONNECTION_URL_ENV = "CONNECTION_URL";
@@ -42,6 +43,11 @@ export async function createMemoryMongoHandle(options = {}, factory = MongoMemor
     ? `mongodb-memory-server with ${SYSTEM_BINARY_ENV}`
     : `mongodb-memory-server download/cache fallback; set ${CONNECTION_URL_ENV} to use external MongoDB`;
   console.log(`[integration-mongo] using ${mode}`);
+
+  if (systemBinary && !existsSync(systemBinary)) {
+    const error = new Error(`${SYSTEM_BINARY_ENV} does not exist: ${systemBinary}`);
+    throw new Error(buildIntegrationMongoHelp(error), { cause: error });
+  }
 
   try {
     return await factory.create(options);
