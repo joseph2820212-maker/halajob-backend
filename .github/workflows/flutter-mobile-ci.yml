@@ -97,6 +97,11 @@ jobs:
       - name: Mobile UI contract
         run: npm run test:mobile-ui-contract
 
+      - name: Mobile screen inventory guard
+        shell: pwsh
+        working-directory: mobile
+        run: ./scripts/assert-mobile-screen-inventory.ps1
+
       - name: Backend response-code contract
         run: npm run test:response-codes
 
