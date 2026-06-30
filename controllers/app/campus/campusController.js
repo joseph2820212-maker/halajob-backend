@@ -5,6 +5,7 @@ import path from "path";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import {
+  CampusEventModel,
   CampusEventRegistrationModel,
   CampusOpportunityModel,
   AuditLogModel,
@@ -152,6 +153,13 @@ const UNIVERSITY_MEMBER_STATUSES = new Set([
   "suspended",
   "removed",
 ]);
+const CAMPUS_EVENT_STATUSES = new Set([
+  "draft",
+  "published",
+  "archived",
+  "cancelled",
+]);
+const CAMPUS_EVENT_VISIBILITIES = new Set(["public", "campus"]);
 
 const normalizeUniversityMemberRole = (value) => {
   const role = cleanText(value).toLowerCase();
@@ -161,6 +169,90 @@ const normalizeUniversityMemberRole = (value) => {
 const normalizeUniversityMemberStatus = (value, fallback = "active") => {
   const status = cleanText(value).toLowerCase();
   return UNIVERSITY_MEMBER_STATUSES.has(status) ? status : fallback;
+};
+
+const normalizeCampusEventStatus = (value, fallback = "draft") => {
+  const status = cleanText(value).toLowerCase();
+  return CAMPUS_EVENT_STATUSES.has(status) ? status : fallback;
+};
+
+const normalizeCampusEventVisibility = (value, fallback = "campus") => {
+  const visibility = cleanText(value).toLowerCase();
+  return CAMPUS_EVENT_VISIBILITIES.has(visibility) ? visibility : fallback;
+};
+
+const campusEventSlug = (value = "", fallback = "campus-event") => {
+  const slug = cleanText(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || fallback;
+};
+
+const buildCampusEventId = ({ university, title }) => {
+  const universityPart = String(university?._id || "global").slice(-6);
+  const titlePart = campusEventSlug(title, "event");
+  const suffix = Date.now().toString(36);
+  return `university-${universityPart}-${titlePart}-${suffix}`;
+};
+
+const numberOrNull = (value) => {
+  if (value === undefined || value === null || value === "") return null;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+};
+
+const campusEventQueryForScope = (scope, eventId = null) => {
+  const query = {};
+  if (!scope?.superAdmin) query.university_id = scope?.university?._id || null;
+  if (scope?.superAdmin && scope?.university?._id)
+    query.university_id = scope.university._id;
+  if (eventId) query._id = eventId;
+  return query;
+};
+
+const serializeCampusEvent = (event = {}) => ({
+  id: String(event._id || ""),
+  _id: event._id,
+  university_id: idOf(event.university_id),
+  event_id: event.event_id || "",
+  title: event.title || "",
+  summary: event.summary || "",
+  description: event.description || "",
+  organizer: event.organizer || "",
+  host: event.organizer || "",
+  kind: event.kind || "",
+  tag: event.kind || event.mode || "",
+  mode: event.mode || "",
+  date_label: event.date_label || "",
+  meta: [event.date_label, event.mode, event.location].filter(Boolean).join(" | "),
+  start_at: event.start_at || null,
+  end_at: event.end_at || null,
+  location: event.location || "",
+  campus_name: event.campus_name || "",
+  registration_url: event.registration_url || "",
+  capacity: event.capacity ?? null,
+  registered_count: Number(event.registered_count || 0),
+  featured: event.featured === true,
+  tags: event.tags || [],
+  bullets: event.bullets || [],
+  status: event.status || "draft",
+  visibility: event.visibility || "campus",
+  sort_order: Number(event.sort_order || 0),
+  source: "campus_events",
+  created_at: event.createdAt || null,
+  updated_at: event.updatedAt || null,
+});
+
+const findPublishedCampusEvent = async (eventId) => {
+  const normalizedId = cleanText(eventId).toLowerCase();
+  if (!normalizedId) return null;
+  const clauses = [{ event_id: normalizedId }];
+  if (isValidObjectId(normalizedId)) clauses.push({ _id: normalizedId });
+  return CampusEventModel.findOne({
+    status: "published",
+    $or: clauses,
+  }).lean();
 };
 
 const permissionsForUniversityRole = (role, provided = undefined) => {
@@ -1665,6 +1757,295 @@ const resources = async (req, res, next) => {
   }
 };
 
+const listUniversityEvents = async (req, res, next) => {
+  try {
+    const scope = await getUniversityAdminScope(req);
+    if (!scope)
+      return ReturnAppData.getError({
+        res,
+        status: 403,
+        message: "university_admin_context_required",
+      });
+
+    const page = Math.max(1, Number(req.query?.page || 1));
+    const limit = normalizeLimit(req.query?.limit, 25, 100);
+    const query = campusEventQueryForScope(scope);
+    const status = cleanText(req.query?.status).toLowerCase();
+    if (status && status !== "all") {
+      query.status = normalizeCampusEventStatus(status, status);
+    } else {
+      query.status = { $ne: "archived" };
+    }
+
+    const search = cleanText(req.query?.q || req.query?.search);
+    if (search) {
+      const regex = new RegExp(escapeRegExp(search), "i");
+      query.$or = [
+        { title: regex },
+        { summary: regex },
+        { description: regex },
+        { organizer: regex },
+        { kind: regex },
+        { location: regex },
+      ];
+    }
+
+    const [events, total] = await Promise.all([
+      CampusEventModel.find(query)
+        .sort({ featured: -1, sort_order: 1, start_at: 1, createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      CampusEventModel.countDocuments(query),
+    ]);
+
+    return ReturnAppData.getData({
+      res,
+      data: events.map(serializeCampusEvent),
+      other: {
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.max(1, Math.ceil(total / limit)),
+        },
+      },
+      message: "university_campus_events",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const createUniversityEvent = async (req, res, next) => {
+  try {
+    const scope = await getUniversityAdminScope(req);
+    if (!scope)
+      return ReturnAppData.createError({
+        res,
+        status: 403,
+        message: "university_admin_context_required",
+      });
+
+    const university = await requireScopedUniversityForMutation(req, scope);
+    if (!university?._id)
+      return ReturnAppData.createError({
+        res,
+        status: 422,
+        message: "university_required",
+      });
+
+    const body = req.body || {};
+    const title = cleanText(body.title || body.event_title);
+    if (!title)
+      return ReturnAppData.createError({
+        res,
+        status: 422,
+        message: "title_required",
+      });
+
+    const event = await CampusEventModel.create({
+      university_id: university._id,
+      event_id: campusEventSlug(
+        body.event_id || buildCampusEventId({ university, title }),
+      ),
+      title,
+      summary: cleanText(body.summary),
+      description: cleanText(body.description || body.details),
+      organizer: cleanText(body.organizer || body.host),
+      kind: cleanText(body.kind || body.tag || body.type),
+      mode: cleanText(body.mode),
+      date_label: cleanText(body.date_label || body.date || body.meta),
+      start_at: parseDateOrNull(body.start_at || body.starts_at),
+      end_at: parseDateOrNull(body.end_at || body.ends_at),
+      location: cleanText(body.location),
+      campus_name: cleanText(body.campus_name || body.campus),
+      registration_url: cleanText(body.registration_url || body.url),
+      capacity: numberOrNull(body.capacity),
+      featured: normalizeBoolean(body.featured, false),
+      tags: uniqueStringArray(body.tags),
+      bullets: uniqueStringArray(body.bullets || body.highlights || body.agenda),
+      status: normalizeCampusEventStatus(body.status, "draft"),
+      visibility: normalizeCampusEventVisibility(body.visibility, "campus"),
+      sort_order: numberOrNull(body.sort_order || body.order) || 0,
+      created_by: req.user?._id || null,
+      updated_by: req.user?._id || null,
+    });
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user?._id,
+      actorType: scope.superAdmin ? "admin" : "university_admin",
+      action: "university_campus_event_created",
+      entityType: "other",
+      entityId: event._id,
+      newValue: serializeCampusEvent(event.toObject()),
+      metadata: { university_id: String(university._id) },
+    });
+
+    return ReturnAppData.createData({
+      res,
+      data: serializeCampusEvent(event.toObject()),
+      message: "university_campus_event_created",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateUniversityEvent = async (req, res, next) => {
+  try {
+    const scope = await getUniversityAdminScope(req);
+    if (!scope)
+      return ReturnAppData.updateError({
+        res,
+        status: 403,
+        message: "university_admin_context_required",
+      });
+    if (!isValidObjectId(req.params.id))
+      return ReturnAppData.updateError({
+        res,
+        status: 400,
+        message: "invalid_event_id",
+      });
+
+    const existing = await CampusEventModel.findOne(
+      campusEventQueryForScope(scope, req.params.id),
+    ).lean();
+    if (!existing)
+      return ReturnAppData.updateError({
+        res,
+        status: 404,
+        message: "campus_event_not_found",
+      });
+
+    const body = req.body || {};
+    const set = { updated_by: req.user?._id || null };
+    if (body.event_id !== undefined) set.event_id = campusEventSlug(body.event_id, existing.event_id);
+    if (body.title !== undefined || body.event_title !== undefined)
+      set.title = cleanText(body.title || body.event_title);
+    if (body.summary !== undefined) set.summary = cleanText(body.summary);
+    if (body.description !== undefined || body.details !== undefined)
+      set.description = cleanText(body.description || body.details);
+    if (body.organizer !== undefined || body.host !== undefined)
+      set.organizer = cleanText(body.organizer || body.host);
+    if (body.kind !== undefined || body.tag !== undefined || body.type !== undefined)
+      set.kind = cleanText(body.kind || body.tag || body.type);
+    if (body.mode !== undefined) set.mode = cleanText(body.mode);
+    if (body.date_label !== undefined || body.date !== undefined || body.meta !== undefined)
+      set.date_label = cleanText(body.date_label || body.date || body.meta);
+    if (body.start_at !== undefined || body.starts_at !== undefined)
+      set.start_at = parseDateOrNull(body.start_at || body.starts_at);
+    if (body.end_at !== undefined || body.ends_at !== undefined)
+      set.end_at = parseDateOrNull(body.end_at || body.ends_at);
+    if (body.location !== undefined) set.location = cleanText(body.location);
+    if (body.campus_name !== undefined || body.campus !== undefined)
+      set.campus_name = cleanText(body.campus_name || body.campus);
+    if (body.registration_url !== undefined || body.url !== undefined)
+      set.registration_url = cleanText(body.registration_url || body.url);
+    if (body.capacity !== undefined) set.capacity = numberOrNull(body.capacity);
+    if (body.featured !== undefined)
+      set.featured = normalizeBoolean(body.featured, existing.featured === true);
+    if (body.tags !== undefined) set.tags = uniqueStringArray(body.tags);
+    if (
+      body.bullets !== undefined ||
+      body.highlights !== undefined ||
+      body.agenda !== undefined
+    ) {
+      set.bullets = uniqueStringArray(body.bullets || body.highlights || body.agenda);
+    }
+    if (body.status !== undefined)
+      set.status = normalizeCampusEventStatus(body.status, existing.status);
+    if (body.visibility !== undefined)
+      set.visibility = normalizeCampusEventVisibility(
+        body.visibility,
+        existing.visibility,
+      );
+    if (body.sort_order !== undefined || body.order !== undefined)
+      set.sort_order = numberOrNull(body.sort_order || body.order) || 0;
+
+    const event = await CampusEventModel.findOneAndUpdate(
+      campusEventQueryForScope(scope, req.params.id),
+      { $set: set },
+      { new: true, runValidators: true },
+    ).lean();
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user?._id,
+      actorType: scope.superAdmin ? "admin" : "university_admin",
+      action: "university_campus_event_updated",
+      entityType: "other",
+      entityId: event._id,
+      oldValue: serializeCampusEvent(existing),
+      newValue: serializeCampusEvent(event),
+      metadata: { university_id: String(event.university_id || "") },
+    });
+
+    return ReturnAppData.updateData({
+      res,
+      data: serializeCampusEvent(event),
+      message: "university_campus_event_updated",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const archiveUniversityEvent = async (req, res, next) => {
+  try {
+    const scope = await getUniversityAdminScope(req);
+    if (!scope)
+      return ReturnAppData.updateError({
+        res,
+        status: 403,
+        message: "university_admin_context_required",
+      });
+    if (!isValidObjectId(req.params.id))
+      return ReturnAppData.updateError({
+        res,
+        status: 400,
+        message: "invalid_event_id",
+      });
+
+    const existing = await CampusEventModel.findOne(
+      campusEventQueryForScope(scope, req.params.id),
+    ).lean();
+    if (!existing)
+      return ReturnAppData.updateError({
+        res,
+        status: 404,
+        message: "campus_event_not_found",
+      });
+
+    const event = await CampusEventModel.findOneAndUpdate(
+      campusEventQueryForScope(scope, req.params.id),
+      { $set: { status: "archived", updated_by: req.user?._id || null } },
+      { new: true, runValidators: true },
+    ).lean();
+
+    await writeAuditLog({
+      req,
+      actorUserId: req.user?._id,
+      actorType: scope.superAdmin ? "admin" : "university_admin",
+      action: "university_campus_event_archived",
+      entityType: "other",
+      entityId: event._id,
+      oldValue: serializeCampusEvent(existing),
+      newValue: serializeCampusEvent(event),
+      metadata: { university_id: String(event.university_id || "") },
+    });
+
+    return ReturnAppData.updateData({
+      res,
+      data: serializeCampusEvent(event),
+      message: "university_campus_event_archived",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const registerEvent = async (req, res, next) => {
   try {
     const eventId = String(
@@ -1681,6 +2062,7 @@ const registerEvent = async (req, res, next) => {
       .select("_id")
       .lean();
     const body = req.body || {};
+    const managedEvent = await findPublishedCampusEvent(eventId);
     const startAt = parseDateOrNull(
       body.start_at ||
         body.starts_at ||
@@ -1691,12 +2073,16 @@ const registerEvent = async (req, res, next) => {
       user_id: req.user._id,
       employee_id: employee?._id || null,
       event_id: eventId,
-      title: String(body.title || body.event_title || "Campus event").trim(),
-      organizer: String(body.organizer || "").trim(),
-      kind: String(body.kind || "").trim(),
-      date_label: String(body.date_label || body.date || "").trim(),
-      start_at: startAt,
-      mode: String(body.mode || "").trim(),
+      title: String(
+        body.title || body.event_title || managedEvent?.title || "Campus event",
+      ).trim(),
+      organizer: String(body.organizer || managedEvent?.organizer || "").trim(),
+      kind: String(body.kind || managedEvent?.kind || "").trim(),
+      date_label: String(
+        body.date_label || body.date || managedEvent?.date_label || "",
+      ).trim(),
+      start_at: startAt || managedEvent?.start_at || null,
+      mode: String(body.mode || managedEvent?.mode || "").trim(),
       status: "registered",
     };
 
@@ -1734,6 +2120,13 @@ const registerEvent = async (req, res, next) => {
       },
       { new: true, upsert: true, runValidators: true },
     ).lean();
+
+    if (managedEvent?._id && existingRegistration?.status !== "registered") {
+      await CampusEventModel.updateOne(
+        { _id: managedEvent._id },
+        { $inc: { registered_count: 1 } },
+      );
+    }
 
     await writeAuditLog({
       req,
@@ -4316,6 +4709,10 @@ export default {
   getTalentVisibility,
   updateTalentVisibility,
   resources,
+  listUniversityEvents,
+  createUniversityEvent,
+  updateUniversityEvent,
+  archiveUniversityEvent,
   registerEvent,
   studentVerificationStatus,
   startStudentVerification,

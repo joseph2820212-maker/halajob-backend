@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import {
   ApplicationStatusHistoryModel,
+  CampusEventModel,
   CampusEventRegistrationModel,
   CompanyModel,
   EmployeeModel,
@@ -38,6 +39,107 @@ function readCampusContent() {
   }
 
   return JSON.parse(JSON.stringify(campusContentCache));
+}
+
+function slugFromText(value = "", fallback = "campus-event") {
+  const slug = cleanText(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || fallback;
+}
+
+function serializeCampusEvent(event = {}, registeredEventIds = new Set()) {
+  const eventId = cleanText(event.event_id || event.id || event.slug || event.key || event._id || slugFromText(event.title));
+  const title = cleanText(event.title || event.name || "Campus event");
+  const organizer = cleanText(event.organizer || event.host || event.provider);
+  const dateLabel = cleanText(event.date_label || event.date || event.meta || event.schedule);
+  const location = cleanText(event.location || event.campus_name);
+  const mode = cleanText(event.mode);
+  const meta = cleanText(event.meta) || [dateLabel, mode, location].filter(Boolean).join(" | ");
+  const kind = cleanText(event.kind || event.tag || event.type || event.category || mode);
+  const tags = Array.isArray(event.tags) ? event.tags.map(cleanText).filter(Boolean) : [];
+  const bullets = Array.isArray(event.bullets)
+    ? event.bullets.map(cleanText).filter(Boolean)
+    : Array.isArray(event.highlights)
+      ? event.highlights.map(cleanText).filter(Boolean)
+      : tags;
+  const startAt = event.start_at || event.starts_at || null;
+  const endAt = event.end_at || event.ends_at || null;
+
+  return {
+    ...event,
+    id: eventId,
+    _id: event._id || null,
+    event_id: eventId,
+    title,
+    host: organizer,
+    organizer,
+    summary: cleanText(event.summary || event.description),
+    description: cleanText(event.description || event.summary),
+    meta,
+    tag: kind,
+    kind,
+    mode,
+    date_label: dateLabel,
+    date: dateLabel,
+    start_at: startAt,
+    end_at: endAt,
+    location,
+    campus_name: cleanText(event.campus_name),
+    registration_url: cleanText(event.registration_url),
+    capacity: event.capacity ?? null,
+    registered_count: Number(event.registered_count || 0),
+    featured: event.featured === true,
+    tags,
+    bullets,
+    tone: cleanText(event.tone) || (event.featured ? "orange" : "navy"),
+    status: cleanText(event.status || "published"),
+    source: cleanText(event.source || "campus_events"),
+    initially_registered: registeredEventIds.has(eventId),
+    is_registered: registeredEventIds.has(eventId),
+  };
+}
+
+async function campusEventsForStudents(staticEvents = [], registeredEventIds = new Set()) {
+  const now = new Date();
+  const managedEvents = await CampusEventModel.find({
+    status: "published",
+    visibility: { $in: ["public", "campus"] },
+    $or: [{ end_at: null }, { end_at: { $gte: now } }],
+  })
+    .sort({ featured: -1, sort_order: 1, start_at: 1, createdAt: -1 })
+    .limit(100)
+    .lean();
+
+  const seen = new Set();
+  const serializedManagedEvents = managedEvents.map((event) => {
+    const serialized = serializeCampusEvent(
+      { ...event, source: "campus_events" },
+      registeredEventIds,
+    );
+    seen.add(serialized.event_id);
+    return serialized;
+  });
+
+  const fallbackEvents = staticEvents
+    .map((event) =>
+      serializeCampusEvent(
+        {
+          ...event,
+          event_id: event.event_id || event.id || slugFromText(event.title),
+          source: "static",
+        },
+        registeredEventIds,
+      ),
+    )
+    .filter((event) => {
+      if (seen.has(event.event_id)) return false;
+      seen.add(event.event_id);
+      return true;
+    });
+
+  return [...serializedManagedEvents, ...fallbackEvents];
 }
 
 function publicCampusJobFilter() {
@@ -252,13 +354,19 @@ const content = async (req, res, next) => {
     })
       .select("event_id title organizer kind date_label mode status updatedAt")
       .lean();
+    const registeredEventIds = new Set(
+      registrations.map((registration) => cleanText(registration.event_id)).filter(Boolean),
+    );
+    const campusContent = readCampusContent();
+    const events = await campusEventsForStudents(campusContent.events || [], registeredEventIds);
 
     return ReturnAppData.getData({
       res,
       data: {
-        ...readCampusContent(),
+        ...campusContent,
+        events,
         event_registrations: registrations,
-        meta: { source: "backend", version: "campus-content-v1" },
+        meta: { source: "backend", version: "campus-content-v2" },
       },
       message: "campus_content",
     });
@@ -278,14 +386,19 @@ const events = async (req, res, next) => {
     const registeredEventIds = registrations
       .map((registration) => cleanText(registration.event_id))
       .filter(Boolean);
+    const campusContent = readCampusContent();
+    const events = await campusEventsForStudents(
+      campusContent.events || [],
+      new Set(registeredEventIds),
+    );
 
     return ReturnAppData.getData({
       res,
       data: {
-        events: readCampusContent().events || [],
+        events,
         event_registrations: registrations,
         registered_event_ids: registeredEventIds,
-        meta: { source: "backend", version: "campus-events-v1" },
+        meta: { source: "backend", version: "campus-events-v2" },
       },
       message: "campus_events",
     });
@@ -320,6 +433,13 @@ const cancelEventRegistration = async (req, res, next) => {
 
     if (!registration) {
       return ReturnAppData.getError({ res, status: 404, message: "Campus event registration not found." });
+    }
+
+    if (existingRegistration?.status === "registered") {
+      await CampusEventModel.updateOne(
+        { event_id: eventId, registered_count: { $gt: 0 } },
+        { $inc: { registered_count: -1 } },
+      );
     }
 
     await writeAuditLog({

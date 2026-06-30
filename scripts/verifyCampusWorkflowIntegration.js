@@ -161,6 +161,7 @@ async function main() {
     AnalyticsEventModel,
     ApplicationStatusHistoryModel,
     AuditLogModel,
+    CampusEventModel,
     CampusEventRegistrationModel,
     CampusOpportunityModel,
     CompanyModel,
@@ -401,7 +402,12 @@ async function main() {
       entity_model: "universities",
       display_name: universityA.name,
       status: "active",
-      permissions: ["campus.verifications.manage", "campus.dashboard.view"],
+      permissions: [
+        "campus.verifications.manage",
+        "campus.dashboard.view",
+        "campus.events.view",
+        "campus.events.manage",
+      ],
       is_default: true,
     },
     {
@@ -412,7 +418,12 @@ async function main() {
       entity_model: "universities",
       display_name: universityB.name,
       status: "active",
-      permissions: ["campus.verifications.manage", "campus.dashboard.view"],
+      permissions: [
+        "campus.verifications.manage",
+        "campus.dashboard.view",
+        "campus.events.view",
+        "campus.events.manage",
+      ],
       is_default: true,
     },
     {
@@ -519,6 +530,143 @@ async function main() {
     "student context should access campus dashboard",
   );
   assert.equal(dashboard.data.account.type, "campus");
+
+  const managedEvent = await expectStatus(
+    request(baseUrl, "POST", "/university/v1/events", {
+      token: universityTokensA.accessToken,
+      contextId: universityContextA._id,
+      body: {
+        title: "Managed Career Fair",
+        summary: "Meet approved campus hiring partners.",
+        organizer: "Alpha Career Center",
+        kind: "fair",
+        mode: "onsite",
+        date_label: "Next Wednesday",
+        start_at: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+        location: "Student Hub",
+        status: "published",
+        featured: true,
+        tags: ["career_fair", "students"],
+      },
+    }),
+    201,
+    "university admin should create a managed campus event",
+  );
+  assert.equal(managedEvent.data.title, "Managed Career Fair");
+  assert.equal(managedEvent.data.status, "published");
+  assert.equal(
+    await CampusEventModel.countDocuments({ university_id: universityA._id }),
+    1,
+    "managed campus event should be stored for the university",
+  );
+  assert.ok(
+    await AuditLogModel.findOne({
+      action: "university_campus_event_created",
+      entity_id: managedEvent.data._id,
+    }).lean(),
+    "managed campus event creation should be audited",
+  );
+
+  const managedEventList = await expectStatus(
+    request(baseUrl, "GET", "/university/v1/events", {
+      token: universityTokensA.accessToken,
+      contextId: universityContextA._id,
+    }),
+    200,
+    "university admin should list managed campus events",
+  );
+  assert.ok(
+    managedEventList.data.some(
+      (event) => String(event._id) === String(managedEvent.data._id),
+    ),
+    "managed campus event list should include the created event",
+  );
+
+  const studentEvents = await expectStatus(
+    request(baseUrl, "GET", "/user/v1/campus/events", {
+      token: studentTokens.accessToken,
+      contextId: studentContext._id,
+    }),
+    200,
+    "student campus events feed should include managed events",
+  );
+  assert.ok(
+    studentEvents.data.events.some(
+      (event) =>
+        event.event_id === managedEvent.data.event_id &&
+        event.source === "campus_events",
+    ),
+    "student event feed should expose published managed campus events",
+  );
+
+  const managedRegistration = await expectStatus(
+    request(
+      baseUrl,
+      "POST",
+      `/user/v1/campus/events/${managedEvent.data.event_id}/register`,
+      {
+        token: studentTokens.accessToken,
+        contextId: studentContext._id,
+      },
+    ),
+    201,
+    "student should register for a managed campus event by id",
+  );
+  assert.equal(
+    managedRegistration.data.title,
+    "Managed Career Fair",
+    "managed event registration should use server-owned event details",
+  );
+  assert.equal(
+    (await CampusEventModel.findById(managedEvent.data._id).lean())
+      .registered_count,
+    1,
+    "managed event registration should update the event registration count",
+  );
+
+  const updatedManagedEvent = await expectStatus(
+    request(baseUrl, "PATCH", `/university/v1/events/${managedEvent.data._id}`, {
+      token: universityTokensA.accessToken,
+      contextId: universityContextA._id,
+      body: {
+        title: "Managed Career Fair Updated",
+        location: "Main Hall",
+        sort_order: 2,
+      },
+    }),
+    200,
+    "university admin should update a managed campus event",
+  );
+  assert.equal(updatedManagedEvent.data.title, "Managed Career Fair Updated");
+  assert.ok(
+    await AuditLogModel.findOne({
+      action: "university_campus_event_updated",
+      entity_id: managedEvent.data._id,
+    }).lean(),
+    "managed campus event update should be audited",
+  );
+
+  const archivedManagedEvent = await expectStatus(
+    request(
+      baseUrl,
+      "DELETE",
+      `/university/v1/events/${managedEvent.data._id}`,
+      {
+        token: universityTokensA.accessToken,
+        contextId: universityContextA._id,
+      },
+    ),
+    200,
+    "university admin should archive a managed campus event",
+  );
+  assert.equal(archivedManagedEvent.data.status, "archived");
+  assert.ok(
+    await AuditLogModel.findOne({
+      action: "university_campus_event_archived",
+      entity_id: managedEvent.data._id,
+    }).lean(),
+    "managed campus event archive should be audited",
+  );
 
   const eventId = `career-fair-${suffix}`;
   const firstRegister = await expectStatus(
@@ -1252,7 +1400,7 @@ async function main() {
   assert.match(csvText, /registered_students/);
 
   console.log(
-    "Campus workflow integration verified for student-only campus access, event lifecycle, opportunity save/apply, verification review, opt-in campus talent privacy gating, partner moderation, university requests, reports, counters, audit logs, and analytics.",
+    "Campus workflow integration verified for student-only campus access, managed campus event CRUD, event lifecycle, opportunity save/apply, verification review, opt-in campus talent privacy gating, partner moderation, university requests, reports, counters, audit logs, and analytics.",
   );
 }
 

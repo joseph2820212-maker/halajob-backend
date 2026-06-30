@@ -84,6 +84,10 @@ const requiredEndpoints = [
   ["GET", "/university/v1/reports/outcomes"],
   ["GET", "/university/v1/partners"],
   ["GET", "/university/v1/employer-partners"],
+  ["GET", "/university/v1/events"],
+  ["POST", "/university/v1/events"],
+  ["PATCH", "/university/v1/events/:id"],
+  ["DELETE", "/university/v1/events/:id"],
   ["GET", "/university/v1/opportunities"],
   ["POST", "/university/v1/opportunities"],
 

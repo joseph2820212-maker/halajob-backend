@@ -238,6 +238,37 @@ router.get(
 );
 
 router.get(
+  "/events",
+  universityAdminGuard,
+  requireUniversityPermission("campus.events.view"),
+  validate(platformSchemas.universityEventListSchema),
+  campusController.listUniversityEvents,
+);
+router.post(
+  "/events",
+  universityAdminGuard,
+  requireUniversityPermission("campus.events.manage"),
+  upload.none(),
+  validate(platformSchemas.universityEventCreateSchema),
+  campusController.createUniversityEvent,
+);
+router.patch(
+  "/events/:id",
+  universityAdminGuard,
+  requireUniversityPermission("campus.events.manage"),
+  upload.none(),
+  validate(platformSchemas.universityEventUpdateSchema),
+  campusController.updateUniversityEvent,
+);
+router.delete(
+  "/events/:id",
+  universityAdminGuard,
+  requireUniversityPermission("campus.events.manage"),
+  validate(platformSchemas.universityEventDeleteSchema),
+  campusController.archiveUniversityEvent,
+);
+
+router.get(
   "/opportunities",
   universityAdminGuard,
   validate(platformSchemas.campusListSchema),

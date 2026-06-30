@@ -472,6 +472,10 @@ assertRoutes({
     "GET /reports/outcomes",
     "GET /partners",
     "GET /employer-partners",
+    "GET /events",
+    "POST /events",
+    "PATCH /events/:id",
+    "DELETE /events/:id",
     "GET /opportunities",
     "POST /opportunities",
   ],
@@ -544,6 +548,26 @@ assertRouteBlocksInclude({
       method: "GET",
       path: "/opportunities",
       snippets: ["universityAdminGuard", "validate(platformSchemas.campusListSchema)", "campusController.userUniversityOpportunities"],
+    },
+    {
+      method: "GET",
+      path: "/events",
+      snippets: ["universityAdminGuard", "requireUniversityPermission(\"campus.events.view\")", "validate(platformSchemas.universityEventListSchema)", "campusController.listUniversityEvents"],
+    },
+    {
+      method: "POST",
+      path: "/events",
+      snippets: ["universityAdminGuard", "requireUniversityPermission(\"campus.events.manage\")", "upload.none()", "validate(platformSchemas.universityEventCreateSchema)", "campusController.createUniversityEvent"],
+    },
+    {
+      method: "PATCH",
+      path: "/events/:id",
+      snippets: ["universityAdminGuard", "requireUniversityPermission(\"campus.events.manage\")", "upload.none()", "validate(platformSchemas.universityEventUpdateSchema)", "campusController.updateUniversityEvent"],
+    },
+    {
+      method: "DELETE",
+      path: "/events/:id",
+      snippets: ["universityAdminGuard", "requireUniversityPermission(\"campus.events.manage\")", "validate(platformSchemas.universityEventDeleteSchema)", "campusController.archiveUniversityEvent"],
     },
     {
       method: "POST",

@@ -84,6 +84,21 @@ const eventIdParam = yup.object({
   eventId: yup.string().trim().max(120).required("eventId is required"),
 });
 
+const campusEventStatus = yup
+  .string()
+  .trim()
+  .oneOf(["draft", "published", "archived", "cancelled"]);
+
+const campusEventVisibility = yup.string().trim().oneOf(["public", "campus"]);
+
+const optionalStringArray = yup
+  .mixed()
+  .test("valid-string-array", "Must be an array or comma-separated string", (value) => {
+    if (value === undefined) return true;
+    if (typeof value === "string") return true;
+    return Array.isArray(value);
+  });
+
 const notificationIdentifierBody = bodyObject.shape({
   id: objectId,
   notification_id: objectId,
@@ -278,6 +293,102 @@ const schemas = {
       mode: yup.string().trim().max(120),
       note: yup.string().trim().max(1000),
     }),
+  }),
+
+  universityEventListSchema: yup.object({
+    query: yup.object({
+      page: yup.number().integer().min(1).max(100000),
+      limit: yup.number().integer().min(1).max(200),
+      status: yup.string().trim().max(80),
+      q: yup.string().trim().max(200),
+      search: yup.string().trim().max(200),
+      university_id: objectId,
+    }),
+    body: bodyObject,
+  }),
+
+  universityEventCreateSchema: yup.object({
+    body: bodyObject.shape({
+      university_id: objectId,
+      event_id: yup.string().trim().max(120),
+      title: yup.string().trim().max(240),
+      event_title: yup.string().trim().max(240),
+      summary: yup.string().trim().max(2000),
+      description: yup.string().trim().max(10000),
+      details: yup.string().trim().max(10000),
+      organizer: yup.string().trim().max(240),
+      host: yup.string().trim().max(240),
+      kind: yup.string().trim().max(120),
+      tag: yup.string().trim().max(120),
+      type: yup.string().trim().max(120),
+      mode: yup.string().trim().max(120),
+      date_label: yup.string().trim().max(160),
+      date: yup.string().trim().max(160),
+      meta: yup.string().trim().max(240),
+      start_at: yup.string().trim().max(120),
+      starts_at: yup.string().trim().max(120),
+      end_at: yup.string().trim().max(120),
+      ends_at: yup.string().trim().max(120),
+      location: yup.string().trim().max(240),
+      campus_name: yup.string().trim().max(240),
+      campus: yup.string().trim().max(240),
+      registration_url: yup.string().trim().max(2000),
+      url: yup.string().trim().max(2000),
+      capacity: yup.number().integer().min(0).max(100000),
+      featured: boolish,
+      tags: optionalStringArray,
+      bullets: optionalStringArray,
+      highlights: optionalStringArray,
+      agenda: optionalStringArray,
+      status: campusEventStatus,
+      visibility: campusEventVisibility,
+      sort_order: yup.number().integer().min(-100000).max(100000),
+      order: yup.number().integer().min(-100000).max(100000),
+    }),
+  }),
+
+  universityEventUpdateSchema: yup.object({
+    params: idParam,
+    body: bodyObject.shape({
+      event_id: yup.string().trim().max(120),
+      title: yup.string().trim().max(240),
+      event_title: yup.string().trim().max(240),
+      summary: yup.string().trim().max(2000),
+      description: yup.string().trim().max(10000),
+      details: yup.string().trim().max(10000),
+      organizer: yup.string().trim().max(240),
+      host: yup.string().trim().max(240),
+      kind: yup.string().trim().max(120),
+      tag: yup.string().trim().max(120),
+      type: yup.string().trim().max(120),
+      mode: yup.string().trim().max(120),
+      date_label: yup.string().trim().max(160),
+      date: yup.string().trim().max(160),
+      meta: yup.string().trim().max(240),
+      start_at: yup.string().trim().max(120),
+      starts_at: yup.string().trim().max(120),
+      end_at: yup.string().trim().max(120),
+      ends_at: yup.string().trim().max(120),
+      location: yup.string().trim().max(240),
+      campus_name: yup.string().trim().max(240),
+      campus: yup.string().trim().max(240),
+      registration_url: yup.string().trim().max(2000),
+      url: yup.string().trim().max(2000),
+      capacity: yup.number().integer().min(0).max(100000).nullable(),
+      featured: boolish,
+      tags: optionalStringArray,
+      bullets: optionalStringArray,
+      highlights: optionalStringArray,
+      agenda: optionalStringArray,
+      status: campusEventStatus,
+      visibility: campusEventVisibility,
+      sort_order: yup.number().integer().min(-100000).max(100000),
+      order: yup.number().integer().min(-100000).max(100000),
+    }),
+  }),
+
+  universityEventDeleteSchema: yup.object({
+    params: idParam,
   }),
 
   campusApplicationMessageSchema: yup.object({
