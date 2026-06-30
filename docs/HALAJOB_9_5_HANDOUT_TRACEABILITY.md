@@ -14,10 +14,10 @@ findings that are now fixed and guarded.
 |---|---|
 | Current code/proof branch | `codex/gate-a-mobile-ui-lock` |
 | Clean source proof commit | `ff5b8ba` |
-| Latest proof-doc baseline before this APK refresh | `0430e7f` |
+| Latest proof-doc baseline before this APK refresh | `ab71aec` |
 | Clean checkout gate | `npm run test:launch-gate` passed from detached clean worktree `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe-clean-ff5b8ba` |
-| Current tester APK source | `8705162` |
-| Current tester APK SHA-256 | `21aeb0a1161bd8ae6531ded16ccaff03419b0fb5b0b8b17f5b42ccf23243c1d8` |
+| Current tester APK source | `ab71aec` |
+| Current tester APK SHA-256 | `c8748ac94902af619a2000e3e12f3456d3d61e552d467373e17bfa6fddb05553` |
 | APK proof guard | `npm run test:mobile-apk-proof --silent` passed against the latest debug APK metadata |
 
 ## Wave Status
@@ -30,7 +30,7 @@ findings that are now fixed and guarded.
 | Wave 4 - Navigation and More cleanup | Done for launch scope | Mobile source inventory and UI contract guards protect seeker/campus/company canonical More placement, prevent company More from duplicating primary tabs, keep AI as one feature-gated entry, and keep seeker live sync below tab content. | Owner visual approval on final Android device. |
 | Wave 5 - Web/admin/company polish | Improved and guarded | Web build, 16-file/65-test Vitest suite, tab reachability, route wiring, UI action contracts, bundle-size guard, and E2E smoke prove admin/company/seeker/campus tabs are reachable, key employer/campus actions are wired, and the role-dashboard bundle stays below the launch threshold. Tests cover confirmations, fixed choices, CV Studio, employer pause/resume, interview join/reschedule, campus events, university verification actions, saved-search delete, notification delete, application withdrawal, interview rejection, and offer decline. | Product-owner judgment on whether web density is acceptable for launch. |
 | Wave 6 - Test/proof reproducibility | Done for code-owned scope | `npm run test:launch-gate` passed from a detached clean checkout at `ff5b8ba`; web did clean install/build/tests/E2E; mobile ran `pub get`, `analyze`, and 450 tests; backend launch-critical and Syria product aggregates passed. After the `8705162` mobile maintainability extraction, `npm run test:launch-gate:mobile` passed again and the screen inventory guard covers the new `seeker_discovery_widgets.dart` and `seeker_cv_manager_widgets.dart` part files. MongoDB integration setup has external URI scoping, `MONGOMS_SYSTEM_BINARY` preflight validation, memory-server fallback guidance, and a helper contract. | None for local code-owned reproducibility; CI/provider availability remains environment-controlled. |
-| Wave 7 - Release readiness without manual device check | Done for code-owned scope, not public-launch complete | The current branch has clean launch-gate proof, current APK metadata proof from `8705162`, emulator auth/campus smoke screenshots, and docs refreshed after the APK proof. Manual real-device approval is explicitly excluded from code completion and not claimed. | Production smoke, provider credentials, signing, and owner device approval. |
+| Wave 7 - Release readiness without manual device check | Done for code-owned scope, not public-launch complete | The current branch has clean launch-gate proof, current APK metadata proof from `ab71aec`, emulator auth/campus smoke screenshots, and docs refreshed after the APK proof. Manual real-device approval is explicitly excluded from code completion and not claimed. | Production smoke, provider credentials, signing, and owner device approval. |
 
 ## Definition Of 9.5 Done Mapping
 
@@ -48,7 +48,7 @@ findings that are now fixed and guarded.
 | Boolean/small-choice controls avoid dropdowns | Passed for launch-critical surfaces by mobile and web fixed-choice tests/contracts. |
 | Arabic/English labels exist for new surfaces | Passed by `npm run test:bilingual-ui-payload`; Arabic launch payload is English/Arabic scoped. |
 | Provider limits are honest | Kept in `docs/SYRIA_LAUNCH_PRODUCT_QA.md`, `docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md`, and this traceability file. |
-| Docs are refreshed after final source proof and APK proof is current | Current proof docs now distinguish the clean `ff5b8ba` full launch-gate replay from the focused `8705162` mobile launch gate and APK rebuild. |
+| Docs are refreshed after final source proof and APK proof is current | Current proof docs now distinguish the clean `ff5b8ba` full launch-gate replay, the focused `8705162` mobile launch gate, and the current `ab71aec` APK rebuild. |
 
 ## Maintainability Follow-Up
 

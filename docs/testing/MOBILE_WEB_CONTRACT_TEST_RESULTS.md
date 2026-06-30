@@ -2,8 +2,8 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `ff5b8ba` clean full launch gate; focused mobile source through `8705162`
-Latest APK source build commit: `8705162`
+Source contracts tested through: `ff5b8ba` clean full launch gate; focused mobile source through `8705162`; current APK proof through `ab71aec`
+Latest APK source build commit: `ab71aec`
 
 ## Passed Coverage
 
@@ -51,7 +51,7 @@ Latest APK source build commit: `8705162`
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed inside the clean `ff5b8ba` full launch-gate replay, then passed again at source commit `8705162` after extracting seeker-discovery and seeker CV Manager dashboard widgets; Flutter `pub get`, `analyze`, and full `flutter test` completed with 450 tests passed |
-| Current APK emulator smoke | A debug APK from source commit `8705162` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 8705162 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `21aeb0a1161bd8ae6531ded16ccaff03419b0fb5b0b8b17f5b42ccf23243c1d8`. Documentation commits after `8705162` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
+| Current APK emulator smoke | A debug APK from source commit `ab71aec` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | ab71aec | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `c8748ac94902af619a2000e3e12f3456d3d61e552d467373e17bfa6fddb05553`. Documentation commits after `ab71aec` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 
