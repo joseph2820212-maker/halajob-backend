@@ -93,5 +93,11 @@ CI/mobile contract evidence until a Flutter SDK machine runs the commands.
 
 - Production secret rotation.
 - Live SMTP, push, storage, hosting, and domain smoke tests.
+- AI provider credentials, pricing, and live output QA, or explicit approval to
+  keep AI disabled for launch.
+- CV parser adapter and live parser proof if auto-fill is desired; otherwise
+  keep parser-disabled UI copy.
 - Production Android signing and device QA.
 - Online payments remain blocked until the owner chooses a payment provider.
+- Owner real-device UI approval from a final APK/AAB built after the final
+  app-code commit.

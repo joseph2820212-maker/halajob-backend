@@ -238,10 +238,41 @@ const qaDoc = read("docs/SYRIA_LAUNCH_PRODUCT_QA.md");
   "Live SMTP, push, storage, hosting, and domain smoke tests",
   "Production Android signing and device QA",
   "Online payments remain blocked until the owner chooses a payment provider",
+  "AI provider credentials, pricing, and live output QA",
+  "CV parser adapter and live parser proof if auto-fill is desired",
+  "Owner real-device UI approval from a final APK/AAB",
 ].forEach((blocker) => {
   assert.ok(
     qaDoc.includes(blocker),
     `Syria launch QA doc must keep owner-side blocker: ${blocker}.`,
+  );
+});
+
+const readinessReport = read("docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md");
+[
+  ["AI provider", "AI is feature-gated; no provider output is claimed."],
+  [
+    "CV parser provider",
+    "Parser defaults disabled and UI states this honestly.",
+  ],
+  [
+    "SMTP/Firebase/storage",
+    "Local contracts exist; live providers are not claimed.",
+  ],
+  ["Payments", "Online checkout/webhooks are not claimed."],
+  [
+    "Production Android release",
+    "Tester APK flow exists; no production-signed APK/AAB is claimed.",
+  ],
+  ["Owner UI approval", "Not done in code."],
+].forEach(([blocker, stance]) => {
+  assert.ok(
+    readinessReport.includes(blocker),
+    `Readiness report must keep provider/owner blocker row: ${blocker}.`,
+  );
+  assert.ok(
+    readinessReport.includes(stance),
+    `Readiness report must keep honest current stance for ${blocker}.`,
   );
 });
 
