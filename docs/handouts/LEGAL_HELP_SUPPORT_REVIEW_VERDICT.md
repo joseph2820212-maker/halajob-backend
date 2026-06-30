@@ -60,16 +60,32 @@ Everything is **frontend + a small backend gate** — no new backend endpoints n
 
 ---
 
-## Owner decision required: SYP currency
+## LOCKED DECISION (owner): SYP currency + payments
 
-The launch contract rejects SYP; the UI defaults to SYP. Pick one (recommended ▸):
+Owner decision (2026-06-30): **Support SYP, USD, and EUR. Enable payments** —
+Syria has a few electronic-payment options, so paid flows are ON (not disabled).
 
-- ▸ **SYP first-class for salary DISPLAY; paid plans/purchases DISABLED at launch.**
-  (Syria-first reality: show pay in SYP, but don't pretend card payments work.)
-  Implementation: add SYP to allowed *display* currencies, keep it out of
-  *payment* currencies, disable purchase flows with an honest "not yet available".
-- Keep contract as-is (USD/EUR/GBP only) and change the UI default away from SYP.
-- Enable SYP everywhere incl. payments (only if legal/provider confirm — unlikely).
+Implementation for Codex:
+- **Allowed currencies = `["SYP", "USD", "EUR"]`** for BOTH salary display and
+  payments. Update `services/globalLaunchContract.service.js:1`
+  (`SUPPORTED_LAUNCH_CURRENCIES`) — add SYP, drop GBP — and the matching test
+  `scripts/verifyGlobalLaunchContract.js` (it currently asserts SYP is rejected;
+  flip that).
+- Update the salary/currency disclaimer content page
+  (`seeders/data/content/pages/03_billing_disclaimers.json`) which currently says
+  "USD, EUR, and GBP" → "SYP, USD, and EUR".
+- Keep the web default `default_currency:"SYP"` (`web/src/shared/settings.tsx:435`)
+  — it's now valid.
+- **Payments ENABLED but provider-agnostic / config-driven.** Wire purchase flows
+  to a configurable payment provider; do NOT hard-code a single processor.
+  Integrate the Syria-available electronic-payment option(s) the owner provides
+  via config/env, with a clean disabled state if a provider isn't configured for
+  an environment.
+- ⚠️ Compliance caveat (record, don't block): the actual processor must be
+  confirmed by ops/legal for sanctions exposure before production money moves.
+  Engineering stays config-driven so the provider can be set per environment.
+- Add tests: SYP/USD/EUR salary display; payment purchase enabled when a provider
+  is configured; honest disabled state when it isn't.
 
 ---
 
