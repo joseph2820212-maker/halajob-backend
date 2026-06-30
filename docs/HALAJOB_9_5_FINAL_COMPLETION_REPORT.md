@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `eaca7f6`
+- Current reviewed code/proof-guard commit before this report refresh: `1ff876d`
 - Current APK source build commit: `eaca7f6`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -11,16 +11,17 @@
 
 ## Current Verdict
 
-The branch is much stronger than the older `dc251c6` audit package. Settings, CV Manager, filters, company IA, fixed-choice controls, and proof gates have all moved forward. It should still not be called final 9.5 until the full release gate list is replayed from a clean checkout and a final current-HEAD APK is rebuilt/smoked after the last app-code change.
+The branch is much stronger than the older `dc251c6` audit package. Settings, CV Manager, filters, company IA, fixed-choice controls, DB aggregates, web E2E, and mobile launch gates have all moved forward. It should still not be called final 9.5 until the final release gate list is replayed from a clean checkout and owner-controlled production/device/signing blockers are closed or explicitly accepted as launch exclusions.
 
 Current working rating: 8.5/10 source readiness.
 
-The remaining gap to 9.5 is mostly final proof and owner-controlled launch readiness: full backend/web/mobile gate replay, production smoke, production secrets/provider checks, production signing, and owner real-device approval.
+The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus clean-checkout release replay: production smoke, production secrets/provider checks, production signing, production-like storage/Firebase/SMTP proof, and owner real-device approval.
 
 ## Recent Codex 9.5 Polish Commits
 
 | Commit | Summary |
 |---|---|
+| `1ff876d` | Fixed mobile analyzer warnings in the university notification service test fake, allowing the full mobile launch gate to pass cleanly. |
 | `eaca7f6` | Refreshed the university notification proof docs after `aef1c87`, keeping the final report and APK-proof expectations aligned before the current APK rebuild. |
 | `aef1c87` | Mobile university-admin notifications are no longer a placeholder-only screen: the header badge loads shared notification unread data, the inbox lists backend notifications, mark-read/mark-all/delete call notification routes, taps route into university tabs/settings, and service/widget/source guards protect the flow. |
 | `b6f5bb2` | Web application question options now render as radio rows instead of dropdowns, with tests proving missing-required handling and unchanged apply payloads. |
@@ -77,8 +78,12 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 | `npm --prefix web test -- src/shared/workflows.test.tsx` | Passed | 3 shared-workflow tests prove notification delete requires confirmation before backend mutation and application question options use radio rows while preserving apply payloads. |
 | `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 62 tests after the web destructive-action guards, AI usage-limit control update, and application question choice update. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed. |
+| `npm --prefix web run e2e` | Passed | Local Vite preview/Chrome smoke passed on this machine, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses. |
 | `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 317/317, UI actions, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed. |
+| `npm run test:integration:launch-critical --silent` | Passed | Full DB-backed launch-critical aggregate passed on rerun using the shared `mongodb-memory-server` fallback after an earlier transient stop around the subscription script; individual remaining scripts also passed. |
+| `npm run test:integration:syria-product --silent` | Passed | Full Syria product aggregate passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding. |
 | `flutter test test\university_dashboard_service_test.dart test\university_dashboard_screen_test.dart` | Passed | 17 focused university tests passed after `aef1c87`, proving `/notifications/v1` load/read/read-all/delete route wiring, real unread badge data, inbox display, notification tap routing, and existing university workflows. |
+| `npm run test:launch-gate:mobile --silent` | Passed | Flutter `pub get`, `analyze`, and full `flutter test` passed after `1ff876d`; 443 mobile tests passed, including typed seeker/company login credentials, campus tester shortcut, Settings fixed-choice rows, CV manager/parser honesty, expanded filters, More placement, company IA, notifications, and sync-card placement. |
 | `npm run test:mobile-ui-contract --silent` | Passed | Passed after `aef1c87`; now also guards the university notification bell against returning to a static placeholder-only screen. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
 | `npm run check:syntax --silent` | Passed | Full JS syntax pass after the integration helper change. |

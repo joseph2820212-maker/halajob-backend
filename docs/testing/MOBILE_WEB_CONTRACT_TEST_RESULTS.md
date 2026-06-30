@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: mobile `aef1c87`, web `b6f5bb2`
+Source contracts tested through: `1ff876d`
 Latest APK source build commit: `eaca7f6`
 
 ## Passed Coverage
@@ -30,6 +30,9 @@ Latest APK source build commit: `eaca7f6`
 | Web company employer tasks | `npm --prefix web test -- company` passed 1 file / 5 tests, proving applicant actions, member/library choices, support ticket create/reply, and company job posting fixed-choice payloads |
 | Web shared workflow contracts | `npm --prefix web test -- src/shared/workflows.test.tsx` passed 1 file / 3 tests, proving notification delete requires confirmation before the backend mutation and application question options render as radio rows while preserving answer payloads |
 | Full web test suite | `npm --prefix web test` passed 16 files / 62 tests after `b6f5bb2` |
+| Web browser E2E smoke | `npm --prefix web run e2e` passed against local Vite preview/Chrome, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses |
+| DB launch-critical aggregate | `npm run test:integration:launch-critical --silent` passed on rerun with the shared Mongo helper; the individual remaining scripts after an earlier transient stop also passed |
+| DB Syria product aggregate | `npm run test:integration:syria-product --silent` passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding |
 | Backend saved-search filter contract | `npm run test:integration:saved-search-alerts` passed after adding API round-trip/run-now proof for skills, education level, salary minimum, and currency filters |
 | Mobile expanded job filters | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` and `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` passed, proving skills, education level, salary minimum, alert frequency, and saved-search persistence |
 | Mobile university admin notifications | `flutter test test/university_dashboard_service_test.dart test/university_dashboard_screen_test.dart` passed 17 focused tests after `aef1c87`, proving university notifications load from `/notifications/v1`, unread badge data is real, mark-read/mark-all/delete actions call backend routes, and notification taps route to the right university dashboard surfaces |
@@ -39,7 +42,7 @@ Latest APK source build commit: `eaca7f6`
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, seeker/campus More placement, and company More primary-flow duplication against regression |
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed, proving external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
-| Flutter analyzer | `flutter analyze` passed from `mobile/` with no issues |
+| Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed after `1ff876d`; Flutter `pub get`, `analyze`, and full `flutter test` completed with 443 tests passed |
 | Current APK emulator smoke | A debug APK from source commit `eaca7f6` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | eaca7f6 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `d9b19d7c5e1bab862d9440e91ab78f96eb647e77465d8143edf9288450192938`. Documentation commits after `eaca7f6` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
