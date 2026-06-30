@@ -1,0 +1,54 @@
+{
+  "document": "docs/FUNCTION_PLACEMENT_MAP.md",
+  "requiredPhrases": [
+    "Header profile opens entity profile",
+    "Header settings opens account settings",
+    "Sign out must be visible",
+    "AI appears once per role",
+    "CV belongs to seeker `CV Studio` on web and mobile `CV Manager`",
+    "Manual WhatsApp belongs to communications/preferences plus contextual share actions",
+    "Video interviews belong to interview/application/applicant workflows",
+    "Primary bottom-tab flows may appear in More only as small shortcuts",
+    "Company More must not repeat Home dashboard cards, Jobs, Applicants, Interviews, or Talent as large cards",
+    "University members are wired on web but not clearly on mobile",
+    "Update this map when changing placement"
+  ],
+  "requiredSections": [
+    "## Job Seeker Placement",
+    "## Campus Student Placement",
+    "## University Career-Center Placement",
+    "## Company Placement",
+    "## Admin And Operations Placement",
+    "## Public And Cross-Cutting Placement",
+    "## Known Gaps To Fix After Mapping"
+  ],
+  "requiredRoleFunctions": {
+    "jobSeeker": [
+      "CV builder/generate/download",
+      "AI career tools",
+      "Manual WhatsApp",
+      "Interviews and video joins"
+    ],
+    "campusStudent": [
+      "Student verification",
+      "Talent visibility",
+      "AI career tools"
+    ],
+    "university": [
+      "Members/team",
+      "Verification queue/documents",
+      "Reports/export"
+    ],
+    "company": [
+      "AI hiring tools",
+      "Interviews/video scheduling",
+      "Talent pool/invitations",
+      "Manual WhatsApp/contact"
+    ],
+    "admin": [
+      "Career passports",
+      "Communication logs",
+      "AI operations"
+    ]
+  }
+}

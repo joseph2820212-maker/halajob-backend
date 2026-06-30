@@ -5,6 +5,10 @@ feature drift where the same function appears in several places with different
 labels, or where a backend function is present but hidden from the expected
 role workflow.
 
+Parent source of truth: `docs/FUNCTION_PLACEMENT_MAP.md`. If a function moves
+between roles, tabs, More, profile, or settings, update that cross-platform map
+first, then update this mobile-specific plan and the regression guards.
+
 ## Shared Chrome Rules
 
 - Job seeker and campus keep three visible header actions: notifications,
@@ -70,6 +74,8 @@ role workflow.
 
 ## Regression Guards
 
+- `npm run test:function-placement-map` verifies the cross-platform function
+  placement map still contains the core role/module ownership rules.
 - `npm run test:ui-actions` verifies the source-level UI action contract in
   `docs/testing/ui-action-contract.json`.
 - `powershell -ExecutionPolicy Bypass -File mobile/scripts/assert-mobile-screen-inventory.ps1`

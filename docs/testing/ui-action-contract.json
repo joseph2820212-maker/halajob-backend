@@ -85,7 +85,8 @@
       "mustContain": [
         "aiToolsEnabledFromSettings(clientSettings)",
         "...(webAiToolsEnabled ? [\"ai tools\"] : [])",
-        "{webAiToolsEnabled && mode === \"student\" && tab === \"ai tools\" && <CampusAiPanel"
+        "{webAiToolsEnabled && mode === \"student\" && tab === \"ai tools\" && (",
+        "<CampusAiPanel setToast={setToast} ui={ui} />"
       ],
       "mustNotContain": [
         "VITE_FEATURE_AI_TOOLS_ENABLED"
