@@ -21,6 +21,12 @@ const universityService = read(
 );
 const authScreen = read("mobile/lib/src/features/auth/auth_screen.dart");
 const authService = read("mobile/lib/src/features/auth/auth_service.dart");
+const legalHelpScreens = read(
+  "mobile/lib/src/features/legal_help/legal_help_screens.dart",
+);
+const legalHelpService = read(
+  "mobile/lib/src/features/legal_help/legal_help_service.dart",
+);
 const clientFeatureSettings = read(
   "mobile/lib/src/core/config/client_feature_settings.dart",
 );
@@ -675,6 +681,41 @@ assertContains(
   authService,
   "Future<ClientFeatureSettings> fetchClientFeatureSettings",
   "mobile full client feature settings loader",
+);
+assertContains(
+  legalHelpService,
+  "Future<HelpArticleData> helpArticle",
+  "mobile help article detail route",
+);
+assertContains(
+  legalHelpService,
+  "path: '/public/v1/help/articles/${Uri.encodeComponent(normalizedKey)}'",
+  "mobile help article detail route",
+);
+assertContains(
+  legalHelpScreens,
+  "class HelpArticleDetailScreen extends StatefulWidget",
+  "mobile help article detail UI",
+);
+assertContains(
+  legalHelpScreens,
+  "key: ValueKey('help-article-${a.key}')",
+  "mobile help article detail UI",
+);
+assertContains(
+  legalHelpScreens,
+  "builder: (_) => HelpArticleDetailScreen(",
+  "mobile help article detail UI",
+);
+assertContains(
+  legalHelpScreens,
+  "ValueKey('help-article-contact-support')",
+  "mobile help article detail CTA",
+);
+assertContains(
+  legalHelpScreens,
+  "ValueKey('help-article-report-concern')",
+  "mobile help article detail CTA",
 );
 [
   "cvStudioEnabled",

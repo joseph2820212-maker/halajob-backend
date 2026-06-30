@@ -665,6 +665,26 @@
       }
     },
     {
+      "label": "mobile help article detail placement",
+      "route": {
+        "path": "mobile/lib/src/features/legal_help/legal_help_service.dart",
+        "mustContain": [
+          "/public/v1/help/articles/${Uri.encodeComponent(normalizedKey)}",
+          "Future<HelpArticleData> helpArticle"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/legal_help/legal_help_screens.dart",
+        "mustContain": [
+          "class HelpArticleDetailScreen",
+          "builder: (_) => HelpArticleDetailScreen(",
+          "ValueKey('help-article-${a.key}')",
+          "ValueKey('help-article-contact-support')",
+          "ValueKey('help-article-report-concern')"
+        ]
+      }
+    },
+    {
       "label": "mobile notification preference placement",
       "route": {
         "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",

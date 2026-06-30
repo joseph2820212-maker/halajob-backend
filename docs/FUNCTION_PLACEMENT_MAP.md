@@ -189,7 +189,7 @@ below.
 | Function family | Backend routes | UI location | Notes |
 | --- | --- | --- | --- |
 | Public company profile/search | `/public/v1/companies*` | Public web search/profile | Public screen only; authenticated shortcuts may link out. |
-| Legal/help pages | `/public/v1/legal*`, content routes | Public web and mobile legal/help screens | Mobile must use locked native navy chrome. |
+| Legal/help pages | `/public/v1/legal*`, content routes | Public web and mobile legal/help screens | Mobile uses locked native navy chrome; help article rows open full article detail from `/public/v1/help/articles/:key`. |
 | Support tickets | `/user/v1/support/tickets*` | Public web `/support` for authenticated ticket create/list/detail/reply/close | Mobile inbox pending in Stream B5; do not duplicate under unrelated More cards. |
 | Client feature settings | `/public/v1/client-settings` | Internal boot/config | Not visible as user feature except in admin Platform Settings. |
 | Health/readiness | `/health/live`, `/health/ready` | Ops/CI only | Never show as user navigation. |
