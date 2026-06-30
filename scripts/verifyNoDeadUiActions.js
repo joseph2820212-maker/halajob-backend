@@ -170,6 +170,13 @@ for (const target of targets) {
           );
         }
       }
+      for (const tag of findJsxTags(source, "ActionBar")) {
+        if (/\bonAction\s*=\s*\{\s*\(?\s*action\s*\)?\s*=>[\s\S]*\?[\s\S]*:/.test(tag.text)) {
+          failures.push(
+            `${file}:${lineForIndex(source, tag.index)} uses fallback ternary ActionBar routing instead of explicit action branches`,
+          );
+        }
+      }
     }
   }
 }
