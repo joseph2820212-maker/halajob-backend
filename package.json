@@ -12,6 +12,8 @@
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "seed": "node seeders/index.js",
     "seed:content": "node seeders/index.js content",
+    "seed:demo": "node scripts/seedDemoData.js",
+    "seed:demo:teardown": "node scripts/seedDemoData.js --teardown",
     "check:content": "node scripts/verifyContentPackageContract.js && node scripts/verifyLegalContentEnforcement.js",
     "check:emails": "node scripts/verifyEmailTemplatesRender.js",
     "check:web-routes": "node scripts/generateRouteVerificationReport.js && node scripts/verifyWebApiWiring.js",
