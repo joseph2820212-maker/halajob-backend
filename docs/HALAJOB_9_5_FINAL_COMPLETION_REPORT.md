@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `80a235a`
+- Current reviewed code/proof-guard commit before this report refresh: `e2611c3`
 - Current APK source build commit: `eaca7f6`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `e2611c3` | Hardened mobile Settings drill-in coverage: grouped rows stay on the Settings index, notification switches serialize channel payloads, and Data rights export/delete actions remain in their detail panel with delete confirmation. |
 | `80a235a` | Refreshed the handout gate proof after the current APK emulator smoke, keeping the final readiness report, route inventory, and mobile/web contract evidence aligned. |
 | `450cf75` | Refreshed the current APK proof after building and installing the `eaca7f6` debug APK on the emulator, including source metadata and SHA evidence. |
 | `1ff876d` | Fixed mobile analyzer warnings in the university notification service test fake, allowing the full mobile launch gate to pass cleanly. |
@@ -72,6 +73,8 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | Command | Result | Notes |
 |---|---|---|
 | `npm run test:launch-gate` | Passed | Full composed launch gate passed from `80a235a`: backend syntax/import/secret/i18n/security/integration/product gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/443 tests, route inventory, UI action, mobile route/UI, More placement, and bilingual payload contracts. |
+| `flutter analyze` | Passed | Run from `mobile/` after `e2611c3`; no issues found. |
+| `flutter test test\widget_test.dart --plain-name "settings"` | Passed | 9 Settings-related widget tests passed after `e2611c3`, including header profile/settings split, grouped Settings index, account detail save/upload/relogin, ticked privacy/job-alert rows, notification switches/payloads, data-rights export/delete confirmation, and logout-all confirmation. |
 | `npm --prefix web test -- public` | Passed | 2 public tests cover segmented public job filters and job rating radio payloads. |
 | `npm --prefix web test -- src/seeker/screens.test.tsx` | Passed | 7 seeker tests cover CV Studio hierarchy/parser honesty/visibility payloads, confirmation-gated CV delete, company review rating radio payloads, confirmation-gated application withdrawal, confirmation-gated interview rejection, and confirmation-gated offer decline. |
 | `npm --prefix web test -- admin` | Passed | 4 admin tests cover analytics choices, AI usage-limit feature choices, company queue confirmation/detail behavior, and audit/interview-prep sidebar reachability. |

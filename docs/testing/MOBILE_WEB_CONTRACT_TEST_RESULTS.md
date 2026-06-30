@@ -2,13 +2,14 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `80a235a`
+Source contracts tested through: `e2611c3`
 Latest APK source build commit: `eaca7f6`
 
 ## Passed Coverage
 
 | Area | Evidence |
 |---|---|
+| Mobile Settings drill-in panels | `flutter test test\widget_test.dart --plain-name "settings"` passed 9 Settings-related widget tests after `e2611c3`, proving grouped Settings index rows, hidden detail controls until drill-in, switch-based notification payloads, Data rights export/delete placement, delete confirmation, account save/upload/relogin, and logout-all confirmation |
 | Full launch gate | `npm run test:launch-gate` passed from `80a235a`, covering backend aggregate gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/443 tests, and UI contract route/action/mobile/bilingual guards |
 | Mobile route mounts | `npm run test:mobile-routes` |
 | Mobile UI contract | `npm run test:mobile-ui-contract` |
