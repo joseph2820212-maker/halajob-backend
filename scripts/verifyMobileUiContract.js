@@ -116,10 +116,10 @@ assertContains(
 );
 assertContains(
   iconButton,
-  ": halaSurfaceTint",
+  ": halaHeaderBtnBg",
   "HalaHeaderIconButton",
 );
-assertContains(iconButton, "? halaNavy", "HalaHeaderIconButton");
+assertContains(iconButton, "? halaHeaderFg", "HalaHeaderIconButton");
 assertContains(
   menuButton,
   "this.size = halaHeaderActionSize",
@@ -127,7 +127,7 @@ assertContains(
 );
 assertContains(
   menuButton,
-  "child: Icon(icon, color: halaNavy",
+  "child: Icon(icon, color: halaHeaderFg",
   "HalaHeaderMenuButton",
 );
 assertContains(brand, "size: halaHeaderBrandMarkSize", "header brand");

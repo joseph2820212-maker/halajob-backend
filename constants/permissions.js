@@ -147,6 +147,47 @@ export const PERMISSIONS = {
   SETTINGS_MANAGE: 'settings.manage',
   SEARCH_HISTORY_READ: 'search_history.read',
   IMPORT_MANAGE: 'import.manage',
+
+  // Permissions referenced by routes that were missing from the catalog, so
+  // delegated (non-super) admin roles could never be granted them and would hit
+  // 403. Adding them here auto-seeds (permissionSeeder) and grants to the admin
+  // role (roleSeeder uses ALL_DASH_PERMISSIONS). The CI catalog guard keeps this
+  // in sync going forward.
+  DASHBOARD_VIEW: 'dashboard.view',
+  DASHBOARD_SEARCH: 'dashboard.search',
+  FILES_READ: 'files.read',
+  AUDIT_VIEW: 'audit.view',
+  AI_VIEW: 'ai.view',
+  AI_MANAGE: 'ai.manage',
+  JOBS_MODERATE: 'jobs.moderate',
+  COMPANIES_MODERATE: 'companies.moderate',
+  UNIVERSITIES_READ: 'universities.read',
+  UNIVERSITIES_MANAGE: 'universities.manage',
+  TRUST_VIEW: 'trust.view',
+  TRUST_MANAGE: 'trust.manage',
+  TRANSLATIONS_VIEW: 'translations.view',
+  NOTIFICATIONS_VIEW: 'notifications.view',
+  CAREER_PASSPORTS_VIEW: 'career_passports.view',
+  SUPPORT_MANAGE: 'support.manage',
+  TALENT_REQUESTS_MANAGE: 'talentrequests.manage',
+  LEARNING_RESOURCES_VIEW: 'learning_resources.view',
+  LEARNING_RESOURCES_MANAGE: 'learning_resources.manage',
+  INTERVIEW_PREP_VIEW: 'interview_prep.view',
+  INTERVIEW_PREP_MANAGE: 'interview_prep.manage',
+
+  JOBS_VIEW: 'jobs.view',
+  JOBS_MANAGE: 'jobs.manage',
+  SETTINGS_VIEW: 'settings.view',
+  SUPPORT_VIEW: 'support.view',
+
+  // Generic resource-factory fallback permissions (dashResourceRouteFactory.js).
+  RESOURCES_READ: 'resources.read',
+  RESOURCES_CREATE: 'resources.create',
+  RESOURCES_UPDATE: 'resources.update',
+  RESOURCES_DELETE: 'resources.delete',
+  RESOURCES_APPROVE: 'resources.approve',
+  RESOURCES_REJECT: 'resources.reject',
+  RESOURCES_MANAGE: 'resources.manage',
 };
 
 export const ALL_DASH_PERMISSIONS = Object.values(PERMISSIONS);

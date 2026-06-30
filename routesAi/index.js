@@ -10,6 +10,8 @@ const router = express.Router();
 
 router.use(express.json({ limit: "1mb" }));
 
+// Career Passport scoring degrades to a rule-based result when no AI provider is
+// configured, so it stays available regardless of the AI feature flag.
 router.post(
   "/career-passport/score",
   authUser,
@@ -18,6 +20,11 @@ router.post(
   CareerPassportController.refreshScore
 );
 
+// The AI runtime kill-switch lives in AiSafetyController: when no AI provider /
+// usage limit is configured these endpoints return a graceful 503
+// (ai_status.reason = "ai_feature_not_enabled") and record a blocked AiRequest +
+// audit log. That is the server-side gate for the Syria-first launch (ship with
+// no provider configured), so no extra route-level feature middleware is needed.
 router.post("/career/copilot", authUser, requireAppAccount("employee"), validate(platformSchemas.aiRequestSchema), AiSafetyController.careerCopilot);
 router.post("/profile/score", authUser, requireAppAccount("employee"), validate(platformSchemas.aiRequestSchema), AiSafetyController.profileScore);
 router.post("/cv/rewrite", authUser, requireAppAccount("employee"), validate(platformSchemas.aiRequestSchema), AiSafetyController.cvRewrite);

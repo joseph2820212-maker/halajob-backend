@@ -381,10 +381,20 @@ export async function syncAccountContextsForUser(userInput) {
       ? ["super_admin"]
       : ["job_seeker", "student", "company_admin", "company_member", "university_admin", "super_admin"];
 
+  // Honour preferredForRole in declared order (e.g. job_seeker before student
+  // for employees). The derived contexts are created via Promise.all, so their
+  // createdAt order is non-deterministic; a plain find(includes(...)) would
+  // return whichever context happened to sort first, ignoring the preference.
+  const preferredMatch = preferredForRole
+    .map((type) =>
+      contexts.find((item) => item.context_type === type && ACTIVE_STATUSES.has(item.status))
+    )
+    .find(Boolean);
+
   const activeContext =
     requestedDefault ||
     contexts.find((item) => item.is_default && ACTIVE_STATUSES.has(item.status)) ||
-    contexts.find((item) => preferredForRole.includes(item.context_type) && ACTIVE_STATUSES.has(item.status)) ||
+    preferredMatch ||
     contexts.find((item) => item.context_type === "job_seeker" && ACTIVE_STATUSES.has(item.status)) ||
     contexts.find((item) => ACTIVE_STATUSES.has(item.status)) ||
     contexts[0] ||
