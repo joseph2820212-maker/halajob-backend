@@ -6,6 +6,18 @@ Model: **Codex implements all code; Claude reviews behind + maintains docs.**
 This index lists every queued work item so nothing falls through. Source specs
 are linked; do not duplicate work already verified as done.
 
+## Live status (reviewed at tip `7c822e8`)
+- **Stream A (navigation/IA): DONE** — all 8 phases committed + extensive
+  hardening guards + CI now runs Flutter analyze and Phase 1–6 widget guards
+  (incl. "Jobs and My Jobs keep separate pipeline state"). Web tests GREEN
+  (16 files / 70 tests).
+- **Stream B (legal/help/support): NOT STARTED** except B1 (tests are green now).
+  B2–B10 pending — verified absent in code (no `LEGAL_CONTENT_ENFORCEMENT_MODE`,
+  currency still USD/EUR/GBP, `myTickets()` not wired to UI).
+- **Stream C:** C1 NOT done (god-file grew to 22,379 lines); C2 partially in CI
+  (Flutter analyze + widget guards added); C3 owner/external pending.
+- Codex is working the backlog in order (nav first) — next up: Stream B.
+
 ## How to work this backlog
 - Update `docs/FUNCTION_PLACEMENT_MAP.md` first when a function moves (your rule).
 - Commit per item with a clear message; Claude reviews each commit against the spec.
