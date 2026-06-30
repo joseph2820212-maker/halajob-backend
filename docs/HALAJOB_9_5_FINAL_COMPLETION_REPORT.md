@@ -3,8 +3,8 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `4c6204c`
-- Current APK source build commit: `6227584`
+- Current reviewed code/proof-guard commit before this report refresh: `336c121`
+- Current APK source build commit: `336c121`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `336c121` | Refreshed web workflow proof docs before the current debug APK rebuild and emulator smoke. |
 | `4c6204c` | Wired employer and campus web workflow actions: company jobs can pause/resume from the edit panel, scheduled interviews expose join-video and reschedule controls, campus events load from the backend, and university verification approve/reject/request-info actions call the backend with focused regression tests. |
 | `cd41a48` | Refreshed the web tab-reachability proof docs after adding the guard and fixing the hidden admin passport panel. |
 | `32bcad0` | Added a web tab-reachability guard to the UI contract gate and surfaced the admin Career Passport operations panel as a real admin tab instead of a hidden rendered branch. |
@@ -130,21 +131,21 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm --prefix web test -- jobAlerts` | Passed | 1 file / 2 tests; verifies web job-alert canonical filter behavior after the shared saved-search type update. |
 | `npm --prefix web run build` | Passed | TypeScript build and Vite production build passed after the shared saved-search filter type update. |
 | `npm run test:mobile-apk-proof --silent` | Passed | Proves the latest debug APK metadata, `.sha256` file, and `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md` agree when an APK artifact exists. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `6227584`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `336c121`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
 
-A fresh debug APK was built and installed on the running emulator from source commit `6227584`. Documentation commits after `6227584` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
+A fresh debug APK was built and installed on the running emulator from source commit `336c121`. Documentation commits after `336c121` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
 
-- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-6227584-1.0.6+27-debug.apk`
-- SHA-256: `d5f1c9f2de76d53d60fcbff2046ce849da0244e731762e8fbe8d6f49951396d8`
+- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-336c121-1.0.6+27-debug.apk`
+- SHA-256: `905a280e1bbf24f4c829d160b9da59da568b9b9afd2b1aaec6f1603979892b2b`
 - Version/build: `1.0.6+27`
 - Build flags: Campus auth `local-device`, `AI tools enabled=true`, base URL `https://jobzain.com`, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 6227584 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
+- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 336c121 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
 
-This APK is current for source commit `6227584`, including the company AI tools heading alignment, dedicated-module AI placement guard, seeker AI career tools heading alignment, and the proof refreshes through this branch.
+This APK is current for source commit `336c121`, including the company AI tools heading alignment, dedicated-module AI placement guard, seeker AI career tools heading alignment, web employer/campus workflow proof refresh, and the proof refreshes through this branch.
 
 ## Current Handout Status
 
