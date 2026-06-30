@@ -520,6 +520,14 @@ async function main() {
     "non-admin denied dashboard subscription read"
   );
 
+  await expectStatus(
+    request(baseUrl, "GET", "/dash/v1/invoices", {
+      token: seekerTokens.accessToken,
+    }),
+    403,
+    "non-admin denied dashboard invoice list"
+  );
+
   const adminSubscription = await expectStatus(
     request(baseUrl, "GET", `/dash/v1/subscriptions/companies/${companyA._id}`, {
       token: adminTokens.accessToken,
@@ -528,6 +536,50 @@ async function main() {
     "dashboard admin reads company subscription"
   );
   assert.equal(adminSubscription.data.plan_key, growthPlan.key);
+
+  const adminInvoiceList = await expectStatus(
+    request(baseUrl, "GET", "/dash/v1/invoices?limit=20", {
+      token: adminTokens.accessToken,
+    }),
+    200,
+    "dashboard admin lists company invoices"
+  );
+  const adminInvoiceIds = (adminInvoiceList.data || []).map((item) => String(item._id || item.id));
+  assert.equal(adminInvoiceIds.includes(String(invoiceA._id)), true, "admin invoice list should include company A invoice");
+  assert.equal(adminInvoiceIds.includes(String(invoiceB._id)), true, "admin invoice list should include company B invoice");
+  assert.equal(adminInvoiceList.pagination.total, 2, "admin invoice list should expose pagination totals");
+
+  const adminPendingInvoices = await expectStatus(
+    request(baseUrl, "GET", "/dash/v1/billing/invoices?status=pending", {
+      token: adminTokens.accessToken,
+    }),
+    200,
+    "dashboard admin filters pending invoices through billing alias"
+  );
+  assert.deepEqual(
+    (adminPendingInvoices.data || []).map((item) => String(item._id || item.id)),
+    [String(invoiceB._id)],
+    "admin pending invoice filter should return only the pending invoice"
+  );
+
+  const adminInvoiceDetail = await expectStatus(
+    request(baseUrl, "GET", `/dash/v1/invoices/${invoiceB._id}`, {
+      token: adminTokens.accessToken,
+    }),
+    200,
+    "dashboard admin reads company invoice detail"
+  );
+  assert.equal(String(adminInvoiceDetail.data._id), String(invoiceB._id));
+  assert.equal(adminInvoiceDetail.data.invoice_no, invoiceB.invoice_no);
+  assert.equal(String(adminInvoiceDetail.data.company_id._id), String(companyB._id));
+
+  await expectStatus(
+    request(baseUrl, "GET", "/dash/v1/billing/invoices/not-an-id", {
+      token: adminTokens.accessToken,
+    }),
+    400,
+    "dashboard invoice invalid id"
+  );
 
   await expectStatus(
     request(baseUrl, "GET", "/dash/v1/subscriptions/companies/not-a-company", {

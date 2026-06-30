@@ -263,6 +263,26 @@ router.get(
   can("notifications.view"),
   adminOperationsController.listNotificationLogs,
 );
+router.get(
+  "/invoices",
+  can("subscriptions.manage"),
+  adminOperationsController.listInvoices,
+);
+router.get(
+  "/invoices/:invoiceId",
+  can("subscriptions.manage"),
+  adminOperationsController.getInvoice,
+);
+router.get(
+  "/billing/invoices",
+  can("subscriptions.manage"),
+  adminOperationsController.listInvoices,
+);
+router.get(
+  "/billing/invoices/:invoiceId",
+  can("subscriptions.manage"),
+  adminOperationsController.getInvoice,
+);
 router.post(
   "/notifications/send",
   can("notifications.manage"),

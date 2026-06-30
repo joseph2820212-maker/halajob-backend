@@ -1,15 +1,15 @@
 # Route Verification Report
 
-Generated: 2026-06-30T06:47:06.639Z
+Generated: 2026-06-30T08:15:42.980Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 2535 |
-| Unique method/path endpoints | 3991 |
-| Endpoints with detected auth/role guard | 3875 |
+| Raw Express endpoint entries | 2541 |
+| Unique method/path endpoints | 3999 |
+| Endpoints with detected auth/role guard | 3883 |
 | Known public/system endpoints | 116 |
 | Unguarded endpoints needing manual classification | 0 |
 
@@ -23,7 +23,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 
 | Module | Total | Protected | Known public | Needs classification |
 | --- | --- | --- | --- | --- |
-| Admin | 3328 | 3323 | 5 | 0 |
+| Admin | 3332 | 3327 | 5 | 0 |
 | AI | 12 | 12 | 0 | 0 |
 | Analytics | 5 | 5 | 0 | 0 |
 | Campus | 18 | 16 | 2 | 0 |
@@ -37,7 +37,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Other | 15 | 0 | 15 | 0 |
 | Seeker | 110 | 109 | 1 | 0 |
 | Trust | 4 | 4 | 0 | 0 |
-| University | 36 | 36 | 0 | 0 |
+| University | 40 | 40 | 0 | 0 |
 
 ## Guard Detection
 
@@ -206,6 +206,7 @@ getHiringSummary
 getInterviewDetails
 getInterviewedJobs
 getInterviews
+getInvoice
 getJobApplicants
 getJobApplications
 getJobAuditLogs
@@ -280,6 +281,7 @@ listFaq
 listFeatures
 listHelpArticles
 listHelpCategories
+listInvoices
 listJobReviewQueue
 listJobReviews
 listJobSavers
@@ -301,6 +303,7 @@ listTokens
 listTranslations
 listUniversities
 listUniversityCampuses
+listUniversityEvents
 listUniversityMembers
 listUniversityResources
 logKeyword
@@ -449,6 +452,7 @@ updateTalentRequestStatus
 updateTemplate
 updateTicketStatus
 updateToken
+updateUniversityEvent
 updateUniversityMember
 updateUniversityResource
 updateUniversityStatus

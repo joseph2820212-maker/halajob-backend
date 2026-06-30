@@ -1,6 +1,6 @@
 # Hala Job API Reference
 
-Generated: 2026-06-29T06:20:45.733Z
+Generated: 2026-06-30T08:15:54.060Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -23,7 +23,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Module | Endpoints |
 | --- | --- |
 | AI | 12 |
-| Admin | 3328 |
+| Admin | 3332 |
 | Analytics | 5 |
 | Campus | 18 |
 | Campus Student | 51 |
@@ -36,7 +36,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Other | 15 |
 | Seeker | 110 |
 | Trust | 4 |
-| University | 36 |
+| University | 40 |
 
 ## AI
 
@@ -371,6 +371,8 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | PATCH | `/dash/v1/Banners/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/Banners/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/Banners/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
+| GET | `/dash/v1/billing/invoices` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listInvoices |
+| GET | `/dash/v1/billing/invoices/:invoiceId` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, getInvoice |
 | GET | `/dash/v1/campus/partners` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, adminCampusPartners |
 | GET | `/dash/v1/campus/privacy-audit` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, adminCampusPrivacyAudit |
 | GET | `/dash/v1/campus/universities` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, listUniversities |
@@ -1602,6 +1604,8 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | PATCH | `/dash/v1/Invitations/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/Invitations/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/Invitations/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
+| GET | `/dash/v1/invoices` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listInvoices |
+| GET | `/dash/v1/invoices/:invoiceId` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, getInvoice |
 | GET | `/dash/v1/Job` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/Job` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/job-approvals` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listJobReviewQueue |
@@ -4073,6 +4077,10 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/university/v1/dashboard` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, userUniversityOverview |
 | GET | `/university/v1/dashboard/overview` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, userUniversityOverview |
 | GET | `/university/v1/employer-partners` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, userUniversityPartners |
+| GET | `/university/v1/events` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, activeContextPermissionGuard, validateRequest, listUniversityEvents |
+| POST | `/university/v1/events` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, activeContextPermissionGuard, validateRequest, listUniversityEvents |
+| DELETE | `/university/v1/events/:id` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, activeContextPermissionGuard, multerMiddleware, validateRequest, updateUniversityEvent |
+| PATCH | `/university/v1/events/:id` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, activeContextPermissionGuard, multerMiddleware, validateRequest, updateUniversityEvent |
 | GET | `/university/v1/members` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, activeContextPermissionGuard, validateRequest, listUniversityMembers |
 | POST | `/university/v1/members` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, activeContextPermissionGuard, validateRequest, listUniversityMembers |
 | DELETE | `/university/v1/members/:memberId` | Bearer token | explicit | inferred:universityAdminGuard, authUser, activeContextGuard, activeContextPermissionGuard, multerMiddleware, validateRequest, updateUniversityMember |

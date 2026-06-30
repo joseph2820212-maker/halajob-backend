@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T06:47:06.639Z",
+  "generatedAt": "2026-06-30T08:15:42.980Z",
   "records": [
     {
       "method": "PATCH",
@@ -5118,6 +5118,36 @@
         "multerMiddleware",
         "validateRequest",
         "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/billing/invoices",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "listInvoices"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/billing/invoices/:invoiceId",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "getInvoice"
       ],
       "inferredGuards": [
         "inferred:isAdmin"
@@ -25374,6 +25404,36 @@
         "multerMiddleware",
         "validateRequest",
         "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/invoices",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "listInvoices"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/invoices/:invoiceId",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "getInvoice"
       ],
       "inferredGuards": [
         "inferred:isAdmin"
@@ -64189,6 +64249,80 @@
         "authUser",
         "activeContextGuard",
         "userUniversityPartners"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/events",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "validateRequest",
+        "listUniversityEvents"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/university/v1/events",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "validateRequest",
+        "listUniversityEvents"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/university/v1/events/:id",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "multerMiddleware",
+        "validateRequest",
+        "updateUniversityEvent"
+      ],
+      "inferredGuards": [
+        "inferred:universityAdminGuard"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/university/v1/events/:id",
+      "module": "University",
+      "middlewares": [
+        "authUser",
+        "activeContextGuard",
+        "activeContextPermissionGuard",
+        "multerMiddleware",
+        "validateRequest",
+        "updateUniversityEvent"
       ],
       "inferredGuards": [
         "inferred:universityAdminGuard"

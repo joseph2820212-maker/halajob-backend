@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import ReturnDashData from "../../helper/ReturnDashData/index.js";
 import {
   AuditLogModel,
+  CompanyInvoiceModel,
   ContentTranslationModel,
   NotificationModel,
 } from "../../models/index.js";
@@ -21,8 +22,12 @@ const paginate = async (model, filter, req, options = {}) => {
   const page = toInt(req.query.page, 1, 1, 100000);
   const limit = toInt(req.query.limit, 25, 1, 200);
   const skip = (page - 1) * limit;
+  let query = model.find(filter).sort(options.sort || { createdAt: -1, _id: -1 }).skip(skip).limit(limit);
+  if (options.populate) query = query.populate(options.populate);
+  if (options.select) query = query.select(options.select);
+
   const [items, total] = await Promise.all([
-    model.find(filter).sort(options.sort || { createdAt: -1, _id: -1 }).skip(skip).limit(limit).lean(),
+    query.lean(),
     model.countDocuments(filter),
   ]);
 
@@ -68,6 +73,21 @@ const addDateRangeFilter = (filter, req) => {
 
 const failIfInvalid = (res, error) =>
   error ? ReturnDashData.getError({ res, status: 400, message: error }) : null;
+
+const invoicePopulate = [
+  {
+    path: "company_id",
+    select: "company_name company_email email mobile image logo status accepted",
+  },
+  {
+    path: "subscription_id",
+    select: "plan_key status starts_at ends_at cancelled_at jobs_require_admin_approval",
+  },
+  {
+    path: "plan_id",
+    select: "key title_ar title_en price currency_code billing_period status",
+  },
+];
 
 export const listAuditLogs = async (req, res) => {
   try {
@@ -158,8 +178,72 @@ export const listNotificationLogs = async (req, res) => {
   }
 };
 
+export const listInvoices = async (req, res) => {
+  try {
+    const filter = {};
+    ["status", "currency_code", "billing_period", "plan_key", "payment_method"].forEach((key) => {
+      const value = clean(req.query[key]);
+      if (value) filter[key] = key === "currency_code" ? value.toUpperCase() : value.toLowerCase();
+    });
+
+    for (const key of ["company_id", "subscription_id", "plan_id"]) {
+      const error = addObjectIdFilter(filter, key, req.query[key]);
+      if (error) return failIfInvalid(res, error);
+    }
+
+    const dateError = addDateRangeFilter(filter, req);
+    if (dateError) return failIfInvalid(res, dateError);
+
+    const q = clean(req.query.q || req.query.search || req.query.invoice_no);
+    if (q) {
+      const regex = new RegExp(escapeRegex(q), "i");
+      filter.$or = [
+        { invoice_no: regex },
+        { plan_key: regex },
+        { status: regex },
+        { billing_period: regex },
+        { payment_method: regex },
+        { transaction_ref: regex },
+      ];
+    }
+
+    const result = await paginate(CompanyInvoiceModel, filter, req, {
+      sort: { issued_at: -1, createdAt: -1, _id: -1 },
+      populate: invoicePopulate,
+    });
+    return ReturnDashData.getData({
+      res,
+      data: result.items,
+      other: { pagination: result.pagination },
+      message: "company_invoices",
+    });
+  } catch (error) {
+    return ReturnDashData.getError({ res, status: 500, message: error.message || "invoices_failed" });
+  }
+};
+
+export const getInvoice = async (req, res) => {
+  try {
+    const invoiceId = clean(req.params.invoiceId || req.params.id);
+    if (!isValidObjectId(invoiceId)) {
+      return ReturnDashData.getError({ res, status: 400, message: "invalid_invoice_id" });
+    }
+
+    const invoice = await CompanyInvoiceModel.findById(invoiceId).populate(invoicePopulate).lean();
+    if (!invoice) {
+      return ReturnDashData.getError({ res, status: 404, message: "invoice_not_found" });
+    }
+
+    return ReturnDashData.getData({ res, data: invoice, message: "company_invoice" });
+  } catch (error) {
+    return ReturnDashData.getError({ res, status: 500, message: error.message || "invoice_failed" });
+  }
+};
+
 export default {
   listAuditLogs,
   listTranslations,
   listNotificationLogs,
+  listInvoices,
+  getInvoice,
 };

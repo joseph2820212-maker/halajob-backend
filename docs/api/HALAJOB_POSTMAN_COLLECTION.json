@@ -10859,6 +10859,73 @@
           }
         },
         {
+          "name": "GET /dash/v1/billing/invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/billing/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "billing",
+                "invoices"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/billing/invoices/:invoiceId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/billing/invoices/:invoiceId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "billing",
+                "invoices",
+                ":invoiceId"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "GET /dash/v1/campus/partners",
           "request": {
             "method": "GET",
@@ -52101,6 +52168,71 @@
                 "Invitations",
                 "update",
                 ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "invoices"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "GET /dash/v1/invoices/:invoiceId",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/invoices/:invoiceId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "invoices",
+                ":invoiceId"
               ]
             },
             "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
@@ -132260,6 +132392,136 @@
                 "university",
                 "v1",
                 "employer-partners"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "GET /university/v1/events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "events"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /university/v1/events",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "events"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "DELETE /university/v1/events/:id",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/events/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "events",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: University. Guard source: explicit."
+          }
+        },
+        {
+          "name": "PATCH /university/v1/events/:id",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/university/v1/events/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "university",
+                "v1",
+                "events",
+                ":id"
               ]
             },
             "description": "Generated from live route inventory. Module: University. Guard source: explicit."

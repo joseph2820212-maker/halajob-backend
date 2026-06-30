@@ -12339,6 +12339,46 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/dash/v1/billing/invoices":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/billing/invoices"
+      operationId: "admin_get_dash_v1_billing_invoices"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/billing/invoices/{invoiceId}":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/billing/invoices/:invoiceId"
+      operationId: "admin_get_dash_v1_billing_invoices_invoiceid"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "invoiceId"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/dash/v1/campus/partners":
     get:
       tags: ["Admin"]
@@ -41855,6 +41895,46 @@ paths:
           application/json:
             schema:
               type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/invoices":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/invoices"
+      operationId: "admin_get_dash_v1_invoices"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/invoices/{invoiceId}":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/invoices/:invoiceId"
+      operationId: "admin_get_dash_v1_invoices_invoiceid"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "invoiceId"
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Successful response
@@ -88227,6 +88307,96 @@ paths:
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
       security:
         - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/university/v1/events":
+    get:
+      tags: ["University"]
+      summary: "GET /university/v1/events"
+      operationId: "university_get_university_v1_events"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    post:
+      tags: ["University"]
+      summary: "POST /university/v1/events"
+      operationId: "university_post_university_v1_events"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/university/v1/events/{id}":
+    delete:
+      tags: ["University"]
+      summary: "DELETE /university/v1/events/:id"
+      operationId: "university_delete_university_v1_events_id"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    patch:
+      tags: ["University"]
+      summary: "PATCH /university/v1/events/:id"
+      operationId: "university_patch_university_v1_events_id"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           description: Successful response
