@@ -50,5 +50,32 @@
       "Communication logs",
       "AI operations"
     ]
-  }
+  },
+  "sourceOccurrences": [
+    {
+      "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "text": "label: 'CV manager'",
+      "equals": 1
+    },
+    {
+      "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "text": "label: 'Job alerts'",
+      "equals": 2
+    },
+    {
+      "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "text": "label: 'Interview prep'",
+      "equals": 1
+    },
+    {
+      "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "text": "seekerSegments: const [_SeekerSegment.recommended]",
+      "equals": 1
+    },
+    {
+      "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "text": "campusSegments: const [_CampusSegment.opportunities]",
+      "equals": 1
+    }
+  ]
 }

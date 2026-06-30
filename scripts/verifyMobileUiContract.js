@@ -255,8 +255,13 @@ assertContains(
 );
 assertContains(
   dashboard,
-  "_chromeQuickActionIds.contains(_normalizedQuickActionId(action))",
-  "dashboard overview chrome quick action filter",
+  "static const Set<String> _overviewHiddenQuickActionIds",
+  "dashboard overview hidden quick action filter",
+);
+assertContains(
+  dashboard,
+  "_overviewHiddenQuickActionIds.contains(",
+  "dashboard overview hidden quick action filter",
 );
 assertContains(
   dashboard,
