@@ -126,11 +126,16 @@
         "'Saved campus roles'",
         "label: 'Salary insights'",
         "id: 'salary_insights'",
-        "SalaryInsightsScreen(baseUrl: widget.apiBaseUrl)"
+        "SalaryInsightsScreen(baseUrl: widget.apiBaseUrl)",
+        "_handleUnknownQuickAction(action)",
+        "debugPrint('Unhandled mobile quick action: $id')",
+        "is not available in this mobile build yet."
       ],
       "mustNotContain": [
         "ValueKey('dashboard-account-menu-settings-item')",
-        "_DashboardHeaderAction.settings"
+        "_DashboardHeaderAction.settings",
+        "_openQuickActionDetails(action)",
+        "void _openQuickActionDetails("
       ],
       "occurrences": [
         {
