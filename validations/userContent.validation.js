@@ -66,6 +66,10 @@ export const supportTicketIdParamSchema = yup.object({
   params: yup.object({ id: idParam }),
 });
 
+export const privacyRequestIdParamSchema = yup.object({
+  params: yup.object({ id: idParam }),
+});
+
 // --- Legal report ---
 export const legalReportSchema = yup.object({
   body: yup.object({
@@ -85,5 +89,6 @@ export default {
   supportCreateTicketSchema,
   supportAddMessageSchema,
   supportTicketIdParamSchema,
+  privacyRequestIdParamSchema,
   legalReportSchema,
 };

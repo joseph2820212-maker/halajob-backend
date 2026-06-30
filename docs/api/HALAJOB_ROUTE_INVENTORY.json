@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T19:41:46.983Z",
+  "generatedAt": "2026-06-30T20:06:59.039Z",
   "records": [
     {
       "method": "PATCH",
@@ -61636,6 +61636,20 @@
         "jsonParser",
         "validateRequest",
         "createPrivacyRequest"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/privacy/requests/:id/cancel",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "validateRequest",
+        "cancelPrivacyRequest"
       ],
       "inferredGuards": [],
       "hasAuthGuard": true,

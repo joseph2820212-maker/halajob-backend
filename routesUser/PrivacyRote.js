@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.post("/requests", authUser, express.json(), validate(schemas.privacyRequestSchema), PrivacyRequestController.createPrivacyRequest);
 router.get("/requests", authUser, PrivacyRequestController.listMyPrivacyRequests);
+router.post("/requests/:id/cancel", authUser, validate(schemas.privacyRequestIdParamSchema), PrivacyRequestController.cancelPrivacyRequest);
 router.get("/consents", authUser, PrivacyRequestController.listConsents);
 router.post("/consents/:purpose", authUser, express.json(), validate(schemas.setConsentSchema), PrivacyRequestController.setConsent);
 router.post("/consents/:pageKey/acknowledge", authUser, express.json(), validate(schemas.acknowledgePolicySchema), PrivacyRequestController.acknowledgePolicy);

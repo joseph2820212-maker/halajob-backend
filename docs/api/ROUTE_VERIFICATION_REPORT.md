@@ -1,15 +1,15 @@
 # Route Verification Report
 
-Generated: 2026-06-30T19:41:46.983Z
+Generated: 2026-06-30T20:06:59.039Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 2545 |
-| Unique method/path endpoints | 4003 |
-| Endpoints with detected auth/role guard | 3887 |
+| Raw Express endpoint entries | 2546 |
+| Unique method/path endpoints | 4004 |
+| Endpoints with detected auth/role guard | 3888 |
 | Known public/system endpoints | 116 |
 | Unguarded endpoints needing manual classification | 0 |
 
@@ -32,7 +32,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Files | 1 | 0 | 1 | 0 |
 | Health | 4 | 0 | 4 | 0 |
 | Jobs | 2 | 2 | 0 | 0 |
-| Legacy User | 204 | 126 | 78 | 0 |
+| Legacy User | 205 | 127 | 78 | 0 |
 | Notifications | 20 | 20 | 0 | 0 |
 | Other | 15 | 0 | 15 | 0 |
 | Seeker | 110 | 109 | 1 | 0 |
@@ -110,6 +110,7 @@ cancelInterview
 cancelJobInvitation
 cancelJobZainTalentRequest
 cancelMyApplication
+cancelPrivacyRequest
 changeApplicationStatus
 changeInterviewStatus
 changeJobStatus

@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import mongoose from "mongoose";
 import {
   PrivacyRequestModel,
   AccessibilityRequestModel,
@@ -121,4 +122,23 @@ const createAccessibilityRequest = async (req, res, next) => {
   }
 };
 
-export default { createPrivacyRequest, listMyPrivacyRequests, acknowledgePolicy, listConsents, setConsent, createAccessibilityRequest };
+const cancelPrivacyRequest = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) return ReturnAppData.getError({ res, status: 400, message: "invalid_id" });
+    const doc = await PrivacyRequestModel.findOne({ _id: id, userId: req.user._id });
+    if (!doc) return ReturnAppData.getError({ res, status: 404, message: "privacy_request_not_found" });
+    const cancellable = ["received", "verifying_identity", "processing"];
+    if (!cancellable.includes(doc.status)) {
+      return ReturnAppData.getError({ res, status: 409, message: "privacy_request_not_cancellable" });
+    }
+    doc.status = "cancelled";
+    await doc.save();
+    await writeAuditLog({ req, actorUserId: req.user._id, actorType: "employee", action: "privacy_request_cancelled", entityType: "user", entityId: req.user._id, note: doc.requestNo });
+    return ReturnAppData.updateData({ res, data: { requestNo: doc.requestNo, status: doc.status }, message: "privacy_request_cancelled" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export default { createPrivacyRequest, listMyPrivacyRequests, cancelPrivacyRequest, acknowledgePolicy, listConsents, setConsent, createAccessibilityRequest };
