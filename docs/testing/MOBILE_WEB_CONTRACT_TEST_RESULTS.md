@@ -2,8 +2,8 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `0a04d5b` current full launch gate; current APK proof through `9c9651c`
-Latest APK source build commit: `9c9651c`
+Source contracts tested through: `0a04d5b` current full launch gate; current APK proof through `a4ff122`
+Latest APK source build commit: `a4ff122`
 
 ## Passed Coverage
 
@@ -53,7 +53,7 @@ Latest APK source build commit: `9c9651c`
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed inside the clean `ff5b8ba` full launch-gate replay, passed again at source commit `8705162` after extracting seeker-discovery and seeker CV Manager dashboard widgets, and passed again at source commit `4898355` after restoring the navy authenticated header and light Android status icons. The latest run completed Flutter `pub get`, `analyze`, and full `flutter test` with 450 tests passed. |
-| Current APK emulator smoke | A debug APK from source commit `9c9651c` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 9c9651c | local-device`, native launch splash/status chrome in navy, and the locked navy authenticated header with cream surfaces/orange accent on Campus home. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `d0b1b6ca0c48ac67ca4c4cd418ed36c0e0c778c3d837285c4f985e8cdb15cc78`. Documentation commits after `9c9651c` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
+| Current APK emulator smoke | A debug APK from source commit `a4ff122` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | a4ff122 | local-device`, native launch splash/status chrome in navy, the locked navy authenticated header with cream surfaces/orange accent on Campus home, and the legal/privacy app bar locked to the same navy chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `1058fe9ef0a97b91913aee6c30ab289794c438894918c4ff0dda4e6fff9c2247`. Documentation commits after `a4ff122` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 
