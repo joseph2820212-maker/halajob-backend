@@ -155,6 +155,65 @@ function findJsxTags(source, tagName) {
   return tags;
 }
 
+function extractJsxAttributeExpression(tagText, attrName) {
+  const marker = `${attrName}=`;
+  const attrIndex = tagText.indexOf(marker);
+  if (attrIndex === -1) return null;
+  let index = attrIndex + marker.length;
+  while (/\s/.test(tagText[index] || "")) index += 1;
+  if (tagText[index] !== "{") return null;
+
+  let braceDepth = 1;
+  let quote = null;
+  let escaped = false;
+  const start = index + 1;
+
+  for (let i = start; i < tagText.length; i += 1) {
+    const ch = tagText[i];
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") {
+      quote = ch;
+      continue;
+    }
+    if (ch === "{") {
+      braceDepth += 1;
+      continue;
+    }
+    if (ch === "}") {
+      braceDepth -= 1;
+      if (braceDepth === 0) return tagText.slice(start, i);
+    }
+  }
+
+  return null;
+}
+
+function extractStringLiterals(expression) {
+  const values = new Set();
+  const re = /(["'])([^"'\\]*(?:\\.[^"'\\]*)*)\1/g;
+  let match;
+  while ((match = re.exec(expression || ""))) {
+    values.add(match[2].replace(/\\(["'\\])/g, "$1"));
+  }
+  return [...values];
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function hasExplicitActionBranch(expression, action) {
+  const escaped = escapeRegExp(action);
+  return new RegExp(
+    `\\baction\\s*===\\s*["']${escaped}["']|["']${escaped}["']\\s*===\\s*action|case\\s+["']${escaped}["']`,
+  ).test(expression || "");
+}
+
 for (const target of targets) {
   for (const file of walk(target.dir, target.extensions)) {
     const source = fs.readFileSync(path.join(root, file), "utf8");
@@ -176,6 +235,15 @@ for (const target of targets) {
         }
       }
       for (const tag of findJsxTags(source, "QueueTable")) {
+        const actionsExpression = extractJsxAttributeExpression(
+          tag.text,
+          "actions",
+        );
+        const actionLabels = extractStringLiterals(actionsExpression);
+        const onActionExpression = extractJsxAttributeExpression(
+          tag.text,
+          "onAction",
+        );
         const hasVisibleActions = !/\bactions\s*=\s*\{\s*\[\s*\]\s*\}/.test(
           tag.text,
         );
@@ -189,12 +257,35 @@ for (const target of targets) {
             `${file}:${lineForIndex(source, tag.index)} has visible QueueTable actions wired to a no-op/toast-only handler`,
           );
         }
+        if (
+          actionLabels.length > 1 &&
+          /^\s*(?:\(\s*)?_action\b/.test(onActionExpression || "")
+        ) {
+          failures.push(
+            `${file}:${lineForIndex(source, tag.index)} has multiple visible QueueTable actions but its inline handler ignores the action label`,
+          );
+        }
       }
       for (const tag of findJsxTags(source, "ActionBar")) {
         if (/\bonAction\s*=\s*\{\s*\(?\s*action\s*\)?\s*=>[\s\S]*\?[\s\S]*:/.test(tag.text)) {
           failures.push(
             `${file}:${lineForIndex(source, tag.index)} uses fallback ternary ActionBar routing instead of explicit action branches`,
           );
+        }
+        const actionsExpression = extractJsxAttributeExpression(
+          tag.text,
+          "actions",
+        );
+        const onActionExpression = extractJsxAttributeExpression(
+          tag.text,
+          "onAction",
+        );
+        for (const action of extractStringLiterals(actionsExpression)) {
+          if (!hasExplicitActionBranch(onActionExpression, action)) {
+            failures.push(
+              `${file}:${lineForIndex(source, tag.index)} has ActionBar action "${action}" without an explicit onAction branch`,
+            );
+          }
         }
       }
     }
