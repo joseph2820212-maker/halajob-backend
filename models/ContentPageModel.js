@@ -40,7 +40,11 @@ const ContentPageSchema = new Schema(
     lastReviewedAt: { type: Date, default: null },
     requiresAcknowledgement: { type: Boolean, default: false },
     acknowledgementAudience: { type: [String], default: [] },
-    legalReviewStatus: { type: String, enum: ["draft", "needs_lawyer_review", "lawyer_approved"], default: "needs_lawyer_review" },
+    legalReviewStatus: {
+      type: String,
+      enum: ["draft", "needs_lawyer_review", "revision_requested", "rejected", "lawyer_approved"],
+      default: "needs_lawyer_review",
+    },
     ownerDepartment: { type: String, default: "legal" }, // product|legal|support|privacy|trust
     createdBy: { type: Schema.Types.ObjectId, ref: "users", default: null },
     updatedBy: { type: Schema.Types.ObjectId, ref: "users", default: null },

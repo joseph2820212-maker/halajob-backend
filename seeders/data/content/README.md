@@ -43,3 +43,6 @@ content/
 - Both `en` and `ar` present for every title/summary/block.
 - No `JobZain`/`jobzain`, no `TODO`/`lorem`/`coming soon` in content.
 - Every legal page has a version and `legalReviewStatus`.
+- `LEGAL_CONTENT_ENFORCEMENT_MODE=staging` allows review drafts to render with
+  their status. `production` blocks required legal/policy pages until
+  `legalReviewStatus` is `lawyer_approved` and reports the failing keys.

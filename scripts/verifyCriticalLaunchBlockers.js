@@ -395,6 +395,22 @@ assert.equal(envFallbackFeatures.employer_branding_enabled, false);
 assert.equal(envFallbackFeatures.payments_mode, "manual");
 assert.equal(envFallbackFeatures.company_self_register, false);
 
+const legalContentEnforcement = read(
+  "services/content/legalContentEnforcement.service.js",
+);
+assert.ok(
+  platformEnvExample.includes("LEGAL_CONTENT_ENFORCEMENT_MODE=staging"),
+  ".env.example must document the legal content enforcement mode default.",
+);
+assert.ok(
+  platformEnvironmentDocs.includes("`LEGAL_CONTENT_ENFORCEMENT_MODE`"),
+  "docs/ENVIRONMENT.md must document LEGAL_CONTENT_ENFORCEMENT_MODE.",
+);
+assert.match(legalContentEnforcement, /REQUIRED_PRODUCTION_LEGAL_PAGE_KEYS/);
+assert.match(legalContentEnforcement, /lawyer_approved/);
+assert.match(legalContentEnforcement, /productionLegalApprovalFailures/);
+assert.match(legalContentEnforcement, /filterPublicLegalContent/);
+
 const userRoutes = read("routesUser/index.js");
 const companyRoutes = read("routesCompany/index.js");
 const universityRoutes = read("routesUniversity/index.js");
@@ -755,6 +771,7 @@ const envExample = read(".env.example");
   "SALARY_INSIGHTS_DEFAULT_CURRENCY=SYP",
   "PUBLIC_COMPANY_PROFILE_BASE_URL=",
   "PUBLIC_CV_SHARE_BASE_URL=",
+  "LEGAL_CONTENT_ENFORCEMENT_MODE=staging",
 ].forEach((line) =>
   assert.ok(envExample.includes(line), `.env.example is missing ${line}`),
 );

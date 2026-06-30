@@ -137,6 +137,12 @@ When a provider is selected, add provider-specific public/private API keys,
 webhook signing secret, checkout URLs, and environment/sandbox selectors here
 before implementation. Do not store real payment secrets in Git.
 
+## Legal Content
+
+| Variable | Required | Purpose |
+|---|---:|---|
+| `LEGAL_CONTENT_ENFORCEMENT_MODE` | Production yes | Use `staging` while legal pages are review drafts. Use `production` only after required legal/policy pages are marked `legalReviewStatus: lawyer_approved`; the launch gate fails with the unapproved key list otherwise. |
+
 ## Scheduled Jobs
 
 | Variable | Required | Purpose |

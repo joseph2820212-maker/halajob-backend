@@ -6,6 +6,10 @@ import {
 } from "../../models/index.js";
 import PageModel from "../../models/PageModel.js";
 import ReturnAppData from "../../helper/ReturnAppData/index.js";
+import {
+  filterPublicLegalContent,
+  isPublicLegalPageVisible,
+} from "../../services/content/legalContentEnforcement.service.js";
 
 const PAGE_PROJECTION = "-createdBy -updatedBy -__v";
 
@@ -21,6 +25,7 @@ const fromLegacyPage = (p) => ({
     text: { en: b.value_en || "", ar: b.value_ar || "" },
     sortOrder: i,
   })),
+  legalReviewStatus: "needs_lawyer_review",
   legacy: true,
 });
 
@@ -30,7 +35,8 @@ const listPages = async (req, res, next) => {
     if (req.query.category) filter.category = String(req.query.category);
     if (req.query.audience) filter.audience = String(req.query.audience);
     const pages = await ContentPageModel.find(filter).select(PAGE_PROJECTION).sort("category key").lean();
-    return ReturnAppData.getData({ res, data: pages, message: "content_pages" });
+    const visiblePages = filterPublicLegalContent(pages);
+    return ReturnAppData.getData({ res, data: visiblePages, message: "content_pages" });
   } catch (error) {
     return next(error);
   }
@@ -45,6 +51,9 @@ const getPage = async (req, res, next) => {
       if (legacy) page = fromLegacyPage(legacy);
     }
     if (!page) return ReturnAppData.getError({ res, status: 404, message: "page_not_found" });
+    if (!isPublicLegalPageVisible(page)) {
+      return ReturnAppData.getError({ res, status: 404, message: "legal_content_not_approved" });
+    }
     return ReturnAppData.getData({ res, data: page, message: "content_page" });
   } catch (error) {
     return next(error);
