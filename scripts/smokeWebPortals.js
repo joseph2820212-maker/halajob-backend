@@ -44,7 +44,7 @@ const forbiddenRouteButtons = {
   campus: ["profile"],
   company: ["pipeline", "invitations", "subscription", "members", "library", "profile"],
   seeker: ["profile", "cv builder"],
-  admin: ["jobs", "trust", "analytics", "talent"],
+  admin: ["jobs", "trust", "talent"],
 };
 
 const clientSettingsPayload = {
