@@ -166,7 +166,7 @@ async function main() {
     },
   ]);
 
-  const [companyUser, otherCompanyUser, seekerUser] = await UserModel.create([
+  const [companyUser, otherCompanyUser, seekerUser, passportUser] = await UserModel.create([
     userSeed({
       firstName: "Translation",
       lastName: "Company",
@@ -187,6 +187,13 @@ async function main() {
       email: `translation.seeker.${suffix}@example.com`,
       roleId: employeeRole._id,
       phone: `${phoneSeed}03`,
+    }),
+    userSeed({
+      firstName: "Translation",
+      lastName: "Passport",
+      email: `translation.passport.${suffix}@example.com`,
+      roleId: employeeRole._id,
+      phone: `${phoneSeed}04`,
     }),
   ]);
 
@@ -229,6 +236,20 @@ async function main() {
     skills: [{ title: "Support", level: 3 }],
   });
 
+  const passportEmployee = await EmployeeModel.create({
+    user_id: passportUser._id,
+    role_id: employeeRole._id,
+    status: true,
+    accepted: true,
+    profile_headline: "Career passport support specialist",
+    current_job_title: "Campus support trainee",
+    about_me: "I keep a career passport without uploading a CV yet.",
+    candidate_stage: "student",
+    profile_completion: 72,
+    skills: [{ title: "Student support", level: 4 }],
+    languages: [{ name: "English", level: 5 }],
+  });
+
   const cv = await EmployeeCvModel.create({
     employee_id: employee._id,
     template_id: objectId(),
@@ -237,7 +258,7 @@ async function main() {
     is_default: true,
   });
 
-  const [companyContext, otherCompanyContext, seekerContext] = await AccountContextModel.create([
+  const [companyContext, otherCompanyContext, seekerContext, passportContext] = await AccountContextModel.create([
     {
       user_id: companyUser._id,
       context_key: `company_admin:${company._id}`,
@@ -271,19 +292,32 @@ async function main() {
       permissions: ["jobs.search", "jobs.apply"],
       is_default: true,
     },
+    {
+      user_id: passportUser._id,
+      context_key: `job_seeker:${passportEmployee._id}`,
+      context_type: "job_seeker",
+      entity_id: passportEmployee._id,
+      entity_model: "employees",
+      display_name: "Passport translation seeker",
+      status: "active",
+      permissions: ["jobs.search", "jobs.apply", "career_passport.manage"],
+      is_default: true,
+    },
   ]);
 
   await Promise.all([
     UserModel.updateOne({ _id: companyUser._id }, { $set: { default_context_id: companyContext._id } }),
     UserModel.updateOne({ _id: otherCompanyUser._id }, { $set: { default_context_id: otherCompanyContext._id } }),
     UserModel.updateOne({ _id: seekerUser._id }, { $set: { default_context_id: seekerContext._id } }),
+    UserModel.updateOne({ _id: passportUser._id }, { $set: { default_context_id: passportContext._id } }),
   ]);
 
   const device = { brand: "Translation", model_name: "Integration", is_device: false };
-  const [companyTokens, otherCompanyTokens, seekerTokens] = await Promise.all([
+  const [companyTokens, otherCompanyTokens, seekerTokens, passportTokens] = await Promise.all([
     generateAuthTokens(companyUser, device),
     generateAuthTokens(otherCompanyUser, device),
     generateAuthTokens(seekerUser, device),
+    generateAuthTokens(passportUser, device),
   ]);
 
   server = app.listen(0);
@@ -530,22 +564,137 @@ async function main() {
     readApprovedCv.data.published_translation.profile_headline
   );
 
-  const [jobTranslation, cvTranslation, jobAudit, cvAudit, jobAnalytics, cvAnalytics] = await Promise.all([
+  const draftPassport = await expectStatus(
+    request(baseUrl, "PUT", "/user/v1/cv/translations/ar", {
+      token: passportTokens.accessToken,
+      contextId: passportContext._id,
+      body: {
+        status: "draft",
+        translated_text: {
+          identity: {
+            headline: "AR draft career passport headline",
+          },
+        },
+      },
+    }),
+    200,
+    "seeker without CV should save draft career passport translation"
+  );
+  assert.equal(draftPassport.data.translation.entity_type, "career_passport");
+  assert.equal(draftPassport.data.can_publish, false);
+
+  const draftPassportRead = await expectStatus(
+    request(baseUrl, "GET", "/user/v1/career-passport", {
+      token: passportTokens.accessToken,
+      contextId: passportContext._id,
+      headers: { lan: "ar", "x-language": "ar" },
+    }),
+    200,
+    "career passport should hide draft translations"
+  );
+  assert.equal(
+    draftPassportRead.data.passport.identity.headline,
+    passportEmployee.profile_headline
+  );
+  assert.equal(draftPassportRead.data.translation, null);
+
+  const approvedPassport = await expectStatus(
+    request(baseUrl, "PUT", "/user/v1/cv/translations/ar", {
+      token: passportTokens.accessToken,
+      contextId: passportContext._id,
+      body: {
+        approve: true,
+        translated_text: {
+          identity: {
+            headline: "Ø¹Ù†ÙˆØ§Ù† Ø¬ÙˆØ§Ø² Ø§Ù„Ù…Ù‡Ù†Ø© Ø§Ù„Ù…Ø¹ØªÙ…Ø¯",
+            current_job_title: "Ù…ØªØ¯Ø±Ø¨ Ø¯Ø¹Ù… Ø§Ù„Ø­Ø±Ù…",
+          },
+          skills: {
+            hard_skills: ["Ø¯Ø¹Ù… Ø§Ù„Ø·Ù„Ø§Ø¨"],
+          },
+        },
+      },
+    }),
+    200,
+    "seeker without CV should approve career passport translation"
+  );
+  assert.equal(approvedPassport.data.translation.entity_type, "career_passport");
+  assert.equal(approvedPassport.data.can_publish, true);
+
+  const readApprovedPassportTranslation = await expectStatus(
+    request(baseUrl, "GET", "/user/v1/cv/translations/ar", {
+      token: passportTokens.accessToken,
+      contextId: passportContext._id,
+    }),
+    200,
+    "seeker should read approved career passport translation"
+  );
+  assert.equal(readApprovedPassportTranslation.data.translation.status, "approved");
+  assert.equal(
+    readApprovedPassportTranslation.data.published_translation.identity.headline,
+    "Ø¹Ù†ÙˆØ§Ù† Ø¬ÙˆØ§Ø² Ø§Ù„Ù…Ù‡Ù†Ø© Ø§Ù„Ù…Ø¹ØªÙ…Ø¯"
+  );
+
+  const translatedPassport = await expectStatus(
+    request(baseUrl, "GET", "/user/v1/career-passport", {
+      token: passportTokens.accessToken,
+      contextId: passportContext._id,
+      headers: { lan: "ar", "x-language": "ar" },
+    }),
+    200,
+    "career passport should consume approved translations"
+  );
+  assert.equal(
+    translatedPassport.data.passport.identity.headline,
+    readApprovedPassportTranslation.data.published_translation.identity.headline
+  );
+  assert.equal(
+    translatedPassport.data.passport.identity.current_job_title,
+    readApprovedPassportTranslation.data.published_translation.identity.current_job_title
+  );
+  assert.deepEqual(
+    translatedPassport.data.passport.skills.hard_skills,
+    readApprovedPassportTranslation.data.published_translation.skills.hard_skills
+  );
+  assert.equal(translatedPassport.data.translation.language, "ar");
+  assert.equal(translatedPassport.data.translation.status, "approved");
+
+  const [
+    jobTranslation,
+    cvTranslation,
+    passportTranslation,
+    jobAudit,
+    cvAudit,
+    passportAudit,
+    jobAnalytics,
+    cvAnalytics,
+    passportAnalytics,
+  ] = await Promise.all([
     ContentTranslationModel.findOne({ entity_type: "job", entity_id: job._id, target_language: "ar" }).lean(),
     ContentTranslationModel.findOne({ entity_type: "cv", entity_id: cv._id, target_language: "ar" }).lean(),
+    ContentTranslationModel.findOne({ entity_type: "career_passport", entity_id: passportEmployee._id, target_language: "ar" }).lean(),
     AuditLogModel.findOne({ action: "job_translation_approved", job_id: job._id }).lean(),
     AuditLogModel.findOne({ action: "cv_translation_approved", entity_type: "translation" }).lean(),
+    AuditLogModel.findOne({
+      action: "cv_translation_approved",
+      entity_type: "translation",
+      "new_value.translated_entity_type": "career_passport",
+    }).lean(),
     AnalyticsEventModel.findOne({ event: "job_translated", job_id: job._id }).lean(),
     AnalyticsEventModel.findOne({ event: "cv_translated", entity_type: "cv" }).lean(),
+    AnalyticsEventModel.findOne({ event: "cv_translated", entity_type: "career_passport" }).lean(),
   ]);
   assert.equal(jobTranslation.status, "approved");
   assert.equal(cvTranslation.status, "approved");
+  assert.equal(passportTranslation.status, "approved");
   assert.ok(jobAudit, "job translation approval should be audited");
   assert.ok(cvAudit, "CV translation approval should be audited");
+  assert.ok(passportAudit, "career passport translation approval should be audited");
   assert.ok(jobAnalytics, "job translation should emit analytics");
   assert.ok(cvAnalytics, "CV translation should emit analytics");
+  assert.ok(passportAnalytics, "career passport translation should emit analytics");
 
-  console.log("Translation workflow integration verified for job/CV save, read, approval, app job list/detail and CV library consumption, ownership denial, unsupported language, audit logs, and analytics.");
+  console.log("Translation workflow integration verified for job/CV/career-passport save, read, approval, app job list/detail, CV library and Career Passport consumption, ownership denial, unsupported language, audit logs, and analytics.");
 }
 
 main()

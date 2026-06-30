@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import {
   CareerPassportModel,
+  ContentTranslationModel,
   EmployeeModel,
   UserModel,
   UserApplyingJobModel,
@@ -16,6 +17,89 @@ const text = (value) => String(value || "").trim();
 const hasText = (value) => text(value).length > 0;
 const list = (value) => (Array.isArray(value) ? value : []);
 const uniqueStrings = (items = []) => [...new Set(items.map(text).filter(Boolean))];
+const supportedTranslationLanguages = new Set(["ar", "en"]);
+
+const languageFromReq = (req) => {
+  const raw = text(
+    req?.query?.lang ||
+      req?.query?.language ||
+      req?.get?.("lan") ||
+      req?.get?.("x-language") ||
+      req?.get?.("lang"),
+  ).toLowerCase();
+  if (!raw) return "";
+  if (raw.startsWith("ar")) return "ar";
+  if (raw.startsWith("en")) return "en";
+  return "";
+};
+
+const isPlainObject = (value) =>
+  value && typeof value === "object" && !Array.isArray(value);
+
+const hasTranslatedValue = (value) => {
+  if (value === undefined || value === null) return false;
+  if (typeof value === "string") return value.trim().length > 0;
+  if (Array.isArray(value)) return value.length > 0;
+  if (isPlainObject(value)) return Object.values(value).some(hasTranslatedValue);
+  return true;
+};
+
+const mergeTranslatedSnapshot = (base, translated) => {
+  if (!hasTranslatedValue(translated)) return base;
+  if (Array.isArray(translated)) return translated;
+  if (!isPlainObject(base) || !isPlainObject(translated)) return translated;
+
+  return Object.entries(translated).reduce(
+    (next, [key, value]) => {
+      if (!hasTranslatedValue(value)) return next;
+      next[key] = mergeTranslatedSnapshot(next[key], value);
+      return next;
+    },
+    { ...base },
+  );
+};
+
+const translationPayloadForSnapshot = (translation = {}) => {
+  const payload = translation.translated_text;
+  if (!isPlainObject(payload)) return payload;
+  return payload.career_passport || payload.passport || payload.snapshot || payload;
+};
+
+const applyApprovedCareerPassportTranslation = async ({
+  result,
+  employeeId,
+  targetLanguage,
+}) => {
+  if (!employeeId || !supportedTranslationLanguages.has(targetLanguage)) return result;
+
+  const translation = await ContentTranslationModel.findOne({
+    entity_type: "career_passport",
+    entity_id: employeeId,
+    employee_id: employeeId,
+    target_language: targetLanguage,
+    status: "approved",
+  })
+    .select("target_language translated_text updatedAt status")
+    .lean();
+
+  if (!translation) {
+    result.translation = null;
+    return result;
+  }
+
+  result.snapshot = mergeTranslatedSnapshot(
+    result.snapshot || {},
+    translationPayloadForSnapshot(translation),
+  );
+  result.translation = {
+    language: targetLanguage,
+    status: "approved",
+    source: "content_translations",
+    translated_text: translation.translated_text || {},
+    updated_at: translation.updatedAt || null,
+  };
+  return result;
+};
 
 const dateValue = (value) => {
   if (!value) return null;
@@ -624,11 +708,16 @@ async function upsertPassport({ user, employee, activeContextId = null, refreshS
 
 export async function getCareerPassport({ user, req }) {
   const employee = await resolveEmployee(user);
-  return upsertPassport({
+  const result = await upsertPassport({
     user,
     employee,
     activeContextId: req?.activeContext?.id || null,
     refreshScore: false,
+  });
+  return applyApprovedCareerPassportTranslation({
+    result,
+    employeeId: employee._id,
+    targetLanguage: languageFromReq(req),
   });
 }
 

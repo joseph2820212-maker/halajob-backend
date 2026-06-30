@@ -17,6 +17,7 @@ const sendPassport = ({ res, result, message }) =>
       score: result.passport.score,
       visibility: result.passport.visibility,
       share: result.passport.share,
+      translation: result.translation || null,
     },
     message,
   });
