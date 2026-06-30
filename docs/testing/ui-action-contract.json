@@ -92,6 +92,22 @@
       ]
     },
     {
+      "path": "web/src/shared/settings.tsx",
+      "mustContain": [
+        "type?: \"text\" | \"number\" | \"checkbox\" | \"choice\"",
+        "field.type === \"choice\"",
+        "field.type === \"checkbox\"",
+        "type=\"radio\"",
+        "type=\"checkbox\""
+      ],
+      "mustNotContain": [
+        "type?: \"text\" | \"number\" | \"select\"",
+        "type: \"select\"",
+        "<select",
+        "</select>"
+      ]
+    },
+    {
       "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
       "mustContain": [
         "key: const ValueKey('dashboard-header-notifications')",

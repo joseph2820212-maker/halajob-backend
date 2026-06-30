@@ -564,9 +564,16 @@ const sourceFiles = [
   "mobile/lib/src/features/dashboard/dashboard_screen.dart",
   "mobile/lib/src/features/company/company_dashboard_screen.dart",
   "mobile/lib/src/features/university/university_dashboard_screen.dart",
+  "mobile/lib/src/features/auth/auth_screen.dart",
+  "mobile/lib/src/features/legal_help/legal_help_screens.dart",
 ];
 const directUiText =
   /Text\(\s*['"](?:Settings|Profile|Notifications|Sign out|Switch account|Account settings|Save settings|Refresh|Back|Close)['"]/;
+const bannedFixedChoiceControls = [
+  "DropdownButton",
+  "DropdownMenu",
+  "DropdownMenuItem",
+];
 for (const file of sourceFiles) {
   const source = read(file);
   assert.ok(
@@ -574,8 +581,15 @@ for (const file of sourceFiles) {
     `${file} has direct hardcoded chrome text; use HalaJobLocalizations`,
   );
   assertNotContains(source, "AppLocalizations", file);
+  for (const banned of bannedFixedChoiceControls) {
+    assertNotContains(
+      source,
+      banned,
+      `${file} fixed-choice UI contract`,
+    );
+  }
 }
 
 console.log(
-  "Mobile UI contract verified for tablet orientation, Gate A cream header chrome, shared bottom nav, and localized chrome strings.",
+  "Mobile UI contract verified for tablet orientation, Gate A cream header chrome, shared bottom nav, fixed-choice controls, and localized chrome strings.",
 );
