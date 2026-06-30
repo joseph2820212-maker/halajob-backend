@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `085c562`
+Source contracts tested through: `714fefe`
 Latest APK source build commit: `085c562`
 
 ## Passed Coverage
@@ -37,7 +37,7 @@ Latest APK source build commit: `085c562`
 | DB Syria product aggregate | `npm run test:integration:syria-product --silent` passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding |
 | Backend saved-search filter contract | `npm run test:integration:saved-search-alerts` passed after adding API round-trip/run-now proof for skills, education level, salary minimum, and currency filters |
 | Mobile expanded job filters | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` and `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` passed, proving skills, education level, salary minimum, alert frequency, and saved-search persistence |
-| Mobile CV cover-letter preview | `flutter test test\seeker_dashboard_service_test.dart --plain-name "previews seeker cover letters through CV Studio routes"` and `flutter test test\widget_test.dart --plain-name "previews a seeker CV cover letter from backend templates"` passed after `089f7d0`, proving the CV Manager uses backend template/preview routes and renders the returned cover-letter panel |
+| Mobile CV cover-letter preview/download | `flutter test test\seeker_dashboard_service_test.dart --plain-name "previews seeker cover letters through CV Studio routes"`, `flutter test test\widget_test.dart --plain-name "previews a seeker CV cover letter from backend templates"`, `flutter test test\seeker_dashboard_service_test.dart --plain-name "downloads seeker cover letters through CV Studio routes"`, and `flutter test test\widget_test.dart --plain-name "downloads a seeker CV cover letter from backend templates"` passed after `714fefe`, proving the CV Manager uses backend template/preview/download routes, renders previews, and saves the returned cover-letter text file |
 | Mobile university admin notifications | `flutter test test/university_dashboard_service_test.dart test/university_dashboard_screen_test.dart` passed 17 focused tests after `aef1c87`, proving university notifications load from `/notifications/v1`, unread badge data is real, mark-read/mark-all/delete actions call backend routes, and notification taps route to the right university dashboard surfaces |
 | UI action wiring | `npm run test:ui-actions` passed 12 source files and 15 route/UI pairs after `b6f5bb2` |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
@@ -45,8 +45,8 @@ Latest APK source build commit: `085c562`
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, seeker/campus More placement, and company More primary-flow duplication against regression |
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed, proving external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
-| Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed after `089f7d0`; Flutter `pub get`, `analyze`, and full `flutter test` completed with 446 tests passed |
-| Current APK emulator smoke | A debug APK from source commit `085c562` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 085c562 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `fb9854517b7e3c3f911ec4b3d5edf17e1b1ce4459819e94d160f428592fbadbb`. Documentation commits after `085c562` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
+| Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed after `714fefe`; Flutter `pub get`, `analyze`, and full `flutter test` completed with 448 tests passed |
+| Current APK emulator smoke | A debug APK from source commit `085c562` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 085c562 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `fb9854517b7e3c3f911ec4b3d5edf17e1b1ce4459819e94d160f428592fbadbb`. Documentation commits after `085c562` do not imply a newer APK unless this row and the APK metadata are refreshed together; app-code commit `714fefe` is newer than this APK, so rebuild before claiming the APK includes mobile CV cover-letter download. |
 
 ## Remaining Required Tests
 

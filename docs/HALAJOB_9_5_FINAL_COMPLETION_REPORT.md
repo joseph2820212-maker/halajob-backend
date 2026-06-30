@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `085c562`
+- Current reviewed code/proof-guard commit before this report refresh: `714fefe`
 - Current APK source build commit: `085c562`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `714fefe` | Mobile CV Manager can now download cover letters through the authenticated backend CV Studio download route, save the returned text file, and prove the route/UI flow with service and widget tests. |
 | `085c562` | Refreshed mobile CV cover-letter proof docs after `089f7d0`, then served as the source commit for the current debug tester APK rebuild. |
 | `089f7d0` | Mobile CV Manager can now preview cover letters from backend CV Studio templates, using the existing template and preview routes with service and widget regression coverage. |
 | `5de5cd9` | Strengthened the Syria documentation contract so provider/owner blockers for AI, CV parsing, SMTP/Firebase/storage, payments, production Android signing, and owner UI approval cannot disappear from handoff docs. |
@@ -94,9 +95,11 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm run test:integration:launch-critical --silent` | Passed | Full DB-backed launch-critical aggregate passed on rerun using the shared `mongodb-memory-server` fallback after an earlier transient stop around the subscription script; individual remaining scripts also passed. |
 | `npm run test:integration:syria-product --silent` | Passed | Full Syria product aggregate passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding. |
 | `flutter test test\university_dashboard_service_test.dart test\university_dashboard_screen_test.dart` | Passed | 17 focused university tests passed after `aef1c87`, proving `/notifications/v1` load/read/read-all/delete route wiring, real unread badge data, inbox display, notification tap routing, and existing university workflows. |
-| `npm run test:launch-gate:mobile --silent` | Passed | Flutter `pub get`, `analyze`, and full `flutter test` passed after `089f7d0`; 446 mobile tests passed, including typed seeker/company login credentials, campus tester shortcut, Settings fixed-choice rows, CV manager/parser honesty, CV cover-letter preview, expanded filters, More placement, company IA, notifications, and sync-card placement. |
+| `npm run test:launch-gate:mobile --silent` | Passed | Flutter `pub get`, `analyze`, and full `flutter test` passed after `714fefe`; 448 mobile tests passed, including typed seeker/company login credentials, campus tester shortcut, Settings fixed-choice rows, CV manager/parser honesty, CV cover-letter preview/download, expanded filters, More placement, company IA, notifications, and sync-card placement. |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "previews seeker cover letters through CV Studio routes"` | Passed | Proves mobile calls the backend CV Studio `cover-letter/templates` and `cover-letter/preview` routes with the selected template, job title, and company name payload fields. |
 | `flutter test test\widget_test.dart --plain-name "previews a seeker CV cover letter from backend templates"` | Passed | Proves the signed-in seeker CV Manager exposes the cover-letter action, loads backend templates, and renders the preview panel. |
+| `flutter test test\seeker_dashboard_service_test.dart --plain-name "downloads seeker cover letters through CV Studio routes"` | Passed | Proves mobile calls the backend CV Studio `cover-letter/download` route as an authenticated POST file download with the selected template payload and fallback filename. |
+| `flutter test test\widget_test.dart --plain-name "downloads a seeker CV cover letter from backend templates"` | Passed | Proves the signed-in seeker CV Manager exposes the cover-letter download action, loads backend templates, saves the returned text file, and shows success feedback. |
 | `npm run test:mobile-ui-contract --silent` | Passed | Passed after `aef1c87`; now also guards the university notification bell against returning to a static placeholder-only screen. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
 | `npm run check:imports --silent` | Passed | Relative import guard passed. |
@@ -124,7 +127,7 @@ A fresh debug APK was built and installed on the running emulator from source co
 - Emulator proof: installed and launched on `emulator-5554`
 - Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 085c562 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
 
-This APK is current for source commit `085c562`, including the mobile CV cover-letter preview work from `089f7d0`.
+This APK is current only for source commit `085c562`, including the mobile CV cover-letter preview work from `089f7d0`. The current source now includes later mobile app-code commit `714fefe`, so this APK does not include mobile CV cover-letter download until it is rebuilt and smoked again.
 
 ## Current Handout Status
 
@@ -133,7 +136,7 @@ This APK is current for source commit `085c562`, including the mobile CV cover-l
 | Locked mobile theme | Done and guarded by mobile UI/source contracts. |
 | Mobile Settings IA | Done: grouped settings index plus drill-in detail panels. |
 | Settings fixed choices | Done for mobile and web; mobile source guard and web tests prevent dropdown regression. |
-| CV Manager / CV Studio | Improved: current CV hero, library, build-from-profile, parser-disabled honesty, visibility choice flow, cover-letter preview, and confirmation-gated delete are in place; mobile and web both have focused regression tests for those claims. |
+| CV Manager / CV Studio | Improved: current CV hero, library, build-from-profile, parser-disabled honesty, visibility choice flow, cover-letter preview/download, and confirmation-gated delete are in place; mobile and web both have focused regression tests for those claims. |
 | CV parser honesty | Done for launch: parser defaults disabled unless configured; UI does not call it ready. |
 | Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency; backend create/update/run-now now preserves and matches skills, education, salary, and currency. |
 | Seeker/Campus More cleanup | Improved: grouped More sections and guarded against primary-flow duplication. |
@@ -141,7 +144,7 @@ This APK is current for source commit `085c562`, including the mobile CV cover-l
 | University admin notifications | Improved: header notifications now use real shared notification backend data and actions instead of a static `no notifications` placeholder, with service/widget/source guards. |
 | Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
 | Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
-| Docs freshness | Improved by this report and the mobile APK proof guard; refresh again after any later mobile app-code commit or APK rebuild. |
+| Docs freshness | Improved by this report and the mobile APK proof guard; refresh again after the next APK rebuild because the latest source commit is now newer than the current APK artifact. |
 
 ## External Blockers
 
