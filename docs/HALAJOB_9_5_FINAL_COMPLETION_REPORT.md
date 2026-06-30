@@ -3,8 +3,8 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `fd84df7`
-- Current APK source build commit: `fd84df7`
+- Current reviewed code/proof-guard commit before this report refresh: `92c84c9`
+- Current APK source build commit: `92c84c9`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `92c84c9` | Removed the duplicated company job-detail AI shortcut so company AI tasks stay in the dedicated `AI hiring tools` module, and added an enabled-state widget guard proving Jobs no longer exposes the old `AI support` panel or contextual AI buttons. |
 | `fd84df7` | Aligned the company mobile AI tools screen heading with the single `AI hiring tools` IA entry, added a widget guard against the old `AI support` heading returning, and served as the source commit for the current debug tester APK rebuild. |
 | `a9e71ed` | Strengthened the company mobile AI IA widget guard so More can expose exactly one AI hiring tools entry while the individual AI tool cards stay inside the dedicated AI tools screen. |
 | `9f1972f` | Refreshed web CV cover-letter proof docs after `f6e6a1f`, then served as the source commit for the current debug tester APK rebuild. |
@@ -106,6 +107,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "downloads seeker cover letters through CV Studio routes"` | Passed | Proves mobile calls the backend CV Studio `cover-letter/download` route as an authenticated POST file download with the selected template payload and fallback filename. |
 | `flutter test test\widget_test.dart --plain-name "downloads a seeker CV cover letter from backend templates"` | Passed | Proves the signed-in seeker CV Manager exposes the cover-letter download action, loads backend templates, saves the returned text file, and shows success feedback. |
 | `flutter test test\widget_test.dart --plain-name "company AI hiring tools are grouped under More when enabled"` | Passed | Proves company More exposes a single AI hiring tools entry when enabled, the dedicated screen keeps the `AI hiring tools` heading instead of the old `AI support` label, Job Draft/Candidate Shortlist/Hiring Message/Job Translation stay inside that dedicated screen, and Talent help/Campus recruiting stay in the Talent tab instead of More. |
+| `flutter test test\widget_test.dart --plain-name "company job details keep AI tools in the dedicated More module"` | Passed | Proves the company Jobs detail screen does not expose the old `AI support` panel or contextual `company-job-ai-shortlist` / `company-job-ai-translation` actions even when AI tools are enabled; AI remains reachable through the dedicated More module. |
 | `npm run test:mobile-ui-contract --silent` | Passed | Passed after `aef1c87`; now also guards the university notification bell against returning to a static placeholder-only screen. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
 | `npm run check:imports --silent` | Passed | Relative import guard passed. |
@@ -119,21 +121,21 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm --prefix web test -- jobAlerts` | Passed | 1 file / 2 tests; verifies web job-alert canonical filter behavior after the shared saved-search type update. |
 | `npm --prefix web run build` | Passed | TypeScript build and Vite production build passed after the shared saved-search filter type update. |
 | `npm run test:mobile-apk-proof --silent` | Passed | Proves the latest debug APK metadata, `.sha256` file, and `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md` agree when an APK artifact exists. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `fd84df7`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `92c84c9`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
 
-A fresh debug APK was built and installed on the running emulator from source commit `fd84df7`. Documentation commits after `fd84df7` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
+A fresh debug APK was built and installed on the running emulator from source commit `92c84c9`. Documentation commits after `92c84c9` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
 
-- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-fd84df7-1.0.6+27-debug.apk`
-- SHA-256: `ed724ce8828c964027dfd7f929049ca51e577eaa31c091a62c10a6ea4c6bd0f6`
+- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-92c84c9-1.0.6+27-debug.apk`
+- SHA-256: `3a0c57be8df7ffdd835310d9e2aea0131dc433204770ebafa4f7827fc96fbce5`
 - Version/build: `1.0.6+27`
 - Build flags: Campus auth `local-device`, `AI tools enabled=true`, base URL `https://jobzain.com`, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified screens: auth screen launch, typed seeker email/password fields accept input, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | fd84df7 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
+- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 92c84c9 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
 
-This APK is current for source commit `fd84df7`, including the company AI tools heading alignment and the mobile/web CV Studio proof refreshes through this branch.
+This APK is current for source commit `92c84c9`, including the company AI tools heading alignment, dedicated-module AI placement guard, and the mobile/web CV Studio proof refreshes through this branch.
 
 ## Current Handout Status
 
