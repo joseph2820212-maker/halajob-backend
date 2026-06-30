@@ -1148,6 +1148,7 @@ const RESOURCE_STATUS_WHITELIST = {
   legalreports: ['received', 'under_review', 'action_needed', 'action_taken', 'rejected', 'closed'],
   privacyrequests: ['received', 'verifying_identity', 'processing', 'completed', 'rejected', 'cancelled'],
   accessibilityrequests: ['received', 'in_progress', 'resolved', 'closed'],
+  supporttickets: ['open', 'waiting_for_user', 'waiting_for_team', 'escalated', 'resolved', 'closed'],
 };
 
 const setResourceStatus = (resourceName) => async (req, res) => {

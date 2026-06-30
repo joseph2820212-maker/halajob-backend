@@ -509,6 +509,11 @@ const schemas = {
           // accessibility requests
           "in_progress",
           "resolved",
+          // support tickets
+          "open",
+          "waiting_for_user",
+          "waiting_for_team",
+          "escalated",
           // shared
           "rejected",
         ])
