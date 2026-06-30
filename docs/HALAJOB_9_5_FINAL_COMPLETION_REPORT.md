@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `e2611c3`
+- Current reviewed code/proof-guard commit before this report refresh: `5de5cd9`
 - Current APK source build commit: `eaca7f6`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `5de5cd9` | Strengthened the Syria documentation contract so provider/owner blockers for AI, CV parsing, SMTP/Firebase/storage, payments, production Android signing, and owner UI approval cannot disappear from handoff docs. |
 | `e2611c3` | Hardened mobile Settings drill-in coverage: grouped rows stay on the Settings index, notification switches serialize channel payloads, and Data rights export/delete actions remain in their detail panel with delete confirmation. |
 | `80a235a` | Refreshed the handout gate proof after the current APK emulator smoke, keeping the final readiness report, route inventory, and mobile/web contract evidence aligned. |
 | `450cf75` | Refreshed the current APK proof after building and installing the `eaca7f6` debug APK on the emulator, including source metadata and SHA evidence. |
@@ -73,6 +74,8 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | Command | Result | Notes |
 |---|---|---|
 | `npm run test:launch-gate` | Passed | Full composed launch gate passed from `80a235a`: backend syntax/import/secret/i18n/security/integration/product gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/443 tests, route inventory, UI action, mobile route/UI, More placement, and bilingual payload contracts. |
+| `npm run test:syria-docs --silent` | Passed | Passed after `5de5cd9`; now also guards provider/owner blocker honesty for AI, CV parsing, SMTP/Firebase/storage, payments, production Android signing, owner UI approval, and current APK metadata. |
+| `npm run check:syntax --silent` | Passed | Full JS syntax pass after strengthening `scripts/verifySyriaDocumentationContract.js`. |
 | `flutter analyze` | Passed | Run from `mobile/` after `e2611c3`; no issues found. |
 | `flutter test test\widget_test.dart --plain-name "settings"` | Passed | 9 Settings-related widget tests passed after `e2611c3`, including header profile/settings split, grouped Settings index, account detail save/upload/relogin, ticked privacy/job-alert rows, notification switches/payloads, data-rights export/delete confirmation, and logout-all confirmation. |
 | `npm --prefix web test -- public` | Passed | 2 public tests cover segmented public job filters and job rating radio payloads. |
@@ -92,7 +95,6 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm run test:launch-gate:mobile --silent` | Passed | Flutter `pub get`, `analyze`, and full `flutter test` passed after `1ff876d`; 443 mobile tests passed, including typed seeker/company login credentials, campus tester shortcut, Settings fixed-choice rows, CV manager/parser honesty, expanded filters, More placement, company IA, notifications, and sync-card placement. |
 | `npm run test:mobile-ui-contract --silent` | Passed | Passed after `aef1c87`; now also guards the university notification bell against returning to a static placeholder-only screen. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
-| `npm run check:syntax --silent` | Passed | Full JS syntax pass after the integration helper change. |
 | `npm run check:imports --silent` | Passed | Relative import guard passed. |
 | `npm run test:integration:saved-search-alerts --silent` | Passed | Representative DB-backed integration still passes through the shared Mongo helper. |
 | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Protects mobile screen inventory, locked chrome, More placement, company header actions, AI single-entry rules, Settings fixed-choice source, expanded opportunity filter source, and canonical More placement. |
@@ -104,7 +106,6 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm --prefix web test -- jobAlerts` | Passed | 1 file / 2 tests; verifies web job-alert canonical filter behavior after the shared saved-search type update. |
 | `npm --prefix web run build` | Passed | TypeScript build and Vite production build passed after the shared saved-search filter type update. |
 | `npm run test:mobile-apk-proof --silent` | Passed | Proves the latest debug APK metadata, `.sha256` file, and `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md` agree when an APK artifact exists. |
-| `npm run test:syria-docs --silent` | Passed | Syria documentation contract passed and then verified the current APK proof metadata against the latest debug APK artifact. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
