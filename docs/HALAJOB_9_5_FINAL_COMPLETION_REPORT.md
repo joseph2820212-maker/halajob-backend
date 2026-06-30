@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `289eb64`
+- Current reviewed code/proof-guard commit before this report refresh: `0b9a32a`
 - Current APK source build commit: `289eb64`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `0b9a32a` | Strengthened DB-backed integration reproducibility by validating `MONGOMS_SYSTEM_BINARY` before `mongodb-memory-server` starts, adding contract coverage for missing and present system-binary paths, and documenting the setup behavior. |
 | `289eb64` | Aligned the seeker/campus AI career tools screen heading with the `AI career tools` entry and added an enabled-state widget guard proving the old generic `AI support` label stays out of that dedicated screen. |
 | `92c84c9` | Removed the duplicated company job-detail AI shortcut so company AI tasks stay in the dedicated `AI hiring tools` module, and added an enabled-state widget guard proving Jobs no longer exposes the old `AI support` panel or contextual AI buttons. |
 | `fd84df7` | Aligned the company mobile AI tools screen heading with the single `AI hiring tools` IA entry, added a widget guard against the old `AI support` heading returning, and served as the source commit for the current debug tester APK rebuild. |
@@ -111,8 +112,8 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `flutter test test\widget_test.dart --plain-name "company job details keep AI tools in the dedicated More module"` | Passed | Proves the company Jobs detail screen does not expose the old `AI support` panel or contextual `company-job-ai-shortlist` / `company-job-ai-translation` actions even when AI tools are enabled; AI remains reachable through the dedicated More module. |
 | `flutter test test\widget_test.dart --plain-name "seeker AI career tools screen keeps dedicated IA label"` | Passed | Proves the seeker AI tools entry opens the dedicated `AI career tools` screen, shows Career Copilot, and does not show the old generic `AI support` heading. |
 | `npm run test:mobile-ui-contract --silent` | Passed | Passed after `aef1c87`; now also guards the university notification bell against returning to a static placeholder-only screen. |
-| `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
-| `npm run check:imports --silent` | Passed | Relative import guard passed. |
+| `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping, clear guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths. |
+| `npm run check:imports --silent` | Passed | Relative import guard passed after the integration Mongo helper system-binary validation change. |
 | `npm run test:integration:saved-search-alerts --silent` | Passed | Representative DB-backed integration still passes through the shared Mongo helper. |
 | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Protects mobile screen inventory, locked chrome, More placement, company header actions, AI single-entry rules, Settings fixed-choice source, expanded opportunity filter source, and canonical More placement. |
 | `flutter analyze` | Passed | Run from `mobile/` with `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\tools\flutter\bin\flutter.bat`; no issues found. |
@@ -153,7 +154,7 @@ This APK is current for source commit `289eb64`, including the company AI tools 
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
 | University admin notifications | Improved: header notifications now use real shared notification backend data and actions instead of a static `no notifications` placeholder, with service/widget/source guards. |
 | Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
-| Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
+| Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, explicit `MONGOMS_SYSTEM_BINARY` path validation, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
 | Docs freshness | Improved by this report and the mobile APK proof guard; refresh again after any later mobile app-code commit or APK rebuild. |
 
 ## External Blockers
