@@ -85,19 +85,20 @@ function lineForIndex(source, index) {
   return source.slice(0, index).split(/\r?\n/).length;
 }
 
-function findButtonTags(source) {
+function findJsxTags(source, tagName) {
   const tags = [];
-  let index = source.indexOf("<button");
+  const prefix = `<${tagName}`;
+  let index = source.indexOf(prefix);
 
   while (index >= 0) {
-    const afterName = source[index + "<button".length] || "";
+    const afterName = source[index + prefix.length] || "";
     if (!/[A-Za-z0-9_$-]/.test(afterName)) {
       let braceDepth = 0;
       let quote = null;
       let escaped = false;
       let end = -1;
 
-      for (let i = index + "<button".length; i < source.length; i += 1) {
+      for (let i = index + prefix.length; i < source.length; i += 1) {
         const ch = source[i];
         if (quote) {
           if (escaped) escaped = false;
@@ -128,7 +129,7 @@ function findButtonTags(source) {
       }
     }
 
-    index = source.indexOf("<button", index + "<button".length);
+    index = source.indexOf(prefix, index + prefix.length);
   }
 
   return tags;
@@ -147,10 +148,25 @@ for (const target of targets) {
       }
     }
     if (file.endsWith(".tsx")) {
-      for (const tag of findButtonTags(source)) {
+      for (const tag of findJsxTags(source, "button")) {
         if (/\bonClick\b/.test(tag.text) && !/\btype\s*=/.test(tag.text)) {
           failures.push(
             `${file}:${lineForIndex(source, tag.index)} has an onClick <button> without explicit type="button"`,
+          );
+        }
+      }
+      for (const tag of findJsxTags(source, "QueueTable")) {
+        const hasVisibleActions = !/\bactions\s*=\s*\{\s*\[\s*\]\s*\}/.test(
+          tag.text,
+        );
+        if (
+          hasVisibleActions &&
+          /\bonAction\s*=\s*\{\s*\(\s*\)\s*=>\s*(?:undefined|null|void\s+0|setToast\()/.test(
+            tag.text,
+          )
+        ) {
+          failures.push(
+            `${file}:${lineForIndex(source, tag.index)} has visible QueueTable actions wired to a no-op/toast-only handler`,
           );
         }
       }
