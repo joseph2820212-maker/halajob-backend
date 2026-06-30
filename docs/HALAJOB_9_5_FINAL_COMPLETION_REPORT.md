@@ -4,7 +4,7 @@
 
 - Branch: `codex/gate-a-mobile-ui-lock`
 - Current clean-checkout proof source commit before this report refresh: `ff5b8ba`
-- Current APK source build commit: `4898355`
+- Current APK source build commit: `9c9651c`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -23,6 +23,7 @@ See `docs/HALAJOB_9_5_HANDOUT_TRACEABILITY.md` for the requirement-by-requiremen
 
 | Commit | Summary |
 |---|---|
+| `9c9651c` | Locked the Android native launch/splash chrome to navy, refreshed the official debug APK metadata, and extended the mobile source inventory guard so native launch chrome cannot drift back to the cream startup frame. |
 | `4898355` | Wrapped the shared native mobile header in a light-status-bar overlay so authenticated navy headers keep readable Android status icons, and strengthened source guards for that requirement. |
 | `86012c1` | Switched global mobile app bar/system chrome defaults to navy with light icons. |
 | `6545177` | Restored the locked navy authenticated mobile header, made the brand readable on navy, and corrected the regression tests that had been enforcing the old cream header. |
@@ -105,7 +106,7 @@ See `docs/HALAJOB_9_5_HANDOUT_TRACEABILITY.md` for the requirement-by-requiremen
 | `npm run test:launch-gate --silent` | Passed | Full composed launch gate passed from detached clean worktree `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe-clean-ff5b8ba` at source commit `ff5b8ba`, then passed again on the current branch at commit `0a04d5b`. The current composed run covered backend syntax/import/secret/i18n/security/integration/product gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/450 Flutter tests, route inventory, UI action, web tab reachability, mobile route/UI, More placement, locked navy header chrome, and bilingual payload contracts. |
 | `npm run test:launch-gate:backend --silent` | Passed | Current-branch backend gate passed at commit `7113eb8`, covering syntax/import/secrets/i18n, smoke checks, security HTTP, OTP, route validation, response codes, model/Mixed/data-retention contracts, Mongo helper, global launch, AI/trust/notification/analytics/translation/admin-operation/career-passport route contracts, and the full launch-critical plus Syria product DB aggregates. |
 | `npm run test:launch-gate:web --silent` | Passed | Current-branch web gate passed at commit `e7403eb`, covering clean web install, production build, SEO prerender for 14 routes, bundle-size guard with largest JS chunk at `385.6 KiB` under 500 KiB, 16 Vitest files / 65 tests, and browser E2E smoke through campus, university, company, seeker, and admin portal navigation. |
-| `npm run test:syria-docs --silent` | Passed | Passed after `5de5cd9`; now also guards provider/owner blocker honesty for AI, CV parsing, SMTP/Firebase/storage, payments, production Android signing, owner UI approval, and current APK metadata. |
+| `npm run test:syria-docs --silent` | Passed | Passed after `5de5cd9`; now also guards provider/owner blocker honesty for AI, CV parsing, SMTP/Firebase/storage, payments, production Android signing, owner UI approval, current APK metadata, and production launch evidence packet structure. |
 | `npm run check:syntax --silent` | Passed | Full JS syntax pass after strengthening `scripts/verifySyriaDocumentationContract.js`. |
 | `flutter analyze` | Passed | Run from `mobile/` after `e2611c3`; no issues found. |
 | `flutter test test\widget_test.dart --plain-name "settings"` | Passed | 9 Settings-related widget tests passed after `e2611c3`, including header profile/settings split, grouped Settings index, account detail save/upload/relogin, ticked privacy/job-alert rows, notification switches/payloads, data-rights export/delete confirmation, and logout-all confirmation. |
@@ -138,7 +139,7 @@ See `docs/HALAJOB_9_5_HANDOUT_TRACEABILITY.md` for the requirement-by-requiremen
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping, clear guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths. |
 | `npm run check:imports --silent` | Passed | Relative import guard passed after the integration Mongo helper system-binary validation change. |
 | `npm run test:integration:saved-search-alerts --silent` | Passed | Representative DB-backed integration still passes through the shared Mongo helper. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Protects mobile screen inventory, locked chrome, More placement, company header actions, AI single-entry rules, Settings fixed-choice source, expanded opportunity filter source, and canonical More placement. |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` | Passed | Protects mobile screen inventory, locked Flutter/native Android launch chrome, More placement, company header actions, AI single-entry rules, Settings fixed-choice source, expanded opportunity filter source, and canonical More placement. |
 | `flutter analyze` | Passed | Run from `mobile/` with `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\tools\flutter\bin\flutter.bat`; no issues found. |
 | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` | Passed | Proves the mobile filter sheet exposes skills, salary minimum, education level, alert frequency, and the existing filter groups. |
 | `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` | Passed | Proves expanded filters persist to saved-search payloads, including skills, education level, salary minimum, currency, work mode, student/fresh-grad, verified employer, and alert frequency. |
@@ -147,21 +148,22 @@ See `docs/HALAJOB_9_5_HANDOUT_TRACEABILITY.md` for the requirement-by-requiremen
 | `npm --prefix web test -- jobAlerts` | Passed | 1 file / 2 tests; verifies web job-alert canonical filter behavior after the shared saved-search type update. |
 | `npm --prefix web run build` | Passed | TypeScript build and Vite production build passed after the shared saved-search filter type update. |
 | `npm run test:mobile-apk-proof --silent` | Passed | Proves the latest debug APK metadata, `.sha256` file, and `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md` agree when an APK artifact exists. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `4898355`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
+| `npm run test:production-launch-evidence --silent` | Passed | Verifies the production launch evidence packet has all 14 owner/provider/device rows and does not convert local proof into live production proof. Complete mode intentionally fails until those rows are closed. |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `9c9651c`, with diagnostics, local campus tester auth, AI tools enabled for review, and navy Android native launch chrome. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
 
-A fresh debug APK was built and installed on the running emulator from source commit `4898355`. Documentation commits after `4898355` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
+A fresh debug APK was built and installed on the running emulator from source commit `9c9651c`. Documentation commits after `9c9651c` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
 
-- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-4898355-1.0.6+27-debug.apk`
-- SHA-256: `ceb77ccc54fd0e660e25c7fdaaefa3d284a6333e4bef8303b7570847c50f2e8e`
+- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-9c9651c-1.0.6+27-debug.apk`
+- SHA-256: `d0b1b6ca0c48ac67ca4c4cd418ed36c0e0c778c3d837285c4f985e8cdb15cc78`
 - Version/build: `1.0.6+27`
 - Build flags: Campus auth `local-device`, `AI tools enabled=true`, base URL `https://jobzain.com`, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 4898355 | local-device`, and the locked navy authenticated header with cream surfaces/orange accent on `emulator-5554`.
+- Verified screens: native splash launch with navy status/body/navigation chrome, auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 9c9651c | local-device`, and the locked navy authenticated header with cream surfaces/orange accent on `emulator-5554`.
 
-This APK is current for source commit `4898355`, including the locked navy authenticated mobile header, light Android status icons over that header, company AI tools heading alignment, dedicated-module AI placement guard, seeker AI career tools heading alignment, seeker-discovery dashboard extraction, seeker CV Manager extraction, web employer/campus workflow proof refresh, the web bundle-size launch guard, and the proof refreshes through this branch.
+This APK is current for source commit `9c9651c`, including the locked Android native launch chrome, locked navy authenticated mobile header, light Android status icons over that header, company AI tools heading alignment, dedicated-module AI placement guard, seeker AI career tools heading alignment, seeker-discovery dashboard extraction, seeker CV Manager extraction, web employer/campus workflow proof refresh, the web bundle-size launch guard, and the proof refreshes through this branch.
 
 ## Current Handout Status
 
@@ -177,7 +179,7 @@ This APK is current for source commit `4898355`, including the locked navy authe
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
 | University admin notifications | Improved: header notifications now use real shared notification backend data and actions instead of a static `no notifications` placeholder, with service/widget/source guards. |
 | Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep/passport reachability, company applicant/member/library/support workflows, company job posting choices, company job pause/resume, interview join/reschedule, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, backend campus events, university verification approve/reject/request-info, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, offer-decline confirmation, and web bundle-size regression protection. |
-| Proof reproducibility | Passed for clean full-gate source commit `ff5b8ba`, focused mobile proof at `8705162`, and current mobile launch-gate/APK proof at `4898355`: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, explicit `MONGOMS_SYSTEM_BINARY` path validation, a fast helper contract, current APK metadata proof, full `npm run test:launch-gate` clean-checkout replay, post-extraction mobile launch-gate pass, and post-navy-header mobile launch-gate pass. |
+| Proof reproducibility | Passed for clean full-gate source commit `ff5b8ba`, focused mobile proof at `8705162`, mobile launch-gate proof at `4898355`, and current APK/source-inventory proof at `9c9651c`: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, explicit `MONGOMS_SYSTEM_BINARY` path validation, a fast helper contract, current APK metadata proof, full `npm run test:launch-gate` clean-checkout replay, post-extraction mobile launch-gate pass, post-navy-header mobile launch-gate pass, and native Android launch-chrome guard proof. |
 | Docs freshness | Improved by this report, `docs/HALAJOB_9_5_HANDOUT_TRACEABILITY.md`, and the mobile APK proof guard; refresh again after any later source commit, and rebuild/refresh APK proof after any later mobile app-code commit. |
 
 ## External Blockers

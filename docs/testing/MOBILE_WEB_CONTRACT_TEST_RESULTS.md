@@ -2,8 +2,8 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `0a04d5b` current full launch gate; current APK proof through `4898355`
-Latest APK source build commit: `4898355`
+Source contracts tested through: `0a04d5b` current full launch gate; current APK proof through `9c9651c`
+Latest APK source build commit: `9c9651c`
 
 ## Passed Coverage
 
@@ -49,11 +49,11 @@ Latest APK source build commit: `4898355`
 | UI action wiring | `npm run test:ui-actions` passed 12 source files and 15 route/UI pairs after `b6f5bb2` |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
 | Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed 327/327 web API route matches, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts inside the clean `ff5b8ba` full launch-gate replay. It passed again on the current branch at `f63140b`, including 332 mobile method/path route checks and the locked navy header chrome contract. |
-| Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, extracted seeker CV Manager commitments, seeker/campus More placement, and company More primary-flow duplication against regression |
+| Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, extracted seeker CV Manager commitments, seeker/campus More placement, company More primary-flow duplication, and Android native launch chrome against regression |
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed inside the clean `ff5b8ba` full launch-gate replay, passed again at source commit `8705162` after extracting seeker-discovery and seeker CV Manager dashboard widgets, and passed again at source commit `4898355` after restoring the navy authenticated header and light Android status icons. The latest run completed Flutter `pub get`, `analyze`, and full `flutter test` with 450 tests passed. |
-| Current APK emulator smoke | A debug APK from source commit `4898355` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 4898355 | local-device`, and the locked navy authenticated header with cream surfaces/orange accent on Campus home. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `ceb77ccc54fd0e660e25c7fdaaefa3d284a6333e4bef8303b7570847c50f2e8e`. Documentation commits after `4898355` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
+| Current APK emulator smoke | A debug APK from source commit `9c9651c` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 9c9651c | local-device`, native launch splash/status chrome in navy, and the locked navy authenticated header with cream surfaces/orange accent on Campus home. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `d0b1b6ca0c48ac67ca4c4cd418ed36c0e0c778c3d837285c4f985e8cdb15cc78`. Documentation commits after `9c9651c` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 

@@ -45,6 +45,7 @@ Read these before handoff or new launch work:
 - `docs/launch-hardening-status.md`
 - `docs/SYRIA_LAUNCH_PRODUCT_QA.md`
 - `docs/OPERATOR_GUIDE.md`
+- `docs/testing/PRODUCTION_LAUNCH_EVIDENCE.md`
 
 ## Syria-First Product Modules
 
@@ -127,6 +128,7 @@ npm run check:secrets
 npm run check:syntax
 npm run check:imports
 npm run test:syria-docs
+npm run test:production-launch-evidence
 npm run smoke:import
 npm run smoke:http
 npm run smoke:cors
@@ -179,3 +181,9 @@ proof for:
 - manual subscription launch acceptance or online payment provider setup
 - production Android signing/package/update strategy
 - owner real-device mobile UI approval
+
+Track final live/provider/device proof in
+`docs/testing/PRODUCTION_LAUNCH_EVIDENCE.md`. Run
+`npm run test:production-launch-evidence` after edits, and run
+`npm run test:production-launch-evidence:complete` only when preparing to claim
+public-launch readiness.

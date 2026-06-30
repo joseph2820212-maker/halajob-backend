@@ -180,6 +180,23 @@ const requiredDocs = [
       "Moderate Support, Legal, And Trust",
     ],
   },
+  {
+    path: "docs/testing/PRODUCTION_LAUNCH_EVIDENCE.md",
+    minLength: 4500,
+    needles: [
+      "production_secret_rotation",
+      "live_backend_smoke",
+      "live_smtp_email",
+      "live_firebase_push",
+      "live_storage_upload_download",
+      "production_android_signing",
+      "owner_real_device_qa",
+      "npm run test:production-launch-evidence",
+      "npm run test:production-launch-evidence:complete",
+      "PENDING_OWNER",
+      "ACCEPTED_EXCLUSION",
+    ],
+  },
 ];
 
 const readme = read("README.md");
