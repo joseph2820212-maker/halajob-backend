@@ -17,17 +17,23 @@ are linked; do not duplicate work already verified as done.
 
 ## Stream A — Navigation / IA cleanup
 Spec: `HALAJOB_MOBILE_HANDOFF.md` + `HALAJOB_UX_NAVIGATION_MASTER_PLAN.md`
+Status: implemented and pushed on `codex/gate-a-mobile-ui-lock` through
+`4603253 Phase 8: enforce UI placement guards in CI`. Verification on
+2026-06-30: `npm run test:launch-gate:ui-contracts`,
+`powershell -ExecutionPolicy Bypass -File mobile/scripts/assert-mobile-screen-inventory.ps1`,
+`npm --prefix web test`, `npm --prefix web run build`, and full
+`flutter test` passed.
 
-- [ ] A1 (Phase 1) — Kill non-deterministic tabs: Jobs vs Saved shared state; build
+- [x] A1 (Phase 1) — Kill non-deterministic tabs: Jobs vs Saved shared state; build
       "My Jobs" pipeline. **Highest priority (the user's main complaint).**
-- [ ] A2 (Phase 2) — One home per function (CV manager, job alerts, interview prep).
-- [ ] A3 (Phase 3) — Per-role nav fixes (relabel university, hide dead Talent tab,
+- [x] A2 (Phase 2) — One home per function (CV manager, job alerts, interview prep).
+- [x] A3 (Phase 3) — Per-role nav fixes (relabel university, hide dead Talent tab,
       promote campus Events).
-- [ ] A4 (Phase 4) — Universal interaction contract (card→detail; quick-action rule).
-- [ ] A5 (Phase 5) — Entity unifier company page (About/Jobs/Reviews/Salary).
-- [ ] A6 (Phase 6) — RTL/Arabic hardening (true mirroring + bidi).
-- [ ] A7 (Phase 7) — Web parity with the mobile IA.
-- [ ] A8 (Phase 8) — Wire placement guard + new tests into CI.
+- [x] A4 (Phase 4) — Universal interaction contract (card→detail; quick-action rule).
+- [x] A5 (Phase 5) — Entity unifier company page (About/Jobs/Reviews/Salary).
+- [x] A6 (Phase 6) — RTL/Arabic hardening (true mirroring + bidi).
+- [x] A7 (Phase 7) — Web parity with the mobile IA.
+- [x] A8 (Phase 8) — Wire placement guard + new tests into CI.
 
 ## Stream B — Legal / Help / Support → 9.5
 Spec: `docs/handouts/HALAJOB_CODEX_HANDOUT_LEGAL_HELP_SUPPORT_9_5_SYRIA.md`
@@ -65,11 +71,13 @@ Source: `docs/handouts/CHATGPT_CODE_REVIEW_VERDICT.md`
 ---
 
 ## Suggested order
-1. **A1** (the live complaint) → 2. **B1** (get tests green) → 3. **B2** (legal gate)
-→ 4. **B3–B8** (support/privacy/reports) → 5. **A2–A4** (nav de-dupe + per-role)
-→ 6. **B9–B10** (currency + Syria schedule) → 7. **A5–A8** (unifier, RTL, web, CI)
-→ 8. **C1** (god-file split, incremental throughout) → 9. **C2** (Flutter proof)
-→ 10. **C3** (owner evidence).
+Stream A is complete. Continue only with the remaining Stream B/C items when the
+owner explicitly resumes those scopes.
+
+1. **B1** (get tests green) → 2. **B2** (legal gate)
+→ 3. **B3–B8** (support/privacy/reports) → 4. **B9–B10** (currency + Syria schedule)
+→ 5. **C1** (god-file split, incremental throughout) → 6. **C2** (Flutter proof)
+→ 7. **C3** (owner evidence).
 
 ## Owner action items (not Codex)
 - C3 production-evidence sign-offs.
