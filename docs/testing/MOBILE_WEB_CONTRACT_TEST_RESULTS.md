@@ -2,8 +2,8 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `ff5b8ba` clean full launch gate; focused mobile source through `4c91980`
-Latest APK source build commit: `4c91980`
+Source contracts tested through: `ff5b8ba` clean full launch gate; focused mobile source through `8705162`
+Latest APK source build commit: `8705162`
 
 ## Passed Coverage
 
@@ -46,11 +46,11 @@ Latest APK source build commit: `4c91980`
 | UI action wiring | `npm run test:ui-actions` passed 12 source files and 15 route/UI pairs after `b6f5bb2` |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
 | Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed 327/327 web API route matches, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts inside the clean `ff5b8ba` full launch-gate replay |
-| Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, seeker/campus More placement, and company More primary-flow duplication against regression |
+| Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, extracted seeker CV Manager commitments, seeker/campus More placement, and company More primary-flow duplication against regression |
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
-| Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed inside the clean `ff5b8ba` full launch-gate replay, then passed again at source commit `4c91980` after extracting seeker-discovery dashboard widgets; Flutter `pub get`, `analyze`, and full `flutter test` completed with 450 tests passed |
-| Current APK emulator smoke | A debug APK from source commit `4c91980` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, typed seeker/company login text entry, diagnostics showing `1.0.6 (27) | debug-apk | 4c91980 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `9ab5646e40a4a7c5256d6608c48f843df2f2d16ac983970e7ccf5106f4963014`. Documentation commits after `4c91980` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
+| Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed inside the clean `ff5b8ba` full launch-gate replay, then passed again at source commit `8705162` after extracting seeker-discovery and seeker CV Manager dashboard widgets; Flutter `pub get`, `analyze`, and full `flutter test` completed with 450 tests passed |
+| Current APK emulator smoke | A debug APK from source commit `8705162` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 8705162 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `21aeb0a1161bd8ae6531ded16ccaff03419b0fb5b0b8b17f5b42ccf23243c1d8`. Documentation commits after `8705162` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 
