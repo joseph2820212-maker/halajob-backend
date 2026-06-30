@@ -24,16 +24,17 @@ const rejects = (fn, code) => {
   throw new Error(`Expected ${code} to be rejected`);
 };
 
-assert.deepEqual(SUPPORTED_LAUNCH_CURRENCIES, ["USD", "EUR", "GBP"]);
+assert.deepEqual(SUPPORTED_LAUNCH_CURRENCIES, ["SYP", "USD", "EUR"]);
 assert.deepEqual(SUPPORTED_LAUNCH_WORK_MODES, ["onsite", "remote", "hybrid"]);
 
 assert.equal(assertSupportedLaunchCurrencyCode("usd"), "USD");
 assert.equal(assertSupportedLaunchCurrencyCode("EUR"), "EUR");
-assert.equal(assertSupportedLaunchCurrencyCode(" gbp "), "GBP");
+assert.equal(assertSupportedLaunchCurrencyCode(" syp "), "SYP");
+rejects(() => assertSupportedLaunchCurrencyCode("GBP"), "unsupported_salary_currency");
 rejects(() => assertSupportedLaunchCurrencyCode("SAR"), "unsupported_salary_currency");
 rejects(() => assertSupportedLaunchCurrencyCode("AED"), "unsupported_salary_currency");
 
-assert.deepEqual(launchCurrencyQuery(), { code: { $in: ["USD", "EUR", "GBP"] } });
+assert.deepEqual(launchCurrencyQuery(), { code: { $in: ["SYP", "USD", "EUR"] } });
 
 assert.equal(normalizeLaunchWorkModeKey("On Site"), "onsite");
 assert.equal(normalizeLaunchWorkModeKey("حضوري"), "onsite");

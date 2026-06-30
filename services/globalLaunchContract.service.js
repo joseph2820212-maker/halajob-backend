@@ -1,4 +1,6 @@
-export const SUPPORTED_LAUNCH_CURRENCIES = Object.freeze(["USD", "EUR", "GBP"]);
+// Syria-first launch (owner decision 2026-06-30): support Syrian pound plus the
+// two international currencies kept for cross-border employers. GBP dropped.
+export const SUPPORTED_LAUNCH_CURRENCIES = Object.freeze(["SYP", "USD", "EUR"]);
 
 export const SUPPORTED_LAUNCH_WORK_MODES = Object.freeze([
   "onsite",

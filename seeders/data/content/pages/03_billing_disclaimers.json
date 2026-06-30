@@ -48,7 +48,7 @@
     "title": { "en": "Salary, Currency, and Job Information Disclaimer", "ar": "إخلاء مسؤولية الراتب والعملة ومعلومات الوظيفة" },
     "summary": { "en": "Job details are employer-provided and should be confirmed.", "ar": "تفاصيل الوظيفة مقدمة من صاحب العمل ويجب تأكيدها." },
     "contentBlocks": [
-      { "type": "paragraph", "text": { "en": "Salary may be employer-provided, estimated, or missing. Supported launch currencies are USD, EUR, and GBP. Remote, hybrid, and onsite labels depend on the job data. Always confirm details with the employer.", "ar": "قد يكون الراتب مقدماً من صاحب العمل أو تقديرياً أو غير متوفر. العملات المدعومة عند الإطلاق هي الدولار الأمريكي واليورو والجنيه الإسترليني. تعتمد تسميات العمل عن بُعد والمختلط والحضوري على بيانات الوظيفة. تأكد دائماً من التفاصيل مع صاحب العمل." }, "sortOrder": 1 }
+      { "type": "paragraph", "text": { "en": "Salary may be employer-provided, estimated, or missing. Supported launch currencies are SYP, USD, and EUR. Remote, hybrid, and onsite labels depend on the job data. Always confirm details with the employer.", "ar": "قد يكون الراتب مقدماً من صاحب العمل أو تقديرياً أو غير متوفر. العملات المدعومة عند الإطلاق هي الليرة السورية والدولار الأمريكي واليورو. تعتمد تسميات العمل عن بُعد والمختلط والحضوري على بيانات الوظيفة. تأكد دائماً من التفاصيل مع صاحب العمل." }, "sortOrder": 1 }
     ],
     "version": "2026.06.28", "requiresAcknowledgement": false, "legalReviewStatus": "needs_lawyer_review", "ownerDepartment": "legal"
   }
