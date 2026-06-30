@@ -3,8 +3,8 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `f6e6a1f`
-- Current APK source build commit: `2c8e4c5`
+- Current reviewed code/proof-guard commit before this report refresh: `9f1972f`
+- Current APK source build commit: `9f1972f`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `9f1972f` | Refreshed web CV cover-letter proof docs after `f6e6a1f`, then served as the source commit for the current debug tester APK rebuild. |
 | `f6e6a1f` | Web CV Studio now proves cover-letter preview/download actions call the backend CV Studio template routes from the CV Library row and open the returned download blob. |
 | `2c8e4c5` | Refreshed mobile cover-letter download proof docs after `714fefe`, then served as the source commit for the current debug tester APK rebuild. |
 | `714fefe` | Mobile CV Manager can now download cover letters through the authenticated backend CV Studio download route, save the returned text file, and prove the route/UI flow with service and widget tests. |
@@ -115,21 +116,21 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm --prefix web test -- jobAlerts` | Passed | 1 file / 2 tests; verifies web job-alert canonical filter behavior after the shared saved-search type update. |
 | `npm --prefix web run build` | Passed | TypeScript build and Vite production build passed after the shared saved-search filter type update. |
 | `npm run test:mobile-apk-proof --silent` | Passed | Proves the latest debug APK metadata, `.sha256` file, and `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md` agree when an APK artifact exists. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `2c8e4c5`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `9f1972f`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
 
-A fresh debug APK was built and installed on the running emulator from source commit `2c8e4c5`. Documentation commits after `2c8e4c5` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
+A fresh debug APK was built and installed on the running emulator from source commit `9f1972f`. Documentation commits after `9f1972f` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
 
-- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-2c8e4c5-1.0.6+27-debug.apk`
-- SHA-256: `f3bd35aea01050a97527d27c7013774e8c79ca7133eee0d4c97604796bfa089b`
+- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-9f1972f-1.0.6+27-debug.apk`
+- SHA-256: `130f814d41554ce2921fc0b27cdca8a3c3da79b65e1157b6633589ab91af92c5`
 - Version/build: `1.0.6+27`
 - Build flags: Campus auth `local-device`, `AI tools enabled=true`, base URL `https://jobzain.com`, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 2c8e4c5 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
+- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 9f1972f | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
 
-This APK is current for source commit `2c8e4c5`, including the mobile CV cover-letter download work from `714fefe`.
+This APK is current for source commit `9f1972f`, including the mobile CV cover-letter download work from `714fefe` and the web CV Studio proof refresh through `9f1972f`.
 
 ## Current Handout Status
 
