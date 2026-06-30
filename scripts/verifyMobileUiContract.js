@@ -96,6 +96,16 @@ assertContains(
 assertContains(header, "color: halaNavy", "HalaNativeHeader");
 assertContains(
   header,
+  "AnnotatedRegion<SystemUiOverlayStyle>",
+  "HalaNativeHeader",
+);
+assertContains(
+  header,
+  "statusBarIconBrightness: Brightness.light",
+  "HalaNativeHeader",
+);
+assertContains(
+  header,
   "halaOrange.withValues(alpha: 0.28)",
   "HalaNativeHeader",
 );
@@ -158,10 +168,9 @@ assertContains(
   "if (leading != null) ...[leading!, const SizedBox(width: 6)]",
   "title header back button alignment",
 );
-assertContains(
-  normalizedHeader,
-  "Expanded(\n            child: showBrand",
-  "title header title alignment",
+assert.ok(
+  /Expanded\(\s+child:\s+showBrand/.test(normalizedHeader),
+  "title header title alignment missing Expanded showBrand branch",
 );
 assertNotContains(
   dashboard,
