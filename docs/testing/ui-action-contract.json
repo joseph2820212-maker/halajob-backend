@@ -203,13 +203,22 @@
         "followKey: 'campus-event-host-follow'",
         "String _bidiSafeText(BuildContext context, String value)",
         "key: const ValueKey('settings-detail-back')",
-        "? Icons.arrow_forward_rounded"
+        "? Icons.arrow_forward_rounded",
+        "final _SeekerProfileField? seekerField",
+        "final _CampusProfileField? campusField",
+        "if (isSeekerCv) return 'seeker-cv'",
+        "final fieldType = item.seekerField",
+        "final fieldType = item.campusField"
       ],
       "mustNotContain": [
         "ValueKey('dashboard-account-menu-settings-item')",
         "_DashboardHeaderAction.settings",
         "_openQuickActionDetails(action)",
-        "void _openQuickActionDetails("
+        "void _openQuickActionDetails(",
+        "item.label == 'Primary CV'",
+        "_seekerProfileFieldFor(",
+        "_campusProfileFieldFor(",
+        "profile-checkpoint-${item.label}"
       ],
       "occurrences": [
         {
