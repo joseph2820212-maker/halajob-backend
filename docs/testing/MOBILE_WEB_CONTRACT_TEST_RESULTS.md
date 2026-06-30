@@ -2,7 +2,8 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Commit tested: source contracts and APK build through `08ae514`
+Source contracts tested through: `08ae514`
+Latest APK source build commit: `0b8d933`
 
 ## Passed Coverage
 
@@ -37,7 +38,7 @@ Commit tested: source contracts and APK build through `08ae514`
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed, proving external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Flutter analyzer | `flutter analyze` passed from `mobile/` with no issues |
-| Current APK emulator smoke | A debug APK from `08ae514` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 08ae514 | local-device`, and current cream/navy/orange auth chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `3077ff864d68ab042e321d925ef00f71047d429058b59f9387d9ad5a0c0378c2`. |
+| Current APK emulator smoke | A debug APK from source commit `0b8d933` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 0b8d933 | local-device`, and current cream/navy/orange auth chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `630cb2dd94abdfd7c97ce7577bc29774ad085daf195600df2222e6eb2cb43a5b`. Documentation commits after `0b8d933` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 
