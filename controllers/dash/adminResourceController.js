@@ -638,6 +638,68 @@ const actorRoleId = (req) => {
   return String(role._id || role);
 };
 
+const SUPER_ADMIN_ROLE_NAMES = new Set([
+  'admin',
+  'super_admin',
+  'super-admin',
+  'superadmin',
+  'platform_admin',
+]);
+
+const isSuperAdminRole = (role = {}) => {
+  if (!role) return false;
+  const name = String(role.name || '').toLowerCase();
+  return role.log_to === 'dash' && (Number(role.role_number) === 1 || SUPER_ADMIN_ROLE_NAMES.has(name));
+};
+
+const loadSuperAdminRoleIds = async () => {
+  const roles = await RoleModel.find({
+    log_to: 'dash',
+    $or: [
+      { role_number: 1 },
+      { name: { $in: Array.from(SUPER_ADMIN_ROLE_NAMES) } },
+    ],
+  }).select('_id').lean();
+  return roles.map((role) => role._id);
+};
+
+const countOtherActiveSuperAdmins = async (userId) => {
+  const roleIds = await loadSuperAdminRoleIds();
+  if (!roleIds.length) return 0;
+  return UserModel.countDocuments({
+    _id: { $ne: userId },
+    status: true,
+    role_id: { $in: roleIds },
+  });
+};
+
+const lastSuperAdminUserGuard = async ({ user, nextRoleId, nextStatus }) => {
+  if (!user?._id) return null;
+  const currentRole = user.role_id?._id ? user.role_id : await RoleModel.findById(user.role_id).lean();
+  if (!isSuperAdminRole(currentRole)) return null;
+
+  const resolvedStatus =
+    nextStatus === undefined || nextStatus === null ? user.status !== false : toBoolean(nextStatus) === true;
+  const nextRole = nextRoleId ? await RoleModel.findById(nextRoleId).lean() : currentRole;
+  const keepsSuperAdminAccess = resolvedStatus && isSuperAdminRole(nextRole);
+  if (keepsSuperAdminAccess) return null;
+
+  const others = await countOtherActiveSuperAdmins(user._id);
+  return others > 0 ? null : 'cannot_remove_last_super_admin';
+};
+
+const lastSuperAdminRoleGuard = async (role) => {
+  if (!isSuperAdminRole(role)) return null;
+  const usersOnRole = await UserModel.countDocuments({ status: true, role_id: role._id });
+  if (!usersOnRole) return null;
+
+  const roleIds = (await loadSuperAdminRoleIds()).filter((roleId) => String(roleId) !== String(role._id));
+  if (!roleIds.length) return 'cannot_remove_last_super_admin_role';
+
+  const usersOnOtherSuperRoles = await UserModel.countDocuments({ status: true, role_id: { $in: roleIds } });
+  return usersOnOtherSuperRoles > 0 ? null : 'cannot_remove_last_super_admin_role';
+};
+
 const auditEntityType = (config) => {
   if (config.model === UserModel) return 'user';
   if (config.model === CompanyModel) return 'company';
@@ -956,6 +1018,19 @@ const update = (resourceName) => async (req, res) => {
       }
     }
 
+    if (config.model === UserModel) {
+      const targetUser = await UserModel.findById(id).populate('role_id');
+      if (!targetUser) return ReturnDashData.updateError({ res, status: 404, message: `${config.key}_not_found` });
+      const guardMessage = await lastSuperAdminUserGuard({
+        user: targetUser,
+        nextRoleId: updatePayload.role_id,
+        nextStatus: updatePayload.status,
+      });
+      if (guardMessage) {
+        return ReturnDashData.updateError({ res, status: 403, message: guardMessage });
+      }
+    }
+
     const doc = await config.model.findByIdAndUpdate(id, updatePayload, { new: true, runValidators: true });
     if (!doc) return ReturnDashData.updateError({ res, status: 404, message: `${config.key}_not_found` });
 
@@ -997,6 +1072,62 @@ const update = (resourceName) => async (req, res) => {
   }
 };
 
+const assignUserRole = () => async (req, res) => {
+  const config = resources.users;
+  const id = req.params.id;
+  const roleId = req.body?.role_id;
+
+  if (!isValidObjectId(id)) return ReturnDashData.updateError({ res, status: 400, message: 'invalid_id' });
+  if (!isValidObjectId(roleId)) return ReturnDashData.updateError({ res, status: 400, message: 'invalid_role_id' });
+  if (isSelfActor(req, id)) {
+    return ReturnDashData.updateError({ res, status: 403, message: 'cannot_change_own_access' });
+  }
+
+  try {
+    const [user, role] = await Promise.all([
+      UserModel.findById(id).populate('role_id'),
+      RoleModel.findById(roleId).lean(),
+    ]);
+
+    if (!user) return ReturnDashData.updateError({ res, status: 404, message: 'users_not_found' });
+    if (!role || role.status === false) return ReturnDashData.updateError({ res, status: 404, message: 'role_not_found' });
+
+    const guardMessage = await lastSuperAdminUserGuard({
+      user,
+      nextRoleId: role._id,
+      nextStatus: user.status,
+    });
+    if (guardMessage) return ReturnDashData.updateError({ res, status: 403, message: guardMessage });
+
+    const oldRoleId = user.role_id?._id || user.role_id || null;
+    user.role_id = role._id;
+    await user.save();
+
+    const responseDoc = await loadResponseDoc(config, user);
+    await writeAdminResourceAudit({
+      req,
+      config,
+      action: 'admin_user_role_assigned',
+      doc: user,
+      oldValue: { role_id: oldRoleId },
+      newValue: { role_id: role._id },
+      metadata: {
+        note: String(req.body?.note || '').trim(),
+        role_name: role.name,
+      },
+    });
+
+    return ReturnDashData.updateData({ res, data: responseDoc, other: { resource: config.key } });
+  } catch (err) {
+    return ReturnDashData.updateError({
+      res,
+      status: 400,
+      message: err.message || 'role_assignment_failed',
+      other: { code: err.code },
+    });
+  }
+};
+
 const remove = (resourceName) => async (req, res) => {
   try {
     const config = getResourceConfig(resourceName || req.params.resource);
@@ -1012,6 +1143,27 @@ const remove = (resourceName) => async (req, res) => {
     }
     if (config.model === RoleModel && actorRoleId(req) && String(actorRoleId(req)) === String(id)) {
       return ReturnDashData.deleteError({ res, status: 403, message: 'cannot_delete_own_role' });
+    }
+
+    if (config.model === UserModel) {
+      const targetUser = await UserModel.findById(id).populate('role_id');
+      if (!targetUser) return ReturnDashData.deleteError({ res, status: 404, message: `${config.key}_not_found` });
+      const guardMessage = await lastSuperAdminUserGuard({
+        user: targetUser,
+        nextStatus: false,
+      });
+      if (guardMessage) {
+        return ReturnDashData.deleteError({ res, status: 403, message: guardMessage });
+      }
+    }
+
+    if (config.model === RoleModel) {
+      const targetRole = await RoleModel.findById(id).lean();
+      if (!targetRole) return ReturnDashData.deleteError({ res, status: 404, message: `${config.key}_not_found` });
+      const guardMessage = await lastSuperAdminRoleGuard(targetRole);
+      if (guardMessage) {
+        return ReturnDashData.deleteError({ res, status: 403, message: guardMessage });
+      }
     }
 
     const canSoftDelete = config.model.schema.path('status');
@@ -1237,6 +1389,7 @@ export default {
   getOne,
   create,
   update,
+  assignUserRole,
   remove,
   delete: remove,
   bulkUpdate,

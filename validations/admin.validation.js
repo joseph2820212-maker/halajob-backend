@@ -198,6 +198,11 @@ const dashboardUserBody = bodyObject.shape({
   status: boolish,
 });
 
+const userRoleAssignmentBody = bodyObject.shape({
+  role_id: objectId.required("role_id is required"),
+  note: yup.string().trim().max(1000),
+});
+
 const aiLimitBody = bodyObject.shape({
   feature: yup.string().trim().max(100),
   scope_type: yup
@@ -577,6 +582,11 @@ const schemas = {
       "role_id or role_name is required",
       (value = {}) => Boolean(value.role_id || value.role_name),
     ),
+  }),
+
+  userRoleAssignmentSchema: yup.object({
+    params: idParam,
+    body: userRoleAssignmentBody,
   }),
 
   aiLimitCreateSchema: yup.object({

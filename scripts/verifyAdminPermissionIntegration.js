@@ -107,7 +107,7 @@ async function main() {
     import("../services/tokenService.js"),
   ]);
 
-  const { PermissionModel, RoleModel, UserModel } = models;
+  const { AuditLogModel, PermissionModel, RoleModel, UserModel } = models;
   const { generateAuthTokens } = tokenService;
 
   await mongoose.connect(process.env.CONNECTION_URL, {
@@ -350,6 +350,62 @@ async function main() {
   assert.equal(createdUser.status, true, "users.manage create response should be successful");
   assert.ok(createdUser.data?._id, "created user should include an id");
 
+  const readUserAssignDenied = await expectStatus(
+    request(baseUrl, "PATCH", `/dash/v1/resources/users/${createdUser.data._id}/role`, {
+      token: userReadTokens.accessToken,
+      body: { role_id: userReadRole._id },
+    }),
+    403,
+    "users.read role cannot assign user roles"
+  );
+  assert.equal(readUserAssignDenied.requiredPermission, "users.manage");
+
+  const selfAssignDenied = await expectStatus(
+    request(baseUrl, "PATCH", `/dash/v1/resources/users/${userManageUser._id}/role`, {
+      token: userManageTokens.accessToken,
+      body: { role_id: userReadRole._id },
+    }),
+    403,
+    "admin cannot change their own role"
+  );
+  assert.equal(selfAssignDenied.message, "cannot_change_own_access");
+
+  const lastSuperAdminDemotionDenied = await expectStatus(
+    request(baseUrl, "PATCH", `/dash/v1/resources/users/${superAdminUser._id}/role`, {
+      token: userManageTokens.accessToken,
+      body: { role_id: employeeRole._id },
+    }),
+    403,
+    "admin cannot demote the last active super admin"
+  );
+  assert.equal(lastSuperAdminDemotionDenied.message, "cannot_remove_last_super_admin");
+
+  const lastSuperAdminDeleteDenied = await expectStatus(
+    request(baseUrl, "DELETE", `/dash/v1/resources/users/${superAdminUser._id}`, {
+      token: userManageTokens.accessToken,
+    }),
+    403,
+    "admin cannot delete the last active super admin"
+  );
+  assert.equal(lastSuperAdminDeleteDenied.message, "cannot_remove_last_super_admin");
+
+  const assignedUserRole = await expectStatus(
+    request(baseUrl, "PATCH", `/dash/v1/resources/users/${createdUser.data._id}/role`, {
+      token: userManageTokens.accessToken,
+      body: { role_id: userReadRole._id, note: "integration role assignment" },
+    }),
+    200,
+    "users.manage role can assign another user's role"
+  );
+  assert.equal(assignedUserRole.status, true, "role assignment response should be successful");
+  const reassignedUser = await UserModel.findById(createdUser.data._id).lean();
+  assert.equal(String(reassignedUser.role_id), String(userReadRole._id), "role assignment should persist");
+  const assignmentAudit = await AuditLogModel.findOne({
+    action: "admin_user_role_assigned",
+    entity_id: createdUser.data._id,
+  }).lean();
+  assert.ok(assignmentAudit, "role assignment should write an audit record");
+
   const companyRequests = await expectStatus(
     request(baseUrl, "GET", "/dash/v1/company-requests", { token: companyModerationTokens.accessToken }),
     200,
@@ -387,7 +443,7 @@ async function main() {
   );
   assert.equal(deniedExtension.message, "file_access_forbidden");
 
-  console.log("Admin permission integration verified for super-admin bypass, limited admin allow/deny, static operations, generic resource routes, and protected dashboard file downloads.");
+  console.log("Admin permission integration verified for super-admin bypass, limited admin allow/deny, role assignment guards, static operations, generic resource routes, and protected dashboard file downloads.");
 }
 
 main()

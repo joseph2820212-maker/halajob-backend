@@ -942,6 +942,20 @@ router.post(
   validate(adminSchemas.genericCreateResourceSchema),
   resourceController.create(),
 );
+router.patch(
+  "/resources/users/:id/role",
+  can(["users.manage", "roles.manage"]),
+  upload.none(),
+  validate(adminSchemas.userRoleAssignmentSchema),
+  resourceController.assignUserRole(),
+);
+router.post(
+  "/resources/users/:id/role",
+  can(["users.manage", "roles.manage"]),
+  upload.none(),
+  validate(adminSchemas.userRoleAssignmentSchema),
+  resourceController.assignUserRole(),
+);
 router.put(
   "/resources/:resource/:id",
   checkResourcePermission("update"),
