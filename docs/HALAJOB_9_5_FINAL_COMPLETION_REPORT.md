@@ -3,24 +3,25 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `a9fd39f`
-- Current APK source build commit: `336c121`
+- Current clean-checkout proof source commit before this report refresh: `ff5b8ba`
+- Current APK source build commit: `ff5b8ba`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
 
 ## Current Verdict
 
-The branch is much stronger than the older `dc251c6` audit package. Settings, CV Manager, filters, company IA, fixed-choice controls, DB aggregates, web E2E, and mobile launch gates have all moved forward. It should still not be called final 9.5 until the final release gate list is replayed from a clean checkout and owner-controlled production/device/signing blockers are closed or explicitly accepted as launch exclusions.
+The branch is much stronger than the older `dc251c6` audit package. Settings, CV Manager, filters, company IA, fixed-choice controls, DB aggregates, web E2E, mobile launch gates, and a clean-checkout launch-gate replay have all moved forward. It should still not be called final 9.5 until owner-controlled production/device/signing blockers are closed or explicitly accepted as launch exclusions.
 
-Current working rating: 8.5/10 source readiness.
+Current working rating: 9.0/10 source readiness.
 
-The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus clean-checkout release replay: production smoke, production secrets/provider checks, production signing, production-like storage/Firebase/SMTP proof, and owner real-device approval.
+The remaining gap to 9.5 is now mostly owner-controlled launch readiness: production smoke, production secrets/provider checks, production signing, production-like storage/Firebase/SMTP proof, and owner real-device approval.
 
 ## Recent Codex 9.5 Polish Commits
 
 | Commit | Summary |
 |---|---|
+| `ff5b8ba` | Refreshed full launch-gate proof docs before the clean-checkout release replay and the current debug APK rebuild. |
 | `a9fd39f` | Refreshed APK proof docs for the `336c121` tester build before the current full launch-gate replay. |
 | `336c121` | Refreshed web workflow proof docs before the current debug APK rebuild and emulator smoke. |
 | `4c6204c` | Wired employer and campus web workflow actions: company jobs can pause/resume from the edit panel, scheduled interviews expose join-video and reschedule controls, campus events load from the backend, and university verification approve/reject/request-info actions call the backend with focused regression tests. |
@@ -90,7 +91,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Command | Result | Notes |
 |---|---|---|
-| `npm run test:launch-gate` | Passed | Full composed launch gate passed from current head `a9fd39f`: backend syntax/import/secret/i18n/security/integration/product gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/450 Flutter tests, route inventory, UI action, web tab reachability, mobile route/UI, More placement, and bilingual payload contracts. |
+| `npm run test:launch-gate` | Passed | Full composed launch gate passed from detached clean worktree `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe-clean-ff5b8ba` at source commit `ff5b8ba`: backend syntax/import/secret/i18n/security/integration/product gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/450 Flutter tests, route inventory, UI action, web tab reachability, mobile route/UI, More placement, and bilingual payload contracts. A first clean run stopped transiently during subscription integration; `npm run test:integration:subscriptions` passed by itself and the full aggregate rerun then passed end to end. |
 | `npm run test:syria-docs --silent` | Passed | Passed after `5de5cd9`; now also guards provider/owner blocker honesty for AI, CV parsing, SMTP/Firebase/storage, payments, production Android signing, owner UI approval, and current APK metadata. |
 | `npm run check:syntax --silent` | Passed | Full JS syntax pass after strengthening `scripts/verifySyriaDocumentationContract.js`. |
 | `flutter analyze` | Passed | Run from `mobile/` after `e2611c3`; no issues found. |
@@ -107,11 +108,11 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 65 tests after `4c6204c`, including the new employer/campus workflow guards and the existing CV Studio cover-letter preview/download guard. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed after `4c6204c`. |
 | `npm --prefix web run e2e` | Passed | Local Vite preview/Chrome smoke passed on this machine, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses. |
-| `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 327/327, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed inside the current `a9fd39f` full launch-gate replay. |
+| `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 327/327, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed inside the clean `ff5b8ba` full launch-gate replay. |
 | `npm run test:integration:launch-critical --silent` | Passed | Full DB-backed launch-critical aggregate passed on rerun using the shared `mongodb-memory-server` fallback after an earlier transient stop around the subscription script; individual remaining scripts also passed. |
 | `npm run test:integration:syria-product --silent` | Passed | Full Syria product aggregate passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding. |
 | `flutter test test\university_dashboard_service_test.dart test\university_dashboard_screen_test.dart` | Passed | 17 focused university tests passed after `aef1c87`, proving `/notifications/v1` load/read/read-all/delete route wiring, real unread badge data, inbox display, notification tap routing, and existing university workflows. |
-| `npm run test:launch-gate:mobile --silent` | Passed | Flutter `pub get`, `analyze`, and full `flutter test` passed inside `npm run test:launch-gate` from `a9fd39f`; 450 mobile tests passed, including typed seeker/company login credentials, campus tester shortcut, Settings fixed-choice rows, CV manager/parser honesty, CV cover-letter preview/download, expanded filters, More placement, company IA, notifications, and sync-card placement. |
+| `npm run test:launch-gate:mobile --silent` | Passed | Flutter `pub get`, `analyze`, and full `flutter test` passed inside `npm run test:launch-gate` from the clean `ff5b8ba` worktree; 450 mobile tests passed, including typed seeker/company login credentials, campus tester shortcut, Settings fixed-choice rows, CV manager/parser honesty, CV cover-letter preview/download, expanded filters, More placement, company IA, notifications, and sync-card placement. |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "previews seeker cover letters through CV Studio routes"` | Passed | Proves mobile calls the backend CV Studio `cover-letter/templates` and `cover-letter/preview` routes with the selected template, job title, and company name payload fields. |
 | `flutter test test\widget_test.dart --plain-name "previews a seeker CV cover letter from backend templates"` | Passed | Proves the signed-in seeker CV Manager exposes the cover-letter action, loads backend templates, and renders the preview panel. |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "downloads seeker cover letters through CV Studio routes"` | Passed | Proves mobile calls the backend CV Studio `cover-letter/download` route as an authenticated POST file download with the selected template payload and fallback filename. |
@@ -132,21 +133,21 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm --prefix web test -- jobAlerts` | Passed | 1 file / 2 tests; verifies web job-alert canonical filter behavior after the shared saved-search type update. |
 | `npm --prefix web run build` | Passed | TypeScript build and Vite production build passed after the shared saved-search filter type update. |
 | `npm run test:mobile-apk-proof --silent` | Passed | Proves the latest debug APK metadata, `.sha256` file, and `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md` agree when an APK artifact exists. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `336c121`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `ff5b8ba`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
 
-A fresh debug APK was built and installed on the running emulator from source commit `336c121`. Documentation commits after `336c121` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
+A fresh debug APK was built and installed on the running emulator from source commit `ff5b8ba`. Documentation commits after `ff5b8ba` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
 
-- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-336c121-1.0.6+27-debug.apk`
-- SHA-256: `905a280e1bbf24f4c829d160b9da59da568b9b9afd2b1aaec6f1603979892b2b`
+- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-ff5b8ba-1.0.6+27-debug.apk`
+- SHA-256: `862b961d3011a79e4accd45585914b27ce41dce7d997c315513d9befd2efab58`
 - Version/build: `1.0.6+27`
 - Build flags: Campus auth `local-device`, `AI tools enabled=true`, base URL `https://jobzain.com`, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 336c121 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
+- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | ff5b8ba | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
 
-This APK is current for source commit `336c121`, including the company AI tools heading alignment, dedicated-module AI placement guard, seeker AI career tools heading alignment, web employer/campus workflow proof refresh, and the proof refreshes through this branch.
+This APK is current for source commit `ff5b8ba`, including the company AI tools heading alignment, dedicated-module AI placement guard, seeker AI career tools heading alignment, web employer/campus workflow proof refresh, and the proof refreshes through this branch.
 
 ## Current Handout Status
 
@@ -162,7 +163,7 @@ This APK is current for source commit `336c121`, including the company AI tools 
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
 | University admin notifications | Improved: header notifications now use real shared notification backend data and actions instead of a static `no notifications` placeholder, with service/widget/source guards. |
 | Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep/passport reachability, company applicant/member/library/support workflows, company job posting choices, company job pause/resume, interview join/reschedule, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, backend campus events, university verification approve/reject/request-info, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
-| Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, explicit `MONGOMS_SYSTEM_BINARY` path validation, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
+| Proof reproducibility | Passed for current source commit `ff5b8ba`: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, explicit `MONGOMS_SYSTEM_BINARY` path validation, a fast helper contract, current APK metadata proof, and full `npm run test:launch-gate` clean-checkout replay. |
 | Docs freshness | Improved by this report and the mobile APK proof guard; refresh again after any later source commit, and rebuild/refresh APK proof after any later mobile app-code commit. |
 
 ## External Blockers
