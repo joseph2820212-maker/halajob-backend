@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `336c121`
+Source contracts tested through: `a9fd39f`
 Latest APK source build commit: `336c121`
 
 ## Passed Coverage
@@ -10,7 +10,7 @@ Latest APK source build commit: `336c121`
 | Area | Evidence |
 |---|---|
 | Mobile Settings drill-in panels | `flutter test test\widget_test.dart --plain-name "settings"` passed 9 Settings-related widget tests after `e2611c3`, proving grouped Settings index rows, hidden detail controls until drill-in, switch-based notification payloads, Data rights export/delete placement, delete confirmation, account save/upload/relogin, and logout-all confirmation |
-| Full launch gate | `npm run test:launch-gate` passed from `80a235a`, covering backend aggregate gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/443 tests, and UI contract route/action/mobile/bilingual guards |
+| Full launch gate | `npm run test:launch-gate` passed from current head `a9fd39f`, covering backend aggregate gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/450 Flutter tests, and UI contract route/action/mobile/bilingual guards |
 | Mobile route mounts | `npm run test:mobile-routes` |
 | Mobile UI contract | `npm run test:mobile-ui-contract` |
 | Campus student routes | `npm run test:mobile-routes` |
@@ -33,7 +33,7 @@ Latest APK source build commit: `336c121`
 | Web company employer tasks | `npm --prefix web test -- company` passed through the full web suite after `4c6204c`, now 1 file / 6 tests, proving applicant actions, interview join-video and reschedule payloads, job pause/resume controls, member/library choices, support ticket create/reply, and company job posting fixed-choice payloads |
 | Web employer/campus workflow slice | `npm --prefix web test -- src/company/screens.test.tsx src/campus/screens.test.tsx` passed 2 files / 10 tests after `4c6204c`, proving company pause/resume job controls, interview join/reschedule actions, campus event loading, and university verification approve/reject/request-info backend routes |
 | Web shared workflow contracts | `npm --prefix web test -- src/shared/workflows.test.tsx` passed 1 file / 3 tests, proving notification delete requires confirmation before the backend mutation and application question options render as radio rows while preserving answer payloads |
-| Full web test suite | `npm --prefix web test` passed 16 files / 65 tests after `4c6204c` |
+| Full web test suite | `npm --prefix web test` passed 16 files / 65 tests inside the current `a9fd39f` full launch-gate replay |
 | Web browser E2E smoke | `npm --prefix web run e2e` passed against local Vite preview/Chrome, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses |
 | DB launch-critical aggregate | `npm run test:integration:launch-critical --silent` passed on rerun with the shared Mongo helper; the individual remaining scripts after an earlier transient stop also passed |
 | DB Syria product aggregate | `npm run test:integration:syria-product --silent` passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding |
@@ -45,11 +45,11 @@ Latest APK source build commit: `336c121`
 | Mobile seeker AI IA guard | `flutter test test\widget_test.dart --plain-name "seeker AI career tools screen keeps dedicated IA label"` and `flutter test test\widget_test.dart --plain-name "seeker AI career tools are hidden by default for Syria launch"` passed after `289eb64`, proving seeker AI remains hidden unless enabled and the enabled screen keeps the `AI career tools` heading instead of `AI support` |
 | UI action wiring | `npm run test:ui-actions` passed 12 source files and 15 route/UI pairs after `b6f5bb2` |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
-| Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed 327/327 web API route matches, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts after `4c6204c` |
+| Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed 327/327 web API route matches, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts inside the current `a9fd39f` full launch-gate replay |
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, seeker/campus More placement, and company More primary-flow duplication against regression |
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
-| Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed after `714fefe`; Flutter `pub get`, `analyze`, and full `flutter test` completed with 448 tests passed |
+| Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed inside the current `a9fd39f` full launch-gate replay; Flutter `pub get`, `analyze`, and full `flutter test` completed with 450 tests passed |
 | Current APK emulator smoke | A debug APK from source commit `336c121` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 336c121 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `905a280e1bbf24f4c829d160b9da59da568b9b9afd2b1aaec6f1603979892b2b`. Documentation commits after `336c121` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests

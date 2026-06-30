@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `336c121`
+- Current reviewed code/proof-guard commit before this report refresh: `a9fd39f`
 - Current APK source build commit: `336c121`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `a9fd39f` | Refreshed APK proof docs for the `336c121` tester build before the current full launch-gate replay. |
 | `336c121` | Refreshed web workflow proof docs before the current debug APK rebuild and emulator smoke. |
 | `4c6204c` | Wired employer and campus web workflow actions: company jobs can pause/resume from the edit panel, scheduled interviews expose join-video and reschedule controls, campus events load from the backend, and university verification approve/reject/request-info actions call the backend with focused regression tests. |
 | `cd41a48` | Refreshed the web tab-reachability proof docs after adding the guard and fixing the hidden admin passport panel. |
@@ -89,7 +90,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Command | Result | Notes |
 |---|---|---|
-| `npm run test:launch-gate` | Passed | Full composed launch gate passed from `80a235a`: backend syntax/import/secret/i18n/security/integration/product gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/443 tests, route inventory, UI action, mobile route/UI, More placement, and bilingual payload contracts. |
+| `npm run test:launch-gate` | Passed | Full composed launch gate passed from current head `a9fd39f`: backend syntax/import/secret/i18n/security/integration/product gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/450 Flutter tests, route inventory, UI action, web tab reachability, mobile route/UI, More placement, and bilingual payload contracts. |
 | `npm run test:syria-docs --silent` | Passed | Passed after `5de5cd9`; now also guards provider/owner blocker honesty for AI, CV parsing, SMTP/Firebase/storage, payments, production Android signing, owner UI approval, and current APK metadata. |
 | `npm run check:syntax --silent` | Passed | Full JS syntax pass after strengthening `scripts/verifySyriaDocumentationContract.js`. |
 | `flutter analyze` | Passed | Run from `mobile/` after `e2611c3`; no issues found. |
@@ -106,11 +107,11 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 65 tests after `4c6204c`, including the new employer/campus workflow guards and the existing CV Studio cover-letter preview/download guard. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed after `4c6204c`. |
 | `npm --prefix web run e2e` | Passed | Local Vite preview/Chrome smoke passed on this machine, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses. |
-| `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 327/327, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed after `4c6204c`. |
+| `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 327/327, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed inside the current `a9fd39f` full launch-gate replay. |
 | `npm run test:integration:launch-critical --silent` | Passed | Full DB-backed launch-critical aggregate passed on rerun using the shared `mongodb-memory-server` fallback after an earlier transient stop around the subscription script; individual remaining scripts also passed. |
 | `npm run test:integration:syria-product --silent` | Passed | Full Syria product aggregate passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding. |
 | `flutter test test\university_dashboard_service_test.dart test\university_dashboard_screen_test.dart` | Passed | 17 focused university tests passed after `aef1c87`, proving `/notifications/v1` load/read/read-all/delete route wiring, real unread badge data, inbox display, notification tap routing, and existing university workflows. |
-| `npm run test:launch-gate:mobile --silent` | Passed | Flutter `pub get`, `analyze`, and full `flutter test` passed after `714fefe`; 448 mobile tests passed, including typed seeker/company login credentials, campus tester shortcut, Settings fixed-choice rows, CV manager/parser honesty, CV cover-letter preview/download, expanded filters, More placement, company IA, notifications, and sync-card placement. |
+| `npm run test:launch-gate:mobile --silent` | Passed | Flutter `pub get`, `analyze`, and full `flutter test` passed inside `npm run test:launch-gate` from `a9fd39f`; 450 mobile tests passed, including typed seeker/company login credentials, campus tester shortcut, Settings fixed-choice rows, CV manager/parser honesty, CV cover-letter preview/download, expanded filters, More placement, company IA, notifications, and sync-card placement. |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "previews seeker cover letters through CV Studio routes"` | Passed | Proves mobile calls the backend CV Studio `cover-letter/templates` and `cover-letter/preview` routes with the selected template, job title, and company name payload fields. |
 | `flutter test test\widget_test.dart --plain-name "previews a seeker CV cover letter from backend templates"` | Passed | Proves the signed-in seeker CV Manager exposes the cover-letter action, loads backend templates, and renders the preview panel. |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "downloads seeker cover letters through CV Studio routes"` | Passed | Proves mobile calls the backend CV Studio `cover-letter/download` route as an authenticated POST file download with the selected template payload and fallback filename. |
