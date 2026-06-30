@@ -18,6 +18,7 @@ import {
   UserShowJobModel,
   UserApplyingJobModel,
   JobEmployeeMatchModel,
+  ContentTranslationModel,
 } from "../../../models/index.js";
 import { calculateJobEmployeeMatch } from "../../../services/matching/jobEmployeeMatching.js";
 import { resolveAppAccount } from "../../../services/appAccount.service.js";
@@ -104,7 +105,7 @@ const dateFromBucket = (key) => {
   return d;
 };
 
-const langFromReq = (req) => (String(req.get("lan") || req.get("lang") || "en").toLowerCase().startsWith("ar") ? "ar" : "en");
+const langFromReq = (req) => (String(req.get("lan") || req.get("x-language") || req.get("lang") || "en").toLowerCase().startsWith("ar") ? "ar" : "en");
 const labelOf = (value, lang = "en") => {
   if (!value) return "";
   if (typeof value === "string") return value;
@@ -330,13 +331,34 @@ const buildJobSalary = (job = {}) => {
     ),
   };
 };
-const decorateJobs = async (jobs, userId, employee) => {
+
+const translatedField = (translation, key) => {
+  const text = translation?.translated_text;
+  if (!text || typeof text !== "object" || Array.isArray(text)) return "";
+  return String(text[key] || "").trim();
+};
+
+const loadApprovedJobTranslations = async (jobIds = [], lang = "en") => {
+  if (!jobIds.length || !["ar", "en"].includes(lang)) return new Map();
+  const rows = await ContentTranslationModel.find({
+    entity_type: "job",
+    entity_id: { $in: jobIds },
+    target_language: lang,
+    status: "approved",
+  }).select("entity_id target_language translated_text updatedAt").lean();
+
+  return new Map(rows.map((row) => [toIdString(row.entity_id), row]));
+};
+
+const decorateJobs = async (jobs, userId, employee, options = {}) => {
   const jobIds = jobs.map((j) => j._id);
-  const [saved, applied, seen, storedMatches] = await Promise.all([
+  const lang = ["ar", "en"].includes(options.lang) ? options.lang : "en";
+  const [saved, applied, seen, storedMatches, translations] = await Promise.all([
     userId ? UserSavedJobModel.find({ user_id: userId, job_id: { $in: jobIds } }).select("job_id").lean() : [],
     userId ? UserApplyingJobModel.find({ user_id: userId, job_id: { $in: jobIds } }).select("job_id status createdAt").lean() : [],
     userId ? UserShowJobModel.find({ user_id: userId, job_id: { $in: jobIds } }).select("job_id").lean() : [],
     employee?._id ? JobEmployeeMatchModel.find({ employee_id: employee._id, job_id: { $in: jobIds } }).lean() : [],
+    loadApprovedJobTranslations(jobIds, lang),
   ]);
   const savedSet = new Set(saved.map((x) => toIdString(x.job_id)));
   const seenSet = new Set(seen.map((x) => toIdString(x.job_id)));
@@ -350,10 +372,20 @@ const decorateJobs = async (jobs, userId, employee) => {
     const match = stored || calculated;
     const companyProjection = job.search_projection?.company || {};
     const appliedDoc = appliedMap.get(key);
+    const translation = translations.get(key);
+    const translatedTitle = translatedField(translation, "job_name");
+    const translatedDescription = translatedField(translation, "description");
+    const hasApprovedTranslation = Boolean(translatedTitle || translatedDescription);
     return {
       id: job._id,
-      title: job.job_name || "",
-      description: job.description || "",
+      title: translatedTitle || job.job_name || "",
+      description: translatedDescription || job.description || "",
+      translation: hasApprovedTranslation ? {
+        language: lang,
+        status: "approved",
+        source: "content_translations",
+        updated_at: translation.updatedAt || null,
+      } : null,
       company: {
         id: job.company_id || companyProjection.id || null,
         name: companyProjection.name || job.company?.company_name || "",
@@ -436,6 +468,7 @@ const recordJobFilterAnalytics = ({ req, filters, page, limit, total }) => {
 const get = async (req, res, next) => {
   try {
     const { userId, employee } = await getEmployeeForRequest(req);
+    const lang = langFromReq(req);
     const filters = readFilters(req);
     const page = parseIntBounded(req.query.page, 1, 1, 100000);
     const limit = parseIntBounded(req.query.limit, 10, 1, 50);
@@ -487,7 +520,7 @@ const get = async (req, res, next) => {
     const [agg] = await jobsModel.aggregate(pipeline).allowDiskUse(true);
     const rawItems = agg?.items || [];
     const total = agg?.meta?.[0]?.total || 0;
-    const data = await decorateJobs(rawItems, userId, employee);
+    const data = await decorateJobs(rawItems, userId, employee, { lang });
 
     if (parseBool(req.query.mark_seen) === true) await markSeen(userId, rawItems.map((x) => x._id));
     recordJobFilterAnalytics({ req, filters, page, limit, total });
@@ -872,6 +905,7 @@ const getFilters = async (req, res, next) => {
 const getById = async (req, res, next) => {
   try {
     const { userId, employee } = await getEmployeeForRequest(req);
+    const lang = langFromReq(req);
 
     const id = toObjectId(req.params.id);
     if (!id) {
@@ -906,7 +940,7 @@ const getById = async (req, res, next) => {
       metadata: { source: "job_detail" },
     }).catch(() => null);
 
-    const [item] = await decorateJobs([job], userId, employee);
+    const [item] = await decorateJobs([job], userId, employee, { lang });
 
     const shouldShowCompanyInformation =
       job.show_company_information === true;

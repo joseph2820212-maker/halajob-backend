@@ -53,6 +53,12 @@ async function expectStatus(responsePromise, expected, label) {
   return payload;
 }
 
+function findJobItem(payload, jobId, label) {
+  const item = (payload.data || []).find((row) => String(row.id) === String(jobId));
+  assert.ok(item, `${label} should include seeded job ${jobId}`);
+  return item;
+}
+
 function userSeed({ firstName, lastName, email, roleId, phone }) {
   return {
     first_name: firstName,
@@ -315,6 +321,36 @@ async function main() {
   assert.equal(readDraftJob.data.translation.status, "draft");
   assert.equal(readDraftJob.data.published_translation, null);
 
+  const draftListJob = findJobItem(
+    await expectStatus(
+      request(baseUrl, "GET", "/user/v1/job/get?limit=10&sort=newest", {
+        token: seekerTokens.accessToken,
+        contextId: seekerContext._id,
+        headers: { lan: "ar", "x-language": "ar" },
+      }),
+      200,
+      "app job list should hide draft translations"
+    ),
+    job._id,
+    "app job list before translation approval"
+  );
+  assert.equal(draftListJob.title, job.job_name);
+  assert.equal(draftListJob.description, job.description);
+  assert.equal(draftListJob.translation, null);
+
+  const draftDetailJob = await expectStatus(
+    request(baseUrl, "GET", `/user/v1/job/get-by-id/${job._id}`, {
+      token: seekerTokens.accessToken,
+      contextId: seekerContext._id,
+      headers: { lan: "ar", "x-language": "ar" },
+    }),
+    200,
+    "app job detail should hide draft translations"
+  );
+  assert.equal(draftDetailJob.data.title, job.job_name);
+  assert.equal(draftDetailJob.data.description, job.description);
+  assert.equal(draftDetailJob.data.translation, null);
+
   const approvedJob = await expectStatus(
     request(baseUrl, "PUT", `/jobs/v1/${job._id}/translations/ar`, {
       token: companyTokens.accessToken,
@@ -342,6 +378,38 @@ async function main() {
   );
   assert.equal(readApprovedJob.data.translation.status, "approved");
   assert.equal(readApprovedJob.data.published_translation.job_name, "مساعد دعم المنتجات");
+
+  const approvedListJob = findJobItem(
+    await expectStatus(
+      request(baseUrl, "GET", "/user/v1/job/get?limit=10&sort=newest", {
+        token: seekerTokens.accessToken,
+        contextId: seekerContext._id,
+        headers: { lan: "ar", "x-language": "ar" },
+      }),
+      200,
+      "app job list should consume approved translations"
+    ),
+    job._id,
+    "app job list after translation approval"
+  );
+  assert.equal(approvedListJob.title, readApprovedJob.data.published_translation.job_name);
+  assert.equal(approvedListJob.description, readApprovedJob.data.published_translation.description);
+  assert.equal(approvedListJob.translation.language, "ar");
+  assert.equal(approvedListJob.translation.status, "approved");
+
+  const approvedDetailJob = await expectStatus(
+    request(baseUrl, "GET", `/user/v1/job/get-by-id/${job._id}`, {
+      token: seekerTokens.accessToken,
+      contextId: seekerContext._id,
+      headers: { lan: "ar", "x-language": "ar" },
+    }),
+    200,
+    "app job detail should consume approved translations"
+  );
+  assert.equal(approvedDetailJob.data.title, readApprovedJob.data.published_translation.job_name);
+  assert.equal(approvedDetailJob.data.description, readApprovedJob.data.published_translation.description);
+  assert.equal(approvedDetailJob.data.translation.language, "ar");
+  assert.equal(approvedDetailJob.data.translation.status, "approved");
 
   await expectStatus(
     request(baseUrl, "GET", `/jobs/v1/${job._id}/translations/ar`, {
@@ -414,7 +482,7 @@ async function main() {
   assert.ok(jobAnalytics, "job translation should emit analytics");
   assert.ok(cvAnalytics, "CV translation should emit analytics");
 
-  console.log("Translation workflow integration verified for job/CV save, read, approval, ownership denial, unsupported language, audit logs, and analytics.");
+  console.log("Translation workflow integration verified for job/CV save, read, approval, app job list/detail consumption, ownership denial, unsupported language, audit logs, and analytics.");
 }
 
 main()
