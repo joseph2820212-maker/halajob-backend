@@ -37,6 +37,14 @@ const targets = [
         re: /\bto\s*=\s*["']#["']/g,
         label: "dead router target",
       },
+      {
+        re: /<QueueTable\b(?:(?!\/?>)[\s\S])*\bsetToast\s*=/g,
+        label: "legacy QueueTable string action prop",
+      },
+      {
+        re: /\bmessage\.split\(["']:["']\)/g,
+        label: "string-split UI action routing",
+      },
     ],
   },
 ];
