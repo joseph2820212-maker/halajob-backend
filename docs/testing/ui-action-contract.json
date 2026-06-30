@@ -273,7 +273,8 @@
         "ValueKey('company-account-menu-settings-item')",
         "_CompanyHeaderAction.settings",
         "title: 'Profile settings'",
-        "Smart matches, TES scores, and searchable candidates"
+        "Smart matches, TES scores, and searchable candidates",
+        "module.title =="
       ],
       "occurrences": [
         {
