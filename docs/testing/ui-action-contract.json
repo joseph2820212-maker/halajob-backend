@@ -72,6 +72,10 @@
         "aiToolsEnabledFromSettings(clientSettings)",
         "...(webAiToolsEnabled ? [\"ai tools\"] : [])",
         "{webAiToolsEnabled && tab === \"ai tools\" && <SeekerAiPanel",
+        "tabGroups={[{ label: \"My Jobs\", tabs: [\"applications\", \"interviews\", \"offers\", \"saved\"] }]}",
+        "const companyDetailLenses",
+        "aria-label={ui(\"Company detail lenses\")}",
+        "companyJobSalaryText(job)",
         "employeeService.downloadCv(id)",
         "CV download opened",
         "{ui(\"Open\")}"
@@ -85,11 +89,20 @@
       "mustContain": [
         "aiToolsEnabledFromSettings(clientSettings)",
         "...(webAiToolsEnabled ? [\"ai tools\"] : [])",
+        "tabGroups={mode === \"student\" ? [{ label: \"My Applications\", tabs: [\"applications\"] }] : undefined}",
         "{webAiToolsEnabled && mode === \"student\" && tab === \"ai tools\" && (",
         "<CampusAiPanel setToast={setToast} ui={ui} />"
       ],
       "mustNotContain": [
         "VITE_FEATURE_AI_TOOLS_ENABLED"
+      ]
+    },
+    {
+      "path": "web/src/shared/dashboard.tsx",
+      "mustContain": [
+        "export type DashboardTabGroup",
+        "tabGroups?: DashboardTabGroup[]",
+        "className=\"tab-group-label\""
       ]
     },
     {

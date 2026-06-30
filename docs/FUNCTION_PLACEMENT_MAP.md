@@ -78,8 +78,8 @@ below.
 | Auth, OTP, password reset, logout-all | `/user/v1/auth/*`, `/employee/v1/auth/*` | Auth screen, Settings account/security | Auth screen, Settings account/security | Login text fields must be editable and visible. OTP remains the configured code length used by backend/mobile together. |
 | Profile and work preferences | `/employee/v1/global/profile`, `/user/v1/employee/profile-*` | Seeker profile/settings and profile checkpoints | Header Profile, profile checkpoints | Do not mix with account credentials; account email/password lives in Settings. |
 | Job discovery and detail | `/employee/v1/global/jobs`, `/user/v1/job*` | `Jobs` tab | Bottom Jobs/Explore tab | Filters belong here, not Settings. |
-| Saved jobs | `/employee/v1/global/jobs/saved`, save/toggle routes | `My Jobs` pipeline, `Saved` sub-state | Bottom `My Jobs` pipeline, `Saved` sub-state | Jobs discovery must never render saved-only state. More may have shortcut only. |
-| Applications | `/employee/v1/applications`, `/employee/v1/global/applications` | `My Jobs` pipeline, `Applied` sub-state | Bottom `My Jobs` pipeline, `Applied` sub-state and detail screens | Detail owns messages, withdraw/cancel, offer/interview links. |
+| Saved jobs | `/employee/v1/global/jobs/saved`, save/toggle routes | `My Jobs` grouped pipeline, `Saved` sub-state | Bottom `My Jobs` pipeline, `Saved` sub-state | Jobs discovery must never render saved-only state. More may have shortcut only. |
+| Applications | `/employee/v1/applications`, `/employee/v1/global/applications` | `My Jobs` grouped pipeline, `Applied` sub-state | Bottom `My Jobs` pipeline, `Applied` sub-state and detail screens | Detail owns messages, withdraw/cancel, offer/interview links. |
 | Application messages | application message routes | Application detail | Application detail | Show only when application data supports it. |
 | Interviews and video joins | interview routes under employee/applications | `My Jobs` pipeline, `Interviews` sub-state | Bottom `My Jobs` pipeline, `Interviews` sub-state plus application/interview detail | Visible when `video_interviews_enabled`; empty state should say no interviews yet. |
 | Offers | employee offers routes | `My Jobs` pipeline, `Offers` sub-state | Bottom `My Jobs` pipeline, `Offers` sub-state plus application detail | Do not create a separate More card. |
@@ -95,7 +95,7 @@ below.
 | Notifications/preferences | `/notifications/v1`, `/user/v1/notification*` | Header bell, `Notifications`, Settings prefs | Header bell, notifications screen, Settings prefs | No duplicate full cards in More. |
 | Manual WhatsApp | `/user/v1/communication/*` | Settings communication plus contextual share | Settings communication plus contextual share button | Not a top-level tab. |
 | Salary insights | salary routes | `Salary Insights` tab | More or dashboard module, not Settings | Should be visible if enabled. |
-| Company directory/profile/reviews/salary | `/employee/v1/global/companies*`, `/employee/v1/companies*`, company review routes, salary routes | Company profile page | More `Companies` -> Company detail lenses `About`/`Jobs`/`Reviews`/`Salary` | Company detail lenses fold reviews and salary guidance into one entity page; no extra bottom tab. |
+| Company directory/profile/reviews/salary | `/employee/v1/global/companies*`, `/employee/v1/companies*`, company review routes, salary routes | Company profile page with `About`/`Jobs`/`Reviews`/`Salary` lenses | More `Companies` -> Company detail lenses `About`/`Jobs`/`Reviews`/`Salary` | Company detail lenses fold reviews and salary guidance into one entity page; no extra bottom tab. |
 | Privacy, export, delete request | `/account/export`, `/account/delete-request`, privacy routes | Settings account/privacy | Settings account/privacy | Destructive actions need confirmation. |
 | Support/legal | support/legal routes | Settings/support/legal | Settings/support/legal | Legal/help pages use locked native chrome on mobile. |
 
@@ -109,7 +109,7 @@ below.
 | Save/apply/external apply | opportunity save/apply routes | Opportunity detail/actions | Opportunity detail/actions | Detail owns readiness/apply. |
 | Employer/event cross-links | Campus opportunity/event routes | Opportunity, employer, and event detail | Opportunity/event detail inline Follow cards | Inline Follow is local until a backend follow endpoint exists; do not create a new bottom tab. |
 | Saved campus opportunities | opportunity save routes | `My Applications` pipeline, `Saved` sub-state | Bottom `My Applications` pipeline, `Saved` sub-state | Must own separate state from Opportunities discovery. |
-| Campus applications/messages/cancel | `/user/v1/campus/applications*` | `My Applications` pipeline, `Applied`/`Interviews`/`Offers` sub-states | Bottom `My Applications` pipeline and detail | Same application rules as seeker. |
+| Campus applications/messages/cancel | `/user/v1/campus/applications*` | `My Applications` grouped pipeline, `Applied`/`Interviews`/`Offers` sub-states | Bottom `My Applications` pipeline and detail | Same application rules as seeker. |
 | Student verification | `/user/v1/campus/student-verifications*`, verification routes | Profile/readiness and university verification review | More/profile readiness and verification screen | Upload/resubmit belongs to student; approve/reject belongs to university admin. |
 | Events | `/user/v1/campus/events*` | `Events` tab | Bottom `Events` tab plus native event detail | Do not duplicate as dashboard cards in multiple places. |
 | Resources | `/user/v1/campus/resources*` | `Resources` tab | More/resources detail | Resource library owns progress/saves. |
