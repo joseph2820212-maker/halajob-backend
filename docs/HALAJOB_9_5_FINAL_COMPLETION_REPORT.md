@@ -3,8 +3,8 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `714fefe`
-- Current APK source build commit: `085c562`
+- Current reviewed code/proof-guard commit before this report refresh: `2c8e4c5`
+- Current APK source build commit: `2c8e4c5`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `2c8e4c5` | Refreshed mobile cover-letter download proof docs after `714fefe`, then served as the source commit for the current debug tester APK rebuild. |
 | `714fefe` | Mobile CV Manager can now download cover letters through the authenticated backend CV Studio download route, save the returned text file, and prove the route/UI flow with service and widget tests. |
 | `085c562` | Refreshed mobile CV cover-letter proof docs after `089f7d0`, then served as the source commit for the current debug tester APK rebuild. |
 | `089f7d0` | Mobile CV Manager can now preview cover letters from backend CV Studio templates, using the existing template and preview routes with service and widget regression coverage. |
@@ -113,21 +114,21 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm --prefix web test -- jobAlerts` | Passed | 1 file / 2 tests; verifies web job-alert canonical filter behavior after the shared saved-search type update. |
 | `npm --prefix web run build` | Passed | TypeScript build and Vite production build passed after the shared saved-search filter type update. |
 | `npm run test:mobile-apk-proof --silent` | Passed | Proves the latest debug APK metadata, `.sha256` file, and `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md` agree when an APK artifact exists. |
-| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `085c562`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
+| `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\build-android.ps1 -BuildTarget debug-apk -BaseUrl https://jobzain.com -LocalCampusAuth -EnableAiTools -ShowDiagnostics` | Passed | Built the current debug tester APK from source commit `2c8e4c5`, with diagnostics, local campus tester auth, and AI tools enabled for review. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
 
-A fresh debug APK was built and installed on the running emulator from source commit `085c562`. Documentation commits after `085c562` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
+A fresh debug APK was built and installed on the running emulator from source commit `2c8e4c5`. Documentation commits after `2c8e4c5` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
 
-- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-085c562-1.0.6+27-debug.apk`
-- SHA-256: `fb9854517b7e3c3f911ec4b3d5edf17e1b1ce4459819e94d160f428592fbadbb`
+- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-2c8e4c5-1.0.6+27-debug.apk`
+- SHA-256: `f3bd35aea01050a97527d27c7013774e8c79ca7133eee0d4c97604796bfa089b`
 - Version/build: `1.0.6+27`
 - Build flags: Campus auth `local-device`, `AI tools enabled=true`, base URL `https://jobzain.com`, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 085c562 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
+- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 2c8e4c5 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
 
-This APK is current only for source commit `085c562`, including the mobile CV cover-letter preview work from `089f7d0`. The current source now includes later mobile app-code commit `714fefe`, so this APK does not include mobile CV cover-letter download until it is rebuilt and smoked again.
+This APK is current for source commit `2c8e4c5`, including the mobile CV cover-letter download work from `714fefe`.
 
 ## Current Handout Status
 
@@ -144,7 +145,7 @@ This APK is current only for source commit `085c562`, including the mobile CV co
 | University admin notifications | Improved: header notifications now use real shared notification backend data and actions instead of a static `no notifications` placeholder, with service/widget/source guards. |
 | Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
 | Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
-| Docs freshness | Improved by this report and the mobile APK proof guard; refresh again after the next APK rebuild because the latest source commit is now newer than the current APK artifact. |
+| Docs freshness | Improved by this report and the mobile APK proof guard; refresh again after any later mobile app-code commit or APK rebuild. |
 
 ## External Blockers
 

@@ -3,7 +3,7 @@
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
 Source contracts tested through: `714fefe`
-Latest APK source build commit: `085c562`
+Latest APK source build commit: `2c8e4c5`
 
 ## Passed Coverage
 
@@ -46,7 +46,7 @@ Latest APK source build commit: `085c562`
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed, proving external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed after `714fefe`; Flutter `pub get`, `analyze`, and full `flutter test` completed with 448 tests passed |
-| Current APK emulator smoke | A debug APK from source commit `085c562` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 085c562 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `fb9854517b7e3c3f911ec4b3d5edf17e1b1ce4459819e94d160f428592fbadbb`. Documentation commits after `085c562` do not imply a newer APK unless this row and the APK metadata are refreshed together; app-code commit `714fefe` is newer than this APK, so rebuild before claiming the APK includes mobile CV cover-letter download. |
+| Current APK emulator smoke | A debug APK from source commit `2c8e4c5` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 2c8e4c5 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `f3bd35aea01050a97527d27c7013774e8c79ca7133eee0d4c97604796bfa089b`. Documentation commits after `2c8e4c5` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 
