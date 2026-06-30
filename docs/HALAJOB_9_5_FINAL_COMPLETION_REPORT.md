@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `b6f5bb2`
+- Current reviewed code/proof-guard commit before this report refresh: `aef1c87`
 - Current APK source build commit: `d4d3a95`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Commit | Summary |
 |---|---|
+| `aef1c87` | Mobile university-admin notifications are no longer a placeholder-only screen: the header badge loads shared notification unread data, the inbox lists backend notifications, mark-read/mark-all/delete call notification routes, taps route into university tabs/settings, and service/widget/source guards protect the flow. |
 | `b6f5bb2` | Web application question options now render as radio rows instead of dropdowns, with tests proving missing-required handling and unchanged apply payloads. |
 | `688a311` | Admin AI usage-limit feature selection now uses ticked/radio choices instead of a dropdown, with payload regression proof for the selected feature. |
 | `d4d3a95` | Web seeker interview rejection and offer decline now require confirmation before calling the backend, with focused tests proving cancel and confirm behavior; app smoke auth setup now uses the in-memory token helper for the authenticated CV Studio path. |
@@ -76,6 +77,8 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 | `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 62 tests after the web destructive-action guards, AI usage-limit control update, and application question choice update. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed. |
 | `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 317/317, UI actions, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed. |
+| `flutter test test\university_dashboard_service_test.dart test\university_dashboard_screen_test.dart` | Passed | 17 focused university tests passed after `aef1c87`, proving `/notifications/v1` load/read/read-all/delete route wiring, real unread badge data, inbox display, notification tap routing, and existing university workflows. |
+| `npm run test:mobile-ui-contract --silent` | Passed | Passed after `aef1c87`; now also guards the university notification bell against returning to a static placeholder-only screen. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
 | `npm run check:syntax --silent` | Passed | Full JS syntax pass after the integration helper change. |
 | `npm run check:imports --silent` | Passed | Relative import guard passed. |
@@ -103,7 +106,7 @@ A fresh debug APK was built and installed on the running emulator from source co
 - Emulator proof: installed and launched on `emulator-5554`
 - Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | d4d3a95 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
 
-This APK is current for mobile source commit `d4d3a95`; the later `688a311` change is web-only and does not change the APK. Rebuild again after the next mobile app-code commit before distribution, owner visual approval, or a new "latest APK" claim.
+This APK is current for mobile source commit `d4d3a95`; later commits, including mobile source commit `aef1c87`, are not included in that APK. Rebuild again after the next mobile app-code commit before distribution, owner visual approval, or a new "latest APK" claim.
 
 ## Current Handout Status
 
@@ -117,6 +120,7 @@ This APK is current for mobile source commit `d4d3a95`; the later `688a311` chan
 | Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency; backend create/update/run-now now preserves and matches skills, education, salary, and currency. |
 | Seeker/Campus More cleanup | Improved: grouped More sections and guarded against primary-flow duplication. |
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
+| University admin notifications | Improved: header notifications now use real shared notification backend data and actions instead of a static `no notifications` placeholder, with service/widget/source guards. |
 | Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
 | Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
 | Docs freshness | Improved by this report and the mobile APK proof guard; must be refreshed again after the final app-code commit and final APK build. |
