@@ -15,6 +15,10 @@ const targets = [
         re: /\bon(?:Pressed|Tap|LongPress|Submitted)\s*:\s*\([^)]*\)\s*(?:async\s*)?\{\s*\}/g,
         label: "empty Flutter action block",
       },
+      {
+        re: /\bon(?:Pressed|Tap|LongPress|Submitted)\s*:\s*[^,\n]*\?\?\s*\(\)\s*(?:async\s*)?\{\s*\}/g,
+        label: "empty Flutter fallback action",
+      },
     ],
   },
   {
@@ -28,6 +32,10 @@ const targets = [
       {
         re: /\bon(?:Click|Submit)\s*=\s*\{\s*\([^)]*\)\s*=>\s*\{\s*\}\s*\}/g,
         label: "empty React action block",
+      },
+      {
+        re: /\bon(?:Click|Submit)\s*=\s*\{[^}\n]*\?\?\s*\(?\s*\(\)\s*=>\s*\{\s*\}\s*\)?\s*\}/g,
+        label: "empty React fallback action",
       },
       {
         re: /\bhref\s*=\s*["'](?:#|javascript:void\(0\))["']/g,
