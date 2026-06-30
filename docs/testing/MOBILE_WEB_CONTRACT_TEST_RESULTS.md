@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `6227584`
+Source contracts tested through: `32bcad0`
 Latest APK source build commit: `6227584`
 
 ## Passed Coverage
@@ -29,6 +29,7 @@ Latest APK source build commit: `6227584`
 | Web public fixed choices | `npm --prefix web test -- public` passed 1 file / 2 tests, proving public job filters render as segmented buttons and public job ratings preserve the backend payload |
 | Web campus fixed-choice forms | `npm --prefix web test -- campus` passed 1 file / 3 tests, proving no dropdowns for campus signup gender or campus opportunity target choices, plus registration and university/company opportunity payloads |
 | Web admin workspaces | `npm --prefix web test -- admin` passed 1 file / 4 tests, proving analytics fixed choices, AI usage-limit feature choices, company queue detail loading, confirmation-gated approve actions, and audit/interview-prep sidebar reachability |
+| Web tab reachability guard | `npm run test:web-tab-reachability --silent` passed after `32bcad0`, proving admin, company, seeker, and campus rendered tab panels are declared or explicitly launch-scope allow-listed; the guard caught and fixed the hidden admin `passport` panel by adding it to the visible admin tabs |
 | Web company employer tasks | `npm --prefix web test -- company` passed 1 file / 5 tests, proving applicant actions, member/library choices, support ticket create/reply, and company job posting fixed-choice payloads |
 | Web shared workflow contracts | `npm --prefix web test -- src/shared/workflows.test.tsx` passed 1 file / 3 tests, proving notification delete requires confirmation before the backend mutation and application question options render as radio rows while preserving answer payloads |
 | Full web test suite | `npm --prefix web test` passed 16 files / 63 tests after `f6e6a1f` |
@@ -43,7 +44,7 @@ Latest APK source build commit: `6227584`
 | Mobile seeker AI IA guard | `flutter test test\widget_test.dart --plain-name "seeker AI career tools screen keeps dedicated IA label"` and `flutter test test\widget_test.dart --plain-name "seeker AI career tools are hidden by default for Syria launch"` passed after `289eb64`, proving seeker AI remains hidden unless enabled and the enabled screen keeps the `AI career tools` heading instead of `AI support` |
 | UI action wiring | `npm run test:ui-actions` passed 12 source files and 15 route/UI pairs after `b6f5bb2` |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
-| Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed web routes, UI actions, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts |
+| Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed web routes, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts |
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, seeker/campus More placement, and company More primary-flow duplication against regression |
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
