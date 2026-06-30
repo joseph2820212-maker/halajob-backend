@@ -35,6 +35,14 @@ if (missingFromAggregate.length > 0) {
   );
 }
 
+if (!scripts['test:web-bundle-size']) {
+  throw new Error('Launch gate is missing test:web-bundle-size.');
+}
+
+if (!/\bnpm\s+run\s+test:web-bundle-size\b/.test(scripts['test:launch-gate:web'] || '')) {
+  throw new Error('test:launch-gate:web must include npm run test:web-bundle-size after the web build.');
+}
+
 console.log(
   `Launch gate aggregate includes ${requiredScripts.length} required gates: ${requiredScripts.join(', ')}`,
 );

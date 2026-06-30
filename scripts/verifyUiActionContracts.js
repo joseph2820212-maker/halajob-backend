@@ -17,7 +17,19 @@ function readSource(relativePath) {
     return "";
   }
   if (!sourceCache.has(relativePath)) {
-    sourceCache.set(relativePath, fs.readFileSync(filePath, "utf8"));
+    const primarySource = fs.readFileSync(filePath, "utf8");
+    const partSources = [];
+    const partRe = /^\s*part\s+['"]([^'"]+)['"]\s*;/gm;
+    let partMatch;
+    while ((partMatch = partRe.exec(primarySource))) {
+      const partPath = path.join(path.dirname(filePath), partMatch[1]);
+      if (!fs.existsSync(partPath)) {
+        failures.push(`${relativePath} declares missing Dart part file: ${partMatch[1]}`);
+        continue;
+      }
+      partSources.push(fs.readFileSync(partPath, "utf8"));
+    }
+    sourceCache.set(relativePath, [primarySource, ...partSources].join("\n"));
   }
   return sourceCache.get(relativePath);
 }
