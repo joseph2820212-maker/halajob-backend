@@ -16,6 +16,8 @@ const proofDocPath = join(
   "testing",
   "MOBILE_WEB_CONTRACT_TEST_RESULTS.md",
 );
+const readinessReportPath = join(root, "docs", "HALAJOB_9_5_FINAL_COMPLETION_REPORT.md");
+const traceabilityPath = join(root, "docs", "HALAJOB_9_5_HANDOUT_TRACEABILITY.md");
 
 if (!existsSync(metadataPath)) {
   console.log("Mobile APK proof check skipped; no latest debug APK metadata found.");
@@ -24,6 +26,8 @@ if (!existsSync(metadataPath)) {
 
 const metadata = JSON.parse(readFileSync(metadataPath, "utf8"));
 const proofDoc = readFileSync(proofDocPath, "utf8");
+const readinessReport = readFileSync(readinessReportPath, "utf8");
+const traceability = readFileSync(traceabilityPath, "utf8");
 
 const commit = String(metadata.gitCommit || "").trim();
 const shortCommit = commit.slice(0, 7);
@@ -51,6 +55,23 @@ assert.equal(shaFileValue, sha256, "APK metadata SHA and .sha256 file must match
   "Documentation commits after",
 ].forEach((needle) => {
   assert.ok(proofDoc.includes(needle), `APK proof doc is missing: ${needle}`);
+});
+
+[
+  `Current APK source build commit: \`${shortCommit}\``,
+  `source commit \`${shortCommit}\``,
+  `halajob-mobile-${shortCommit}-${metadata.versionLabel}-debug.apk`,
+  `SHA-256: \`${sha256}\``,
+  `diagnostics showing \`1.0.6 (27) | debug-apk | ${shortCommit} | local-device\``,
+].forEach((needle) => {
+  assert.ok(readinessReport.includes(needle), `Readiness report is missing: ${needle}`);
+});
+
+[
+  `Current tester APK source | \`${shortCommit}\``,
+  `Current tester APK SHA-256 | \`${sha256}\``,
+].forEach((needle) => {
+  assert.ok(traceability.includes(needle), `Handout traceability is missing: ${needle}`);
 });
 
 console.log(`Mobile APK proof matches latest debug APK metadata for ${shortCommit}.`);
