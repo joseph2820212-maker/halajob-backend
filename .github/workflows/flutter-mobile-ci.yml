@@ -91,6 +91,9 @@ jobs:
       - name: UI action wiring contract
         run: npm run test:ui-actions
 
+      - name: Dead UI action guard
+        run: npm run test:ui-dead-actions
+
       - name: Function placement map guard
         run: npm run test:function-placement-map
 

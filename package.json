@@ -54,6 +54,7 @@
     "test:integration:auth-context": "node scripts/verifyAuthContextIntegration.js",
     "test:otp-contract": "node scripts/verifyOtpContract.js",
     "test:ui-actions": "node scripts/verifyUiActionContracts.js",
+    "test:ui-dead-actions": "node scripts/verifyNoDeadUiActions.js",
     "test:bilingual-ui-payload": "node scripts/verifyBilingualUiPayloadContract.js",
     "test:integration:trust-documents": "node scripts/verifyTrustDocumentWorkflowIntegration.js",
     "test:object-authorization": "node scripts/verifyObjectAuthorizationIntegration.js",
@@ -110,7 +111,7 @@
     "test:launch-gate:web": "npm --prefix web ci --ignore-scripts && npm --prefix web run build && npm run test:web-bundle-size && npm --prefix web test && npm --prefix web run e2e",
     "test:launch-gate:mobile": "node scripts/runMobileLaunchGate.js",
     "test:web-tab-reachability": "node web/scripts/verifyTabReachability.js",
-    "test:launch-gate:ui-contracts": "npm run check:web-routes && npm run test:function-placement-map && npm run test:ui-actions && npm run test:web-tab-reachability && npm run test:mobile-routes && npm run test:mobile-ui-contract && npm run test:bilingual-ui-payload",
+    "test:launch-gate:ui-contracts": "npm run check:web-routes && npm run test:function-placement-map && npm run test:ui-actions && npm run test:ui-dead-actions && npm run test:web-tab-reachability && npm run test:mobile-routes && npm run test:mobile-ui-contract && npm run test:bilingual-ui-payload",
     "test:launch-gate": "npm run check:launch-gate && npm run test:launch-gate:backend && npm run test:launch-gate:web && npm run test:launch-gate:mobile && npm run test:launch-gate:ui-contracts"
   },
   "keywords": [],
