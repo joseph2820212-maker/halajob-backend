@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `ff5b8ba` clean full launch gate; current backend proof through `7113eb8`; current web proof through `e7403eb`; current route/UI contract proof through `f63140b`; current mobile launch gate through `4898355`; current APK proof through `4898355`
+Source contracts tested through: `0a04d5b` current full launch gate; current APK proof through `4898355`
 Latest APK source build commit: `4898355`
 
 ## Passed Coverage
@@ -10,7 +10,7 @@ Latest APK source build commit: `4898355`
 | Area | Evidence |
 |---|---|
 | Mobile Settings drill-in panels | `flutter test test\widget_test.dart --plain-name "settings"` passed 9 Settings-related widget tests after `e2611c3`, proving grouped Settings index rows, hidden detail controls until drill-in, switch-based notification payloads, Data rights export/delete placement, delete confirmation, account save/upload/relogin, and logout-all confirmation |
-| Full launch gate | `npm run test:launch-gate` passed from detached clean worktree `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe-clean-ff5b8ba` at source commit `ff5b8ba`, covering backend aggregate gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/450 Flutter tests, and UI contract route/action/mobile/bilingual guards. A first clean run stopped transiently during subscription integration; `npm run test:integration:subscriptions` passed by itself and the full aggregate rerun passed end to end. |
+| Full launch gate | `npm run test:launch-gate` passed from detached clean worktree `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe-clean-ff5b8ba` at source commit `ff5b8ba`, covering backend aggregate gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/450 Flutter tests, and UI contract route/action/mobile/bilingual guards. It passed again on the current branch at commit `0a04d5b`, covering the backend launch gate, web launch gate, mobile launch gate, and route/UI contract gate in one composed run. |
 | Current backend launch gate | `npm run test:launch-gate:backend --silent` passed on current branch commit `7113eb8`, covering syntax/import/secrets/i18n, smoke checks, security HTTP, OTP, route validation, response codes, model/Mixed/data-retention contracts, Mongo helper, global launch, AI/trust/notification/analytics/translation/admin-operation/career-passport route contracts, and the full launch-critical plus Syria product DB aggregates. |
 | Current web launch gate | `npm run test:launch-gate:web --silent` passed on current branch commit `e7403eb`, covering clean web install, production build, SEO prerender for 14 routes, bundle-size guard with the largest JS chunk at `385.6 KiB` under the 500 KiB threshold, 16 Vitest files / 65 tests, and browser E2E smoke through campus, university, company, seeker, and admin portal navigation. |
 | Mobile route mounts | `npm run test:mobile-routes` |
