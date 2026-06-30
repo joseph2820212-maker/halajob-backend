@@ -268,13 +268,42 @@ assertContains(
   "static const Set<String> _morePrimaryFlowActionIds = {",
   "dashboard More primary flow filter",
 );
+const overviewHiddenQuickActionIdsStart = dashboard.indexOf(
+  "static const Set<String> _overviewHiddenQuickActionIds = {",
+);
+const morePrimaryFlowActionIdsStart = dashboard.indexOf(
+  "static const Set<String> _morePrimaryFlowActionIds = {",
+);
+assert.ok(
+  overviewHiddenQuickActionIdsStart >= 0 && morePrimaryFlowActionIdsStart >= 0,
+  "dashboard quick action placement sets missing",
+);
+const overviewHiddenQuickActionIds = dashboard.slice(
+  overviewHiddenQuickActionIdsStart,
+  morePrimaryFlowActionIdsStart,
+);
+const morePrimaryFlowActionIdsEnd =
+  dashboard.indexOf("};", morePrimaryFlowActionIdsStart) + 2;
+const morePrimaryFlowActionIds = dashboard.slice(
+  morePrimaryFlowActionIdsStart,
+  morePrimaryFlowActionIdsEnd,
+);
+assertContains(
+  overviewHiddenQuickActionIds,
+  "'campus_resources'",
+  "dashboard campus resources More-only placement",
+);
+assertNotContains(
+  morePrimaryFlowActionIds,
+  "'campus_resources'",
+  "dashboard campus resources More-only placement",
+);
 [
   "'browse_jobs'",
   "'saved_jobs'",
   "'applications'",
   "'campus_feed'",
   "'campus_events'",
-  "'campus_resources'",
 ].forEach((id) =>
   assertContains(dashboard, id, "dashboard More primary flow filter"),
 );
@@ -401,8 +430,18 @@ assertContains(
 );
 assertContains(
   company,
-  "? _CompanyTalentPanel(",
+  "3 when widget.clientFeatureSettings.talentPoolCrmEnabled =>",
   "company canonical tab panels",
+);
+assertContains(
+  company,
+  "if (talentPoolCrmEnabled) _talentTab",
+  "company talent tab feature gate",
+);
+assertContains(
+  company,
+  "talentPoolCrmEnabled: widget.clientFeatureSettings.talentPoolCrmEnabled",
+  "company talent tab feature gate",
 );
 assertContains(
   company,

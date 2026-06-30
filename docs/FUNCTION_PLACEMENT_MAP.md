@@ -129,11 +129,11 @@ below.
 | Student career passport | `/university/v1/students/:id/career-passport` | Student detail/passport | Student detail/passport | Read-only university review. |
 | Verification queue/documents | `/university/v1/verifications*`, `/campus/v1/admin/*` | `Verifications` tab | Verifications screen | Approve/reject/request info live here. |
 | Partners/employer partners | `/university/v1/partners*` | `Partners` tab | Partners screen | Approve/reject/suspend here. |
-| Opportunities/post internships | `/university/v1/opportunities*` | `Opportunities` and `Post Internship` | Opportunities/create surfaces | Do not hide posting only in settings. |
+| Opportunities/post internships | `/university/v1/opportunities*` | `Opportunities` and `Post Internship` | More opportunities/create surface | Do not expose as a bottom tab; keep posting reachable from More. |
 | Members/team | `/university/v1/members*`, `/campus/v1/admin/members*` | `Members` tab | Gap: needs mobile placement | Web is wired; mobile still needs a native members/team screen. |
-| Analytics/readiness/outcomes | `/university/v1/analytics*` | `Analytics` tab | Analytics cards/screens | Keep reports separate from dashboard. |
-| Reports/export | `/university/v1/reports/outcomes` | `Reports` tab | Outcomes/report/export action | No More dashboard duplication. |
-| Events/resources/assignments | `/university/v1/events*`, `/resources*` | `Events/resources` tab | Events/resources screens | Assignment/analytics should stay with resources. |
+| Analytics/readiness/outcomes | `/university/v1/analytics*` | `Analytics` tab | Home summary plus More analytics/outcomes | Keep full reports out of the Students/Partners tabs. |
+| Reports/export | `/university/v1/reports/outcomes` | `Reports` tab | More outcomes/report/export action | No separate bottom tab. |
+| Events/resources/assignments | `/university/v1/events*`, `/resources*` | `Events/resources` tab | More events/resources screens | Assignment/analytics should stay with resources. |
 | Notifications | notification routes | Header bell or real notifications tab | Wire backend data or remove placeholder | Placeholder-only notification screens are not launch acceptable. |
 | Account/settings/sign out | settings/account routes | Settings/account | Account details/settings | Next mobile refactor should align with shared header/settings rules. |
 
@@ -147,7 +147,7 @@ below.
 | Job translation | `/ai/v1/translate/job/:jobId` and translation routes | Job detail/contextual action | Job detail/contextual action | Not a separate AI card. |
 | Applicants and statuses | company applicants/application routes | `Applicants` tab | Bottom Applicants tab | Detail owns notes, status, messages, rating. |
 | Interviews/video scheduling | company interview routes | `Interviews` tab and Applicant detail | Applicant/interview workflow | Enabled by `video_interviews_enabled`; not repeated in More. |
-| Talent pool/invitations | talent pool routes | `Talent Pool` tab | Bottom Talent tab | Invitations and talent help live here. |
+| Talent pool/invitations | talent pool routes | `Talent Pool` tab | Bottom Talent tab only when `talent_pool_crm_enabled`; otherwise hidden | Invitations and talent help live here when enabled; no disabled dead panel. |
 | Campus recruiting | company campus routes | `Campus` tab | Talent tab or campus recruiting module | Do not duplicate in More. |
 | AI hiring tools | `/ai/v1/company/jobs/generate`, `/shortlist`, `/messages/generate` | `AI tools` tab when enabled | One `AI hiring tools` More entry when enabled | Must be grouped like seeker AI, not spread through More. |
 | Manual WhatsApp/contact | communication/company routes | Communication/settings plus contextual action | Manual WhatsApp contextual surface | Preference-backed, not a primary tab. |
