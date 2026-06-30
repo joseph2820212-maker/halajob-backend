@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `f6e6a1f`
+Source contracts tested through: `a9e71ed`
 Latest APK source build commit: `9f1972f`
 
 ## Passed Coverage
@@ -39,6 +39,7 @@ Latest APK source build commit: `9f1972f`
 | Mobile expanded job filters | `flutter test test\widget_test.dart --plain-name "seeker jobs feed exposes filters and sort controls"` and `flutter test test\widget_test.dart --plain-name "creates job alerts with expanded opportunity filters"` passed, proving skills, education level, salary minimum, alert frequency, and saved-search persistence |
 | Mobile CV cover-letter preview/download | `flutter test test\seeker_dashboard_service_test.dart --plain-name "previews seeker cover letters through CV Studio routes"`, `flutter test test\widget_test.dart --plain-name "previews a seeker CV cover letter from backend templates"`, `flutter test test\seeker_dashboard_service_test.dart --plain-name "downloads seeker cover letters through CV Studio routes"`, and `flutter test test\widget_test.dart --plain-name "downloads a seeker CV cover letter from backend templates"` passed after `714fefe`, proving the CV Manager uses backend template/preview/download routes, renders previews, and saves the returned cover-letter text file |
 | Mobile university admin notifications | `flutter test test/university_dashboard_service_test.dart test/university_dashboard_screen_test.dart` passed 17 focused tests after `aef1c87`, proving university notifications load from `/notifications/v1`, unread badge data is real, mark-read/mark-all/delete actions call backend routes, and notification taps route to the right university dashboard surfaces |
+| Mobile company AI IA guard | `flutter test test\widget_test.dart --plain-name "company AI hiring tools are grouped under More when enabled"` passed after `a9e71ed`, proving company More exposes one AI hiring tools entry when enabled and does not spread individual AI cards or Talent-tab workflows into More |
 | UI action wiring | `npm run test:ui-actions` passed 12 source files and 15 route/UI pairs after `b6f5bb2` |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
 | Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed web routes, UI actions, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts |

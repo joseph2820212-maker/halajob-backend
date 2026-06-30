@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `9f1972f`
+- Current reviewed code/proof-guard commit before this report refresh: `a9e71ed`
 - Current APK source build commit: `9f1972f`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `a9e71ed` | Strengthened the company mobile AI IA widget guard so More can expose exactly one AI hiring tools entry while the individual AI tool cards stay inside the dedicated AI tools screen. |
 | `9f1972f` | Refreshed web CV cover-letter proof docs after `f6e6a1f`, then served as the source commit for the current debug tester APK rebuild. |
 | `f6e6a1f` | Web CV Studio now proves cover-letter preview/download actions call the backend CV Studio template routes from the CV Library row and open the returned download blob. |
 | `2c8e4c5` | Refreshed mobile cover-letter download proof docs after `714fefe`, then served as the source commit for the current debug tester APK rebuild. |
@@ -103,6 +104,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `flutter test test\widget_test.dart --plain-name "previews a seeker CV cover letter from backend templates"` | Passed | Proves the signed-in seeker CV Manager exposes the cover-letter action, loads backend templates, and renders the preview panel. |
 | `flutter test test\seeker_dashboard_service_test.dart --plain-name "downloads seeker cover letters through CV Studio routes"` | Passed | Proves mobile calls the backend CV Studio `cover-letter/download` route as an authenticated POST file download with the selected template payload and fallback filename. |
 | `flutter test test\widget_test.dart --plain-name "downloads a seeker CV cover letter from backend templates"` | Passed | Proves the signed-in seeker CV Manager exposes the cover-letter download action, loads backend templates, saves the returned text file, and shows success feedback. |
+| `flutter test test\widget_test.dart --plain-name "company AI hiring tools are grouped under More when enabled"` | Passed | Proves company More exposes a single AI hiring tools entry when enabled, keeps Job Draft/Candidate Shortlist/Hiring Message/Job Translation inside the dedicated AI tools screen, and keeps Talent help/Campus recruiting in the Talent tab instead of More. |
 | `npm run test:mobile-ui-contract --silent` | Passed | Passed after `aef1c87`; now also guards the university notification bell against returning to a static placeholder-only screen. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
 | `npm run check:imports --silent` | Passed | Relative import guard passed. |
