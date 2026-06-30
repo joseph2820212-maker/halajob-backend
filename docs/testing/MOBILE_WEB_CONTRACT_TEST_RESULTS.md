@@ -2,13 +2,14 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `1ff876d`
+Source contracts tested through: `80a235a`
 Latest APK source build commit: `eaca7f6`
 
 ## Passed Coverage
 
 | Area | Evidence |
 |---|---|
+| Full launch gate | `npm run test:launch-gate` passed from `80a235a`, covering backend aggregate gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/443 tests, and UI contract route/action/mobile/bilingual guards |
 | Mobile route mounts | `npm run test:mobile-routes` |
 | Mobile UI contract | `npm run test:mobile-ui-contract` |
 | Campus student routes | `npm run test:mobile-routes` |
