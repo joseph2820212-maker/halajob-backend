@@ -2,8 +2,8 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `ff5b8ba`
-Latest APK source build commit: `ff5b8ba`
+Source contracts tested through: `ff5b8ba` clean full launch gate; focused mobile source through `4c91980`
+Latest APK source build commit: `4c91980`
 
 ## Passed Coverage
 
@@ -49,8 +49,8 @@ Latest APK source build commit: `ff5b8ba`
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, seeker/campus More placement, and company More primary-flow duplication against regression |
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
-| Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed inside the clean `ff5b8ba` full launch-gate replay; Flutter `pub get`, `analyze`, and full `flutter test` completed with 450 tests passed |
-| Current APK emulator smoke | A debug APK from source commit `ff5b8ba` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | ff5b8ba | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `862b961d3011a79e4accd45585914b27ce41dce7d997c315513d9befd2efab58`. Documentation commits after `ff5b8ba` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
+| Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed inside the clean `ff5b8ba` full launch-gate replay, then passed again at source commit `4c91980` after extracting seeker-discovery dashboard widgets; Flutter `pub get`, `analyze`, and full `flutter test` completed with 450 tests passed |
+| Current APK emulator smoke | A debug APK from source commit `4c91980` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, typed seeker/company login text entry, diagnostics showing `1.0.6 (27) | debug-apk | 4c91980 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `9ab5646e40a4a7c5256d6608c48f843df2f2d16ac983970e7ccf5106f4963014`. Documentation commits after `4c91980` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 

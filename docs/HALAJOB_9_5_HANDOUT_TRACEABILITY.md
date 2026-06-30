@@ -14,10 +14,10 @@ findings that are now fixed and guarded.
 |---|---|
 | Current code/proof branch | `codex/gate-a-mobile-ui-lock` |
 | Clean source proof commit | `ff5b8ba` |
-| Latest proof-doc commit | `74f89fb` |
+| Latest proof-doc baseline before this APK refresh | `0430e7f` |
 | Clean checkout gate | `npm run test:launch-gate` passed from detached clean worktree `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe-clean-ff5b8ba` |
-| Current tester APK source | `ff5b8ba` |
-| Current tester APK SHA-256 | `862b961d3011a79e4accd45585914b27ce41dce7d997c315513d9befd2efab58` |
+| Current tester APK source | `4c91980` |
+| Current tester APK SHA-256 | `9ab5646e40a4a7c5256d6608c48f843df2f2d16ac983970e7ccf5106f4963014` |
 | APK proof guard | `npm run test:mobile-apk-proof --silent` passed against the latest debug APK metadata |
 
 ## Wave Status
@@ -29,8 +29,8 @@ findings that are now fixed and guarded.
 | Wave 3 - Job filters and saved search polish | Done for launch scope | Mobile filters now cover keyword/location/company/skills/date/job type/experience/salary/work mode/education/category/deadline/student/fresh-grad/verified/easy apply/alert frequency. Saved-search persistence is covered by mobile widget tests and `npm run test:integration:saved-search-alerts`. | Live production search quality tuning against real job data. |
 | Wave 4 - Navigation and More cleanup | Done for launch scope | Mobile source inventory and UI contract guards protect seeker/campus/company canonical More placement, prevent company More from duplicating primary tabs, keep AI as one feature-gated entry, and keep seeker live sync below tab content. | Owner visual approval on final Android device. |
 | Wave 5 - Web/admin/company polish | Improved and guarded | Web build, 16-file/65-test Vitest suite, tab reachability, route wiring, UI action contracts, and E2E smoke prove admin/company/seeker/campus tabs are reachable and key employer/campus actions are wired. Tests cover confirmations, fixed choices, CV Studio, employer pause/resume, interview join/reschedule, campus events, university verification actions, saved-search delete, notification delete, application withdrawal, interview rejection, and offer decline. | Product-owner judgment on whether web density is acceptable for launch. |
-| Wave 6 - Test/proof reproducibility | Done for code-owned scope | `npm run test:launch-gate` passed from a detached clean checkout at `ff5b8ba`; web did clean install/build/tests/E2E; mobile ran `pub get`, `analyze`, and 450 tests; backend launch-critical and Syria product aggregates passed. MongoDB integration setup has external URI scoping, `MONGOMS_SYSTEM_BINARY` preflight validation, memory-server fallback guidance, and a helper contract. | None for local code-owned reproducibility; CI/provider availability remains environment-controlled. |
-| Wave 7 - Release readiness without manual device check | Done for code-owned scope, not public-launch complete | The current branch has clean launch-gate proof, APK metadata proof, and docs refreshed after the source proof. Manual real-device approval is explicitly excluded from code completion and not claimed. | Production smoke, provider credentials, signing, and owner device approval. |
+| Wave 6 - Test/proof reproducibility | Done for code-owned scope | `npm run test:launch-gate` passed from a detached clean checkout at `ff5b8ba`; web did clean install/build/tests/E2E; mobile ran `pub get`, `analyze`, and 450 tests; backend launch-critical and Syria product aggregates passed. After the `4c91980` mobile maintainability extraction, `npm run test:launch-gate:mobile` passed again and the screen inventory guard covers the new `seeker_discovery_widgets.dart` part file. MongoDB integration setup has external URI scoping, `MONGOMS_SYSTEM_BINARY` preflight validation, memory-server fallback guidance, and a helper contract. | None for local code-owned reproducibility; CI/provider availability remains environment-controlled. |
+| Wave 7 - Release readiness without manual device check | Done for code-owned scope, not public-launch complete | The current branch has clean launch-gate proof, current APK metadata proof from `4c91980`, emulator auth/campus smoke screenshots, and docs refreshed after the APK proof. Manual real-device approval is explicitly excluded from code completion and not claimed. | Production smoke, provider credentials, signing, and owner device approval. |
 
 ## Definition Of 9.5 Done Mapping
 
@@ -48,7 +48,11 @@ findings that are now fixed and guarded.
 | Boolean/small-choice controls avoid dropdowns | Passed for launch-critical surfaces by mobile and web fixed-choice tests/contracts. |
 | Arabic/English labels exist for new surfaces | Passed by `npm run test:bilingual-ui-payload`; Arabic launch payload is English/Arabic scoped. |
 | Provider limits are honest | Kept in `docs/SYRIA_LAUNCH_PRODUCT_QA.md`, `docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md`, and this traceability file. |
-| Docs are refreshed after final source proof and APK proof is current | Current proof docs are refreshed through `74f89fb`; APK source remains `ff5b8ba` unless a later mobile source commit rebuilds it. |
+| Docs are refreshed after final source proof and APK proof is current | Current proof docs now distinguish the clean `ff5b8ba` full launch-gate replay from the focused `4c91980` mobile launch gate and APK rebuild. |
+
+## Maintainability Follow-Up
+
+After the clean full launch-gate replay, source commit `4c91980` extracted the seeker-discovery/opportunity-filter widgets from the large mobile dashboard into `mobile/lib/src/features/dashboard/seeker_discovery_widgets.dart`, reducing `dashboard_screen.dart` by about 790 lines. The mobile source inventory guard now requires the part file and protects the expanded opportunity filter controls there, and `npm run test:launch-gate:mobile` passed after the extraction.
 
 ## Owner-Controlled Blockers
 
