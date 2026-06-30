@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `32bcad0`
+Source contracts tested through: `4c6204c`
 Latest APK source build commit: `6227584`
 
 ## Passed Coverage
@@ -22,17 +22,18 @@ Latest APK source build commit: `6227584`
 | Notification route/event contract | `npm run test:notification-routes` |
 | Analytics route/event contract | `npm run test:analytics-routes` |
 | Web clean install | `npm --prefix web ci --ignore-scripts` |
-| Web production build and SEO prerender | `npm --prefix web run build` passed after `b6f5bb2`; SEO prerendered 14 routes |
+| Web production build and SEO prerender | `npm --prefix web run build` passed after `4c6204c`; SEO prerendered 14 routes |
 | Web Settings fixed-choice controls | `npm --prefix web test -- settings` passed 1 file / 3 tests, proving no `<select>` for fixed choices and checkbox/radio serialization compatibility |
 | Web job-alert filter/delete contract | `npm --prefix web test -- src/shared/jobAlerts.test.tsx` passed 1 file / 3 tests, proving canonical filters, radio frequency edits, and confirmation-gated saved-search delete |
 | Web seeker CV/company/application/interview/offer contracts | `npm --prefix web test -- src/seeker/screens.test.tsx` passed 1 file / 8 tests, proving current-CV-first hierarchy, parser-disabled honesty, no dropdowns, radio visibility payloads, cover-letter preview/download route wiring from the CV Library row, confirmation-gated CV delete, company review rating payloads, confirmation-gated application withdrawal, confirmation-gated interview rejection, and confirmation-gated offer decline |
 | Web public fixed choices | `npm --prefix web test -- public` passed 1 file / 2 tests, proving public job filters render as segmented buttons and public job ratings preserve the backend payload |
-| Web campus fixed-choice forms | `npm --prefix web test -- campus` passed 1 file / 3 tests, proving no dropdowns for campus signup gender or campus opportunity target choices, plus registration and university/company opportunity payloads |
+| Web campus fixed-choice forms and university actions | `npm --prefix web test -- campus` passed through the full web suite after `4c6204c`, now 1 file / 4 tests, proving no dropdowns for campus signup gender or campus opportunity target choices, registration and university/company opportunity payloads, backend campus events, and university verification approve/reject/request-info route payloads |
 | Web admin workspaces | `npm --prefix web test -- admin` passed 1 file / 4 tests, proving analytics fixed choices, AI usage-limit feature choices, company queue detail loading, confirmation-gated approve actions, and audit/interview-prep sidebar reachability |
 | Web tab reachability guard | `npm run test:web-tab-reachability --silent` passed after `32bcad0`, proving admin, company, seeker, and campus rendered tab panels are declared or explicitly launch-scope allow-listed; the guard caught and fixed the hidden admin `passport` panel by adding it to the visible admin tabs |
-| Web company employer tasks | `npm --prefix web test -- company` passed 1 file / 5 tests, proving applicant actions, member/library choices, support ticket create/reply, and company job posting fixed-choice payloads |
+| Web company employer tasks | `npm --prefix web test -- company` passed through the full web suite after `4c6204c`, now 1 file / 6 tests, proving applicant actions, interview join-video and reschedule payloads, job pause/resume controls, member/library choices, support ticket create/reply, and company job posting fixed-choice payloads |
+| Web employer/campus workflow slice | `npm --prefix web test -- src/company/screens.test.tsx src/campus/screens.test.tsx` passed 2 files / 10 tests after `4c6204c`, proving company pause/resume job controls, interview join/reschedule actions, campus event loading, and university verification approve/reject/request-info backend routes |
 | Web shared workflow contracts | `npm --prefix web test -- src/shared/workflows.test.tsx` passed 1 file / 3 tests, proving notification delete requires confirmation before the backend mutation and application question options render as radio rows while preserving answer payloads |
-| Full web test suite | `npm --prefix web test` passed 16 files / 63 tests after `f6e6a1f` |
+| Full web test suite | `npm --prefix web test` passed 16 files / 65 tests after `4c6204c` |
 | Web browser E2E smoke | `npm --prefix web run e2e` passed against local Vite preview/Chrome, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses |
 | DB launch-critical aggregate | `npm run test:integration:launch-critical --silent` passed on rerun with the shared Mongo helper; the individual remaining scripts after an earlier transient stop also passed |
 | DB Syria product aggregate | `npm run test:integration:syria-product --silent` passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding |
@@ -44,7 +45,7 @@ Latest APK source build commit: `6227584`
 | Mobile seeker AI IA guard | `flutter test test\widget_test.dart --plain-name "seeker AI career tools screen keeps dedicated IA label"` and `flutter test test\widget_test.dart --plain-name "seeker AI career tools are hidden by default for Syria launch"` passed after `289eb64`, proving seeker AI remains hidden unless enabled and the enabled screen keeps the `AI career tools` heading instead of `AI support` |
 | UI action wiring | `npm run test:ui-actions` passed 12 source files and 15 route/UI pairs after `b6f5bb2` |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
-| Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed web routes, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts |
+| Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed 327/327 web API route matches, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts after `4c6204c` |
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, seeker/campus More placement, and company More primary-flow duplication against regression |
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |

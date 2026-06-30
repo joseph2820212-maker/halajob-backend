@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `32bcad0`
+- Current reviewed code/proof-guard commit before this report refresh: `4c6204c`
 - Current APK source build commit: `6227584`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,8 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `4c6204c` | Wired employer and campus web workflow actions: company jobs can pause/resume from the edit panel, scheduled interviews expose join-video and reschedule controls, campus events load from the backend, and university verification approve/reject/request-info actions call the backend with focused regression tests. |
+| `cd41a48` | Refreshed the web tab-reachability proof docs after adding the guard and fixing the hidden admin passport panel. |
 | `32bcad0` | Added a web tab-reachability guard to the UI contract gate and surfaced the admin Career Passport operations panel as a real admin tab instead of a hidden rendered branch. |
 | `6227584` | Refreshed the Mongo/APK proof documents after the integration-helper guard, keeping the branch clean before the current debug APK rebuild. |
 | `0b9a32a` | Strengthened DB-backed integration reproducibility by validating `MONGOMS_SYSTEM_BINARY` before `mongodb-memory-server` starts, adding contract coverage for missing and present system-binary paths, and documenting the setup behavior. |
@@ -95,14 +97,15 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `npm --prefix web test -- src/seeker/screens.test.tsx` | Passed | 8 seeker tests cover CV Studio hierarchy/parser honesty/visibility payloads, cover-letter preview/download route wiring, confirmation-gated CV delete, company review rating radio payloads, confirmation-gated application withdrawal, confirmation-gated interview rejection, and confirmation-gated offer decline. |
 | `npm --prefix web test -- admin` | Passed | 4 admin tests cover analytics choices, AI usage-limit feature choices, company queue confirmation/detail behavior, and audit/interview-prep sidebar reachability. |
 | `npm run test:web-tab-reachability --silent` | Passed | Added after `32bcad0`; verifies admin, company, seeker, and campus rendered tab panels are either declared in their tab lists or explicitly allow-listed with a launch-scope reason. It caught and fixed the hidden admin `passport` panel by adding it to the visible admin tabs. |
-| `npm --prefix web test -- campus` | Passed | 3 campus tests cover signup gender choice rows, university opportunity target payloads, company campus target payloads, and async refresh callbacks. |
-| `npm --prefix web test -- company` | Passed | 5 company tests cover applicant actions, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
+| `npm --prefix web test -- src/company/screens.test.tsx src/campus/screens.test.tsx` | Passed | 2 files / 10 tests after `4c6204c`; proves company pause/resume job controls, interview join-video and reschedule payloads, campus backend event loading, and university verification approve/reject/request-info backend routes. |
+| `npm --prefix web test -- campus` | Passed | 4 campus tests now cover signup gender choice rows, university opportunity target payloads, company campus target payloads, async refresh callbacks, backend campus events, and university verification actions. |
+| `npm --prefix web test -- company` | Passed | 6 company tests now cover applicant actions, interview join/reschedule flows, job pause/resume, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
 | `npm --prefix web test -- src/shared/jobAlerts.test.tsx` | Passed | 3 job-alert tests cover canonical filter payloads, radio frequency edits, and confirmation-gated saved-search delete. |
 | `npm --prefix web test -- src/shared/workflows.test.tsx` | Passed | 3 shared-workflow tests prove notification delete requires confirmation before backend mutation and application question options use radio rows while preserving apply payloads. |
-| `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 63 tests after `f6e6a1f`, including the web CV Studio cover-letter preview/download guard. |
-| `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed. |
+| `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 65 tests after `4c6204c`, including the new employer/campus workflow guards and the existing CV Studio cover-letter preview/download guard. |
+| `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed after `4c6204c`. |
 | `npm --prefix web run e2e` | Passed | Local Vite preview/Chrome smoke passed on this machine, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses. |
-| `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 317/317, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed. |
+| `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 327/327, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed after `4c6204c`. |
 | `npm run test:integration:launch-critical --silent` | Passed | Full DB-backed launch-critical aggregate passed on rerun using the shared `mongodb-memory-server` fallback after an earlier transient stop around the subscription script; individual remaining scripts also passed. |
 | `npm run test:integration:syria-product --silent` | Passed | Full Syria product aggregate passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding. |
 | `flutter test test\university_dashboard_service_test.dart test\university_dashboard_screen_test.dart` | Passed | 17 focused university tests passed after `aef1c87`, proving `/notifications/v1` load/read/read-all/delete route wiring, real unread badge data, inbox display, notification tap routing, and existing university workflows. |
@@ -156,7 +159,7 @@ This APK is current for source commit `6227584`, including the company AI tools 
 | Seeker/Campus More cleanup | Improved: grouped More sections and guarded against primary-flow duplication. |
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
 | University admin notifications | Improved: header notifications now use real shared notification backend data and actions instead of a static `no notifications` placeholder, with service/widget/source guards. |
-| Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep/passport reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
+| Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep/passport reachability, company applicant/member/library/support workflows, company job posting choices, company job pause/resume, interview join/reschedule, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, backend campus events, university verification approve/reject/request-info, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
 | Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, explicit `MONGOMS_SYSTEM_BINARY` path validation, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
 | Docs freshness | Improved by this report and the mobile APK proof guard; refresh again after any later source commit, and rebuild/refresh APK proof after any later mobile app-code commit. |
 
