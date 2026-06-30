@@ -2,8 +2,8 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `0b9a32a`
-Latest APK source build commit: `289eb64`
+Source contracts tested through: `6227584`
+Latest APK source build commit: `6227584`
 
 ## Passed Coverage
 
@@ -48,7 +48,7 @@ Latest APK source build commit: `289eb64`
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed after `714fefe`; Flutter `pub get`, `analyze`, and full `flutter test` completed with 448 tests passed |
-| Current APK emulator smoke | A debug APK from source commit `289eb64` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 289eb64 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `423c0f70e0eddc72c9f8419fe78857ab047b24fe84cd466ccd39b1706225bae4`. Documentation commits after `289eb64` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
+| Current APK emulator smoke | A debug APK from source commit `6227584` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 6227584 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `d5f1c9f2de76d53d60fcbff2046ce849da0244e731762e8fbe8d6f49951396d8`. Documentation commits after `6227584` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 
