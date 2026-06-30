@@ -129,7 +129,12 @@
         "SalaryInsightsScreen(baseUrl: widget.apiBaseUrl)",
         "_handleUnknownQuickAction(action)",
         "debugPrint('Unhandled mobile quick action: $id')",
-        "is not available in this mobile build yet."
+        "is not available in this mobile build yet.",
+        "enum _CompanyDetailLens",
+        "key: const ValueKey('company-detail-salary-lens')",
+        "key: const ValueKey('company-salary-insights-button')",
+        "cardKey: 'campus-opportunity-employer-link'",
+        "followKey: 'campus-event-host-follow'"
       ],
       "mustNotContain": [
         "ValueKey('dashboard-account-menu-settings-item')",

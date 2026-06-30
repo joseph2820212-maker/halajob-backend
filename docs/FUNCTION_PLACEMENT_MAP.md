@@ -95,6 +95,7 @@ below.
 | Notifications/preferences | `/notifications/v1`, `/user/v1/notification*` | Header bell, `Notifications`, Settings prefs | Header bell, notifications screen, Settings prefs | No duplicate full cards in More. |
 | Manual WhatsApp | `/user/v1/communication/*` | Settings communication plus contextual share | Settings communication plus contextual share button | Not a top-level tab. |
 | Salary insights | salary routes | `Salary Insights` tab | More or dashboard module, not Settings | Should be visible if enabled. |
+| Company directory/profile/reviews/salary | `/employee/v1/global/companies*`, `/employee/v1/companies*`, company review routes, salary routes | Company profile page | More `Companies` -> Company detail lenses `About`/`Jobs`/`Reviews`/`Salary` | Company detail lenses fold reviews and salary guidance into one entity page; no extra bottom tab. |
 | Privacy, export, delete request | `/account/export`, `/account/delete-request`, privacy routes | Settings account/privacy | Settings account/privacy | Destructive actions need confirmation. |
 | Support/legal | support/legal routes | Settings/support/legal | Settings/support/legal | Legal/help pages use locked native chrome on mobile. |
 
@@ -106,6 +107,7 @@ below.
 | Campus dashboard | `/user/v1/campus/dashboard`, overview routes | Campus student `Overview` | Bottom Home/Campus content | Dashboard is summary only. |
 | Opportunities/search/detail | `/user/v1/campus/opportunities*` | `Opportunities` tab | Bottom `Opportunities` tab | Discovery/search only; saved-only campus mode must not reuse generic opportunities state. |
 | Save/apply/external apply | opportunity save/apply routes | Opportunity detail/actions | Opportunity detail/actions | Detail owns readiness/apply. |
+| Employer/event cross-links | Campus opportunity/event routes | Opportunity, employer, and event detail | Opportunity/event detail inline Follow cards | Inline Follow is local until a backend follow endpoint exists; do not create a new bottom tab. |
 | Saved campus opportunities | opportunity save routes | `My Applications` pipeline, `Saved` sub-state | Bottom `My Applications` pipeline, `Saved` sub-state | Must own separate state from Opportunities discovery. |
 | Campus applications/messages/cancel | `/user/v1/campus/applications*` | `My Applications` pipeline, `Applied`/`Interviews`/`Offers` sub-states | Bottom `My Applications` pipeline and detail | Same application rules as seeker. |
 | Student verification | `/user/v1/campus/student-verifications*`, verification routes | Profile/readiness and university verification review | More/profile readiness and verification screen | Upload/resubmit belongs to student; approve/reject belongs to university admin. |

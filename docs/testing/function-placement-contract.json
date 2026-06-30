@@ -8,6 +8,7 @@
     "CV belongs to seeker `CV Studio` on web and mobile `CV Manager`",
     "Manual WhatsApp belongs to communications/preferences plus contextual share actions",
     "Video interviews belong to interview/application/applicant workflows",
+    "Company detail lenses fold reviews and salary guidance into one entity page",
     "Primary bottom-tab flows may appear in More only as small shortcuts",
     "Company More must not repeat Home dashboard cards, Jobs, Applicants, Interviews, or Talent as large cards",
     "University members are wired on web but not clearly on mobile",
@@ -26,11 +27,13 @@
     "jobSeeker": [
       "CV builder/generate/download",
       "AI career tools",
+      "Company directory/profile/reviews/salary",
       "Manual WhatsApp",
       "Interviews and video joins"
     ],
     "campusStudent": [
       "Student verification",
+      "Employer/event cross-links",
       "Talent visibility",
       "AI career tools"
     ],
