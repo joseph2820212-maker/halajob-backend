@@ -2,22 +2,42 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
+const flutterActionNamePattern =
+  "(?:Pressed|Tap|LongPress|Submitted|FieldSubmitted|Changed|Selected|Select[A-Za-z0-9_]*)";
+const sameFlutterCallback =
+  "(?:(?!\\n\\s*on[A-Z][A-Za-z0-9_]*\\s*:)[\\s\\S])";
 const targets = [
   {
     dir: "mobile/lib",
     extensions: new Set([".dart"]),
     patterns: [
       {
-        re: /\bon(?:Pressed|Tap|LongPress|Submitted)\s*:\s*\([^)]*\)\s*(?:async\s*)?=>\s*(?:null|Future\.value\(\)|void\s+0)\b/g,
+        re: new RegExp(
+          `\\bon${flutterActionNamePattern}\\s*:\\s*\\([^)]*\\)\\s*(?:async\\s*)?=>\\s*(?:null|Future\\.value\\(\\)|void\\s+0)\\b`,
+          "g",
+        ),
         label: "no-op Flutter action expression",
       },
       {
-        re: /\bon(?:Pressed|Tap|LongPress|Submitted)\s*:\s*\([^)]*\)\s*(?:async\s*)?\{\s*\}/g,
+        re: new RegExp(
+          `\\bon${flutterActionNamePattern}\\s*:\\s*\\([^)]*\\)\\s*(?:async\\s*)?\\{\\s*\\}`,
+          "g",
+        ),
         label: "empty Flutter action block",
       },
       {
-        re: /\bon(?:Pressed|Tap|LongPress|Submitted)\s*:\s*[^,\n]*\?\?\s*\(\)\s*(?:async\s*)?\{\s*\}/g,
+        re: new RegExp(
+          `\\bon${flutterActionNamePattern}\\s*:[^,\\n]*\\?\\?\\s*\\(\\)\\s*(?:async\\s*)?\\{\\s*\\}`,
+          "g",
+        ),
         label: "empty Flutter fallback action",
+      },
+      {
+        re: new RegExp(
+          `\\bon${flutterActionNamePattern}\\s*:${sameFlutterCallback}{0,180}\\?${sameFlutterCallback}{0,180}(?::\\s*)?(?:\\([^)]*\\)\\s*)?(?:async\\s*)?\\{\\s*\\}`,
+          "g",
+        ),
+        label: "empty Flutter ternary action branch",
       },
     ],
   },
