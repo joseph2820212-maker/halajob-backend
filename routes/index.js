@@ -264,6 +264,16 @@ router.get(
   adminOperationsController.listNotificationLogs,
 );
 router.get(
+  "/career-passports",
+  can("career_passports.view"),
+  adminOperationsController.listCareerPassports,
+);
+router.get(
+  "/career-passports/:passportId",
+  can("career_passports.view"),
+  adminOperationsController.getCareerPassport,
+);
+router.get(
   "/invoices",
   can("subscriptions.manage"),
   adminOperationsController.listInvoices,

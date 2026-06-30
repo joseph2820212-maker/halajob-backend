@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import ReturnDashData from "../../helper/ReturnDashData/index.js";
 import {
   AuditLogModel,
+  CareerPassportModel,
   CompanyInvoiceModel,
   ContentTranslationModel,
   NotificationModel,
@@ -74,6 +75,15 @@ const addDateRangeFilter = (filter, req) => {
 const failIfInvalid = (res, error) =>
   error ? ReturnDashData.getError({ res, status: 400, message: error }) : null;
 
+const boolFilter = (value) => {
+  if (typeof value === "boolean") return value;
+  const normalized = clean(value).toLowerCase();
+  if (!normalized) return null;
+  if (["true", "1", "yes"].includes(normalized)) return true;
+  if (["false", "0", "no"].includes(normalized)) return false;
+  return null;
+};
+
 const invoicePopulate = [
   {
     path: "company_id",
@@ -86,6 +96,21 @@ const invoicePopulate = [
   {
     path: "plan_id",
     select: "key title_ar title_en price currency_code billing_period status",
+  },
+];
+
+const careerPassportPopulate = [
+  {
+    path: "user_id",
+    select: "first_name last_name email phone_e164 status role_id default_context_id",
+  },
+  {
+    path: "employee_id",
+    select: "profile_headline current_job_title candidate_stage profile_completion is_student status accepted image",
+  },
+  {
+    path: "active_context_id",
+    select: "context_type display_name status entity_id entity_model permissions",
   },
 ];
 
@@ -240,10 +265,85 @@ export const getInvoice = async (req, res) => {
   }
 };
 
+export const listCareerPassports = async (req, res) => {
+  try {
+    const filter = {};
+    const visibility = clean(req.query.visibility);
+    if (visibility) filter.visibility = visibility;
+
+    const shareEnabled = boolFilter(req.query.share_enabled);
+    if (shareEnabled !== null) filter["share.enabled"] = shareEnabled;
+
+    const generatedByAi = boolFilter(req.query.generated_by_ai);
+    if (generatedByAi !== null) filter["score.generated_by_ai"] = generatedByAi;
+
+    const minScore = Number.parseInt(clean(req.query.score_min), 10);
+    const maxScore = Number.parseInt(clean(req.query.score_max), 10);
+    const scoreFilter = {};
+    if (Number.isFinite(minScore)) scoreFilter.$gte = Math.max(0, minScore);
+    if (Number.isFinite(maxScore)) scoreFilter.$lte = Math.min(100, maxScore);
+    if (Object.keys(scoreFilter).length) filter["score.total"] = scoreFilter;
+
+    for (const key of ["user_id", "employee_id", "active_context_id"]) {
+      const error = addObjectIdFilter(filter, key, req.query[key]);
+      if (error) return failIfInvalid(res, error);
+    }
+
+    const dateError = addDateRangeFilter(filter, req);
+    if (dateError) return failIfInvalid(res, dateError);
+
+    const q = clean(req.query.q || req.query.search);
+    if (q) {
+      const regex = new RegExp(escapeRegex(q), "i");
+      filter.$or = [
+        { visibility: regex },
+        { "score.source": regex },
+        { "score.explanation": regex },
+        { "snapshot.identity.full_name": regex },
+        { "snapshot.identity.headline": regex },
+        { "snapshot.identity.current_job_title": regex },
+      ];
+    }
+
+    const result = await paginate(CareerPassportModel, filter, req, {
+      sort: { updatedAt: -1, _id: -1 },
+      populate: careerPassportPopulate,
+    });
+    return ReturnDashData.getData({
+      res,
+      data: result.items,
+      other: { pagination: result.pagination },
+      message: "career_passports",
+    });
+  } catch (error) {
+    return ReturnDashData.getError({ res, status: 500, message: error.message || "career_passports_failed" });
+  }
+};
+
+export const getCareerPassport = async (req, res) => {
+  try {
+    const passportId = clean(req.params.passportId || req.params.id);
+    if (!isValidObjectId(passportId)) {
+      return ReturnDashData.getError({ res, status: 400, message: "invalid_career_passport_id" });
+    }
+
+    const passport = await CareerPassportModel.findById(passportId).populate(careerPassportPopulate).lean();
+    if (!passport) {
+      return ReturnDashData.getError({ res, status: 404, message: "career_passport_not_found" });
+    }
+
+    return ReturnDashData.getData({ res, data: passport, message: "career_passport" });
+  } catch (error) {
+    return ReturnDashData.getError({ res, status: 500, message: error.message || "career_passport_failed" });
+  }
+};
+
 export default {
   listAuditLogs,
   listTranslations,
   listNotificationLogs,
   listInvoices,
   getInvoice,
+  listCareerPassports,
+  getCareerPassport,
 };

@@ -83,6 +83,7 @@ Runtime verifier: `npm run test:integration:university-members` proves role-base
 | `translations.view` | Content translation/translation-log reads. |
 | `notifications.view` | Notification log reads. |
 | `notifications.manage` | Dashboard admin notification sending. |
+| `career_passports.view` | Dashboard career passport list/detail/filter reads. |
 | `files.read` | Protected dashboard file downloads under `/dash/v1/file/:name`. |
 | `support.view` | Dashboard support ticket queue/detail reads. |
 | `support.manage` | Dashboard support ticket queue/detail reads, status updates, assignment, closure, and admin replies. |

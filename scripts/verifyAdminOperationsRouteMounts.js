@@ -17,6 +17,8 @@ const requiredEndpoints = [
   ["GET", "/dash/v1/translation-logs", "/translation-logs"],
   ["GET", "/dash/v1/notifications/logs", "/notifications/logs"],
   ["GET", "/dash/v1/notification-logs", "/notification-logs"],
+  ["GET", "/dash/v1/career-passports", "/career-passports"],
+  ["GET", "/dash/v1/career-passports/:passportId", "/career-passports/:passportId"],
   ["GET", "/dash/v1/invoices", "/invoices"],
   ["GET", "/dash/v1/invoices/:invoiceId", "/invoices/:invoiceId"],
   ["GET", "/dash/v1/billing/invoices", "/billing/invoices"],
@@ -52,17 +54,20 @@ assert.deepEqual(unguardedRoutes, [], "Dashboard operations endpoints must be de
 assert.deepEqual(
   [
     "AuditLogModel",
+    "CareerPassportModel",
     "CompanyInvoiceModel",
     "ContentTranslationModel",
     "NotificationModel",
     "listAuditLogs",
     "listTranslations",
     "listNotificationLogs",
+    "listCareerPassports",
+    "getCareerPassport",
     "listInvoices",
     "getInvoice",
   ].filter((snippet) => !controllerSource.includes(snippet)),
   [],
-  "admin operations controller must read audit, translation, notification, and invoice models"
+  "admin operations controller must read audit, translation, notification, invoice, and career passport models"
 );
 
 console.log(`Admin operations route mounts verified (${requiredEndpoints.length} method/path checks).`);

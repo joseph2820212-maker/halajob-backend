@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T08:15:42.980Z",
+  "generatedAt": "2026-06-30T08:44:26.058Z",
   "records": [
     {
       "method": "PATCH",
@@ -5229,6 +5229,36 @@
         "multerMiddleware",
         "validateRequest",
         "updateUniversityStatus"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/career-passports",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "listCareerPassports"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/dash/v1/career-passports/:passportId",
+      "module": "Admin",
+      "middlewares": [
+        "checkPermissionMiddleware",
+        "getCareerPassport"
       ],
       "inferredGuards": [
         "inferred:isAdmin"

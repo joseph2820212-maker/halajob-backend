@@ -12481,6 +12481,46 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/dash/v1/career-passports":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/career-passports"
+      operationId: "admin_get_dash_v1_career_passports"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/dash/v1/career-passports/{passportId}":
+    get:
+      tags: ["Admin"]
+      summary: "GET /dash/v1/career-passports/:passportId"
+      operationId: "admin_get_dash_v1_career_passports_passportid"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "passportId"
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/dash/v1/Color":
     get:
       tags: ["Admin"]

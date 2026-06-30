@@ -1,6 +1,6 @@
 # Hala Job API Reference
 
-Generated: 2026-06-30T08:15:54.060Z
+Generated: 2026-06-30T08:44:34.274Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -23,7 +23,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Module | Endpoints |
 | --- | --- |
 | AI | 12 |
-| Admin | 3332 |
+| Admin | 3334 |
 | Analytics | 5 |
 | Campus | 18 |
 | Campus Student | 51 |
@@ -378,6 +378,8 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/dash/v1/campus/universities` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, listUniversities |
 | POST | `/dash/v1/campus/universities` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, listUniversities |
 | PATCH | `/dash/v1/campus/universities/:id/status` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, updateUniversityStatus |
+| GET | `/dash/v1/career-passports` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listCareerPassports |
+| GET | `/dash/v1/career-passports/:passportId` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, getCareerPassport |
 | GET | `/dash/v1/Color` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/Color` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/Color/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
