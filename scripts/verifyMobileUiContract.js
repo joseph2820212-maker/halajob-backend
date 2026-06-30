@@ -44,6 +44,28 @@ function extractClass(source, className) {
   return nextClass >= 0 ? source.slice(index, nextClass) : source.slice(index);
 }
 
+function extractBetween(source, start, end, label) {
+  const startIndex = source.indexOf(start);
+  assert.ok(startIndex >= 0, `${label} missing start: ${start}`);
+  const endIndex = source.indexOf(end, startIndex + start.length);
+  assert.ok(endIndex >= 0, `${label} missing end: ${end}`);
+  return source.slice(startIndex, endIndex);
+}
+
+function extractFrom(source, start, label) {
+  const startIndex = source.indexOf(start);
+  assert.ok(startIndex >= 0, `${label} missing start: ${start}`);
+  return source.slice(startIndex);
+}
+
+function collectQuickActionIds(source) {
+  return Array.from(
+    source.matchAll(/(?:const\s+)?_QuickActionItem\(\s*\bid:\s*'([^']+)'/g),
+  )
+    .map((match) => match[1])
+    .filter(Boolean);
+}
+
 const header = extractClass(cards, "HalaNativeHeader");
 const normalizedHeader = header.replace(/\r\n/g, "\n");
 const iconButton = extractClass(cards, "HalaHeaderIconButton");
@@ -55,6 +77,23 @@ const normalizedBottomNavItem = bottomNavItem.replace(/\r\n/g, "\n");
 const companyHeader = extractClass(company, "_CompanyHeader");
 const companyMorePanel = extractClass(company, "_CompanyMorePanel");
 const normalizedDashboard = dashboard.replace(/\r\n/g, "\n");
+const mobileQuickActionRouter = extractBetween(
+  dashboard,
+  "void _handleMoreAction(_QuickActionItem action)",
+  "void _handleUnknownQuickAction(_QuickActionItem action)",
+  "mobile quick action router",
+);
+const mobileMoreQuickActions = extractBetween(
+  dashboard,
+  "List<_QuickActionItem> _moreActions()",
+  "List<_QuickActionItem> _visibleOverviewQuickActions()",
+  "mobile More quick actions",
+);
+const mobileBuiltInContent = extractFrom(
+  dashboard,
+  "_DashboardContent _contentFor(AppRole role)",
+  "mobile built-in dashboard content",
+);
 
 assertContains(
   app,
@@ -312,6 +351,17 @@ assertContains(
   "if (_morePrimaryFlowActionIds.contains(actionId))",
   "dashboard More primary flow filter",
 );
+const builtInMobileQuickActionIds = new Set([
+  ...collectQuickActionIds(mobileMoreQuickActions),
+  ...collectQuickActionIds(mobileBuiltInContent),
+]);
+for (const id of builtInMobileQuickActionIds) {
+  assertContains(
+    mobileQuickActionRouter,
+    `case '${id}':`,
+    `mobile built-in quick action router coverage for ${id}`,
+  );
+}
 assertContains(
   dashboard,
   "'Career tools': <_QuickActionItem>[]",
