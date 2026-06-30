@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `ff5b8ba` clean full launch gate; current backend proof through `7113eb8`; current route/UI contract proof through `f63140b`; current mobile launch gate through `4898355`; current APK proof through `4898355`
+Source contracts tested through: `ff5b8ba` clean full launch gate; current backend proof through `7113eb8`; current web proof through `e7403eb`; current route/UI contract proof through `f63140b`; current mobile launch gate through `4898355`; current APK proof through `4898355`
 Latest APK source build commit: `4898355`
 
 ## Passed Coverage
@@ -12,6 +12,7 @@ Latest APK source build commit: `4898355`
 | Mobile Settings drill-in panels | `flutter test test\widget_test.dart --plain-name "settings"` passed 9 Settings-related widget tests after `e2611c3`, proving grouped Settings index rows, hidden detail controls until drill-in, switch-based notification payloads, Data rights export/delete placement, delete confirmation, account save/upload/relogin, and logout-all confirmation |
 | Full launch gate | `npm run test:launch-gate` passed from detached clean worktree `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe-clean-ff5b8ba` at source commit `ff5b8ba`, covering backend aggregate gates, web clean install/build/tests/E2E, mobile `pub get`/`analyze`/450 Flutter tests, and UI contract route/action/mobile/bilingual guards. A first clean run stopped transiently during subscription integration; `npm run test:integration:subscriptions` passed by itself and the full aggregate rerun passed end to end. |
 | Current backend launch gate | `npm run test:launch-gate:backend --silent` passed on current branch commit `7113eb8`, covering syntax/import/secrets/i18n, smoke checks, security HTTP, OTP, route validation, response codes, model/Mixed/data-retention contracts, Mongo helper, global launch, AI/trust/notification/analytics/translation/admin-operation/career-passport route contracts, and the full launch-critical plus Syria product DB aggregates. |
+| Current web launch gate | `npm run test:launch-gate:web --silent` passed on current branch commit `e7403eb`, covering clean web install, production build, SEO prerender for 14 routes, bundle-size guard with the largest JS chunk at `385.6 KiB` under the 500 KiB threshold, 16 Vitest files / 65 tests, and browser E2E smoke through campus, university, company, seeker, and admin portal navigation. |
 | Mobile route mounts | `npm run test:mobile-routes` |
 | Mobile UI contract | `npm run test:mobile-ui-contract` |
 | Campus student routes | `npm run test:mobile-routes` |
@@ -23,7 +24,7 @@ Latest APK source build commit: `4898355`
 | Notification route/event contract | `npm run test:notification-routes` |
 | Analytics route/event contract | `npm run test:analytics-routes` |
 | Web clean install | `npm --prefix web ci --ignore-scripts` |
-| Web production build and SEO prerender | `npm --prefix web run build` passed after `4c6204c`; SEO prerendered 14 routes |
+| Web production build and SEO prerender | `npm --prefix web run build` passed inside the current `e7403eb` web launch gate; SEO prerendered 14 routes |
 | Web Settings fixed-choice controls | `npm --prefix web test -- settings` passed 1 file / 3 tests, proving no `<select>` for fixed choices and checkbox/radio serialization compatibility |
 | Web job-alert filter/delete contract | `npm --prefix web test -- src/shared/jobAlerts.test.tsx` passed 1 file / 3 tests, proving canonical filters, radio frequency edits, and confirmation-gated saved-search delete |
 | Web seeker CV/company/application/interview/offer contracts | `npm --prefix web test -- src/seeker/screens.test.tsx` passed 1 file / 8 tests, proving current-CV-first hierarchy, parser-disabled honesty, no dropdowns, radio visibility payloads, cover-letter preview/download route wiring from the CV Library row, confirmation-gated CV delete, company review rating payloads, confirmation-gated application withdrawal, confirmation-gated interview rejection, and confirmation-gated offer decline |
@@ -34,9 +35,9 @@ Latest APK source build commit: `4898355`
 | Web company employer tasks | `npm --prefix web test -- company` passed through the full web suite after `4c6204c`, now 1 file / 6 tests, proving applicant actions, interview join-video and reschedule payloads, job pause/resume controls, member/library choices, support ticket create/reply, and company job posting fixed-choice payloads |
 | Web employer/campus workflow slice | `npm --prefix web test -- src/company/screens.test.tsx src/campus/screens.test.tsx` passed 2 files / 10 tests after `4c6204c`, proving company pause/resume job controls, interview join/reschedule actions, campus event loading, and university verification approve/reject/request-info backend routes |
 | Web shared workflow contracts | `npm --prefix web test -- src/shared/workflows.test.tsx` passed 1 file / 3 tests, proving notification delete requires confirmation before the backend mutation and application question options render as radio rows while preserving answer payloads |
-| Full web test suite | `npm --prefix web test` passed 16 files / 65 tests inside the clean `ff5b8ba` full launch-gate replay |
-| Web browser E2E smoke | `npm --prefix web run e2e` passed against local Vite preview/Chrome, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses |
-| Web bundle-size guard | `npm run test:web-bundle-size --silent` passed after `npm --prefix web run build`; largest JS chunk is `385.6 KiB` under the 500 KiB launch threshold, and `test:launch-gate:web` now runs this guard after the production build |
+| Full web test suite | `npm --prefix web test` passed 16 files / 65 tests inside the current `e7403eb` web launch gate |
+| Web browser E2E smoke | `npm --prefix web run e2e` passed inside the current `e7403eb` web launch gate against local Vite preview/Chrome, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses |
+| Web bundle-size guard | `npm run test:web-bundle-size --silent` passed inside the current `e7403eb` web launch gate after production build; largest JS chunk is `385.6 KiB` under the 500 KiB launch threshold, and `test:launch-gate:web` runs this guard after the production build |
 | DB launch-critical aggregate | `npm run test:integration:launch-critical --silent` passed on rerun with the shared Mongo helper; the individual remaining scripts after an earlier transient stop also passed |
 | DB Syria product aggregate | `npm run test:integration:syria-product --silent` passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding |
 | Backend saved-search filter contract | `npm run test:integration:saved-search-alerts` passed after adding API round-trip/run-now proof for skills, education level, salary minimum, and currency filters |
