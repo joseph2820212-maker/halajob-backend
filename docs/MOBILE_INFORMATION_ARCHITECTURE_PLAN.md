@@ -30,7 +30,8 @@ first, then update this mobile-specific plan and the regression guards.
 
 | Function | Canonical Location | Notes |
 | --- | --- | --- |
-| Jobs, saved jobs, applications | Bottom tabs | More may link to them only as shortcuts, not duplicate primary cards. |
+| Job discovery/search | Bottom Jobs tab | Discovery-only. It must never render saved jobs or share state with the My Jobs pipeline. |
+| Saved jobs, applications, interviews, offers | Bottom My Jobs tab | My Jobs owns its own Saved / Applied / Interviews / Offers sub-state and resets to Saved when opened. More may link to it only as a shortcut. |
 | CV manager | More and profile checkpoints | The CV manager must remain a real upload/activate/generate/delete workflow. |
 | AI career tools | More | Job detail may show contextual AI for that job, but the full toolset lives under one AI career tools entry. |
 | Live seeker sync | Bottom of the current tab content | It must not sit above the main page content. |
@@ -42,8 +43,10 @@ first, then update this mobile-specific plan and the regression guards.
 
 | Function | Canonical Location | Notes |
 | --- | --- | --- |
-| Opportunities, saved, applications | Bottom tabs | Campus tab owns opportunity search/feed; Saved owns a saved-only campus mode and must not reuse the generic opportunities state. |
-| Events and resources | More plus detail screens | Cards open real native detail screens. |
+| Opportunities/search | Bottom Opportunities tab | Discovery-only. It must not render saved-only campus state. |
+| Events | Bottom Events tab plus detail screens | Cards open real native detail screens. |
+| Saved campus opportunities and applications | Bottom My Applications tab | My Applications owns Saved / Applied / Interviews / Offers sub-state and resets to Saved when opened. |
+| Resources | More plus detail screens | Cards open real native detail screens. |
 | Career Passport | More/profile readiness | Student readiness and public share controls live here. |
 | Campus profile | Header profile and profile checkpoints | Student academic/profile data lives here. |
 | Settings | Header settings and settings screen | Account credentials, language, privacy, notification preferences, and sign out live here. |

@@ -234,9 +234,14 @@ assertContains(
 );
 assertContains(dashboard, "keyId: 'home'", "dashboard stable tab keys");
 assertContains(dashboard, "keyId: 'jobs'", "dashboard stable tab keys");
-assertContains(dashboard, "keyId: 'campus'", "dashboard stable tab keys");
-assertContains(dashboard, "keyId: 'saved'", "dashboard stable tab keys");
-assertContains(dashboard, "keyId: 'applied'", "dashboard stable tab keys");
+assertContains(dashboard, "keyId: 'my-jobs'", "dashboard stable tab keys");
+assertContains(dashboard, "keyId: 'opportunities'", "dashboard stable tab keys");
+assertContains(dashboard, "keyId: 'events'", "dashboard stable tab keys");
+assertContains(
+  dashboard,
+  "keyId: 'my-applications'",
+  "dashboard stable tab keys",
+);
 assertContains(dashboard, "keyId: 'more'", "dashboard stable tab keys");
 assertContains(
   dashboard,
