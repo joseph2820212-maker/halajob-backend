@@ -625,6 +625,19 @@ const stripProtectedAdminUpdateFields = (updatePayload = {}, config, options = {
 
 const auditActorId = (req) => req.admin?._id || req.user?._id || null;
 
+// Guard against an admin locking themselves out of the dashboard by editing
+// their own access, deleting their own account, or deleting the role they hold.
+const isSelfActor = (req, id) => {
+  const actor = auditActorId(req);
+  return Boolean(actor && id && String(actor) === String(id));
+};
+
+const actorRoleId = (req) => {
+  const role = req.admin?.role_id ?? req.user?.role_id;
+  if (!role) return null;
+  return String(role._id || role);
+};
+
 const auditEntityType = (config) => {
   if (config.model === UserModel) return 'user';
   if (config.model === CompanyModel) return 'company';
@@ -934,6 +947,15 @@ const update = (resourceName) => async (req, res) => {
       return ReturnDashData.updateError({ res, status: 400, message: 'no_update_fields' });
     }
 
+    // Self-lockout guard: an admin may not strip their own access (role,
+    // permissions, or active status). Another admin must make that change.
+    if (config.model === UserModel && isSelfActor(req, id)) {
+      const guardedFields = ['role_id', 'permissions', 'status'];
+      if (guardedFields.some((field) => field in updatePayload)) {
+        return ReturnDashData.updateError({ res, status: 403, message: 'cannot_change_own_access' });
+      }
+    }
+
     const doc = await config.model.findByIdAndUpdate(id, updatePayload, { new: true, runValidators: true });
     if (!doc) return ReturnDashData.updateError({ res, status: 404, message: `${config.key}_not_found` });
 
@@ -982,6 +1004,15 @@ const remove = (resourceName) => async (req, res) => {
 
     const id = req.params.id || req.body?.id || req.query.id;
     if (!isValidObjectId(id)) return ReturnDashData.deleteError({ res, status: 400, message: 'invalid_id' });
+
+    // Self-lockout guard: an admin may not delete their own account or the
+    // role they currently hold.
+    if (config.model === UserModel && isSelfActor(req, id)) {
+      return ReturnDashData.deleteError({ res, status: 403, message: 'cannot_delete_self' });
+    }
+    if (config.model === RoleModel && actorRoleId(req) && String(actorRoleId(req)) === String(id)) {
+      return ReturnDashData.deleteError({ res, status: 403, message: 'cannot_delete_own_role' });
+    }
 
     const canSoftDelete = config.model.schema.path('status');
     const forceDelete = req.query.force === 'true' || req.body?.force === true || req.body?.force === 'true';
