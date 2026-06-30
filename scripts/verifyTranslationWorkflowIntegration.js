@@ -59,6 +59,14 @@ function findJobItem(payload, jobId, label) {
   return item;
 }
 
+function findCvItem(payload, cvId, label) {
+  const item = (payload.data || []).find((row) =>
+    String(row._id || row.id || row.cv_id) === String(cvId)
+  );
+  assert.ok(item, `${label} should include seeded CV ${cvId}`);
+  return item;
+}
+
 function userSeed({ firstName, lastName, email, roleId, phone }) {
   return {
     first_name: firstName,
@@ -438,6 +446,40 @@ async function main() {
     "CV translation should not exist before save"
   );
 
+  const draftCv = await expectStatus(
+    request(baseUrl, "PUT", "/user/v1/cv/translations/ar", {
+      token: seekerTokens.accessToken,
+      contextId: seekerContext._id,
+      body: {
+        cv_id: cv._id,
+        status: "draft",
+        translated_text: {
+          title: "AR Draft CV Title",
+          profile_headline: "AR draft profile headline",
+        },
+      },
+    }),
+    200,
+    "seeker should save draft CV translation"
+  );
+  assert.equal(draftCv.data.can_publish, false);
+
+  const draftCvLibraryItem = findCvItem(
+    await expectStatus(
+      request(baseUrl, "GET", "/employee/v1/cv/uploaded", {
+        token: seekerTokens.accessToken,
+        contextId: seekerContext._id,
+        headers: { lan: "ar", "x-language": "ar" },
+      }),
+      200,
+      "CV library should hide draft translations"
+    ),
+    cv._id,
+    "CV library before translation approval"
+  );
+  assert.equal(draftCvLibraryItem.title, cv.title);
+  assert.equal(draftCvLibraryItem.translation, null);
+
   const approvedCv = await expectStatus(
     request(baseUrl, "PUT", "/user/v1/cv/translations/ar", {
       token: seekerTokens.accessToken,
@@ -467,6 +509,27 @@ async function main() {
   assert.equal(readApprovedCv.data.translation.status, "approved");
   assert.equal(readApprovedCv.data.published_translation.title, "السيرة الذاتية المعتمدة");
 
+  const approvedCvLibraryItem = findCvItem(
+    await expectStatus(
+      request(baseUrl, "GET", "/employee/v1/cv/uploaded", {
+        token: seekerTokens.accessToken,
+        contextId: seekerContext._id,
+        headers: { lan: "ar", "x-language": "ar" },
+      }),
+      200,
+      "CV library should consume approved translations"
+    ),
+    cv._id,
+    "CV library after translation approval"
+  );
+  assert.equal(approvedCvLibraryItem.title, readApprovedCv.data.published_translation.title);
+  assert.equal(approvedCvLibraryItem.translation.language, "ar");
+  assert.equal(approvedCvLibraryItem.translation.status, "approved");
+  assert.equal(
+    approvedCvLibraryItem.translation.translated_text.profile_headline,
+    readApprovedCv.data.published_translation.profile_headline
+  );
+
   const [jobTranslation, cvTranslation, jobAudit, cvAudit, jobAnalytics, cvAnalytics] = await Promise.all([
     ContentTranslationModel.findOne({ entity_type: "job", entity_id: job._id, target_language: "ar" }).lean(),
     ContentTranslationModel.findOne({ entity_type: "cv", entity_id: cv._id, target_language: "ar" }).lean(),
@@ -482,7 +545,7 @@ async function main() {
   assert.ok(jobAnalytics, "job translation should emit analytics");
   assert.ok(cvAnalytics, "CV translation should emit analytics");
 
-  console.log("Translation workflow integration verified for job/CV save, read, approval, app job list/detail consumption, ownership denial, unsupported language, audit logs, and analytics.");
+  console.log("Translation workflow integration verified for job/CV save, read, approval, app job list/detail and CV library consumption, ownership denial, unsupported language, audit logs, and analytics.");
 }
 
 main()

@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { EmployeeCvModel, CvTemplateModel } from "../../../models/index.js";
+import { EmployeeCvModel, CvTemplateModel, ContentTranslationModel } from "../../../models/index.js";
 import { fail, getEmployeePlain, success } from "../../../helper/employeeDash/employeeDashHelpers.js";
 
 const CV_ROOT = path.resolve(process.cwd(), "cv");
@@ -32,6 +32,60 @@ const removeStoredCvFile = async (value = "") => {
 
 const getDefaultTemplate = async () =>
   CvTemplateModel.findOne({ is_active: true }).sort({ sort_order: 1, createdAt: -1 }).lean();
+
+const langFromReq = (req) =>
+  String(req.get("lan") || req.get("x-language") || req.get("lang") || "en")
+    .toLowerCase()
+    .startsWith("ar")
+    ? "ar"
+    : "en";
+
+const toIdString = (value) => String(value?._id || value || "").trim();
+
+const translatedField = (translation, key) => {
+  const text = translation?.translated_text;
+  if (!text || typeof text !== "object" || Array.isArray(text)) return "";
+  return String(text[key] || "").trim();
+};
+
+const loadApprovedCvTranslations = async ({ cvIds = [], employeeId, lang = "en" }) => {
+  if (!cvIds.length || !employeeId || !["ar", "en"].includes(lang)) return new Map();
+  const rows = await ContentTranslationModel.find({
+    entity_type: "cv",
+    entity_id: { $in: cvIds },
+    employee_id: employeeId,
+    target_language: lang,
+    status: "approved",
+  }).select("entity_id target_language translated_text updatedAt").lean();
+
+  return new Map(rows.map((row) => [toIdString(row.entity_id), row]));
+};
+
+const decorateCvs = async ({ cvs = [], employee, lang }) => {
+  const translations = await loadApprovedCvTranslations({
+    cvIds: cvs.map((cv) => cv._id).filter(Boolean),
+    employeeId: employee?._id,
+    lang,
+  });
+
+  return cvs.map((cv) => {
+    const translation = translations.get(toIdString(cv._id));
+    const translatedTitle = translatedField(translation, "title");
+    const hasApprovedTranslation = Boolean(translation && (translatedTitle || translation.translated_text));
+
+    return {
+      ...cv,
+      title: translatedTitle || cv.title || "",
+      translation: hasApprovedTranslation ? {
+        language: lang,
+        status: "approved",
+        source: "content_translations",
+        translated_text: translation.translated_text || {},
+        updated_at: translation.updatedAt || null,
+      } : null,
+    };
+  });
+};
 
 export const uploadMyCv = async (req, res, next) => {
   try {
@@ -71,13 +125,14 @@ export const getMyUploadedCvs = async (req, res, next) => {
   try {
     const employee = await getEmployeePlain(req, res);
     if (!employee) return;
+    const lang = langFromReq(req);
 
     const cvs = await EmployeeCvModel.find({ employee_id: employee._id })
       .populate("template_id", "key title_ar title_en preview_image")
       .sort({ is_default: -1, createdAt: -1 })
       .lean();
 
-    return success(res, cvs);
+    return success(res, await decorateCvs({ cvs, employee, lang }));
   } catch (error) {
     next(error);
   }
