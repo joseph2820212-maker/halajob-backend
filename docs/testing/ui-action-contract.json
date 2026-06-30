@@ -685,6 +685,31 @@
       }
     },
     {
+      "label": "mobile support ticket lifecycle placement",
+      "route": {
+        "path": "mobile/lib/src/features/legal_help/legal_help_service.dart",
+        "mustContain": [
+          "/user/v1/support/tickets",
+          "/user/v1/support/tickets/${Uri.encodeComponent(normalizedId)}",
+          "/user/v1/support/tickets/${Uri.encodeComponent(normalizedId)}/messages",
+          "/user/v1/support/tickets/${Uri.encodeComponent(normalizedId)}/close",
+          "Future<List<SupportTicketData>> supportTickets",
+          "Future<SupportTicketData> supportTicket"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/legal_help/legal_help_screens.dart",
+        "mustContain": [
+          "class SupportTicketInboxScreen",
+          "class SupportTicketDetailScreen",
+          "ValueKey('support-ticket-refresh')",
+          "ValueKey('support-ticket-row-${_ticketId(ticket)}')",
+          "ValueKey('support-ticket-send-reply')",
+          "ValueKey('support-ticket-close')"
+        ]
+      }
+    },
+    {
       "label": "mobile notification preference placement",
       "route": {
         "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",

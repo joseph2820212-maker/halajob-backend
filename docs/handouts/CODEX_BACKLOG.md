@@ -6,7 +6,7 @@ Model: **Codex implements all code; Claude reviews behind + maintains docs.**
 This index lists every queued work item so nothing falls through. Source specs
 are linked; do not duplicate work already verified as done.
 
-## Live status (reviewed after B4 implementation)
+## Live status (reviewed after B5 implementation)
 - **Stream A (navigation/IA): DONE** - all 8 phases committed + extensive
   hardening guards + CI now runs Flutter analyze and Phase 1-6 widget guards
   (incl. "Jobs and My Jobs keep separate pipeline state"). Web tests GREEN
@@ -14,11 +14,12 @@ are linked; do not duplicate work already verified as done.
 - **Stream B (legal/help/support): IN PROGRESS.** B1 is green. B2 is implemented
   and pushed (`LEGAL_CONTENT_ENFORCEMENT_MODE`, production legal approval gate,
   and clear missing-approval failure list). B3 is implemented and pushed for the
-  web support inbox. B4 is implemented for mobile help article detail. B5-B10
-  are still pending.
+  web support inbox. B4 is implemented for mobile help article detail. B5 is
+  implemented for mobile support ticket list/detail/reply/close. B6-B10 are
+  still pending.
 - **Stream C:** C1 NOT done (god-file grew to 22,379 lines); C2 partially in CI
   (Flutter analyze + widget guards added); C3 owner/external pending.
-- Codex is working the backlog in order. Next up: Stream B5.
+- Codex is working the backlog in order. Next up: Stream B6.
 
 ## How to work this backlog
 - Update `docs/FUNCTION_PLACEMENT_MAP.md` first when a function moves (your rule).
@@ -60,7 +61,7 @@ Verified scope: `docs/handouts/LEGAL_HELP_SUPPORT_REVIEW_VERDICT.md`
       `LEGAL_CONTENT_ENFORCEMENT_MODE` env + launch-gate failure list.
 - [x] B3 - Web support inbox: wire existing `myTickets()` + detail/reply/close UI.
 - [x] B4 - Mobile help article detail screen.
-- [ ] B5 - Mobile support inbox (list/detail/reply/close).
+- [x] B5 - Mobile support inbox (list/detail/reply/close).
 - [ ] B6 - Mobile privacy cancel-delete + accessibility request form
       (`/user/v1/privacy/accessibility`).
 - [ ] B7 - Contextual reports carry real `targetType`+`targetId` (web + mobile).

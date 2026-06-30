@@ -717,6 +717,61 @@ assertContains(
   "ValueKey('help-article-report-concern')",
   "mobile help article detail CTA",
 );
+assertContains(
+  legalHelpService,
+  "Future<List<SupportTicketData>> supportTickets",
+  "mobile support ticket lifecycle route",
+);
+assertContains(
+  legalHelpService,
+  "Future<SupportTicketData> supportTicket",
+  "mobile support ticket lifecycle route",
+);
+assertContains(
+  legalHelpService,
+  "path: '/user/v1/support/tickets'",
+  "mobile support ticket lifecycle route",
+);
+assertContains(
+  legalHelpService,
+  "path: '/user/v1/support/tickets/${Uri.encodeComponent(normalizedId)}'",
+  "mobile support ticket detail route",
+);
+assertContains(
+  legalHelpService,
+  "'/user/v1/support/tickets/${Uri.encodeComponent(normalizedId)}/messages'",
+  "mobile support ticket reply route",
+);
+assertContains(
+  legalHelpService,
+  "'/user/v1/support/tickets/${Uri.encodeComponent(normalizedId)}/close'",
+  "mobile support ticket close route",
+);
+assertContains(
+  legalHelpScreens,
+  "class SupportTicketInboxScreen extends StatefulWidget",
+  "mobile support ticket inbox UI",
+);
+assertContains(
+  legalHelpScreens,
+  "class SupportTicketDetailScreen extends StatefulWidget",
+  "mobile support ticket detail UI",
+);
+assertContains(
+  legalHelpScreens,
+  "ValueKey('support-ticket-row-${_ticketId(ticket)}')",
+  "mobile support ticket row UI",
+);
+assertContains(
+  legalHelpScreens,
+  "ValueKey('support-ticket-send-reply')",
+  "mobile support ticket reply UI",
+);
+assertContains(
+  legalHelpScreens,
+  "ValueKey('support-ticket-close')",
+  "mobile support ticket close UI",
+);
 [
   "cvStudioEnabled",
   "resourceLibraryEnabled",
