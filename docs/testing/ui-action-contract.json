@@ -102,7 +102,12 @@
       "mustContain": [
         "export type DashboardTabGroup",
         "tabGroups?: DashboardTabGroup[]",
-        "className=\"tab-group-label\""
+        "className=\"tab-group-label\"",
+        "type=\"button\">{ui(tab)}</button>",
+        "className=\"brand dashboard-brand\" onClick={() => setActive(\"overview\")} type=\"button\"",
+        "void onAction(action, item); }} type=\"button\"",
+        "onClick={onClose} type=\"button\"",
+        "onClick={() => onAction(action)} type=\"button\""
       ]
     },
     {
