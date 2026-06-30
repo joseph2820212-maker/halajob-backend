@@ -3,7 +3,7 @@
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
 Source contracts tested through: mobile `aef1c87`, web `b6f5bb2`
-Latest APK source build commit: `d4d3a95`
+Latest APK source build commit: `eaca7f6`
 
 ## Passed Coverage
 
@@ -40,7 +40,7 @@ Latest APK source build commit: `d4d3a95`
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed, proving external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Flutter analyzer | `flutter analyze` passed from `mobile/` with no issues |
-| Current APK emulator smoke | A debug APK from source commit `d4d3a95` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | d4d3a95 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `7b58aea0af269fb1733ca4dcdb7356d9f5fba1c80c3f4e90de79b91553b5c3df`. Documentation commits after `d4d3a95` and source commits after `d4d3a95`, including `aef1c87`, do not imply a newer APK unless this row and the APK metadata are refreshed together. |
+| Current APK emulator smoke | A debug APK from source commit `eaca7f6` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | eaca7f6 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `d9b19d7c5e1bab862d9440e91ab78f96eb647e77465d8143edf9288450192938`. Documentation commits after `eaca7f6` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 

@@ -3,8 +3,8 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `aef1c87`
-- Current APK source build commit: `d4d3a95`
+- Current reviewed code/proof-guard commit before this report refresh: `eaca7f6`
+- Current APK source build commit: `eaca7f6`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Commit | Summary |
 |---|---|
+| `eaca7f6` | Refreshed the university notification proof docs after `aef1c87`, keeping the final report and APK-proof expectations aligned before the current APK rebuild. |
 | `aef1c87` | Mobile university-admin notifications are no longer a placeholder-only screen: the header badge loads shared notification unread data, the inbox lists backend notifications, mark-read/mark-all/delete call notification routes, taps route into university tabs/settings, and service/widget/source guards protect the flow. |
 | `b6f5bb2` | Web application question options now render as radio rows instead of dropdowns, with tests proving missing-required handling and unchanged apply payloads. |
 | `688a311` | Admin AI usage-limit feature selection now uses ticked/radio choices instead of a dropdown, with payload regression proof for the selected feature. |
@@ -97,16 +98,16 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 ## APK Status
 
-A fresh debug APK was built and installed on the running emulator from source commit `d4d3a95`. Documentation/proof commits after `d4d3a95` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
+A fresh debug APK was built and installed on the running emulator from source commit `eaca7f6`. Documentation/proof commits after `eaca7f6` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
 
-- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-d4d3a95-1.0.6+27-debug.apk`
-- SHA-256: `7b58aea0af269fb1733ca4dcdb7356d9f5fba1c80c3f4e90de79b91553b5c3df`
+- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-eaca7f6-1.0.6+27-debug.apk`
+- SHA-256: `d9b19d7c5e1bab862d9440e91ab78f96eb647e77465d8143edf9288450192938`
 - Version/build: `1.0.6+27`
 - Build flags: Campus auth `local-device`, `AI tools enabled=true`, base URL `https://jobzain.com`, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | d4d3a95 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
+- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | eaca7f6 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
 
-This APK is current for mobile source commit `d4d3a95`; later commits, including mobile source commit `aef1c87`, are not included in that APK. Rebuild again after the next mobile app-code commit before distribution, owner visual approval, or a new "latest APK" claim.
+This APK is current for source commit `eaca7f6`, including the mobile university notification work from `aef1c87`. Rebuild again after the next mobile app-code commit before distribution, owner visual approval, or a new "latest APK" claim.
 
 ## Current Handout Status
 
