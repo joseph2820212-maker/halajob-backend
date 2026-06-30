@@ -489,6 +489,34 @@ const schemas = {
     body: bodyObject,
   }),
 
+  resourceStatusSchema: yup.object({
+    params: idParamsWithRequiredResource,
+    body: yup.object({
+      status: yup
+        .string()
+        .oneOf([
+          // legal reports
+          "received",
+          "under_review",
+          "action_needed",
+          "action_taken",
+          "closed",
+          // privacy requests
+          "verifying_identity",
+          "processing",
+          "completed",
+          "cancelled",
+          // accessibility requests
+          "in_progress",
+          "resolved",
+          // shared
+          "rejected",
+        ])
+        .required(),
+      note: yup.string().max(2000).optional(),
+    }),
+  }),
+
   contentLegalReviewSchema: yup.object({
     params: idParamsWithRequiredResource,
     body: yup.object({

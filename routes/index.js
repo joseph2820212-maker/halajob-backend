@@ -983,5 +983,12 @@ router.post(
   validate(adminSchemas.contentLegalReviewSchema),
   resourceController.setLegalReview(),
 );
+router.post(
+  "/resources/:resource/:id/status",
+  checkResourcePermission("approve"),
+  upload.none(),
+  validate(adminSchemas.resourceStatusSchema),
+  resourceController.setResourceStatus(),
+);
 
 export default router;

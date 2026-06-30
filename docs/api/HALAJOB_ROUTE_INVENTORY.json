@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T19:15:03.095Z",
+  "generatedAt": "2026-06-30T19:41:46.983Z",
   "records": [
     {
       "method": "PATCH",
@@ -40142,6 +40142,23 @@
     {
       "method": "POST",
       "path": "/dash/v1/resources/:resource/:id/reject",
+      "module": "Admin",
+      "middlewares": [
+        "checkResourcePermissionMiddleware",
+        "multerMiddleware",
+        "validateRequest",
+        "anonymous"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/dash/v1/resources/:resource/:id/status",
       "module": "Admin",
       "middlewares": [
         "checkResourcePermissionMiddleware",

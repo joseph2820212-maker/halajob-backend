@@ -1142,6 +1142,63 @@ const setLegalReview = (resourceName) => async (req, res) => {
   }
 };
 
+// Allowed status transitions per request-queue resource. Whitelisted so the
+// generic status endpoint can never set a value outside the model enum.
+const RESOURCE_STATUS_WHITELIST = {
+  legalreports: ['received', 'under_review', 'action_needed', 'action_taken', 'rejected', 'closed'],
+  privacyrequests: ['received', 'verifying_identity', 'processing', 'completed', 'rejected', 'cancelled'],
+  accessibilityrequests: ['received', 'in_progress', 'resolved', 'closed'],
+};
+
+const setResourceStatus = (resourceName) => async (req, res) => {
+  const config = getResourceConfig(resourceName || req.params.resource);
+  if (!config) return ReturnDashData.getError({ res, status: 404, message: 'resource_not_found' });
+  const allowed = RESOURCE_STATUS_WHITELIST[config.key];
+  if (!allowed) {
+    return ReturnDashData.getError({ res, status: 400, message: 'status_update_not_supported' });
+  }
+  const { id } = req.params;
+  if (!isValidObjectId(id)) return ReturnDashData.getError({ res, status: 400, message: 'invalid_id' });
+  const status = String(req.body?.status || '').trim();
+  if (!allowed.includes(status)) {
+    return ReturnDashData.getError({ res, status: 400, message: 'invalid_status' });
+  }
+  const note = String(req.body?.note || '').trim();
+  try {
+    const doc = await config.model.findById(id);
+    if (!doc) return ReturnDashData.getError({ res, status: 404, message: 'not_found' });
+    const oldValue = doc.status;
+    const actorId = auditActorId(req);
+    doc.status = status;
+    // Stamp the per-resource handler/closure fields so the queue reflects who acted.
+    if (config.key === 'legalreports') {
+      doc.reviewedBy = actorId;
+      doc.reviewedAt = new Date();
+      if (note) doc.outcome = note;
+    } else if (config.key === 'privacyrequests') {
+      doc.handledBy = actorId;
+      if (note) doc.responseSummary = note;
+      if (status === 'completed') doc.completedAt = new Date();
+    } else if (config.key === 'accessibilityrequests') {
+      doc.handledBy = actorId;
+      if (status === 'resolved' || status === 'closed') doc.resolvedAt = new Date();
+    }
+    await doc.save();
+    await writeAdminResourceAudit({
+      req,
+      config,
+      action: 'admin_resource_status',
+      doc,
+      oldValue: { status: oldValue },
+      newValue: { status },
+      metadata: { note },
+    });
+    return ReturnDashData.getData({ res, data: doc, other: { resource: config.key } });
+  } catch (err) {
+    return ReturnDashData.getError({ res, status: 400, message: err.message || 'status_update_failed' });
+  }
+};
+
 export default {
   list,
   get: list,
@@ -1154,4 +1211,5 @@ export default {
   approve,
   reject,
   setLegalReview,
+  setResourceStatus,
 };
