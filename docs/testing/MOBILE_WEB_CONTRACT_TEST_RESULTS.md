@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `714fefe`
+Source contracts tested through: `f6e6a1f`
 Latest APK source build commit: `2c8e4c5`
 
 ## Passed Coverage
@@ -25,13 +25,13 @@ Latest APK source build commit: `2c8e4c5`
 | Web production build and SEO prerender | `npm --prefix web run build` passed after `b6f5bb2`; SEO prerendered 14 routes |
 | Web Settings fixed-choice controls | `npm --prefix web test -- settings` passed 1 file / 3 tests, proving no `<select>` for fixed choices and checkbox/radio serialization compatibility |
 | Web job-alert filter/delete contract | `npm --prefix web test -- src/shared/jobAlerts.test.tsx` passed 1 file / 3 tests, proving canonical filters, radio frequency edits, and confirmation-gated saved-search delete |
-| Web seeker CV/company/application/interview/offer contracts | `npm --prefix web test -- src/seeker/screens.test.tsx` passed 1 file / 7 tests, proving current-CV-first hierarchy, parser-disabled honesty, no dropdowns, radio visibility payloads, confirmation-gated CV delete, company review rating payloads, confirmation-gated application withdrawal, confirmation-gated interview rejection, and confirmation-gated offer decline |
+| Web seeker CV/company/application/interview/offer contracts | `npm --prefix web test -- src/seeker/screens.test.tsx` passed 1 file / 8 tests, proving current-CV-first hierarchy, parser-disabled honesty, no dropdowns, radio visibility payloads, cover-letter preview/download route wiring from the CV Library row, confirmation-gated CV delete, company review rating payloads, confirmation-gated application withdrawal, confirmation-gated interview rejection, and confirmation-gated offer decline |
 | Web public fixed choices | `npm --prefix web test -- public` passed 1 file / 2 tests, proving public job filters render as segmented buttons and public job ratings preserve the backend payload |
 | Web campus fixed-choice forms | `npm --prefix web test -- campus` passed 1 file / 3 tests, proving no dropdowns for campus signup gender or campus opportunity target choices, plus registration and university/company opportunity payloads |
 | Web admin workspaces | `npm --prefix web test -- admin` passed 1 file / 4 tests, proving analytics fixed choices, AI usage-limit feature choices, company queue detail loading, confirmation-gated approve actions, and audit/interview-prep sidebar reachability |
 | Web company employer tasks | `npm --prefix web test -- company` passed 1 file / 5 tests, proving applicant actions, member/library choices, support ticket create/reply, and company job posting fixed-choice payloads |
 | Web shared workflow contracts | `npm --prefix web test -- src/shared/workflows.test.tsx` passed 1 file / 3 tests, proving notification delete requires confirmation before the backend mutation and application question options render as radio rows while preserving answer payloads |
-| Full web test suite | `npm --prefix web test` passed 16 files / 62 tests after `b6f5bb2` |
+| Full web test suite | `npm --prefix web test` passed 16 files / 63 tests after `f6e6a1f` |
 | Web browser E2E smoke | `npm --prefix web run e2e` passed against local Vite preview/Chrome, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses |
 | DB launch-critical aggregate | `npm run test:integration:launch-critical --silent` passed on rerun with the shared Mongo helper; the individual remaining scripts after an earlier transient stop also passed |
 | DB Syria product aggregate | `npm run test:integration:syria-product --silent` passed, covering CV Studio/parsing honesty, learning resources, interview prep, saved searches/job alerts, communication hub, salary insights, campus privacy/workflows, interview scheduling, talent-pool CRM, and company branding |

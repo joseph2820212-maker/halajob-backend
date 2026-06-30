@@ -12,8 +12,8 @@ CV Studio extends the existing `CvTemplateModel` and `EmployeeCvModel` systems. 
 ## User Flows
 
 - Job seeker creates or uploads CV material.
-- User can score, duplicate, set default, preview cover letters, and attach the selected CV snapshot to applications.
-- Mobile CV Manager previews and downloads cover letters through the backend template, preview, and authenticated download routes.
+- User can score, duplicate, set default, preview/download cover letters, and attach the selected CV snapshot to applications.
+- Web CV Studio and mobile CV Manager preview and download cover letters through the backend template, preview, and authenticated download routes.
 - Parser upload is provider-safe: when no parser provider is configured, the parse job fails honestly instead of pretending success.
 
 ## Verification
@@ -25,4 +25,4 @@ npm run test:integration:cv-studio
 npm run test:launch-gate:mobile --silent
 ```
 
-This covers quality scoring, visibility, duplication, defaulting, parser ownership, parse confirmation/rejection, cover letters, selected CV application snapshots, and mobile CV Manager preview/download regression coverage.
+This covers quality scoring, visibility, duplication, defaulting, parser ownership, parse confirmation/rejection, cover letters, selected CV application snapshots, and web/mobile CV Manager preview/download regression coverage.

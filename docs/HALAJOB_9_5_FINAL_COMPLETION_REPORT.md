@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `2c8e4c5`
+- Current reviewed code/proof-guard commit before this report refresh: `f6e6a1f`
 - Current APK source build commit: `2c8e4c5`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 
 | Commit | Summary |
 |---|---|
+| `f6e6a1f` | Web CV Studio now proves cover-letter preview/download actions call the backend CV Studio template routes from the CV Library row and open the returned download blob. |
 | `2c8e4c5` | Refreshed mobile cover-letter download proof docs after `714fefe`, then served as the source commit for the current debug tester APK rebuild. |
 | `714fefe` | Mobile CV Manager can now download cover letters through the authenticated backend CV Studio download route, save the returned text file, and prove the route/UI flow with service and widget tests. |
 | `085c562` | Refreshed mobile CV cover-letter proof docs after `089f7d0`, then served as the source commit for the current debug tester APK rebuild. |
@@ -83,13 +84,13 @@ The remaining gap to 9.5 is now mostly owner-controlled launch readiness plus cl
 | `flutter analyze` | Passed | Run from `mobile/` after `e2611c3`; no issues found. |
 | `flutter test test\widget_test.dart --plain-name "settings"` | Passed | 9 Settings-related widget tests passed after `e2611c3`, including header profile/settings split, grouped Settings index, account detail save/upload/relogin, ticked privacy/job-alert rows, notification switches/payloads, data-rights export/delete confirmation, and logout-all confirmation. |
 | `npm --prefix web test -- public` | Passed | 2 public tests cover segmented public job filters and job rating radio payloads. |
-| `npm --prefix web test -- src/seeker/screens.test.tsx` | Passed | 7 seeker tests cover CV Studio hierarchy/parser honesty/visibility payloads, confirmation-gated CV delete, company review rating radio payloads, confirmation-gated application withdrawal, confirmation-gated interview rejection, and confirmation-gated offer decline. |
+| `npm --prefix web test -- src/seeker/screens.test.tsx` | Passed | 8 seeker tests cover CV Studio hierarchy/parser honesty/visibility payloads, cover-letter preview/download route wiring, confirmation-gated CV delete, company review rating radio payloads, confirmation-gated application withdrawal, confirmation-gated interview rejection, and confirmation-gated offer decline. |
 | `npm --prefix web test -- admin` | Passed | 4 admin tests cover analytics choices, AI usage-limit feature choices, company queue confirmation/detail behavior, and audit/interview-prep sidebar reachability. |
 | `npm --prefix web test -- campus` | Passed | 3 campus tests cover signup gender choice rows, university opportunity target payloads, company campus target payloads, and async refresh callbacks. |
 | `npm --prefix web test -- company` | Passed | 5 company tests cover applicant actions, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
 | `npm --prefix web test -- src/shared/jobAlerts.test.tsx` | Passed | 3 job-alert tests cover canonical filter payloads, radio frequency edits, and confirmation-gated saved-search delete. |
 | `npm --prefix web test -- src/shared/workflows.test.tsx` | Passed | 3 shared-workflow tests prove notification delete requires confirmation before backend mutation and application question options use radio rows while preserving apply payloads. |
-| `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 62 tests after the web destructive-action guards, AI usage-limit control update, and application question choice update. |
+| `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 63 tests after `f6e6a1f`, including the web CV Studio cover-letter preview/download guard. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed. |
 | `npm --prefix web run e2e` | Passed | Local Vite preview/Chrome smoke passed on this machine, clicking through campus, university, company, seeker, and admin portal navigation with stubbed API responses. |
 | `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 317/317, UI actions, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed. |
