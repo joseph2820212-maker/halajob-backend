@@ -489,6 +489,23 @@ const schemas = {
     body: bodyObject,
   }),
 
+  contentLegalReviewSchema: yup.object({
+    params: idParamsWithRequiredResource,
+    body: yup.object({
+      legalReviewStatus: yup
+        .string()
+        .oneOf([
+          "draft",
+          "needs_lawyer_review",
+          "revision_requested",
+          "rejected",
+          "lawyer_approved",
+        ])
+        .required(),
+      note: yup.string().max(2000).optional(),
+    }),
+  }),
+
   deleteResourceSchema: yup.object({
     params: idParamsWithOptionalResource,
     query: yup.object({ force: forceDelete }),

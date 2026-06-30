@@ -976,5 +976,12 @@ router.post(
   validate(adminSchemas.genericStatusResourceSchema),
   resourceController.reject(),
 );
+router.post(
+  "/resources/:resource/:id/legal-review",
+  checkResourcePermission("approve"),
+  upload.none(),
+  validate(adminSchemas.contentLegalReviewSchema),
+  resourceController.setLegalReview(),
+);
 
 export default router;

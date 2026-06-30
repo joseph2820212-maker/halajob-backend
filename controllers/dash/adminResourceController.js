@@ -1103,6 +1103,45 @@ const reject = (resourceName) => async (req, res) => {
   return update(resourceName)(req, res);
 };
 
+// Dedicated, safe legal-review action for content pages. The generic approve()
+// only flips `status`; lawyer review tracking lives in `legalReviewStatus` and
+// must be set explicitly (whitelisted enum + audit), never via mass assignment.
+const setLegalReview = (resourceName) => async (req, res) => {
+  const config = getResourceConfig(resourceName || req.params.resource);
+  if (!config) return ReturnDashData.getError({ res, status: 404, message: 'resource_not_found' });
+  if (config.model !== ContentPageModel) {
+    return ReturnDashData.getError({ res, status: 400, message: 'legal_review_not_supported' });
+  }
+  const { id } = req.params;
+  if (!isValidObjectId(id)) return ReturnDashData.getError({ res, status: 400, message: 'invalid_id' });
+  const allowed = ['draft', 'needs_lawyer_review', 'revision_requested', 'rejected', 'lawyer_approved'];
+  const legalReviewStatus = String(req.body?.legalReviewStatus || '').trim();
+  if (!allowed.includes(legalReviewStatus)) {
+    return ReturnDashData.getError({ res, status: 400, message: 'invalid_legal_review_status' });
+  }
+  const note = String(req.body?.note || '').trim();
+  try {
+    const doc = await config.model.findById(id);
+    if (!doc) return ReturnDashData.getError({ res, status: 404, message: 'not_found' });
+    const oldValue = doc.legalReviewStatus;
+    doc.legalReviewStatus = legalReviewStatus;
+    doc.updatedBy = auditActorId(req);
+    await doc.save();
+    await writeAdminResourceAudit({
+      req,
+      config,
+      action: 'admin_content_legal_review',
+      doc,
+      oldValue: { legalReviewStatus: oldValue },
+      newValue: { legalReviewStatus },
+      metadata: { note },
+    });
+    return ReturnDashData.getData({ res, data: doc, other: { resource: config.key } });
+  } catch (err) {
+    return ReturnDashData.getError({ res, status: 400, message: err.message || 'legal_review_failed' });
+  }
+};
+
 export default {
   list,
   get: list,
@@ -1114,4 +1153,5 @@ export default {
   bulkUpdate,
   approve,
   reject,
+  setLegalReview,
 };
