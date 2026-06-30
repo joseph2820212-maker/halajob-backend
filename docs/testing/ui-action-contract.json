@@ -126,10 +126,18 @@
         "companyJobSalaryText(job)",
         "employeeService.downloadCv(id)",
         "CV download opened",
-        "{ui(\"Open\")}"
+        "{ui(\"Open\")}",
+        "<ProfileChecklist setToast={setToast} ui={ui} />",
+        "const [active, setActive] = useState(\"basic\")",
+        "key={item.key}",
+        "onClick={() => setActive(item.key)}",
+        "active === item.key"
       ],
       "mustNotContain": [
-        "VITE_FEATURE_AI_TOOLS_ENABLED"
+        "VITE_FEATURE_AI_TOOLS_ENABLED",
+        "setActive(item.label)",
+        "active === item.label",
+        "key={item.label}"
       ]
     },
     {
