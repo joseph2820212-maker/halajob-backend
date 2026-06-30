@@ -85,6 +85,55 @@ function lineForIndex(source, index) {
   return source.slice(0, index).split(/\r?\n/).length;
 }
 
+function findButtonTags(source) {
+  const tags = [];
+  let index = source.indexOf("<button");
+
+  while (index >= 0) {
+    const afterName = source[index + "<button".length] || "";
+    if (!/[A-Za-z0-9_$-]/.test(afterName)) {
+      let braceDepth = 0;
+      let quote = null;
+      let escaped = false;
+      let end = -1;
+
+      for (let i = index + "<button".length; i < source.length; i += 1) {
+        const ch = source[i];
+        if (quote) {
+          if (escaped) escaped = false;
+          else if (ch === "\\") escaped = true;
+          else if (ch === quote) quote = null;
+          continue;
+        }
+        if (ch === '"' || ch === "'" || ch === "`") {
+          quote = ch;
+          continue;
+        }
+        if (ch === "{") {
+          braceDepth += 1;
+          continue;
+        }
+        if (ch === "}") {
+          braceDepth = Math.max(0, braceDepth - 1);
+          continue;
+        }
+        if (ch === ">" && braceDepth === 0) {
+          end = i;
+          break;
+        }
+      }
+
+      if (end > index) {
+        tags.push({ index, text: source.slice(index, end + 1) });
+      }
+    }
+
+    index = source.indexOf("<button", index + "<button".length);
+  }
+
+  return tags;
+}
+
 for (const target of targets) {
   for (const file of walk(target.dir, target.extensions)) {
     const source = fs.readFileSync(path.join(root, file), "utf8");
@@ -95,6 +144,15 @@ for (const target of targets) {
         failures.push(
           `${file}:${lineForIndex(source, match.index)} contains ${pattern.label}: ${match[0]}`,
         );
+      }
+    }
+    if (file.endsWith(".tsx")) {
+      for (const tag of findButtonTags(source)) {
+        if (/\bonClick\b/.test(tag.text) && !/\btype\s*=/.test(tag.text)) {
+          failures.push(
+            `${file}:${lineForIndex(source, tag.index)} has an onClick <button> without explicit type="button"`,
+          );
+        }
       }
     }
   }
