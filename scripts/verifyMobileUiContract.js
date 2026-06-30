@@ -16,6 +16,9 @@ const dashboard = read(
 const university = read(
   "mobile/lib/src/features/university/university_dashboard_screen.dart",
 );
+const universityService = read(
+  "mobile/lib/src/features/university/university_dashboard_service.dart",
+);
 const authScreen = read("mobile/lib/src/features/auth/auth_screen.dart");
 const authService = read("mobile/lib/src/features/auth/auth_service.dart");
 const clientFeatureSettings = read(
@@ -174,6 +177,36 @@ assertNotContains(
   university,
   "class _UniversityBottomNavItem",
   "university duplicate nav item",
+);
+assertContains(
+  university,
+  "key: const ValueKey('university-header-notifications')",
+  "university header notifications",
+);
+assertContains(
+  university,
+  "child: _UniversityNotificationsScreen(",
+  "university notifications screen",
+);
+assertNotContains(
+  university,
+  "child: const _UniversityNotificationsScreen()",
+  "university notifications placeholder",
+);
+assertContains(
+  universityService,
+  "Future<UniversityNotificationsSnapshot> loadNotifications",
+  "university notification backend loading",
+);
+assertContains(
+  universityService,
+  "'/notifications/v1/list'",
+  "university notification backend loading",
+);
+assertContains(
+  universityService,
+  "Future<void> markAllNotificationsRead",
+  "university notification actions",
 );
 assertContains(
   dashboard,
