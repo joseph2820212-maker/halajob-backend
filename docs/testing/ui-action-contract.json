@@ -64,6 +64,54 @@
       ],
       "mustNotContain": [
         "VITE_FEATURE_AI_TOOLS_ENABLED"
+      ],
+      "scopes": [
+        {
+          "start": "const companyInterviewAction = async (action: string, item: QueueItem) => {",
+          "end": "const loadCompanyJobReviews = () => {",
+          "mustContain": [
+            "Unsupported company interview action"
+          ]
+        },
+        {
+          "start": "const applicantAction = async (action: string, item: QueueItem) => {",
+          "end": "const refreshSelectedApplicant = async () => {",
+          "mustContain": [
+            "Unsupported applicant action"
+          ]
+        },
+        {
+          "start": "const jobAction = async (action: string, job: NormalizedJob) => {",
+          "end": "const invitationAction = async (action: string, item: QueueItem) => {",
+          "mustContain": [
+            "action !== \"Edit\"",
+            "Unsupported company job action"
+          ]
+        },
+        {
+          "start": "const invitationAction = async (action: string, item: QueueItem) => {",
+          "end": "const invoiceAction = async (_action: string, item: QueueItem) => {",
+          "mustContain": [
+            "action !== \"Cancel\"",
+            "Unsupported invitation action"
+          ]
+        },
+        {
+          "start": "const talentCandidateAction = async (action: string, item: QueueItem) => {",
+          "end": "const talentRequestAction = async (action: string, item: QueueItem) => {",
+          "mustContain": [
+            "action !== \"View\"",
+            "Unsupported talent candidate action"
+          ]
+        },
+        {
+          "start": "const talentRequestAction = async (action: string, item: QueueItem) => {",
+          "end": "const loadSmartMatches = async (jobId: string) => {",
+          "mustContain": [
+            "action !== \"View\"",
+            "Unsupported talent request action"
+          ]
+        }
       ]
     },
     {
