@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `d4d3a95`
+- Current reviewed code/proof-guard commit before this report refresh: `688a311`
 - Current APK source build commit: `d4d3a95`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Commit | Summary |
 |---|---|
+| `688a311` | Admin AI usage-limit feature selection now uses ticked/radio choices instead of a dropdown, with payload regression proof for the selected feature. |
 | `d4d3a95` | Web seeker interview rejection and offer decline now require confirmation before calling the backend, with focused tests proving cancel and confirm behavior; app smoke auth setup now uses the in-memory token helper for the authenticated CV Studio path. |
 | `a81f332` | Web seeker application withdrawal now requires confirmation before calling the backend, with a focused test proving cancel and confirm behavior. |
 | `2dba6ad` | Web notification delete now requires confirmation before calling the backend, with a focused test proving cancel and confirm behavior. |
@@ -66,12 +67,12 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 |---|---|---|
 | `npm --prefix web test -- public` | Passed | 2 public tests cover segmented public job filters and job rating radio payloads. |
 | `npm --prefix web test -- src/seeker/screens.test.tsx` | Passed | 7 seeker tests cover CV Studio hierarchy/parser honesty/visibility payloads, confirmation-gated CV delete, company review rating radio payloads, confirmation-gated application withdrawal, confirmation-gated interview rejection, and confirmation-gated offer decline. |
-| `npm --prefix web test -- admin` | Passed | 3 admin tests cover analytics choices, company queue confirmation/detail behavior, and audit/interview-prep sidebar reachability. |
+| `npm --prefix web test -- admin` | Passed | 4 admin tests cover analytics choices, AI usage-limit feature choices, company queue confirmation/detail behavior, and audit/interview-prep sidebar reachability. |
 | `npm --prefix web test -- campus` | Passed | 3 campus tests cover signup gender choice rows, university opportunity target payloads, company campus target payloads, and async refresh callbacks. |
 | `npm --prefix web test -- company` | Passed | 5 company tests cover applicant actions, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
 | `npm --prefix web test -- src/shared/jobAlerts.test.tsx` | Passed | 3 job-alert tests cover canonical filter payloads, radio frequency edits, and confirmation-gated saved-search delete. |
 | `npm --prefix web test -- src/shared/workflows.test.tsx` | Passed | 1 shared-workflow test proves notification delete requires confirmation before the backend mutation. |
-| `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 59 tests after the web destructive-action guards. |
+| `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 60 tests after the web destructive-action guards and AI usage-limit control update. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed. |
 | `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 317/317, UI actions, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
@@ -101,7 +102,7 @@ A fresh debug APK was built and installed on the running emulator from source co
 - Emulator proof: installed and launched on `emulator-5554`
 - Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | d4d3a95 | local-device`, and current cream/navy/orange auth/campus chrome on `emulator-5554`.
 
-This APK is current for the app code reviewed here. Rebuild again after the next app-code commit before distribution, owner visual approval, or a new "latest APK" claim.
+This APK is current for mobile source commit `d4d3a95`; the later `688a311` change is web-only and does not change the APK. Rebuild again after the next mobile app-code commit before distribution, owner visual approval, or a new "latest APK" claim.
 
 ## Current Handout Status
 
@@ -115,7 +116,7 @@ This APK is current for the app code reviewed here. Rebuild again after the next
 | Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency; backend create/update/run-now now preserves and matches skills, education, salary, and currency. |
 | Seeker/Campus More cleanup | Improved: grouped More sections and guarded against primary-flow duplication. |
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
-| Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, interview prep, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
+| Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, interview prep, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
 | Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
 | Docs freshness | Improved by this report and the mobile APK proof guard; must be refreshed again after the final app-code commit and final APK build. |
 
