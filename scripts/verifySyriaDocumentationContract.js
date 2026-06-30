@@ -150,6 +150,23 @@ const requiredDocs = [
     ],
   },
   {
+    path: "docs/HALAJOB_9_5_HANDOUT_TRACEABILITY.md",
+    minLength: 3000,
+    needles: [
+      "ChatGPT handout",
+      "Wave 1 - Settings UX refactor",
+      "Wave 2 - CV Studio / CV Manager polish and honesty",
+      "Wave 3 - Job filters and saved search polish",
+      "Wave 4 - Navigation and More cleanup",
+      "Wave 5 - Web/admin/company polish",
+      "Wave 6 - Test/proof reproducibility",
+      "Wave 7 - Release readiness without manual device check",
+      "npm run test:launch-gate",
+      "Owner-Controlled Blockers",
+      "Do Not Regress",
+    ],
+  },
+  {
     path: "docs/OPERATOR_GUIDE.md",
     minLength: 1200,
     needles: [

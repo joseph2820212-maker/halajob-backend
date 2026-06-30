@@ -17,6 +17,8 @@ Current working rating: 9.0/10 source readiness.
 
 The remaining gap to 9.5 is now mostly owner-controlled launch readiness: production smoke, production secrets/provider checks, production signing, production-like storage/Firebase/SMTP proof, and owner real-device approval.
 
+See `docs/HALAJOB_9_5_HANDOUT_TRACEABILITY.md` for the requirement-by-requirement map from the ChatGPT handout to current source evidence and remaining owner-controlled blockers.
+
 ## Recent Codex 9.5 Polish Commits
 
 | Commit | Summary |
@@ -164,7 +166,7 @@ This APK is current for source commit `ff5b8ba`, including the company AI tools 
 | University admin notifications | Improved: header notifications now use real shared notification backend data and actions instead of a static `no notifications` placeholder, with service/widget/source guards. |
 | Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep/passport reachability, company applicant/member/library/support workflows, company job posting choices, company job pause/resume, interview join/reschedule, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, backend campus events, university verification approve/reject/request-info, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
 | Proof reproducibility | Passed for current source commit `ff5b8ba`: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, explicit `MONGOMS_SYSTEM_BINARY` path validation, a fast helper contract, current APK metadata proof, and full `npm run test:launch-gate` clean-checkout replay. |
-| Docs freshness | Improved by this report and the mobile APK proof guard; refresh again after any later source commit, and rebuild/refresh APK proof after any later mobile app-code commit. |
+| Docs freshness | Improved by this report, `docs/HALAJOB_9_5_HANDOUT_TRACEABILITY.md`, and the mobile APK proof guard; refresh again after any later source commit, and rebuild/refresh APK proof after any later mobile app-code commit. |
 
 ## External Blockers
 

@@ -1,0 +1,77 @@
+# HalaJob 9.5 Handout Traceability
+
+Date: 2026-06-30
+Branch: `codex/gate-a-mobile-ui-lock`
+Handout source: `HALAJOB_CURRENT_AUDIT_AND_CODEX_9_5_HANDOUT.md`
+
+This document maps the ChatGPT handout requirements to the current branch state.
+It exists so future Codex or Claude passes do not keep re-opening old `dc251c6`
+findings that are now fixed and guarded.
+
+## Current Source Proof
+
+| Item | Current evidence |
+|---|---|
+| Current code/proof branch | `codex/gate-a-mobile-ui-lock` |
+| Clean source proof commit | `ff5b8ba` |
+| Latest proof-doc commit | `74f89fb` |
+| Clean checkout gate | `npm run test:launch-gate` passed from detached clean worktree `C:\Users\Admin\Documents\Codex\2026-06-28\ca\work\halajobe-clean-ff5b8ba` |
+| Current tester APK source | `ff5b8ba` |
+| Current tester APK SHA-256 | `862b961d3011a79e4accd45585914b27ce41dce7d997c315513d9befd2efab58` |
+| APK proof guard | `npm run test:mobile-apk-proof --silent` passed against the latest debug APK metadata |
+
+## Wave Status
+
+| Handout wave | Status | Evidence | Still not code-owned |
+|---|---|---|---|
+| Wave 1 - Settings UX refactor | Done for launch scope | Mobile Settings uses grouped drill-in panels and focused detail screens; `flutter test test\widget_test.dart --plain-name "settings"` covers grouped rows, account save/upload/relogin, notification switches, data-rights placement, delete confirmation, logout-all confirmation, and ticked choices. Web Settings tests cover checkbox/radio serialization and no boolean fixed-choice `<select>` regressions. | Real-user approval of Settings UX on device. |
+| Wave 2 - CV Studio / CV Manager polish and honesty | Done for launch scope | Mobile and web expose a current CV first hierarchy, CV Library actions, cover-letter preview/download, confirmation-gated delete, and CV visibility choices. Parser UI is honest when no provider is configured. `npm run test:integration:cv-studio`, `npm run test:integration:cv-parsing`, focused web CV tests, and mobile CV manager widget/service tests cover the flow. | A real parser provider remains optional owner/provider work. |
+| Wave 3 - Job filters and saved search polish | Done for launch scope | Mobile filters now cover keyword/location/company/skills/date/job type/experience/salary/work mode/education/category/deadline/student/fresh-grad/verified/easy apply/alert frequency. Saved-search persistence is covered by mobile widget tests and `npm run test:integration:saved-search-alerts`. | Live production search quality tuning against real job data. |
+| Wave 4 - Navigation and More cleanup | Done for launch scope | Mobile source inventory and UI contract guards protect seeker/campus/company canonical More placement, prevent company More from duplicating primary tabs, keep AI as one feature-gated entry, and keep seeker live sync below tab content. | Owner visual approval on final Android device. |
+| Wave 5 - Web/admin/company polish | Improved and guarded | Web build, 16-file/65-test Vitest suite, tab reachability, route wiring, UI action contracts, and E2E smoke prove admin/company/seeker/campus tabs are reachable and key employer/campus actions are wired. Tests cover confirmations, fixed choices, CV Studio, employer pause/resume, interview join/reschedule, campus events, university verification actions, saved-search delete, notification delete, application withdrawal, interview rejection, and offer decline. | Product-owner judgment on whether web density is acceptable for launch. |
+| Wave 6 - Test/proof reproducibility | Done for code-owned scope | `npm run test:launch-gate` passed from a detached clean checkout at `ff5b8ba`; web did clean install/build/tests/E2E; mobile ran `pub get`, `analyze`, and 450 tests; backend launch-critical and Syria product aggregates passed. MongoDB integration setup has external URI scoping, `MONGOMS_SYSTEM_BINARY` preflight validation, memory-server fallback guidance, and a helper contract. | None for local code-owned reproducibility; CI/provider availability remains environment-controlled. |
+| Wave 7 - Release readiness without manual device check | Done for code-owned scope, not public-launch complete | The current branch has clean launch-gate proof, APK metadata proof, and docs refreshed after the source proof. Manual real-device approval is explicitly excluded from code completion and not claimed. | Production smoke, provider credentials, signing, and owner device approval. |
+
+## Definition Of 9.5 Done Mapping
+
+| Handout definition item | Current state |
+|---|---|
+| Backend/API gates pass from a clean checkout | Passed inside `npm run test:launch-gate` from clean worktree `ff5b8ba`. |
+| Web build/tests/E2E pass | Passed inside the clean launch gate. |
+| Flutter analyze/test pass | Passed inside the clean launch gate with 450 mobile tests. |
+| Mobile design contract remains green | Passed inside `npm run test:launch-gate:ui-contracts`; mobile UI contract protects locked cream/navy/orange chrome and shared bottom nav. |
+| Settings is grouped with detail screens | Passed by mobile Settings widget tests and source inventory guards. |
+| CV Manager has active CV hero and honest parser state | Passed by mobile/web CV tests and parser integration docs; real parser provider is not claimed. |
+| Job filters match employment-app expectations and saved alerts persist filters | Passed by mobile expanded-filter tests and saved-search integration tests. |
+| More/navigation has no confusing duplicate primary surfaces | Passed by mobile source inventory and UI contract guards. |
+| Admin/company web screens are reachable and not hidden behind dead tabs | Passed by web tab reachability and web E2E smoke. |
+| Boolean/small-choice controls avoid dropdowns | Passed for launch-critical surfaces by mobile and web fixed-choice tests/contracts. |
+| Arabic/English labels exist for new surfaces | Passed by `npm run test:bilingual-ui-payload`; Arabic launch payload is English/Arabic scoped. |
+| Provider limits are honest | Kept in `docs/SYRIA_LAUNCH_PRODUCT_QA.md`, `docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md`, and this traceability file. |
+| Docs are refreshed after final source proof and APK proof is current | Current proof docs are refreshed through `74f89fb`; APK source remains `ff5b8ba` unless a later mobile source commit rebuilds it. |
+
+## Owner-Controlled Blockers
+
+The handout excludes manual device review from code completion, but these items
+must still be proven or explicitly accepted before public launch:
+
+- Production secret rotation.
+- Approved production smoke accounts and deployed API URL.
+- Live SMTP/email proof.
+- Live Firebase/push proof.
+- Live storage/upload/download proof.
+- AI provider key, model, pricing, and output QA, or AI disabled.
+- CV parser adapter and live parser proof if auto-fill is desired, or parser disabled.
+- Online payments only after the owner selects a provider; manual/admin subscription launch is the current honest path.
+- Production Android signing, package ID, versioning, and distribution path.
+- Owner real-device UI approval from a final APK/AAB.
+
+## Do Not Regress
+
+- Do not reintroduce the old long all-in-one Settings surface.
+- Do not use dropdowns for boolean or small fixed-choice launch controls.
+- Do not call CV parsing ready while `CV_PARSER_PROVIDER=manual` or no adapter is configured.
+- Do not spread company AI cards across More or Jobs; keep one `AI hiring tools` module when enabled.
+- Do not duplicate primary bottom-tab flows as large More cards.
+- Do not claim a fresh APK unless it was built from the named source commit and `npm run test:mobile-apk-proof --silent` passes.
+- Do not claim production smoke, provider integrations, production signing, or owner real-device approval without external evidence.

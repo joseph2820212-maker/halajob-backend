@@ -40,6 +40,7 @@ Read these before handoff or new launch work:
 - `docs/ENVIRONMENT.md`
 - `docs/PAYMENTS_AND_SUBSCRIPTIONS.md`
 - `docs/HALAJOB_9_5_FINAL_COMPLETION_REPORT.md`
+- `docs/HALAJOB_9_5_HANDOUT_TRACEABILITY.md`
 - `docs/one-phase-launch-scope.md`
 - `docs/launch-hardening-status.md`
 - `docs/SYRIA_LAUNCH_PRODUCT_QA.md`
