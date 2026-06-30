@@ -19,12 +19,25 @@
         "/public/v1/client-settings",
         "/public/v1/companies/",
         "/dash/v1/support-tickets",
+        "/user/v1/support/tickets/${pathSegment(id)}",
+        "/user/v1/support/tickets/${pathSegment(id)}/messages",
+        "/user/v1/support/tickets/${pathSegment(id)}/close",
         "/employee/v1/cv/download/",
         "/user/v1/campus/applications"
       ],
       "mustNotContain": [
         "api.get(\"/user/v1/applying-job/get\", scoped(\"campus\"))",
         "api.get(\"/user/v1/campus/resources\");"
+      ]
+    },
+    {
+      "path": "web/src/public/legalHelp.tsx",
+      "mustContain": [
+        "contentService.myTickets()",
+        "contentService.supportTicket(id)",
+        "contentService.addSupportTicketMessage(id, reply)",
+        "contentService.closeSupportTicket(id)",
+        "Support ticket detail"
       ]
     },
     {

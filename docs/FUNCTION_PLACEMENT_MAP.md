@@ -97,7 +97,7 @@ below.
 | Salary insights | salary routes | `Salary Insights` tab | More or dashboard module, not Settings | Should be visible if enabled. |
 | Company directory/profile/reviews/salary | `/employee/v1/global/companies*`, `/employee/v1/companies*`, company review routes, salary routes | Company profile page with `About`/`Jobs`/`Reviews`/`Salary` lenses | More `Companies` -> Company detail lenses `About`/`Jobs`/`Reviews`/`Salary` | Company detail lenses fold reviews and salary guidance into one entity page; no extra bottom tab. |
 | Privacy, export, delete request | `/account/export`, `/account/delete-request`, privacy routes | Settings account/privacy | Settings account/privacy | Destructive actions need confirmation. |
-| Support/legal | support/legal routes | Settings/support/legal | Settings/support/legal | Legal/help pages use locked native chrome on mobile. |
+| Support/legal | `/user/v1/support/*`, support/legal routes | `/support` ticket inbox/create/detail/reply/close plus Settings/support/legal links | Settings/support/legal | Web support inbox is wired; mobile inbox is tracked separately in Stream B5. Legal/help pages use locked native chrome on mobile. |
 
 ## Campus Student Placement
 
@@ -190,6 +190,7 @@ below.
 | --- | --- | --- | --- |
 | Public company profile/search | `/public/v1/companies*` | Public web search/profile | Public screen only; authenticated shortcuts may link out. |
 | Legal/help pages | `/public/v1/legal*`, content routes | Public web and mobile legal/help screens | Mobile must use locked native navy chrome. |
+| Support tickets | `/user/v1/support/tickets*` | Public web `/support` for authenticated ticket create/list/detail/reply/close | Mobile inbox pending in Stream B5; do not duplicate under unrelated More cards. |
 | Client feature settings | `/public/v1/client-settings` | Internal boot/config | Not visible as user feature except in admin Platform Settings. |
 | Health/readiness | `/health/live`, `/health/ready` | Ops/CI only | Never show as user navigation. |
 | Notifications delivery | `/notifications/v1` plus role notification routes | Role notification screens and admin communication logs | Keep user inbox separate from admin logs. |

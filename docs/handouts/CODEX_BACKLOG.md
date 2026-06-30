@@ -6,17 +6,18 @@ Model: **Codex implements all code; Claude reviews behind + maintains docs.**
 This index lists every queued work item so nothing falls through. Source specs
 are linked; do not duplicate work already verified as done.
 
-## Live status (reviewed at tip `dd87c46`)
+## Live status (reviewed after B3 implementation)
 - **Stream A (navigation/IA): DONE** - all 8 phases committed + extensive
   hardening guards + CI now runs Flutter analyze and Phase 1-6 widget guards
   (incl. "Jobs and My Jobs keep separate pipeline state"). Web tests GREEN
   (16 files / 70 tests).
 - **Stream B (legal/help/support): IN PROGRESS.** B1 is green. B2 is implemented
   and pushed (`LEGAL_CONTENT_ENFORCEMENT_MODE`, production legal approval gate,
-  and clear missing-approval failure list). B3-B10 are still pending.
+  and clear missing-approval failure list). B3 is implemented and pushed for the
+  web support inbox. B4-B10 are still pending.
 - **Stream C:** C1 NOT done (god-file grew to 22,379 lines); C2 partially in CI
   (Flutter analyze + widget guards added); C3 owner/external pending.
-- Codex is working the backlog in order. Next up: Stream B3.
+- Codex is working the backlog in order. Next up: Stream B4.
 
 ## How to work this backlog
 - Update `docs/FUNCTION_PLACEMENT_MAP.md` first when a function moves (your rule).
@@ -56,7 +57,7 @@ Verified scope: `docs/handouts/LEGAL_HELP_SUPPORT_REVIEW_VERDICT.md`
       `npm --prefix web test` fully green.
 - [x] B2 - Legal review production gate: enforce `legalReviewStatus` +
       `LEGAL_CONTENT_ENFORCEMENT_MODE` env + launch-gate failure list.
-- [ ] B3 - Web support inbox: wire existing `myTickets()` + detail/reply/close UI.
+- [x] B3 - Web support inbox: wire existing `myTickets()` + detail/reply/close UI.
 - [ ] B4 - Mobile help article detail screen.
 - [ ] B5 - Mobile support inbox (list/detail/reply/close).
 - [ ] B6 - Mobile privacy cancel-delete + accessibility request form
@@ -86,7 +87,7 @@ Source: `docs/handouts/CHATGPT_CODE_REVIEW_VERDICT.md`
 Stream A is complete. Continue only with the remaining Stream B/C items when the
 owner explicitly resumes those scopes.
 
-1. **B3-B8** (support/privacy/reports) -> 2. **B9-B10** (currency + Syria schedule)
+1. **B4-B8** (support/privacy/reports) -> 2. **B9-B10** (currency + Syria schedule)
 -> 3. **C1** (god-file split, incremental throughout) -> 4. **C2** (Flutter proof)
 -> 5. **C3** (owner evidence).
 
