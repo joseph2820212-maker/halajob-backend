@@ -3,8 +3,8 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed source commit: `2138c85`
-- Current APK build commit: `2138c85`
+- Current reviewed code/proof-guard commit before this report refresh: `757f14b`
+- Current APK source build commit: `0b8d933`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
 - Status: improved and focused-gate green for the proof below, but not a final 9.5/public-launch certification.
@@ -21,6 +21,17 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Commit | Summary |
 |---|---|
+| `757f14b` | Added `test:mobile-apk-proof`, an optional guard that verifies APK metadata, SHA files, and the mobile proof document match when a latest debug APK artifact exists. |
+| `e26d6b4` | Corrected the current APK proof document so it points to the `0b8d933` APK source build and its SHA instead of the older `08ae514` artifact. |
+| `0b8d933` | Refreshed current mobile APK proof after building and installing a debug APK with diagnostics, local campus auth, and AI tools enabled for tester visibility. |
+| `08ae514` | Web CV Studio delete now requires confirmation before calling the backend, with tests proving cancel and confirm behavior. |
+| `5714b82` | Mobile opportunity filter chips now show polished labels like `Last 30 days`, `Hybrid`, and `Fresh graduate`, with tests for visible chips and saved-alert persistence. |
+| `e9d7e00` | Mobile CV delete is confirmation-gated and protected by a widget test proving cancel does not mutate state. |
+| `e24c370` | Mobile and web fixed-choice control contracts now ban dropdown regressions in launch-critical auth/dashboard/company/university/legal/settings surfaces. |
+| `77b4490` | Mobile legal report choices use explicit ticked rows/radio controls and are protected by widget coverage. |
+| `160784b` | Legal choice controls and the mobile launch gate were refreshed. |
+| `e959000` | Mobile IA and launch-gate contracts were refreshed for header/profile/settings split, More placement, AI grouping, and bottom sync placement. |
+| `53b7a16` | Refreshed APK proof after the mobile IA gate pass. |
 | `2138c85` | Public job filters plus public/seeker rating forms now use fixed choice controls instead of dropdowns, with tests proving the unchanged backend payloads. |
 | `839cae6` | Admin web audit and interview-prep workspaces are now reachable from the sidebar and protected by tests. |
 | `4a135c7` | Campus web signup and campus opportunity target forms now use fixed choice rows instead of dropdowns, with tests proving registration and university/company opportunity payloads plus async refresh callbacks. |
@@ -50,11 +61,11 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 | Command | Result | Notes |
 |---|---|---|
 | `npm --prefix web test -- public` | Passed | 2 public tests cover segmented public job filters and job rating radio payloads. |
-| `npm --prefix web test -- seeker` | Passed | 3 seeker tests cover CV Studio hierarchy/parser honesty/visibility payloads plus company review rating radio payloads. |
+| `npm --prefix web test -- src/seeker/screens.test.tsx` | Passed | 4 seeker tests cover CV Studio hierarchy/parser honesty/visibility payloads, confirmation-gated CV delete, and company review rating radio payloads. |
 | `npm --prefix web test -- admin` | Passed | 3 admin tests cover analytics choices, company queue confirmation/detail behavior, and audit/interview-prep sidebar reachability. |
 | `npm --prefix web test -- campus` | Passed | 3 campus tests cover signup gender choice rows, university opportunity target payloads, company campus target payloads, and async refresh callbacks. |
 | `npm --prefix web test -- company` | Passed | 5 company tests cover applicant actions, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
-| `npm --prefix web test` | Passed | Full Vitest suite passed: 14 files / 52 tests. |
+| `npm --prefix web test` | Passed | Full Vitest suite passed: 15 files / 54 tests after the web CV delete guard. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed. |
 | `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 317/317, UI actions, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
@@ -69,18 +80,20 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 | `npm --prefix web test -- settings` | Passed | 1 file / 3 tests; proves web Settings has no `<select>` for fixed choices and serializes checkbox/radio values correctly. |
 | `npm --prefix web test -- jobAlerts` | Passed | 1 file / 2 tests; verifies web job-alert canonical filter behavior after the shared saved-search type update. |
 | `npm --prefix web run build` | Passed | TypeScript build and Vite production build passed after the shared saved-search filter type update. |
+| `npm run test:mobile-apk-proof --silent` | Passed | Proves the latest debug APK metadata, `.sha256` file, and `docs/testing/MOBILE_WEB_CONTRACT_TEST_RESULTS.md` agree when an APK artifact exists. |
+| `npm run test:syria-docs --silent` | Passed | Syria documentation contract passed and then verified the current APK proof metadata against the latest debug APK artifact. |
 | `git diff --check` | Passed | No whitespace errors. |
 
 ## APK Status
 
-A fresh debug APK was built and installed on the running emulator from commit `2138c85`.
+A fresh debug APK was built and installed on the running emulator from source commit `0b8d933`. Documentation/proof commits after `0b8d933` do not imply a newer APK unless the APK metadata and proof row are refreshed together.
 
-- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-codex-gate-a-mobile-ui-lock-2138c85-debug.apk`
-- SHA-256: `e5e8b2eafcc5c8e6c18c3d133adfe93696a2258f9162bbfc4cda30c4f4e2a70b`
+- Built artifact copied to: `C:\Users\Admin\Documents\Codex\2026-06-28\ca\outputs\halajob-mobile-0b8d933-1.0.6+27-debug.apk`
+- SHA-256: `630cb2dd94abdfd7c97ce7577bc29774ad085daf195600df2222e6eb2cb43a5b`
 - Version/build: `1.0.6+27`
 - Build flags: Campus auth `local-device`, `AI tools enabled=true`, base URL `https://jobzain.com`, debug signing
 - Emulator proof: installed and launched on `emulator-5554`
-- Verified screens: auth screen launch, visible Campus role entry, diagnostics showing `1.0.6 (27) | debug-apk | 2138c85 | local-device`, and current cream/navy/orange auth chrome on `emulator-5554`.
+- Verified screens: auth screen launch, visible Campus role entry, visible `Use campus tester account`, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 0b8d933 | local-device`, and current cream/navy/orange auth chrome on `emulator-5554`.
 
 This APK is current for the app code reviewed here. Rebuild again after the next app-code commit before distribution, owner visual approval, or a new "latest APK" claim.
 
@@ -91,14 +104,14 @@ This APK is current for the app code reviewed here. Rebuild again after the next
 | Locked mobile theme | Done and guarded by mobile UI/source contracts. |
 | Mobile Settings IA | Done: grouped settings index plus drill-in detail panels. |
 | Settings fixed choices | Done for mobile and web; mobile source guard and web tests prevent dropdown regression. |
-| CV Manager / CV Studio | Improved: current CV hero, library, build-from-profile, parser-disabled honesty, and visibility choice flow are in place; web CV Studio now has focused regression tests for those claims. |
+| CV Manager / CV Studio | Improved: current CV hero, library, build-from-profile, parser-disabled honesty, visibility choice flow, and confirmation-gated delete are in place; mobile and web both have focused regression tests for those claims. |
 | CV parser honesty | Done for launch: parser defaults disabled unless configured; UI does not call it ready. |
 | Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency; backend create/update/run-now now preserves and matches skills, education, salary, and currency. |
 | Seeker/Campus More cleanup | Improved: grouped More sections and guarded against primary-flow duplication. |
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
 | Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, and interview prep. |
-| Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, and a fast helper contract; full clean-checkout release replay remains required. |
-| Docs freshness | Improved by this report; must be refreshed again after the final commit and final APK build. |
+| Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
+| Docs freshness | Improved by this report and the mobile APK proof guard; must be refreshed again after the final app-code commit and final APK build. |
 
 ## External Blockers
 
