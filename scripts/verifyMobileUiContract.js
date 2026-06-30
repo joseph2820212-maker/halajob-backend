@@ -93,10 +93,10 @@ assertContains(
   "const double halaHeaderActionSize = 36;",
   "section 3 header constants",
 );
-assertContains(header, "color: halaSurface", "HalaNativeHeader");
+assertContains(header, "color: halaNavy", "HalaNativeHeader");
 assertContains(
   header,
-  "halaBorder.withValues(alpha: 0.82)",
+  "halaOrange.withValues(alpha: 0.28)",
   "HalaNativeHeader",
 );
 assertContains(
@@ -121,7 +121,7 @@ assertContains(
   "HalaHeaderMenuButton",
 );
 assertContains(brand, "size: halaHeaderBrandMarkSize", "header brand");
-assertContains(brand, "leftColor: halaNavy", "header brand");
+assertContains(brand, "leftColor: halaCreamSoft", "header brand");
 
 assertContains(
   cards,
@@ -624,5 +624,5 @@ for (const file of sourceFiles) {
 }
 
 console.log(
-  "Mobile UI contract verified for tablet orientation, Gate A cream header chrome, shared bottom nav, fixed-choice controls, and localized chrome strings.",
+  "Mobile UI contract verified for tablet orientation, locked navy header chrome, shared bottom nav, fixed-choice controls, and localized chrome strings.",
 );
