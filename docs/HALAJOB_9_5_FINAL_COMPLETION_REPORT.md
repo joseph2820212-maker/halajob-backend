@@ -3,7 +3,7 @@
 ## Source
 
 - Branch: `codex/gate-a-mobile-ui-lock`
-- Current reviewed code/proof-guard commit before this report refresh: `688a311`
+- Current reviewed code/proof-guard commit before this report refresh: `b6f5bb2`
 - Current APK source build commit: `d4d3a95`
 - Date: 2026-06-30
 - Backend version/tag: `server@1.0.0`, Node engine `>=20`
@@ -21,6 +21,7 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 
 | Commit | Summary |
 |---|---|
+| `b6f5bb2` | Web application question options now render as radio rows instead of dropdowns, with tests proving missing-required handling and unchanged apply payloads. |
 | `688a311` | Admin AI usage-limit feature selection now uses ticked/radio choices instead of a dropdown, with payload regression proof for the selected feature. |
 | `d4d3a95` | Web seeker interview rejection and offer decline now require confirmation before calling the backend, with focused tests proving cancel and confirm behavior; app smoke auth setup now uses the in-memory token helper for the authenticated CV Studio path. |
 | `a81f332` | Web seeker application withdrawal now requires confirmation before calling the backend, with a focused test proving cancel and confirm behavior. |
@@ -71,8 +72,8 @@ The remaining gap to 9.5 is mostly final proof and owner-controlled launch readi
 | `npm --prefix web test -- campus` | Passed | 3 campus tests cover signup gender choice rows, university opportunity target payloads, company campus target payloads, and async refresh callbacks. |
 | `npm --prefix web test -- company` | Passed | 5 company tests cover applicant actions, member/library metadata, support ticket create/reply, and company job posting fixed choices/payloads. |
 | `npm --prefix web test -- src/shared/jobAlerts.test.tsx` | Passed | 3 job-alert tests cover canonical filter payloads, radio frequency edits, and confirmation-gated saved-search delete. |
-| `npm --prefix web test -- src/shared/workflows.test.tsx` | Passed | 1 shared-workflow test proves notification delete requires confirmation before the backend mutation. |
-| `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 60 tests after the web destructive-action guards and AI usage-limit control update. |
+| `npm --prefix web test -- src/shared/workflows.test.tsx` | Passed | 3 shared-workflow tests prove notification delete requires confirmation before backend mutation and application question options use radio rows while preserving apply payloads. |
+| `npm --prefix web test` | Passed | Full Vitest suite passed: 16 files / 62 tests after the web destructive-action guards, AI usage-limit control update, and application question choice update. |
 | `npm --prefix web run build` | Passed | TypeScript build, Vite production build, and SEO prerender completed. |
 | `npm run test:launch-gate:ui-contracts --silent` | Passed | Web API wiring 317/317, UI actions, mobile routes, mobile UI contract, canonical More placement, and bilingual payload contracts passed. |
 | `npm run test:integration-mongo-helper --silent` | Passed | Proves external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures. |
@@ -116,7 +117,7 @@ This APK is current for mobile source commit `d4d3a95`; the later `688a311` chan
 | Job filters / saved search | Improved: mobile now exposes keyword/company/location, skills, education level, date posted, job type, experience, salary/minimum salary, work mode, category, deadline, student/fresh-grad, verified employer, easy apply, and saved-alert frequency; backend create/update/run-now now preserves and matches skills, education, salary, and currency. |
 | Seeker/Campus More cleanup | Improved: grouped More sections and guarded against primary-flow duplication. |
 | Company mobile IA | Improved: profile/settings split, sign out in account settings, grouped AI tools, guarded header actions, and guarded More placement. |
-| Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, interview prep, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
+| Web/admin/company/campus/public fixed choices and flows | Improved with focused tests across settings, resources, admin analytics, admin AI usage-limit choices, admin company queue confirmations/details, admin audit/interview-prep reachability, company applicant/member/library/support workflows, company job posting choices, seeker company ratings, public job filters/ratings, campus signup/opportunity choices, interview prep, application-question choices, saved-search delete confirmation, notification delete confirmation, CV delete confirmation, application-withdrawal confirmation, interview-rejection confirmation, and offer-decline confirmation. |
 | Proof reproducibility | Improved: integration Mongo setup has external Mongo URI scoping, clearer memory-server fallback guidance, a fast helper contract, and current APK metadata proof; full clean-checkout release replay remains required. |
 | Docs freshness | Improved by this report and the mobile APK proof guard; must be refreshed again after the final app-code commit and final APK build. |
 
