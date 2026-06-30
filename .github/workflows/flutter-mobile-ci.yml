@@ -91,6 +91,9 @@ jobs:
       - name: UI action wiring contract
         run: npm run test:ui-actions
 
+      - name: Function placement map guard
+        run: npm run test:function-placement-map
+
       - name: Mobile UI contract
         run: npm run test:mobile-ui-contract
 
@@ -126,6 +129,9 @@ jobs:
 
       - name: Web/backend API wiring contract
         run: npm run check:web-routes
+
+      - name: Launch UI contract aggregate
+        run: npm run test:launch-gate:ui-contracts
 
       - name: Web portal smoke
         run: npm --prefix web run e2e
@@ -191,6 +197,21 @@ jobs:
       - name: Static analysis
         working-directory: mobile
         run: flutter analyze
+
+      - name: Phase 1-6 mobile IA widget guards
+        working-directory: mobile
+        run: |
+          flutter test test/widget_test.dart --plain-name "seeker Jobs and My Jobs keep separate pipeline state"
+          flutter test test/widget_test.dart --plain-name "campus Opportunities and My Applications keep separate pipeline state"
+          flutter test test/widget_test.dart --plain-name "seeker more tab exposes secondary function cards"
+          flutter test test/widget_test.dart --plain-name "campus more tab exposes student function cards"
+          flutter test test/widget_test.dart --plain-name "company IA places workflows in owning tabs"
+          flutter test test/widget_test.dart --plain-name "company AI hiring tools are grouped under More when enabled"
+          flutter test test/widget_test.dart --plain-name "seeker more actions open their launch destinations"
+          flutter test test/widget_test.dart --plain-name "campus more actions open their launch destinations"
+          flutter test test/widget_test.dart --plain-name "opens seeker company directory and submits a review"
+          flutter test test/widget_test.dart --plain-name "supports campus event detail flow"
+          flutter test test/widget_test.dart --plain-name "RTL golden contract"
 
       - name: Run tests
         working-directory: mobile
