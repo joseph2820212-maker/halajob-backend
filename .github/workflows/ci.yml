@@ -1,0 +1,48 @@
+name: Backend CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci --ignore-scripts
+      - run: npm run check:syntax
+      - run: npm run check:imports
+      - run: npm run check:permissions
+      - run: npm run smoke:import
+      - run: npm run test:route-validation
+      - run: npm run test:response-codes
+      - run: npm run test:model-integrity
+      - run: npm run test:mixed-fields
+      - run: npm run test:data-retention
+      - run: npm run test:security-http
+      - run: npm run check:secrets
+      - run: npm run docs:api-artifacts
+      - run: npm run test:integration:auth-context
+        env:
+          CONNECTION_URL: mongodb://localhost:27017/halajob_ci
