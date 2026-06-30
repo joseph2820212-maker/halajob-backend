@@ -2,7 +2,7 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `ff5b8ba` clean full launch gate; current mobile launch gate through `4898355`; current APK proof through `4898355`
+Source contracts tested through: `ff5b8ba` clean full launch gate; current route/UI contract proof through `f63140b`; current mobile launch gate through `4898355`; current APK proof through `4898355`
 Latest APK source build commit: `4898355`
 
 ## Passed Coverage
@@ -46,7 +46,7 @@ Latest APK source build commit: `4898355`
 | Mobile seeker AI IA guard | `flutter test test\widget_test.dart --plain-name "seeker AI career tools screen keeps dedicated IA label"` and `flutter test test\widget_test.dart --plain-name "seeker AI career tools are hidden by default for Syria launch"` passed after `289eb64`, proving seeker AI remains hidden unless enabled and the enabled screen keeps the `AI career tools` heading instead of `AI support` |
 | UI action wiring | `npm run test:ui-actions` passed 12 source files and 15 route/UI pairs after `b6f5bb2` |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
-| Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed 327/327 web API route matches, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts inside the clean `ff5b8ba` full launch-gate replay |
+| Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed 327/327 web API route matches, UI actions, web tab reachability, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts inside the clean `ff5b8ba` full launch-gate replay. It passed again on the current branch at `f63140b`, including 332 mobile method/path route checks and the locked navy header chrome contract. |
 | Mobile source inventory | `powershell -NoProfile -ExecutionPolicy Bypass -File mobile\scripts\assert-mobile-screen-inventory.ps1` passed and now guards mobile Settings fixed-choice rows, expanded opportunity filter groups, extracted seeker CV Manager commitments, seeker/campus More placement, and company More primary-flow duplication against regression |
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed after `0b9a32a`, proving external Mongo URI scoping, clear fallback guidance for memory-server binary/download failures, and preflight validation for missing/present `MONGOMS_SYSTEM_BINARY` paths |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
