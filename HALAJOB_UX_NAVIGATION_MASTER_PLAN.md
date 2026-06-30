@@ -220,8 +220,10 @@ Phases 1–4 + 8 get you to "tidy and predictable." 5–7 get you to "best-in-cl
 
 ---
 
-## 7. Division of labour
-- **Codex** (has Flutter): Phases 1–6 mobile work, builds + APK proof.
-- **Claude** (web/docs/CI): Phase 0 spec, Phase 7 web parity, Phase 8 CI
-  enforcement, the company-unifier web side, doc upkeep.
-- Both build through the locked navy design contract; placement map updated first.
+## 7. Division of labour (single writer on code)
+- **Codex implements ALL phases** (mobile + web + CI + tests) on branch
+  `codex/gate-a-mobile-ui-lock`, updating the placement map first.
+- **Claude does not commit code** — Claude reviews each phase behind Codex and
+  maintains the planning docs only. One writer on code = no branch conflicts.
+- Execution spec for Codex: `HALAJOB_MOBILE_HANDOFF.md` (same branch).
+- Everything builds through the locked navy design contract.
