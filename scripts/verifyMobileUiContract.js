@@ -76,6 +76,13 @@ const bottomNavItem = extractClass(cards, "_HalaBottomNavItem");
 const normalizedBottomNavItem = bottomNavItem.replace(/\r\n/g, "\n");
 const companyHeader = extractClass(company, "_CompanyHeader");
 const companyMorePanel = extractClass(company, "_CompanyMorePanel");
+const authSignInForm = extractBetween(
+  authScreen,
+  "Widget _buildSignInForm(ThemeData theme)",
+  "Widget _buildRecoveryPanel(ThemeData theme)",
+  "auth sign-in form",
+);
+const authOtpInput = extractClass(authScreen, "_OtpCodeInputState");
 const normalizedDashboard = dashboard.replace(/\r\n/g, "\n");
 const mobileQuickActionRouter = extractBetween(
   dashboard,
@@ -595,16 +602,29 @@ assertContains(
   "auth OTP length formatter",
 );
 assertContains(
-  authScreen,
+  authSignInForm,
   "'login-identifier-${_selectedRole.id}-${_usesLocalCampusAuth ? 'local' : 'remote'}'",
   "auth login identifier field key",
 );
 assertContains(
-  authScreen,
+  authSignInForm,
   "'login-password-${_selectedRole.id}-${_usesLocalCampusAuth ? 'local' : 'remote'}'",
   "auth login password field key",
 );
-assertContains(authScreen, "style: halaInputTextStyle", "auth editable text style");
+assertContains(authSignInForm, "enabled: !_loading", "auth login fields enabled state");
+assertContains(authSignInForm, "style: halaInputTextStyle", "auth editable text style");
+assertContains(authSignInForm, "cursorColor: halaOrange", "auth login cursor color");
+assertContains(authSignInForm, "textInputAction: TextInputAction.next", "auth login identifier next action");
+assertContains(
+  authSignInForm,
+  "onFieldSubmitted: (_) => _loginPasswordFocusNode.requestFocus()",
+  "auth login identifier focus handoff",
+);
+assertContains(authSignInForm, "textInputAction: TextInputAction.done", "auth login password done action");
+assertContains(authSignInForm, "if (!_loading) _submitLogin();", "auth login password submit action");
+assertContains(authOtpInput, "index < value.length ? value[index] : ''", "auth OTP visible digit boxes");
+assertContains(authOtpInput, "color: halaNavy", "auth OTP visible digit color");
+assertContains(authOtpInput, "style: const TextStyle(color: Colors.transparent)", "auth OTP transparent capture field");
 
 assertContains(
   authService,
