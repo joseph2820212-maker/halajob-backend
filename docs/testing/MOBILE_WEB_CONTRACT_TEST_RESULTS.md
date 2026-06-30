@@ -2,8 +2,8 @@
 
 Date: 2026-06-30
 Branch: `codex/gate-a-mobile-ui-lock`
-Source contracts tested through: `92c84c9`
-Latest APK source build commit: `92c84c9`
+Source contracts tested through: `289eb64`
+Latest APK source build commit: `289eb64`
 
 ## Passed Coverage
 
@@ -40,6 +40,7 @@ Latest APK source build commit: `92c84c9`
 | Mobile CV cover-letter preview/download | `flutter test test\seeker_dashboard_service_test.dart --plain-name "previews seeker cover letters through CV Studio routes"`, `flutter test test\widget_test.dart --plain-name "previews a seeker CV cover letter from backend templates"`, `flutter test test\seeker_dashboard_service_test.dart --plain-name "downloads seeker cover letters through CV Studio routes"`, and `flutter test test\widget_test.dart --plain-name "downloads a seeker CV cover letter from backend templates"` passed after `714fefe`, proving the CV Manager uses backend template/preview/download routes, renders previews, and saves the returned cover-letter text file |
 | Mobile university admin notifications | `flutter test test/university_dashboard_service_test.dart test/university_dashboard_screen_test.dart` passed 17 focused tests after `aef1c87`, proving university notifications load from `/notifications/v1`, unread badge data is real, mark-read/mark-all/delete actions call backend routes, and notification taps route to the right university dashboard surfaces |
 | Mobile company AI IA guard | `flutter test test\widget_test.dart --plain-name "company AI hiring tools are grouped under More when enabled"` and `flutter test test\widget_test.dart --plain-name "company job details keep AI tools in the dedicated More module"` passed after `92c84c9`, proving company More exposes one AI hiring tools entry when enabled, the dedicated screen keeps the `AI hiring tools` heading instead of `AI support`, individual AI cards or Talent-tab workflows are not spread into More, and Jobs detail no longer exposes duplicated contextual AI actions |
+| Mobile seeker AI IA guard | `flutter test test\widget_test.dart --plain-name "seeker AI career tools screen keeps dedicated IA label"` and `flutter test test\widget_test.dart --plain-name "seeker AI career tools are hidden by default for Syria launch"` passed after `289eb64`, proving seeker AI remains hidden unless enabled and the enabled screen keeps the `AI career tools` heading instead of `AI support` |
 | UI action wiring | `npm run test:ui-actions` passed 12 source files and 15 route/UI pairs after `b6f5bb2` |
 | Arabic/English UI payload contract | `npm run test:bilingual-ui-payload` verifies English/Arabic-only launch scope, web `x-language`/`lan` headers, web RTL/persistence tests, mobile localization key parity for critical chrome/auth/company labels, mobile persisted locale controls, and mobile request language headers |
 | Launch UI contract gate | `npm run test:launch-gate:ui-contracts --silent` passed web routes, UI actions, mobile routes, mobile UI contract, canonical More placement, company AI grouping, and bilingual payload contracts |
@@ -47,7 +48,7 @@ Latest APK source build commit: `92c84c9`
 | Integration Mongo helper | `npm run test:integration-mongo-helper --silent` passed, proving external Mongo URI scoping and clear fallback guidance for memory-server binary/download failures |
 | Representative DB integration | `npm run test:integration:saved-search-alerts --silent` passed through the shared Mongo helper |
 | Mobile launch gate | `npm run test:launch-gate:mobile --silent` passed after `714fefe`; Flutter `pub get`, `analyze`, and full `flutter test` completed with 448 tests passed |
-| Current APK emulator smoke | A debug APK from source commit `92c84c9` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 92c84c9 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `3a0c57be8df7ffdd835310d9e2aea0131dc433204770ebafa4f7827fc96fbce5`. Documentation commits after `92c84c9` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
+| Current APK emulator smoke | A debug APK from source commit `289eb64` installed on `emulator-5554` and proved app launch, visible Campus role entry, visible `Use campus tester account` button, successful Campus tester dashboard entry, diagnostics showing `1.0.6 (27) | debug-apk | 289eb64 | local-device`, and current cream/navy/orange auth/campus chrome. Built with diagnostics on, local-device campus auth, and AI tools enabled for tester visibility. SHA-256 `423c0f70e0eddc72c9f8419fe78857ab047b24fe84cd466ccd39b1706225bae4`. Documentation commits after `289eb64` do not imply a newer APK unless this row and the APK metadata are refreshed together. |
 
 ## Remaining Required Tests
 
