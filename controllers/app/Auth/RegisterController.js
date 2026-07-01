@@ -5,7 +5,7 @@ import { CountryModel, EmployeeModel, UserModel } from "../../../models/index.js
 import { createNewUser, fetchUserFromEmail } from "../../../services/authService.js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
-import crypto from "crypto";
+import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
 import mongoose from "mongoose";
 
 const strongPasswordRe =
@@ -417,9 +417,7 @@ function normalizeCandidateStage(value) {
   return value.trim().toLowerCase();
 }
 
-function createPasscode() {
-  return crypto.randomInt(10000, 100000);
-}
+const createPasscode = generatePasscode;
 
 async function getEmployeeRole() {
   return RoleModel.findOne({
@@ -701,7 +699,7 @@ const register = async (req, res, next) => {
     try {
       newUser = await createNewUser({
         email: emailNorm,
-        passcode,
+        passcode: hashPasscode(passcode),
         passcode_expires_at,
         password: hashedPassword,
         source: "email",

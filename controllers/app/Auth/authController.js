@@ -1,8 +1,8 @@
 import bcryptjs from "bcryptjs";
-import crypto from "crypto";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import { RoleModel, UserModel } from "../../../models/index.js";
+import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
 import { verifyUserFromRefreshTokenPayload } from "../../../services/authService.js";
 import {
   clearRefreshToken,
@@ -49,9 +49,8 @@ function makeDefaultDevice(user, idx) {
   user.device = user.device.map((d, i) => ({ ...d, is_default: i === idx }));
 }
 
-function createPasscode() {
-  return crypto.randomInt(10000, 100000);
-}
+// Shared 6-digit issuer; matches every other OTP-issuing controller.
+const createPasscode = generatePasscode;
 
 function buildUserDto(user) {
   return {
@@ -85,7 +84,7 @@ function buildRoleDto(role, user) {
 
 async function sendLoginPasscode(user) {
   const passcode = createPasscode();
-  user.passcode = passcode;
+  user.passcode = hashPasscode(passcode);
   user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000);
   await user.save();
   await sendRecoveryEmail({ to: user.email, passcode });
@@ -221,7 +220,7 @@ const login = async (req, res, next) => {
     }
 
     const twofa = createPasscode();
-    user.another_device_code = twofa;
+    user.another_device_code = hashPasscode(twofa);
     user.another_device_expires_at = new Date(Date.now() + 10 * 60 * 1000);
     user.pending_device = incomingDevice;
     await user.save();

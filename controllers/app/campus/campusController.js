@@ -382,7 +382,11 @@ const hashVerificationCode = ({ code, userId }) =>
     .update(`${code}:${userId}:${process.env.JWT_SECRET}`)
     .digest("hex");
 
-const createVerificationCode = () => String(crypto.randomInt(10000, 100000));
+// Bumped from 5 digits (90k space) to 6 digits (900k) to match every other
+// OTP issuer in the app. The stored value is already HMAC-hashed via
+// hashVerificationCode below, so this only affects the space of the code
+// the student types in.
+const createVerificationCode = () => String(crypto.randomInt(100000, 1000000));
 
 const normalizeVerificationMethod = (value) => {
   const method = cleanText(value).toLowerCase();

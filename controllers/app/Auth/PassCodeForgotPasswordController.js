@@ -1,5 +1,6 @@
 import { UserModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
+import { verifyPasscode } from "../../../services/passcodeHash.service.js";
 
 // Match the sibling PassCodeController lockout budget. Five wrong tries while
 // the same code is still valid → the caller must request a new code. Without
@@ -105,13 +106,13 @@ export const passcodeVerify = async (req, res, next) => {
 
     const recoveryCodeValid =
       user.passcode &&
-      String(user.passcode) === String(passcode).trim() &&
+      verifyPasscode(passcode, user.passcode) &&
       user.passcode_expires_at &&
       now < new Date(user.passcode_expires_at);
 
     const newDeviceCodeValid =
       user.another_device_code &&
-      String(user.another_device_code) === String(passcode).trim() &&
+      verifyPasscode(passcode, user.another_device_code) &&
       user.another_device_expires_at &&
       now < new Date(user.another_device_expires_at);
 

@@ -2,6 +2,7 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { UserModel } from "../../../models/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
 import { setRefreshCookie, webAuthScope } from "../../../services/authCookie.service.js";
+import { verifyPasscode } from "../../../services/passcodeHash.service.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 
@@ -81,7 +82,7 @@ export const verifyNewDevice = async (req, res) => {
 
     const now = new Date();
     const expired = now > new Date(user.another_device_expires_at);
-    const codeMatches = String(code).trim() === String(user.another_device_code);
+    const codeMatches = verifyPasscode(code, user.another_device_code);
 
     if (expired) {
       user.another_device_code = undefined;

@@ -1,8 +1,8 @@
 import bcryptjs from "bcryptjs";
-import crypto from "crypto";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import { UserModel, RefreshTokenModel } from "../../../models/index.js";
+import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
 import {
   buildRoleDto,
   buildUserDto,
@@ -49,9 +49,9 @@ function ensureDeviceArray(user) {
   else user.device = [];
 }
 
-function createPasscode() {
-  return crypto.randomInt(10000, 100000);
-}
+// OTP generation delegated to services/passcodeHash so every issuer stays
+// on the same 6-digit space and every stored code is HMAC-hashed.
+const createPasscode = generatePasscode;
 
 async function buildAuthPayload(user, device) {
   const tokens = await generateAuthTokens(user, device);
@@ -150,14 +150,17 @@ const login = async (req, res, next) => {
     };
 
     const passcode = createPasscode();
+    const passcodeHash = hashPasscode(passcode);
 
-    user.another_device_code = passcode;
+    // Only the hash is stored. The plaintext leaves this scope via the email
+    // channel and is dropped from memory when the request ends.
+    user.another_device_code = passcodeHash;
     user.another_device_expires_at = new Date(Date.now() + 10 * 60 * 1000);
     user.pending_device = incomingDevice;
     user.passcode_attempts = 0;
 
     if (!user.status || user.passcode_active === false) {
-      user.passcode = passcode;
+      user.passcode = passcodeHash;
       user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000);
     }
 

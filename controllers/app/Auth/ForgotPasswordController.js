@@ -1,7 +1,7 @@
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { UserModel } from "../../../models/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
-import crypto from "crypto";
+import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
 
 /** تطبيع السلاسل */
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
@@ -129,9 +129,10 @@ const forgotPassword = async (req, res, next) => {
         await user.save();
       } catch (_) {}
 
-      // أرسل رمز استعادة (٥ أرقام)
-      const passcode = crypto.randomInt(10000, 100000);
-      user.passcode = passcode;
+      // Recovery OTP: only the hash is persisted; the plaintext leaves via
+      // the email channel and drops out of scope with the request.
+      const passcode = generatePasscode();
+      user.passcode = hashPasscode(passcode);
       user.can_update_password = false;
       user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000); // 10 دقائق
       user.passcode_attempts = 0;
@@ -150,9 +151,9 @@ const forgotPassword = async (req, res, next) => {
       });
     }
 
-    // جهاز جديد → أرسل رمز تحقق قبل السماح بالاستعادة
-    const twofa = crypto.randomInt(10000, 100000);
-    user.another_device_code = twofa;
+    // New-device 2FA: same hash-on-store pattern.
+    const twofa = generatePasscode();
+    user.another_device_code = hashPasscode(twofa);
     user.another_device_expires_at = new Date(Date.now() + 10 * 60 * 1000);
     user.pending_device = incomingDevice;
 

@@ -11,6 +11,7 @@ import { generateAuthTokens } from "../../../services/tokenService.js";
 import { syncAccountContextsForUser } from "../../../services/accountContext.service.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import { setRefreshCookie, webAuthScope } from "../../../services/authCookie.service.js";
+import { verifyPasscode } from "../../../services/passcodeHash.service.js";
 
 const MAX_PASSCODE_ATTEMPTS = 5;
 
@@ -137,13 +138,13 @@ export const passcodeVerify = async (req, res, next) => {
 
     const passcodeValid =
       user.passcode &&
-      String(user.passcode) === String(passcode).trim() &&
+      verifyPasscode(passcode, user.passcode) &&
       user.passcode_expires_at &&
       now < new Date(user.passcode_expires_at);
 
     const deviceCodeValid =
       user.another_device_code &&
-      String(user.another_device_code) === String(passcode).trim() &&
+      verifyPasscode(passcode, user.another_device_code) &&
       user.another_device_expires_at &&
       now < new Date(user.another_device_expires_at);
 

@@ -1,8 +1,8 @@
 // controller/auth/ResendOtpController.js
-import crypto from "crypto";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { UserModel } from "../../../models/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
+import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
 
 const normEmail = (e) => (e || "").trim().toLowerCase();
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
@@ -10,9 +10,7 @@ const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
 const OTP_EXPIRE_MINUTES = 10;
 const RESEND_COOLDOWN_SECONDS = 60;
 
-function createPasscode() {
-  return crypto.randomInt(10000, 100000);
-}
+const createPasscode = generatePasscode;
 
 function getRemainingSeconds(lastSentAt) {
   if (!lastSentAt) return 0;
@@ -102,6 +100,7 @@ if (
     }
 
     const passcode = createPasscode();
+    const passcodeHash = hashPasscode(passcode);
     const expiresAt = new Date(Date.now() + OTP_EXPIRE_MINUTES * 60 * 1000);
     const now = new Date();
     if (otpType === "verify_account") {
@@ -113,10 +112,10 @@ if (
         });
       }
 
-      user.passcode = passcode;
+      user.passcode = passcodeHash;
       user.passcode_expires_at = expiresAt;
     } else if (otpType === "forgot_password") {
-      user.passcode = passcode;
+      user.passcode = passcodeHash;
       user.passcode_expires_at = expiresAt;
       user.can_update_password = false;
     } else if (otpType === "new_device") {
@@ -128,7 +127,7 @@ if (
         });
       }
 
-      user.another_device_code = passcode;
+      user.another_device_code = passcodeHash;
       user.another_device_expires_at = expiresAt;
     } else {
       return ReturnAppData.createError({
