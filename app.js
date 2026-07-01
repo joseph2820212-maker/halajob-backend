@@ -12,6 +12,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { createRateLimitStore } from "./services/rateLimitStore.js";
 import { verifyCvPublicToken } from "./services/cvPublicToken.service.js";
+import { httpMetricsMiddleware, metricsHandler, isMetricsEnabled } from "./services/metrics.service.js";
 
 import routes from "./routes/index.js";
 import userRoutes from "./routesUser/index.js";
@@ -149,6 +150,19 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
+
+/* ----------------------------- Metrics ----------------------------- */
+
+// Mount BEFORE routes so req.route is populated when the middleware fires.
+// GET /metrics returns 404 when METRICS_ENABLED != true — indistinguishable
+// from "not mounted" for outside callers, so scraping infra can hard-fail
+// if the endpoint is expected but disabled.
+app.use(httpMetricsMiddleware);
+app.get("/metrics", metricsHandler);
+if (isMetricsEnabled()) {
+  // eslint-disable-next-line no-console
+  console.log("[metrics] GET /metrics enabled");
+}
 
 /* ----------------------------- Rate Limits ----------------------------- */
 
