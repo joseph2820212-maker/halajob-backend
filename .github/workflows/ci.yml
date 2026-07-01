@@ -27,10 +27,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: .nvmrc
           cache: npm
 
-      - run: npm ci --ignore-scripts
+      - name: Install (postinstall scripts disabled)
+        run: npm ci --ignore-scripts
+
+      - name: Dependency audit (production)
+        run: npm audit --omit=dev --audit-level=high
+
       - run: npm run check:syntax
       - run: npm run check:imports
       - run: npm run check:permissions
