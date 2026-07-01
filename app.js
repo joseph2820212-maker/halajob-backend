@@ -4,12 +4,13 @@ import cors from "cors";
 import helmet from "helmet";
 import mongoSanitize from "express-mongo-sanitize";
 import morgan from "morgan";
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 import hpp from "hpp";
 import mongoose from "mongoose";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createRateLimitStore } from "./services/rateLimitStore.js";
 
 import routes from "./routes/index.js";
 import userRoutes from "./routesUser/index.js";
@@ -137,6 +138,30 @@ app.options("*", cors(corsOptions));
 
 /* ----------------------------- Rate Limits ----------------------------- */
 
+// Key generator: fold the raw IP into a normalized form and combine it with
+// the caller's identity when we have one. Without the /64 IPv6 grouping,
+// attackers rotate the low 64 bits of an IPv6 address and defeat per-IP
+// limits entirely — the abuse profile we saw in the pre-launch audit.
+//
+// - ipKeyGenerator collapses IPv6 addresses to /64 blocks and normalizes IPv4.
+// - Auth-tier limits also key off normalized email/user_id so credential
+//   stuffing from a botnet can't hide behind a fresh IP per attempt.
+const identityKey = (req) => {
+  const emailFromBody = String(req.body?.email || "").trim().toLowerCase();
+  const emailFromQuery = String(req.query?.email || "").trim().toLowerCase();
+  const phoneFromBody = String(req.body?.phone || req.body?.phone_national || "").trim();
+  const userId = req.user?._id ? String(req.user._id) : "";
+  return emailFromBody || emailFromQuery || phoneFromBody || userId || "";
+};
+
+const ipOnlyKey = (req) => ipKeyGenerator(req.ip || "");
+
+const ipPlusIdentityKey = (req) => {
+  const identity = identityKey(req);
+  const ip = ipKeyGenerator(req.ip || "");
+  return identity ? `${ip}|${identity}` : ip;
+};
+
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: isProduction ? 300 : 2000,
@@ -146,6 +171,8 @@ const globalLimiter = rateLimit({
     success: false,
     message: "too_many_requests",
   },
+  keyGenerator: ipOnlyKey,
+  store: createRateLimitStore("rl:global"),
 });
 
 const authLimiter = rateLimit({
@@ -157,6 +184,8 @@ const authLimiter = rateLimit({
     success: false,
     message: "too_many_auth_requests",
   },
+  keyGenerator: ipPlusIdentityKey,
+  store: createRateLimitStore("rl:auth"),
 });
 
 const uploadLimiter = rateLimit({
@@ -168,6 +197,8 @@ const uploadLimiter = rateLimit({
     success: false,
     message: "too_many_upload_requests",
   },
+  keyGenerator: ipPlusIdentityKey,
+  store: createRateLimitStore("rl:upload"),
 });
 
 app.use(globalLimiter);

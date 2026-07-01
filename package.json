@@ -167,6 +167,7 @@
     "nspell": "^2.1.5",
     "password-validator": "^5.2.1",
     "puppeteer": "^24.43.1",
+    "rate-limit-redis": "^5.0.0",
     "redis": "^4.7.1",
     "sharp": "^0.34.1",
     "trim-request": "^1.0.6",
