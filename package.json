@@ -122,6 +122,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "^10.63.0",
     "@turf/turf": "^7.1.0",
     "@types/passport": "^1.0.7",
     "@vitalets/google-translate-api": "^9.2.1",

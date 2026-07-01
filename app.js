@@ -14,6 +14,7 @@ import { createRateLimitStore } from "./services/rateLimitStore.js";
 import { verifyCvPublicToken } from "./services/cvPublicToken.service.js";
 import { httpMetricsMiddleware, metricsHandler, isMetricsEnabled } from "./services/metrics.service.js";
 import { idempotencyMiddleware } from "./middlewares/idempotency.js";
+import { initSentryHttpHooks, initSentryErrorHook, isSentryEnabled } from "./services/sentry.service.js";
 
 import routes from "./routes/index.js";
 import userRoutes from "./routesUser/index.js";
@@ -148,6 +149,15 @@ const corsOptions = {
   maxAge: 86400,
   optionsSuccessStatus: 204,
 };
+
+// Sentry request + tracing handlers must be the FIRST middleware so
+// every request is captured, including ones that die inside CORS / rate
+// limit. No-op when SENTRY_DSN is unset.
+initSentryHttpHooks(app);
+if (isSentryEnabled()) {
+  // eslint-disable-next-line no-console
+  console.log("[sentry] request tracing enabled");
+}
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
@@ -473,6 +483,11 @@ app.use("/public/v1", publicRoutes);
 app.use("/user/v1", userRoutes);
 
 /* ----------------------------- Error Handling ----------------------------- */
+
+// Sentry error handler runs BEFORE our own so it captures the exception
+// before error.handler serialises it into an HTTP response. No-op when
+// SENTRY_DSN is unset.
+initSentryErrorHook(app);
 
 app.use(error.notFound);
 app.use(error.converter);
