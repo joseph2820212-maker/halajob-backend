@@ -2,6 +2,7 @@ import { CompanyModel } from "../../models/index.js";
 import { fail, paginate, success } from "../../helper/companyDash/companyDashHelpers.js";
 import {
   PUBLIC_COMPANY_BASE_FILTER,
+  PUBLIC_JOB_FIELDS,
   buildCompanyPublicSearchFilter,
   buildPublicCompanyPayload,
   listPublicJobsForCompany,
@@ -70,6 +71,7 @@ export const getCompanyJobs = async (req, res, next) => {
     const result = await paginate(jobsModel, publicJobFilterForCompany(company._id), req, {
       sort: { createdAt: -1, _id: -1 },
       populate: [],
+      select: PUBLIC_JOB_FIELDS,
       lean: true,
     });
     return success(res, result.items, "public_company_jobs", 200, result.meta);

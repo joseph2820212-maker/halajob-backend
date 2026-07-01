@@ -1,16 +1,30 @@
 # Contributing
 
-Date: 2026-06-28
+Date: 2026-07-01
 
 This repo is in launch-hardening mode. Keep changes small, testable, and tied
 to a handout gate or a documented bug.
 
+## Repository Scope
+
+This is the **backend-only** repo. It was split off the historical `halajobe`
+monorepo. The sibling repos hold the other surfaces:
+
+- `halajob-website` — public site + seeker web (Vite + React + TS)
+- `halajob-admin`   — admin console (Vite + React + TS)
+- `halajob-mobile`  — seeker + campus mobile (Flutter)
+
+Backend-only changes belong here. Web, admin, or mobile changes belong in the
+matching sibling repo. Do not open PRs here that touch `web/` or `mobile/` —
+those folders do not exist in this split.
+
 ## Branches
 
-- Base launch work on `flutter-seeker-campus`.
+- Base launch work on `main`. The old `flutter-seeker-campus` branch lived in
+  the monorepo and does not exist in this split.
 - Use a focused branch name such as `codex/<gate-or-fix>` or `claude/<gate-or-fix>`.
-- The GitHub workflow runs for `flutter-seeker-campus`, `codex/**`, `claude/**`,
-  pull requests into `flutter-seeker-campus`, and manual dispatch.
+- The GitHub workflow runs for `main`, `codex/**`, `claude/**`, pull requests
+  into `main`, and manual dispatch.
 
 ## Secrets And Runtime Files
 
@@ -31,28 +45,15 @@ npm run check:secrets
 
 ## Setup
 
-Backend:
+Backend (this repo):
 
 ```bash
 npm ci
 npm run dev
 ```
 
-Web:
-
-```bash
-npm --prefix web ci
-npm --prefix web run build
-```
-
-Mobile:
-
-```bash
-cd mobile
-flutter pub get
-flutter analyze
-flutter test
-```
+Web / admin / mobile: check out the matching sibling repo and follow its own
+`README.md` / `CONTRIBUTING.md`.
 
 ## Tests
 
@@ -102,4 +103,3 @@ Every PR or handoff should state:
 Do not hide external blockers. Production credentials, provider setup, real
 device approval, production admin audit, secret rotation, and live smoke tests
 must be called out clearly when they are not available.
-

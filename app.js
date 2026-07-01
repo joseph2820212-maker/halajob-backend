@@ -35,8 +35,21 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const isProduction = process.env.NODE_ENV === "production";
+const isDevelopment = process.env.NODE_ENV === "development";
 
-app.set("trust proxy", 1);
+// Explicit opt-in for the "allow any origin" behaviour that used to be
+// implicit whenever NODE_ENV !== "production". Any staging/preview deploy
+// without NODE_ENV=production was previously reflecting Access-Control-Allow-
+// Origin for every caller. Now callers must set ALLOW_ANY_CORS=true (only
+// safe for local dev) to reopen that door.
+const allowAnyCors =
+  (process.env.ALLOW_ANY_CORS || "").trim().toLowerCase() === "true";
+
+// TRUST_PROXY controls how many upstream proxies express counts as trusted
+// when reading req.ip. Vercel/Cloudflare/etc typically want 1; a bare host
+// wants 0. Kept as env with a safe default of 1 for the current deploy shape.
+const trustProxy = Number.parseInt(process.env.TRUST_PROXY || "1", 10);
+app.set("trust proxy", Number.isFinite(trustProxy) ? trustProxy : 1);
 
 /* ----------------------------- CORS ----------------------------- */
 
@@ -59,11 +72,25 @@ const allowedOriginPatterns = parseOrigins(process.env.CORS_ORIGIN_PATTERNS).map
 const isAllowedOrigin = (origin) =>
   allowedOrigins.includes(origin) || allowedOriginPatterns.some((pattern) => pattern.test(origin));
 
+// Assert we're not accidentally left with an empty CORS_ORIGINS in a real
+// deploy. In development that's a hint. Anywhere else it's fatal.
+if (!isDevelopment && allowedOrigins.length === 0 && allowedOriginPatterns.length === 0 && !allowAnyCors) {
+  // eslint-disable-next-line no-console
+  console.error(
+    "[cors] refusing to boot: CORS_ORIGINS is empty and ALLOW_ANY_CORS!=true. " +
+      "Set CORS_ORIGINS to the comma-separated list of allowed origins.",
+  );
+  process.exit(1);
+}
+
 const corsOptions = {
   origin(origin, callback) {
     if (!origin) return callback(null, true);
 
-    if (!isProduction) {
+    // Explicit dev-time bypass. Never gated on NODE_ENV alone — we saw deploys
+    // in the wild running with NODE_ENV unset, which used to reopen CORS to
+    // the world. Now the bypass requires the operator to set the env var.
+    if (allowAnyCors) {
       return callback(null, true);
     }
 

@@ -511,9 +511,23 @@ const listSessions = async (req, res, next) => {
     }
 
     const currentRefreshToken = refreshTokenFromRequest(req, "company");
+    // Look up the current session's _id from the token instead of shipping
+    // every session's token to the client. Any client that can read the
+    // /sessions payload could otherwise walk away with every one of the
+    // user's live refresh tokens.
+    const currentSession = currentRefreshToken
+      ? await RefreshTokenModel.findOne({
+          userRef: userId,
+          token: currentRefreshToken,
+        })
+          .select("_id")
+          .lean()
+      : null;
+    const currentSessionId = currentSession?._id?.toString() || null;
+
     const sessions = await RefreshTokenModel.find({ userRef: userId })
       .sort({ updatedAt: -1, loginTime: -1 })
-      .select("_id loginTime expiresAt device createdAt updatedAt token")
+      .select("_id loginTime expiresAt device createdAt updatedAt")
       .lean();
 
     return ReturnAppData.createData({
@@ -527,7 +541,7 @@ const listSessions = async (req, res, next) => {
         createdAt: session.createdAt,
         updatedAt: session.updatedAt,
         current: Boolean(
-          currentRefreshToken && session.token === currentRefreshToken,
+          currentSessionId && session._id?.toString() === currentSessionId,
         ),
       })),
     });

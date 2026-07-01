@@ -1,6 +1,12 @@
 import { UserModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 
+// Match the sibling PassCodeController lockout budget. Five wrong tries while
+// the same code is still valid → the caller must request a new code. Without
+// this counter, the 5-digit code (crypto.randomInt(10000, 100000) → 90k space)
+// would be brute-forceable inside the 10-minute validity window.
+const MAX_PASSCODE_ATTEMPTS = 5;
+
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
 const normEmail = (e) => (e || "").trim().toLowerCase();
@@ -80,6 +86,23 @@ export const passcodeVerify = async (req, res, next) => {
     }
 
     const now = new Date();
+
+    // Brute-force lockout: too many wrong attempts while a code is still valid.
+    const codeStillValid =
+      (user.passcode_expires_at && now < new Date(user.passcode_expires_at)) ||
+      (user.another_device_expires_at &&
+        now < new Date(user.another_device_expires_at));
+    if ((user.passcode_attempts || 0) >= MAX_PASSCODE_ATTEMPTS && codeStillValid) {
+      return ReturnAppData.createError({
+        res,
+        status: 429,
+        message:
+          lan === "ar"
+            ? "محاولات كثيرة غير صحيحة. اطلب رمزًا جديدًا."
+            : "Too many incorrect attempts. Please request a new code.",
+      });
+    }
+
     const recoveryCodeValid =
       user.passcode &&
       String(user.passcode) === String(passcode).trim() &&
@@ -117,6 +140,7 @@ export const passcodeVerify = async (req, res, next) => {
       user.another_device_code = undefined;
       user.another_device_expires_at = undefined;
       user.pending_device = undefined;
+      user.passcode_attempts = 0;
       user.can_update_password = true;
       user.passcode = undefined;
       user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000);
@@ -137,6 +161,7 @@ export const passcodeVerify = async (req, res, next) => {
     if (recoveryCodeValid) {
       user.passcode = undefined;
       user.passcode_expires_at = new Date(Date.now() + 10 * 60 * 1000);
+      user.passcode_attempts = 0;
       user.can_update_password = true;
       if (incomingDevice?.brand && incomingDevice?.model_name) {
         addOrUpdateDevice(user, incomingDevice, { makeDefault: true });
@@ -154,6 +179,12 @@ export const passcodeVerify = async (req, res, next) => {
             : "Account verified. You can reset your password now.",
       });
     }
+
+    // Wrong/expired code: count the failed attempt toward the lockout threshold.
+    user.passcode_attempts = (user.passcode_attempts || 0) + 1;
+    try {
+      await user.save();
+    } catch (_) {}
 
     return ReturnAppData.createError({
       res,

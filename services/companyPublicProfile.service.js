@@ -179,11 +179,66 @@ export const publicJobFilterForCompany = (companyId) => ({
   publish_status: { $in: ["published", null] },
 });
 
+// Explicit allow-list of job fields that are safe to hand to unauthenticated
+// callers. Any field not listed here — recruiter emails, internal user_id /
+// created_by / stopped_by refs, trust score, is_send_emails, and every other
+// operational field — is stripped from the payload. Applies to both the
+// company profile page and the public /companies/:slug/jobs listing.
+export const PUBLIC_JOB_FIELDS = [
+  "_id",
+  "title",
+  "title_ar",
+  "slug",
+  "description",
+  "description_ar",
+  "requirements",
+  "requirements_ar",
+  "skills",
+  "job_type",
+  "job_type_id",
+  "work_mode",
+  "work_mode_id",
+  "work_time",
+  "work_time_id",
+  "experience_level",
+  "experience_level_id",
+  "education_level_id",
+  "industry_id",
+  "category_id",
+  "salary_min",
+  "salary_max",
+  "salary_type",
+  "salary_type_id",
+  "currency",
+  "currency_id",
+  "country",
+  "country_id",
+  "city",
+  "city_id",
+  "address",
+  "location",
+  "company_id",
+  "publish_status",
+  "publish_at",
+  "expires_at",
+  "createdAt",
+  "updatedAt",
+  "views_count",
+  "applications_count",
+  "saves_count",
+  "rating_avg",
+  "rating_count",
+  "is_urgent",
+  "is_featured",
+  "positions_number",
+].join(" ");
+
 export const listPublicJobsForCompany = (companyId, limit = 10) =>
   jobsModel
     .find(publicJobFilterForCompany(companyId))
     .sort({ createdAt: -1, _id: -1 })
     .limit(Number(limit) || 10)
+    .select(PUBLIC_JOB_FIELDS)
     .populate(publicJobPopulate)
     .lean();
 
