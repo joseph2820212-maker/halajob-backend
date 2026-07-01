@@ -1,6 +1,6 @@
 # Hala Job API Reference
 
-Generated: 2026-07-01T11:29:19.162Z
+Generated: 2026-07-01T11:32:10.428Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -23,7 +23,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Module | Endpoints |
 | --- | --- |
 | AI | 12 |
-| Admin | 938 |
+| Admin | 530 |
 | Analytics | 5 |
 | Campus | 18 |
 | Campus Student | 51 |
@@ -91,78 +91,30 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/dash/v1/accessibility-requests/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/accessibility-requests/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/activity` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, tracking |
-| GET | `/dash/v1/Admin` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admin` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Admin/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admin/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admin/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Admin/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admin/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admin/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admin/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admin/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admin/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Admin/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admin/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admin/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admin/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admin/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admin/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admin/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admin/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admin/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admin/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admin/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admin/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Admin/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/admins` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/admins` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admins` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admins` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/admins/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/admins/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/admins/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/admins/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Admins/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admins/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admins/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Admins/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/admins/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/admins/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admins/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admins/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/admins/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/admins/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admins/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admins/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/admins/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admins/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/admins/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/admins/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Admins/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admins/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/admins/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admins/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/admins/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admins/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/admins/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admins/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/admins/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admins/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/admins/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admins/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/admins/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Admins/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/admins/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/admins/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admins/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admins/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/admins/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/admins/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/admins/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Admins/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Admins/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Admins/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/ai/features` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listFeatures |
 | GET | `/dash/v1/ai/limits` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, listLimits |
 | POST | `/dash/v1/ai/limits` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, listLimits |
@@ -195,54 +147,28 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/dash/v1/communication/test-send` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, testSend |
 | GET | `/dash/v1/companies` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/companies` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Companies` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Companies` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/companies/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/companies/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/companies/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/companies/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Companies/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Companies/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Companies/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Companies/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/companies/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/companies/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Companies/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Companies/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/companies/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/companies/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Companies/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Companies/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/companies/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Companies/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/companies/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/companies/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Companies/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Companies/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/companies/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Companies/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/companies/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Companies/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/companies/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Companies/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/companies/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Companies/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/companies/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Companies/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/companies/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Companies/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/companies/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/companies/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Companies/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Companies/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/companies/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/companies/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/companies/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Companies/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Companies/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Companies/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Company` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Company` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/company-public-profiles/:companyId/approve` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, approve |
 | POST | `/dash/v1/company-public-profiles/:companyId/reject` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, reject |
 | GET | `/dash/v1/company-public-profiles/pending` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, listPending |
@@ -251,52 +177,6 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/dash/v1/company-requests/:id/approve` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, approveCompanyRequest |
 | PATCH | `/dash/v1/company-requests/:id/reject` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, rejectCompanyRequest |
 | POST | `/dash/v1/company-requests/:id/reject` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, rejectCompanyRequest |
-| DELETE | `/dash/v1/Company/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Company/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Company/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Company/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Company/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Company/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Company/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Company/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Company/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Company/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Company/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Company/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Company/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Company/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Company/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Company/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Company/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Company/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Company/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Company/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Company/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Company/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/content-pages` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/content-pages` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/content-pages/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/content-pages/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/content-pages/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/content-pages/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/content-pages/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/content-pages/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/content-pages/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/content-pages/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/content-pages/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/content-pages/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/content-pages/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/content-pages/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/content-pages/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/content-pages/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/content-pages/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/content-pages/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/content-pages/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/content-pages/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/content-pages/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/content-pages/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/content-pages/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/content-pages/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/content/pages` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/content/pages` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/content/pages/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
@@ -338,78 +218,30 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/dash/v1/dashboard/dash` | Bearer token | inferred-parent-mount | inferred:isAdmin, overview |
 | GET | `/dash/v1/dashboard/overview` | Bearer token | inferred-parent-mount | inferred:isAdmin, overview |
 | GET | `/dash/v1/dashboard/tracking` | Bearer token | inferred-parent-mount | inferred:isAdmin, tracking |
-| GET | `/dash/v1/Employee` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employee` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Employee/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employee/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employee/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Employee/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employee/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employee/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employee/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employee/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employee/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Employee/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employee/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employee/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employee/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employee/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employee/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employee/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employee/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employee/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employee/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employee/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employee/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Employee/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/employees` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/employees` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employees` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employees` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/employees/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/employees/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/employees/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/employees/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Employees/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employees/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employees/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Employees/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/employees/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/employees/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employees/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employees/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/employees/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/employees/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employees/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employees/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/employees/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employees/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/employees/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/employees/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Employees/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employees/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/employees/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employees/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/employees/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employees/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/employees/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employees/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/employees/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employees/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/employees/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employees/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/employees/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Employees/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/employees/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/employees/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employees/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employees/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/employees/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/employees/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/employees/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Employees/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Employees/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Employees/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/excel/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, create |
 | POST | `/dash/v1/excel/csv` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, csv |
 | POST | `/dash/v1/excel/exsel` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, uploadExcel |
@@ -432,83 +264,35 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | PATCH | `/dash/v1/interview-prep/questions/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, updateQuestion |
 | GET | `/dash/v1/invoices` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listInvoices |
 | GET | `/dash/v1/invoices/:invoiceId` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, getInvoice |
-| GET | `/dash/v1/Job` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Job` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/job-approvals` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listJobReviewQueue |
-| DELETE | `/dash/v1/Job/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Job/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Job/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Job/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Job/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Job/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Job/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Job/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Job/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Job/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Job/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Job/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Job/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Job/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Job/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Job/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Job/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Job/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Job/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Job/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Job/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Job/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/jobs` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/jobs` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Jobs` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Jobs` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/jobs/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/jobs/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/jobs/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/jobs/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Jobs/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Jobs/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Jobs/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Jobs/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/jobs/:id/approve` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, approveJob |
 | POST | `/dash/v1/jobs/:id/approve` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, approveJob |
 | PATCH | `/dash/v1/jobs/:id/reject` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, rejectJob |
 | POST | `/dash/v1/jobs/:id/reject` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, rejectJob |
 | PATCH | `/dash/v1/jobs/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/jobs/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Jobs/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Jobs/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/jobs/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/jobs/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Jobs/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Jobs/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/jobs/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Jobs/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/jobs/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/jobs/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Jobs/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Jobs/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/jobs/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Jobs/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/jobs/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Jobs/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/jobs/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Jobs/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/jobs/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Jobs/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/jobs/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Jobs/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/jobs/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Jobs/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/jobs/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/jobs/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Jobs/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Jobs/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/jobs/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/jobs/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/jobs/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Jobs/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Jobs/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Jobs/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/keyword/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, get |
 | GET | `/dash/v1/Keyword/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, get |
 | GET | `/dash/v1/keyword/log` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, logKeyword |
@@ -562,30 +346,6 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/dash/v1/operations/support-tickets/:ticketId/messages` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, addAdminMessage |
 | PATCH | `/dash/v1/operations/support-tickets/:ticketId/status` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, updateTicketStatus |
 | GET | `/dash/v1/operations/talent-requests` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listTalentRequests |
-| GET | `/dash/v1/Permission` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Permission` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Permission/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Permission/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Permission/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Permission/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Permission/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Permission/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Permission/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Permission/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Permission/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Permission/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Permission/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Permission/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Permission/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Permission/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Permission/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Permission/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Permission/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Permission/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Permission/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Permission/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Permission/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Permission/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/permissions` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/permissions` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/permissions/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
@@ -657,30 +417,6 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/dash/v1/resources/:resource/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkResourcePermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/resources/users/:id/role` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/resources/users/:id/role` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Role` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Role` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Role/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Role/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Role/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Role/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Role/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Role/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Role/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Role/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Role/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Role/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Role/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Role/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Role/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Role/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Role/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Role/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Role/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Role/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Role/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Role/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Role/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Role/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/roles` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/roles` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/roles/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
@@ -711,52 +447,28 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/dash/v1/search/global` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, globalSearch |
 | GET | `/dash/v1/settings` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/settings` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Settings` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Settings` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/settings/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/settings/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/settings/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/settings/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Settings/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Settings/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Settings/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Settings/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/settings/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/settings/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Settings/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Settings/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/settings/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/settings/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Settings/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Settings/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/settings/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Settings/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/settings/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/settings/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Settings/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Settings/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/settings/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Settings/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/settings/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Settings/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/settings/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Settings/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/settings/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Settings/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/settings/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Settings/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/settings/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Settings/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/settings/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/settings/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Settings/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Settings/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/settings/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/settings/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/settings/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Settings/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Settings/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Settings/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/statistics` | Bearer token | inferred-parent-mount | inferred:isAdmin, overview |
 | GET | `/dash/v1/statistics/activity` | Bearer token | inferred-parent-mount | inferred:isAdmin, tracking |
 | GET | `/dash/v1/statistics/dash` | Bearer token | inferred-parent-mount | inferred:isAdmin, overview |
@@ -819,30 +531,6 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | PATCH | `/dash/v1/talent-requests/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/talent-requests/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/talent-requests/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/TalentRequest` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/TalentRequest` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/TalentRequest/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/TalentRequest/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/TalentRequest/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/TalentRequest/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/TalentRequest/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/TalentRequest/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/TalentRequest/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/TalentRequest/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/TalentRequest/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/TalentRequest/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/TalentRequest/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/TalentRequest/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/TalentRequest/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/TalentRequest/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/TalentRequest/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/TalentRequest/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/TalentRequest/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/TalentRequest/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/TalentRequest/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/TalentRequest/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/TalentRequest/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/TalentRequest/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/tracking` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, tracking |
 | GET | `/dash/v1/translation-logs` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listTranslations |
 | GET | `/dash/v1/translations` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, listTranslations |
@@ -855,148 +543,52 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/dash/v1/trust/review-queue` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, reviewQueue |
 | GET | `/dash/v1/universities` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/universities` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Universities` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Universities` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/universities/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/universities/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/universities/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/universities/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Universities/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Universities/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Universities/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Universities/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/universities/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/universities/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Universities/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Universities/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/universities/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/universities/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Universities/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Universities/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/universities/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Universities/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/universities/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/universities/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Universities/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Universities/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/universities/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Universities/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/universities/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Universities/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/universities/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Universities/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/universities/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Universities/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/universities/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Universities/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/universities/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Universities/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/universities/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/universities/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Universities/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Universities/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/universities/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/universities/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/universities/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Universities/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Universities/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Universities/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/University` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/University` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/University/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/University/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/University/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/University/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/University/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/University/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/University/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/University/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/University/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/University/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/University/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/University/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/University/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/University/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/University/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/University/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/University/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/University/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/University/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/University/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/University/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/University/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/User` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/User` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/User/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/User/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/User/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/User/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/User/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/User/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/User/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/User/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/User/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/User/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/User/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/User/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/User/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/User/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/User/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/User/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/User/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/User/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/User/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/User/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/User/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/User/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/users` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/users` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Users` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Users` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/users/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/users/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/users/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/users/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Users/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Users/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Users/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Users/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/users/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/users/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Users/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Users/approve/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/users/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/users/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Users/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Users/bulk-update` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/users/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Users/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | DELETE | `/dash/v1/users/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/users/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| DELETE | `/dash/v1/Users/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Users/delete/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/users/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Users/details/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/users/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Users/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/users/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Users/get-one/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/users/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Users/getOne` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/users/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Users/getOne/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | GET | `/dash/v1/users/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
-| GET | `/dash/v1/Users/list` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/users/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/users/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Users/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Users/reject/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PATCH | `/dash/v1/users/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | POST | `/dash/v1/users/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 | PUT | `/dash/v1/users/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PATCH | `/dash/v1/Users/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| POST | `/dash/v1/Users/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
-| PUT | `/dash/v1/Users/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, anonymous |
 
 ## Analytics
 

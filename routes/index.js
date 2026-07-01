@@ -705,22 +705,16 @@ router.patch(
   LearningResourceAdminController.updateCategory,
 );
 
-/* ----------------------------- Legacy resource aliases used by old dashboard ----------------------------- */
-router.use("/Role", createDashResourceRouter("roles"));
+/* ----------------------------- Canonical admin resource mounts (kebab-case) ----------------------------- */
+// Wave 2 (cleanup): consolidated to one canonical kebab-case mount per resource.
+// Every client (admin + website + mobile) already uses the kebab-case spellings via
+// the generic /dash/v1/resources/:resource surface; the CamelCase and singular aliases
+// had zero direct callers.
 router.use("/roles", createDashResourceRouter("roles"));
-router.use("/Permission", createDashResourceRouter("permissions"));
 router.use("/permissions", createDashResourceRouter("permissions"));
-router.use("/User", createDashResourceRouter("users"));
-router.use("/Users", createDashResourceRouter("users"));
 router.use("/users", createDashResourceRouter("users"));
-router.use("/Admin", createDashResourceRouter("admins"));
-router.use("/Admins", createDashResourceRouter("admins"));
 router.use("/admins", createDashResourceRouter("admins"));
-router.use("/Employee", createDashResourceRouter("employees"));
-router.use("/Employees", createDashResourceRouter("employees"));
 router.use("/employees", createDashResourceRouter("employees"));
-router.use("/Company", createDashResourceRouter("companies"));
-router.use("/Companies", createDashResourceRouter("companies"));
 router.use("/companies", createDashResourceRouter("companies"));
 // Removed Wave 1 (cleanup): companyreviews, industries admin CRUD scaffolds — zero admin UI callers.
 //   router.use("/CompanyReview",  createDashResourceRouter("companyreviews"));
@@ -728,8 +722,6 @@ router.use("/companies", createDashResourceRouter("companies"));
 //   router.use("/Industry",   createDashResourceRouter("industries"));
 //   router.use("/industries", createDashResourceRouter("industries"));
 
-router.use("/Job", createDashResourceRouter("jobs"));
-router.use("/Jobs", createDashResourceRouter("jobs"));
 router.use("/jobs", createDashResourceRouter("jobs"));
 // Removed Wave 1 (cleanup): jobnames, jobservices, jobtypes, jobsalaries, worktime, workmodes, worklocations
 // admin CRUD scaffolds — zero admin UI callers. Reference/lookup data is admin-managed elsewhere or seeded.
@@ -786,10 +778,7 @@ router.use("/jobs", createDashResourceRouter("jobs"));
 //   router.use("/Reports",    createDashResourceRouter("jobreports"));
 //   router.use("/JobReport",  createDashResourceRouter("jobreports"));
 //   router.use("/reports",    createDashResourceRouter("jobreports"));
-router.use("/TalentRequest", createDashResourceRouter("talentrequests"));
 router.use("/talent-requests", createDashResourceRouter("talentrequests"));
-router.use("/University", createDashResourceRouter("universities"));
-router.use("/Universities", createDashResourceRouter("universities"));
 router.use("/universities", createDashResourceRouter("universities"));
 router.get(
   "/campus/universities",
@@ -852,9 +841,9 @@ router.get(
 //   router.use("/Pages", createDashResourceRouter("pages"));
 //   router.use("/pages", createDashResourceRouter("pages"));
 
-// Legal / Help / Support / Privacy content package (Gate 3) admin management
+// Legal / Help / Support / Privacy content package (Gate 3) admin management.
+// Wave 2 (cleanup): dropped /content-pages alias — admin repo uses /content/pages.
 router.use("/content/pages", createDashResourceRouter("contentpages"));
-router.use("/content-pages", createDashResourceRouter("contentpages"));
 // Removed Wave 1 (cleanup): helpcategories, helparticles, faqitems admin CRUD scaffolds — zero admin UI callers.
 // Help content is admin-managed via contentpages + content/help/faq resource endpoints.
 //   router.use("/help/categories",  createDashResourceRouter("helpcategories"));
@@ -891,7 +880,7 @@ router.use(
 //   router.use("/CompanySubscription",  createDashResourceRouter("companysubscriptions"));
 //   router.use("/CompanySubscriptions", createDashResourceRouter("companysubscriptions"));
 //   router.use("/company-subscriptions", createDashResourceRouter("companysubscriptions"));
-router.use("/Settings", createDashResourceRouter("settings"));
+// Wave 2 (cleanup): dropped /Settings alias.
 router.use("/settings", createDashResourceRouter("settings"));
 
 /* ----------------------------- Generic API for new dashboard screens ----------------------------- */
