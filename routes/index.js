@@ -605,8 +605,9 @@ router.use("/import", can("jobs.moderate"), exselRoute);
 router.use("/Keyword", keywordRoute);
 router.use("/keyword", keywordRoute);
 router.use("/cv", cvRoute);
-router.use("/cv-template", createDashResourceRouter("cvtemplates"));
-router.use("/cv-templates", createDashResourceRouter("cvtemplates"));
+// Removed Wave 1 (cleanup): cvtemplates admin CRUD scaffold — zero admin UI callers.
+//   router.use("/cv-template",  createDashResourceRouter("cvtemplates"));
+//   router.use("/cv-templates", createDashResourceRouter("cvtemplates"));
 
 /* ----------------------------- Interview prep question bank ----------------------------- */
 router.get(
@@ -721,77 +722,70 @@ router.use("/employees", createDashResourceRouter("employees"));
 router.use("/Company", createDashResourceRouter("companies"));
 router.use("/Companies", createDashResourceRouter("companies"));
 router.use("/companies", createDashResourceRouter("companies"));
-router.use("/CompanyReview", createDashResourceRouter("companyreviews"));
-router.use("/company-reviews", createDashResourceRouter("companyreviews"));
-router.use("/Industry", createDashResourceRouter("industries"));
-router.use("/industries", createDashResourceRouter("industries"));
+// Removed Wave 1 (cleanup): companyreviews, industries admin CRUD scaffolds — zero admin UI callers.
+//   router.use("/CompanyReview",  createDashResourceRouter("companyreviews"));
+//   router.use("/company-reviews", createDashResourceRouter("companyreviews"));
+//   router.use("/Industry",   createDashResourceRouter("industries"));
+//   router.use("/industries", createDashResourceRouter("industries"));
 
 router.use("/Job", createDashResourceRouter("jobs"));
 router.use("/Jobs", createDashResourceRouter("jobs"));
 router.use("/jobs", createDashResourceRouter("jobs"));
-router.use("/JobName", createDashResourceRouter("jobnames"));
-router.use("/job-names", createDashResourceRouter("jobnames"));
-router.use("/JobService", createDashResourceRouter("jobservices"));
-router.use("/job-services", createDashResourceRouter("jobservices"));
-router.use("/JobType", createDashResourceRouter("jobtypes"));
-router.use("/job-types", createDashResourceRouter("jobtypes"));
-router.use("/JobSalary", createDashResourceRouter("jobsalaries"));
-router.use("/job-salaries", createDashResourceRouter("jobsalaries"));
-router.use("/WorkTime", createDashResourceRouter("worktime"));
-router.use("/work-times", createDashResourceRouter("worktime"));
-router.use("/WorkMode", createDashResourceRouter("workmodes"));
-router.use("/work-modes", createDashResourceRouter("workmodes"));
-router.use("/WorkLocation", createDashResourceRouter("worklocations"));
-router.use("/work-locations", createDashResourceRouter("worklocations"));
+// Removed Wave 1 (cleanup): jobnames, jobservices, jobtypes, jobsalaries, worktime, workmodes, worklocations
+// admin CRUD scaffolds — zero admin UI callers. Reference/lookup data is admin-managed elsewhere or seeded.
+//   router.use("/JobName",    createDashResourceRouter("jobnames"));
+//   router.use("/job-names",  createDashResourceRouter("jobnames"));
+//   router.use("/JobService", createDashResourceRouter("jobservices"));
+//   router.use("/job-services", createDashResourceRouter("jobservices"));
+//   router.use("/JobType",    createDashResourceRouter("jobtypes"));
+//   router.use("/job-types",  createDashResourceRouter("jobtypes"));
+//   router.use("/JobSalary",  createDashResourceRouter("jobsalaries"));
+//   router.use("/job-salaries", createDashResourceRouter("jobsalaries"));
+//   router.use("/WorkTime",   createDashResourceRouter("worktime"));
+//   router.use("/work-times", createDashResourceRouter("worktime"));
+//   router.use("/WorkMode",   createDashResourceRouter("workmodes"));
+//   router.use("/work-modes", createDashResourceRouter("workmodes"));
+//   router.use("/WorkLocation",   createDashResourceRouter("worklocations"));
+//   router.use("/work-locations", createDashResourceRouter("worklocations"));
 
-router.use(
-  "/ApplicationHistory",
-  createDashResourceRouter("applicationhistory"),
-);
-router.use(
-  "/application-history",
-  createDashResourceRouter("applicationhistory"),
-);
-router.use(
-  "/OutsideApplication",
-  createDashResourceRouter("outsideapplications"),
-);
-router.use(
-  "/outside-applications",
-  createDashResourceRouter("outsideapplications"),
-);
-router.use("/JobMatch", createDashResourceRouter("jobmatches"));
-router.use("/job-matches", createDashResourceRouter("jobmatches"));
-router.use("/JobEmployeeMatch", createDashResourceRouter("jobemployeematches"));
-router.use(
-  "/job-employee-matches",
-  createDashResourceRouter("jobemployeematches"),
-);
-router.use("/Rating", createDashResourceRouter("ratings"));
-router.use("/ratings", createDashResourceRouter("ratings"));
-router.use("/Review", createDashResourceRouter("reviews"));
-router.use("/reviews", createDashResourceRouter("reviews"));
-router.use("/SavedJob", createDashResourceRouter("savedjobs"));
-router.use("/saved-jobs", createDashResourceRouter("savedjobs"));
-router.use("/ShownJob", createDashResourceRouter("shownjobs"));
-router.use("/shown-jobs", createDashResourceRouter("shownjobs"));
-router.use("/EmployeeCv", createDashResourceRouter("employeecvs"));
-router.use("/employee-cvs", createDashResourceRouter("employeecvs"));
-router.use("/UserResume", createDashResourceRouter("userresumes"));
-router.use("/user-resumes", createDashResourceRouter("userresumes"));
-router.use("/Application", createDashResourceRouter("applications"));
-router.use("/Applications", createDashResourceRouter("applications"));
-router.use("/applications", createDashResourceRouter("applications"));
-router.use("/Interview", createDashResourceRouter("interviews"));
-router.use("/Interviews", createDashResourceRouter("interviews"));
-router.use("/interviews", createDashResourceRouter("interviews"));
-router.use("/Invitation", createDashResourceRouter("invitations"));
-router.use("/Invitations", createDashResourceRouter("invitations"));
-router.use("/invitations", createDashResourceRouter("invitations"));
-router.use("/Report", createDashResourceRouter("jobreports"));
-router.use("/Reports", createDashResourceRouter("jobreports"));
-router.use("/JobReport", createDashResourceRouter("jobreports"));
-router.use("/reports", createDashResourceRouter("jobreports"));
+// Removed Wave 1 (cleanup): the following admin CRUD scaffolds — zero admin UI callers per audit
+// (applicationhistory, outsideapplications, jobmatches, jobemployeematches, ratings, reviews,
+// savedjobs, shownjobs, employeecvs, userresumes, applications, interviews, invitations, jobreports).
+// Controllers + models retained; only the generic Express mounts are removed. Custom moderation
+// paths for jobs/companies keep their own explicit routes.
+//   router.use("/ApplicationHistory", createDashResourceRouter("applicationhistory"));
+//   router.use("/application-history", createDashResourceRouter("applicationhistory"));
+//   router.use("/OutsideApplication", createDashResourceRouter("outsideapplications"));
+//   router.use("/outside-applications", createDashResourceRouter("outsideapplications"));
+//   router.use("/JobMatch",  createDashResourceRouter("jobmatches"));
+//   router.use("/job-matches", createDashResourceRouter("jobmatches"));
+//   router.use("/JobEmployeeMatch",     createDashResourceRouter("jobemployeematches"));
+//   router.use("/job-employee-matches", createDashResourceRouter("jobemployeematches"));
+//   router.use("/Rating",  createDashResourceRouter("ratings"));
+//   router.use("/ratings", createDashResourceRouter("ratings"));
+//   router.use("/Review",  createDashResourceRouter("reviews"));
+//   router.use("/reviews", createDashResourceRouter("reviews"));
+//   router.use("/SavedJob",    createDashResourceRouter("savedjobs"));
+//   router.use("/saved-jobs",  createDashResourceRouter("savedjobs"));
+//   router.use("/ShownJob",    createDashResourceRouter("shownjobs"));
+//   router.use("/shown-jobs",  createDashResourceRouter("shownjobs"));
+//   router.use("/EmployeeCv",     createDashResourceRouter("employeecvs"));
+//   router.use("/employee-cvs",   createDashResourceRouter("employeecvs"));
+//   router.use("/UserResume",     createDashResourceRouter("userresumes"));
+//   router.use("/user-resumes",   createDashResourceRouter("userresumes"));
+//   router.use("/Application",    createDashResourceRouter("applications"));
+//   router.use("/Applications",   createDashResourceRouter("applications"));
+//   router.use("/applications",   createDashResourceRouter("applications"));
+//   router.use("/Interview",  createDashResourceRouter("interviews"));
+//   router.use("/Interviews", createDashResourceRouter("interviews"));
+//   router.use("/interviews", createDashResourceRouter("interviews"));
+//   router.use("/Invitation",   createDashResourceRouter("invitations"));
+//   router.use("/Invitations",  createDashResourceRouter("invitations"));
+//   router.use("/invitations",  createDashResourceRouter("invitations"));
+//   router.use("/Report",     createDashResourceRouter("jobreports"));
+//   router.use("/Reports",    createDashResourceRouter("jobreports"));
+//   router.use("/JobReport",  createDashResourceRouter("jobreports"));
+//   router.use("/reports",    createDashResourceRouter("jobreports"));
 router.use("/TalentRequest", createDashResourceRouter("talentrequests"));
 router.use("/talent-requests", createDashResourceRouter("talentrequests"));
 router.use("/University", createDashResourceRouter("universities"));
@@ -830,41 +824,45 @@ router.get(
   campusController.adminCampusPrivacyAudit,
 );
 
-router.use("/Country", createDashResourceRouter("countries"));
-router.use("/countries", createDashResourceRouter("countries"));
-router.use("/Currency", createDashResourceRouter("currencies"));
-router.use("/currencies", createDashResourceRouter("currencies"));
-router.use("/Language", createDashResourceRouter("languages"));
-router.use("/languages", createDashResourceRouter("languages"));
-router.use("/Skill", createDashResourceRouter("skills"));
-router.use("/skills", createDashResourceRouter("skills"));
-router.use("/EducationLevel", createDashResourceRouter("educationlevels"));
-router.use("/education-levels", createDashResourceRouter("educationlevels"));
-router.use("/ExperienceLevel", createDashResourceRouter("experiencelevels"));
-router.use("/experience-levels", createDashResourceRouter("experiencelevels"));
-
-router.use("/Color", createDashResourceRouter("colors"));
-router.use("/colors", createDashResourceRouter("colors"));
-router.use("/Font", createDashResourceRouter("fonts"));
-router.use("/fonts", createDashResourceRouter("fonts"));
-router.use("/Resume", createDashResourceRouter("resumes"));
-router.use("/resumes", createDashResourceRouter("resumes"));
-router.use("/Banner", createDashResourceRouter("banners"));
-router.use("/Banners", createDashResourceRouter("banners"));
-router.use("/banners", createDashResourceRouter("banners"));
-router.use("/Page", createDashResourceRouter("pages"));
-router.use("/Pages", createDashResourceRouter("pages"));
-router.use("/pages", createDashResourceRouter("pages"));
+// Removed Wave 1 (cleanup): reference-data admin CRUD scaffolds — zero admin UI callers
+// (countries, currencies, languages, skills, educationlevels, experiencelevels, colors, fonts,
+// resumes, banners, pages). These lookup tables are seeded; admin edits happen via seeders/, not runtime CRUD.
+//   router.use("/Country",   createDashResourceRouter("countries"));
+//   router.use("/countries", createDashResourceRouter("countries"));
+//   router.use("/Currency",  createDashResourceRouter("currencies"));
+//   router.use("/currencies", createDashResourceRouter("currencies"));
+//   router.use("/Language",  createDashResourceRouter("languages"));
+//   router.use("/languages", createDashResourceRouter("languages"));
+//   router.use("/Skill",     createDashResourceRouter("skills"));
+//   router.use("/skills",    createDashResourceRouter("skills"));
+//   router.use("/EducationLevel",   createDashResourceRouter("educationlevels"));
+//   router.use("/education-levels", createDashResourceRouter("educationlevels"));
+//   router.use("/ExperienceLevel",   createDashResourceRouter("experiencelevels"));
+//   router.use("/experience-levels", createDashResourceRouter("experiencelevels"));
+//   router.use("/Color",  createDashResourceRouter("colors"));
+//   router.use("/colors", createDashResourceRouter("colors"));
+//   router.use("/Font",   createDashResourceRouter("fonts"));
+//   router.use("/fonts",  createDashResourceRouter("fonts"));
+//   router.use("/Resume", createDashResourceRouter("resumes"));
+//   router.use("/resumes", createDashResourceRouter("resumes"));
+//   router.use("/Banner",  createDashResourceRouter("banners"));
+//   router.use("/Banners", createDashResourceRouter("banners"));
+//   router.use("/banners", createDashResourceRouter("banners"));
+//   router.use("/Page",  createDashResourceRouter("pages"));
+//   router.use("/Pages", createDashResourceRouter("pages"));
+//   router.use("/pages", createDashResourceRouter("pages"));
 
 // Legal / Help / Support / Privacy content package (Gate 3) admin management
 router.use("/content/pages", createDashResourceRouter("contentpages"));
 router.use("/content-pages", createDashResourceRouter("contentpages"));
-router.use("/help/categories", createDashResourceRouter("helpcategories"));
-router.use("/help-categories", createDashResourceRouter("helpcategories"));
-router.use("/help/articles", createDashResourceRouter("helparticles"));
-router.use("/help-articles", createDashResourceRouter("helparticles"));
-router.use("/faq", createDashResourceRouter("faqitems"));
-router.use("/faq-items", createDashResourceRouter("faqitems"));
+// Removed Wave 1 (cleanup): helpcategories, helparticles, faqitems admin CRUD scaffolds — zero admin UI callers.
+// Help content is admin-managed via contentpages + content/help/faq resource endpoints.
+//   router.use("/help/categories",  createDashResourceRouter("helpcategories"));
+//   router.use("/help-categories",  createDashResourceRouter("helpcategories"));
+//   router.use("/help/articles",    createDashResourceRouter("helparticles"));
+//   router.use("/help-articles",    createDashResourceRouter("helparticles"));
+//   router.use("/faq",       createDashResourceRouter("faqitems"));
+//   router.use("/faq-items", createDashResourceRouter("faqitems"));
 router.use("/support-queue", createDashResourceRouter("supporttickets"));
 router.use("/legal-reports", createDashResourceRouter("legalreports"));
 router.use("/privacy-requests", createDashResourceRouter("privacyrequests"));
@@ -872,39 +870,27 @@ router.use(
   "/accessibility-requests",
   createDashResourceRouter("accessibilityrequests"),
 );
-router.use("/email/templates", createDashResourceRouter("emailtemplates"));
-router.use("/email-templates", createDashResourceRouter("emailtemplates"));
-router.use("/email/logs", createDashResourceRouter("emaillogs"));
-router.use("/email-logs", createDashResourceRouter("emaillogs"));
-router.use(
-  "/policy-acknowledgements",
-  createDashResourceRouter("policyacknowledgements"),
-);
-router.use("/Notification", createDashResourceRouter("notifications"));
-router.use("/notifications", createDashResourceRouter("notifications"));
-router.use("/FcmToken", createDashResourceRouter("fcmtokens"));
-router.use("/fcm-tokens", createDashResourceRouter("fcmtokens"));
-router.use("/SearchHistory", createDashResourceRouter("searchhistory"));
-router.use("/search-history", createDashResourceRouter("searchhistory"));
-
-router.use("/SubscriptionPlan", createDashResourceRouter("subscriptionplans"));
-router.use("/SubscriptionPlans", createDashResourceRouter("subscriptionplans"));
-router.use(
-  "/subscription-plans",
-  createDashResourceRouter("subscriptionplans"),
-);
-router.use(
-  "/CompanySubscription",
-  createDashResourceRouter("companysubscriptions"),
-);
-router.use(
-  "/CompanySubscriptions",
-  createDashResourceRouter("companysubscriptions"),
-);
-router.use(
-  "/company-subscriptions",
-  createDashResourceRouter("companysubscriptions"),
-);
+// Removed Wave 1 (cleanup): emailtemplates, emaillogs, policyacknowledgements, notifications,
+// fcmtokens, searchhistory, subscriptionplans, companysubscriptions admin CRUD scaffolds —
+// zero admin UI callers. Email templates edited via /dash/v1/communication/templates;
+// notifications sent via /dash/v1/notifications/send; subscriptions assigned via /dash/v1/subscriptions/*.
+//   router.use("/email/templates", createDashResourceRouter("emailtemplates"));
+//   router.use("/email-templates", createDashResourceRouter("emailtemplates"));
+//   router.use("/email/logs",  createDashResourceRouter("emaillogs"));
+//   router.use("/email-logs",  createDashResourceRouter("emaillogs"));
+//   router.use("/policy-acknowledgements", createDashResourceRouter("policyacknowledgements"));
+//   router.use("/Notification",  createDashResourceRouter("notifications"));
+//   router.use("/notifications", createDashResourceRouter("notifications"));
+//   router.use("/FcmToken",   createDashResourceRouter("fcmtokens"));
+//   router.use("/fcm-tokens", createDashResourceRouter("fcmtokens"));
+//   router.use("/SearchHistory",   createDashResourceRouter("searchhistory"));
+//   router.use("/search-history",  createDashResourceRouter("searchhistory"));
+//   router.use("/SubscriptionPlan",  createDashResourceRouter("subscriptionplans"));
+//   router.use("/SubscriptionPlans", createDashResourceRouter("subscriptionplans"));
+//   router.use("/subscription-plans", createDashResourceRouter("subscriptionplans"));
+//   router.use("/CompanySubscription",  createDashResourceRouter("companysubscriptions"));
+//   router.use("/CompanySubscriptions", createDashResourceRouter("companysubscriptions"));
+//   router.use("/company-subscriptions", createDashResourceRouter("companysubscriptions"));
 router.use("/Settings", createDashResourceRouter("settings"));
 router.use("/settings", createDashResourceRouter("settings"));
 
