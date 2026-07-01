@@ -128,6 +128,7 @@
     "@vitalets/google-translate-api": "^9.2.1",
     "araby": "^0.0.4-x",
     "axios": "^1.7.9",
+    "bcrypt": "^6.0.0",
     "body-parser": "^1.19.2",
     "bull": "^4.16.4",
     "cheerio": "^1.2.0",
