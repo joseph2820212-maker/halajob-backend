@@ -34,6 +34,7 @@ Read these before handoff or new launch work:
 
 - `CODEX.md`
 - `CONTRIBUTING.md`
+- `docs/REPO_SEPARATION_STATUS.md`
 - `docs/HANDOVER.md`
 - `docs/TESTING_GUIDE.md`
 - `docs/DEPLOYMENT.md`
