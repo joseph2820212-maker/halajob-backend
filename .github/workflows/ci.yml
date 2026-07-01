@@ -48,6 +48,19 @@ jobs:
       - run: npm run test:security-http
       - run: npm run check:secrets
       - run: npm run docs:api-artifacts
+
+      # OpenAPI drift check. The generated OpenAPI/Postman/API-reference
+      # artifacts are committed under docs/api/. If a route or middleware
+      # changed but the docs weren't regenerated, this step fails so the
+      # author has to run `npm run docs:api-artifacts` locally and commit.
+      - name: Fail on OpenAPI drift
+        run: |
+          if ! git diff --quiet docs/api/HALAJOB_OPENAPI.yaml docs/api/HALAJOB_API_REFERENCE.md docs/api/HALAJOB_POSTMAN_COLLECTION.json docs/api/HALAJOB_ROUTE_INVENTORY.json; then
+            echo "::error::OpenAPI / route inventory drift detected. Run 'npm run docs:api-artifacts' + 'npm run docs:route-report' and commit the results."
+            git --no-pager diff --stat docs/api/HALAJOB_OPENAPI.yaml docs/api/HALAJOB_API_REFERENCE.md docs/api/HALAJOB_POSTMAN_COLLECTION.json docs/api/HALAJOB_ROUTE_INVENTORY.json
+            exit 1
+          fi
+
       - run: npm run test:integration:auth-context
         env:
           CONNECTION_URL: mongodb://localhost:27017/halajob_ci
