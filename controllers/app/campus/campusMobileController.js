@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import {
   ApplicationStatusHistoryModel,
+  CampusContentModel,
   CampusEventModel,
   CampusEventRegistrationModel,
   CompanyModel,
@@ -26,6 +27,7 @@ import {
 
 const { Types } = mongoose;
 const CAMPUS_CONTENT_PATH = new URL("../../../data/campusContent.json", import.meta.url);
+const CAMPUS_CONTENT_KEY = "default";
 let campusContentCache = null;
 
 const cleanText = (value = "") => String(value || "").trim();
@@ -33,12 +35,41 @@ const toObjectId = (value) =>
   mongoose.isValidObjectId(String(value || "")) ? new Types.ObjectId(String(value)) : null;
 const APPLICATION_MESSAGE_CHANNELS = new Set(["email", "sms", "notification", "phone", "whatsapp", "internal"]);
 
-function readCampusContent() {
+function readPackagedCampusContent() {
   if (!campusContentCache) {
     campusContentCache = JSON.parse(fs.readFileSync(CAMPUS_CONTENT_PATH, "utf8"));
   }
 
   return JSON.parse(JSON.stringify(campusContentCache));
+}
+
+async function readCampusContent() {
+  const dbContent = await CampusContentModel.findOne({
+    key: CAMPUS_CONTENT_KEY,
+    status: "published",
+  }).lean();
+
+  if (dbContent?.payload && Object.keys(dbContent.payload).length > 0) {
+    return {
+      content: JSON.parse(JSON.stringify(dbContent.payload)),
+      meta: {
+        source: "database",
+        version: dbContent.version || "campus-content-v2",
+        content_key: dbContent.key,
+        content_id: dbContent._id,
+        updated_at: dbContent.updatedAt,
+      },
+    };
+  }
+
+  return {
+    content: readPackagedCampusContent(),
+    meta: {
+      source: "packaged_fallback",
+      version: "campus-content-v2",
+      content_key: CAMPUS_CONTENT_KEY,
+    },
+  };
 }
 
 function slugFromText(value = "", fallback = "campus-event") {
@@ -357,7 +388,7 @@ const content = async (req, res, next) => {
     const registeredEventIds = new Set(
       registrations.map((registration) => cleanText(registration.event_id)).filter(Boolean),
     );
-    const campusContent = readCampusContent();
+    const { content: campusContent, meta } = await readCampusContent();
     const events = await campusEventsForStudents(campusContent.events || [], registeredEventIds);
 
     return ReturnAppData.getData({
@@ -366,7 +397,7 @@ const content = async (req, res, next) => {
         ...campusContent,
         events,
         event_registrations: registrations,
-        meta: { source: "backend", version: "campus-content-v2" },
+        meta,
       },
       message: "campus_content",
     });
@@ -386,7 +417,7 @@ const events = async (req, res, next) => {
     const registeredEventIds = registrations
       .map((registration) => cleanText(registration.event_id))
       .filter(Boolean);
-    const campusContent = readCampusContent();
+    const { content: campusContent, meta } = await readCampusContent();
     const events = await campusEventsForStudents(
       campusContent.events || [],
       new Set(registeredEventIds),
@@ -398,7 +429,10 @@ const events = async (req, res, next) => {
         events,
         event_registrations: registrations,
         registered_event_ids: registeredEventIds,
-        meta: { source: "backend", version: "campus-events-v2" },
+        meta: {
+          ...meta,
+          version: meta.version || "campus-events-v2",
+        },
       },
       message: "campus_events",
     });

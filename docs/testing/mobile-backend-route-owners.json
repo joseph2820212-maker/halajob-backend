@@ -1,0 +1,335 @@
+{
+  "version": 1,
+  "description": "Every backend route literal used by the Flutter mobile app must be owned by a reachable mobile surface or explicitly classified as background/auth/config.",
+  "routeSources": [
+    "mobile/lib/src/features/auth/auth_service.dart",
+    "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+    "mobile/lib/src/features/dashboard/campus_content_service.dart",
+    "mobile/lib/src/features/company/company_dashboard_service.dart",
+    "mobile/lib/src/features/university/university_dashboard_service.dart",
+    "mobile/lib/src/features/legal_help/legal_help_service.dart",
+    "mobile/lib/src/features/analytics/analytics_service.dart",
+    "mobile/lib/src/features/communication/communication_service.dart"
+  ],
+  "owners": [
+    {
+      "id": "auth_and_client_settings",
+      "surface": "Auth screen and app bootstrap",
+      "kind": "auth",
+      "routePatterns": [
+        "^/(?:company|user|employee)/v1/auth/",
+        "^/public/v1/(?:client-settings|settings/client)$"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "sign-in-card-seeker",
+            "sign-in-card-company",
+            "Company email or phone",
+            "Password"
+          ]
+        },
+        {
+          "path": "mobile/test/auth_service_test.dart",
+          "mustContain": [
+            "loads full mobile feature settings from public client settings",
+            "/public/v1/client-settings",
+            "/public/v1/settings/client"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "analytics_background",
+      "surface": "App analytics background events",
+      "kind": "background",
+      "routePatterns": [
+        "^/analytics/v1/(?:events|track)$"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "tracks login analytics after seeker sign in",
+            "login_completed"
+          ]
+        },
+        {
+          "path": "mobile/test/analytics_service_test.dart",
+          "mustContain": [
+            "/analytics/v1/events",
+            "/analytics/v1/track"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "notifications_and_preferences",
+      "surface": "Role notification screens and settings notification panel",
+      "kind": "shared_ui",
+      "routePatterns": [
+        "^/notifications/v1(?:/|$)",
+        "^/user/v1/notifications(?:/|$)",
+        "^/user/v1/fcm/"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/company_dashboard_service_test.dart",
+          "mustContain": [
+            "company notification service lists and manages account updates",
+            "/notifications/v1/list",
+            "/notifications/v1/unread-count"
+          ]
+        },
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "approved profile settings notification chrome stays locked for every role",
+            "settings notifications and data rights stay in drill-in panels",
+            "settings-notification-manual-whatsapp"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seeker_jobs_applications_profile",
+      "surface": "Job seeker Jobs, My Jobs, profile, company directory, and detail flows",
+      "kind": "role_ui",
+      "routePatterns": [
+        "^/employee/v1/(?:global/)?jobs(?:/|$)",
+        "^/employee/v1/(?:global/)?applications(?:/|$)",
+        "^/employee/v1/(?:global/)?companies(?:/|$)",
+        "^/employee/v1/(?:global/)?profile(?:/|$)",
+        "^/employee/v1/global$",
+        "^/employee/v1/global/me/basic-profile$",
+        "^/employee/v1/helper/",
+        "^/user/v1/job(?:/|-)",
+        "^/user/v1/applying-job(?:/|$)",
+        "^/user/v1/app/dashboard/overview$",
+        "^/user/v1/employee/",
+        "^/user/v1/auth/update-(?:profile|image)$",
+        "^/user/v1/helper/",
+        "^/trust/v1/jobs/",
+        "^/user/v1/settings$",
+        "^/user/v1/account/",
+        "^/user/v1/resources$",
+        "^/user/v1/interview-prep$",
+        "^/user/v1/saved-searches(?:/|$)",
+        "^/user/v1/job-alerts/"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "seeker main tabs keep the locked header and four bottom tabs",
+            "seeker card detail and filter routes keep the locked follow-up chrome",
+            "seeker more actions open their launch destinations",
+            "settings screen saves account details through backend service"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seeker_career_passport",
+      "surface": "Seeker and campus Career Passport",
+      "kind": "role_ui",
+      "routePatterns": [
+        "^/user/v1/career-passport(?:/|$)",
+        "^/ai/v1/career-passport/score$"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "career passport share panel copies the public viewer link",
+            "career passport screen saves editable backend fields",
+            "career-passport-screen",
+            "career-passport-share-qr",
+            "career-passport-save-details"
+          ]
+        },
+        {
+          "path": "mobile/test/seeker_dashboard_service_test.dart",
+          "mustContain": [
+            "/user/v1/career-passport",
+            "/ai/v1/career-passport/score",
+            "/user/v1/career-passport/share"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seeker_cv_manager",
+      "surface": "Seeker and campus CV manager",
+      "kind": "role_ui",
+      "routePatterns": [
+        "^/employee/v1/cv(?:/|$)",
+        "^/user/v1/cv/"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "opens signed-in seeker CV manager with backend CVs",
+            "opens signed-in campus CV manager with backend CVs",
+            "campus CV profile checkpoint opens the same CV manager",
+            "quick-action-upload_cv",
+            "seeker-cv-manager-screen"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "seeker_and_campus_ai_tools",
+      "surface": "Seeker and campus AI career tools plus job-detail AI buttons",
+      "kind": "role_ui",
+      "routePatterns": [
+        "^/ai/v1/(?:career|profile|cv|interview)/",
+        "^/ai/v1/translate/cv$",
+        "^/ai/v1/jobs/"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "seeker and campus AI career tool buttons call every backend feature",
+            "job detail AI buttons call match and cover-letter tools",
+            "ai-tool-career_copilot",
+            "job-ai-match"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "campus_student_mode",
+      "surface": "Campus mode home, opportunities, events, applications, verification, and profile",
+      "kind": "role_ui",
+      "routePatterns": [
+        "^/user/v1/campus(?:/|$)",
+        "^/campus/v1/(?:universities|student-verifications|verification)"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "campus main tabs keep the locked header and five bottom tabs",
+            "campus card detail and filter routes keep the locked follow-up chrome",
+            "campus more actions open their launch destinations",
+            "campus CV profile checkpoint opens the same CV manager"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "company_workspace",
+      "surface": "Company dashboard, jobs, applicants, talent, More tools, profile, billing, and settings",
+      "kind": "role_ui",
+      "routePatterns": [
+        "^/company/v1/(?:global|jobs|talent-pool|campus|profile|helper|interviews|settings)(?:/|$)",
+        "^/jobs/v1/.*/translations/",
+        "^/ai/v1/company/",
+        "^/ai/v1/translate/job/"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "company main tabs keep the locked header and five bottom tabs",
+            "company More module cards open their workflow screens",
+            "company AI hiring tools are grouped under More when enabled",
+            "company job screen manages live job actions",
+            "company applicant screen updates status, notes, and rating",
+            "company talent screens search and manage help requests"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "university_admin_workspace",
+      "surface": "University dashboard, students, verifications, partners, opportunities, reports, and profile/settings",
+      "kind": "role_ui",
+      "routePatterns": [
+        "^/university/v1(?:/|$)"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "university main tabs keep the locked header and five bottom tabs",
+            "university profile settings notifications and details keep follow-up chrome"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "legal_help_support_privacy",
+      "surface": "Legal/help/support/privacy screens",
+      "kind": "shared_ui",
+      "routePatterns": [
+        "^/public/v1/(?:legal|content/pages|help|faq)",
+        "^/user/v1/(?:support|legal-reports|privacy)"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/legal_help_screens_test.dart",
+          "mustContain": [
+            "help article rows open the full article detail screen",
+            "support inbox opens detail, replies, and closes the ticket",
+            "privacy service uses list, create, cancel, and accessibility endpoints"
+          ]
+        },
+        {
+          "path": "mobile/test/legal_help_screens_test.dart",
+          "mustContain": [
+            "/public/v1/help/articles",
+            "/user/v1/support/tickets",
+            "/user/v1/privacy/requests"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "manual_whatsapp_communication",
+      "surface": "Manual WhatsApp communication settings/helpers",
+      "kind": "shared_ui",
+      "routePatterns": [
+        "^/user/v1/communication/"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "settings notifications and data rights stay in drill-in panels",
+            "settings-notification-manual-whatsapp"
+          ]
+        },
+        {
+          "path": "mobile/test/communication_service_test.dart",
+          "mustContain": [
+            "communication service uses preferences and manual WhatsApp endpoints",
+            "/user/v1/communication/preferences",
+            "/user/v1/communication/manual-whatsapp-link"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "company_request",
+      "surface": "Seeker company access request screen",
+      "kind": "role_ui",
+      "routePatterns": [
+        "^/user/v1/company/"
+      ],
+      "proof": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "opens company request screen and submits a verification file",
+            "quick-action-company_request"
+          ]
+        }
+      ]
+    }
+  ]
+}

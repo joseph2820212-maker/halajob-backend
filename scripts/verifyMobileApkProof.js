@@ -34,6 +34,7 @@ const shortCommit = commit.slice(0, 7);
 const sha256 = String(metadata.sha256 || "").trim().toLowerCase();
 const latestArtifactPath = String(metadata.latestArtifactPath || "").trim();
 const latestShaPath = `${latestArtifactPath}.sha256`;
+const diagnosticsLabel = `${metadata.buildName} (${metadata.buildNumber}) | ${metadata.buildTarget} | ${shortCommit} | ${metadata.campusAuthMode}`;
 
 assert.match(commit, /^[0-9a-f]{40}$/i, "APK metadata must include a full git commit.");
 assert.match(sha256, /^[0-9a-f]{64}$/i, "APK metadata must include a SHA-256 hash.");
@@ -50,7 +51,7 @@ assert.equal(shaFileValue, sha256, "APK metadata SHA and .sha256 file must match
 [
   `Latest APK source build commit: \`${shortCommit}\``,
   `debug APK from source commit \`${shortCommit}\``,
-  `diagnostics showing \`1.0.6 (27) | debug-apk | ${shortCommit} | local-device\``,
+  `diagnostics showing \`${diagnosticsLabel}\``,
   `SHA-256 \`${sha256}\``,
   "Documentation commits after",
 ].forEach((needle) => {
@@ -60,9 +61,9 @@ assert.equal(shaFileValue, sha256, "APK metadata SHA and .sha256 file must match
 [
   `Current APK source build commit: \`${shortCommit}\``,
   `source commit \`${shortCommit}\``,
-  `halajob-mobile-${shortCommit}-${metadata.versionLabel}-debug.apk`,
+  `Version/build: \`${metadata.versionLabel}\``,
   `SHA-256: \`${sha256}\``,
-  `diagnostics showing \`1.0.6 (27) | debug-apk | ${shortCommit} | local-device\``,
+  `diagnostics showing \`${diagnosticsLabel}\``,
 ].forEach((needle) => {
   assert.ok(readinessReport.includes(needle), `Readiness report is missing: ${needle}`);
 });

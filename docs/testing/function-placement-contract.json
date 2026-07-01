@@ -5,7 +5,7 @@
     "Header settings opens account settings",
     "Sign out must be visible",
     "AI appears once per role",
-    "CV belongs to seeker `CV Studio` on web and mobile `CV Manager`",
+    "CV belongs to seeker/campus `CV Studio` on web and mobile `CV Manager`",
     "Manual WhatsApp belongs to communications/preferences plus contextual share actions",
     "Video interviews belong to interview/application/applicant workflows",
     "Company detail lenses fold reviews and salary guidance into one entity page",
@@ -33,6 +33,7 @@
     ],
     "campusStudent": [
       "Student verification",
+      "CV upload/builder/library",
       "Employer/event cross-links",
       "Talent visibility",
       "AI career tools"
@@ -58,6 +59,11 @@
     {
       "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
       "text": "label: 'CV manager'",
+      "equals": 1
+    },
+    {
+      "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "text": "label: 'CV builder'",
       "equals": 1
     },
     {

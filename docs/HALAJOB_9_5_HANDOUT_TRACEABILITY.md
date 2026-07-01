@@ -20,8 +20,8 @@ findings that are now fixed and guarded.
 | Current backend launch gate proof | `npm run test:launch-gate:backend --silent` passed on branch commit `7113eb8` before this docs refresh |
 | Current web launch gate proof | `npm run test:launch-gate:web --silent` passed on branch commit `e7403eb` before this docs refresh |
 | Current route/UI contract proof | `npm run test:launch-gate:ui-contracts --silent` passed on branch commit `f63140b` before this docs refresh |
-| Current tester APK source | `a4ff122` |
-| Current tester APK SHA-256 | `1058fe9ef0a97b91913aee6c30ab289794c438894918c4ff0dda4e6fff9c2247` |
+| Current tester APK source | `b136ca8` |
+| Current tester APK SHA-256 | `f751a3f2dfe5fb4d33df0abea2f6f2a345d440594f1f19675cad675067628513` |
 | APK proof guard | `npm run test:mobile-apk-proof --silent` passed against the latest debug APK metadata |
 | Production launch evidence contract | `npm run test:production-launch-evidence --silent` passed; complete mode intentionally fails until 14 owner/provider/device rows are closed |
 

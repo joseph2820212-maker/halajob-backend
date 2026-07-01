@@ -201,6 +201,7 @@
         "key: const ValueKey('dashboard-header-notifications')",
         "key: const ValueKey('dashboard-header-profile')",
         "key: const ValueKey('dashboard-header-settings')",
+        "key: const ValueKey('settings-switch-account-button')",
         "tooltip: loc.t('settings')",
         "key: ValueKey('bottom-nav-${tab.keyId}')",
         "static const Set<String> _chromeQuickActionIds",
@@ -213,7 +214,8 @@
         "'Saved campus roles'",
         "label: 'Salary insights'",
         "id: 'salary_insights'",
-        "SalaryInsightsScreen(baseUrl: widget.apiBaseUrl)",
+        "SalaryInsightsScreen(",
+        "baseUrl: widget.apiBaseUrl",
         "_handleUnknownQuickAction(action)",
         "debugPrint('Unhandled mobile quick action: $id')",
         "is not available in this mobile build yet.",
@@ -229,7 +231,13 @@
         "final _CampusProfileField? campusField",
         "if (isSeekerCv) return 'seeker-cv'",
         "final fieldType = item.seekerField",
-        "final fieldType = item.campusField"
+        "final fieldType = item.campusField",
+        "token.startsWith('campus-local:')",
+        "backend_account_required",
+        "_localCampusCvReviewFiles",
+        "_localCampusCvBackendRequired",
+        "Use a backend campus account to save, generate, or download CV files.",
+        "key: const ValueKey('ai-career-tools-screen')"
       ],
       "mustNotContain": [
         "ValueKey('dashboard-account-menu-settings-item')",
@@ -254,6 +262,8 @@
           "mustContain": [
             "id: 'career_passport'",
             "id: 'upload_cv'",
+            "id: 'ai_career_tools'",
+            "Campus-safe CV, interview, and readiness suggestions.",
             "id: 'salary_insights'",
             "id: 'campus_verification'",
             "id: 'job_alerts'"
@@ -276,10 +286,14 @@
         "key: const ValueKey('company-header-notifications')",
         "key: const ValueKey('company-header-profile')",
         "key: const ValueKey('company-header-settings')",
-        "key: const ValueKey('company-header-switch-account')",
+        "key: const ValueKey('company-account-switch-account-button')",
         "key: const ValueKey('company-account-sign-out-button')",
         "title: HalaJobLocalizations.of(context).t('accountAndSettings')",
         "loc.t('accountAndSettings')",
+        "int get _companyMoreTabIndex => 4",
+        "3 => const _CompanyTalentUnavailablePanel()",
+        "const tabs = [..._primaryTabs, _talentTab, _moreTab]",
+        "Talent-pool CRM is currently disabled",
         "title: 'AI hiring tools'",
         "moduleSection('AI tools', aiModules)",
         "moduleSection('Company files', fileModules)",
@@ -304,6 +318,8 @@
         "_CompanyHeaderAction.settings",
         "title: 'Profile settings'",
         "Smart matches, TES scores, and searchable candidates",
+        "if (talentPoolCrmEnabled) _talentTab",
+        "widget.clientFeatureSettings.talentPoolCrmEnabled ? 4 : 3",
         "module.title =="
       ],
       "occurrences": [
@@ -321,10 +337,6 @@
         },
         {
           "text": "key: const ValueKey('company-header-settings')",
-          "equals": 1
-        },
-        {
-          "text": "key: const ValueKey('company-header-switch-account')",
           "equals": 1
         },
         {
@@ -386,6 +398,7 @@
     {
       "path": "mobile/lib/src/features/university/university_dashboard_screen.dart",
       "mustContain": [
+        "key: const ValueKey('university-header-notifications')",
         "key: const ValueKey('university-header-profile')",
         "key: const ValueKey('university-header-settings')",
         "tooltip: loc.t('settings')"
@@ -436,6 +449,70 @@
           "cv-parse-preview",
           "cv-parse-confirm",
           "cv-parse-reject"
+        ]
+      }
+    },
+    {
+      "label": "mobile seeker campus CV manager lifecycle",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/employee/v1/cv/uploaded",
+          "/employee/v1/cv/generate/templates",
+          "/employee/v1/cv/generate/download-url",
+          "/employee/v1/cv/upload",
+          "/employee/v1/cv/upload/${Uri.encodeComponent(normalizedCvId)}",
+          "/employee/v1/cv/uploaded/${Uri.encodeComponent(normalizedCvId)}",
+          "/employee/v1/cv/${Uri.encodeComponent(normalizedCvId)}/quality-score",
+          "/employee/v1/cv/${Uri.encodeComponent(normalizedCvId)}/duplicate",
+          "/employee/v1/cv/${Uri.encodeComponent(normalizedCvId)}/visibility",
+          "Future<List<SeekerCvFile>> fetchUploadedCvs",
+          "Future<List<SeekerCvTemplate>> fetchCvTemplates",
+          "Future<SeekerCvGenerationResult> generateCvDownloadUrl",
+          "Future<SeekerCvMutationResult> uploadCv",
+          "Future<SeekerCvMutationResult> activateCv",
+          "Future<SeekerCvMutationResult> deleteCv",
+          "Future<SeekerCvMutationResult> scoreCvQuality",
+          "Future<SeekerCvMutationResult> duplicateCv",
+          "Future<SeekerCvMutationResult> updateCvVisibility"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/seeker_cv_manager_widgets.dart",
+        "mustContain": [
+          "key: const ValueKey('seeker-cv-manager-screen')",
+          "key: const ValueKey('cv-upload-pdf')",
+          "key: const ValueKey('cv-build-from-profile-panel')",
+          "key: const ValueKey('cv-generate-download')",
+          "ValueKey('cv-activate-${cv.id}')",
+          "ValueKey('cv-score-${cv.id}')",
+          "ValueKey('cv-duplicate-${cv.id}')",
+          "ValueKey('cv-visibility-${cv.id}')",
+          "ValueKey('cv-delete-${cv.id}')"
+        ]
+      }
+    },
+    {
+      "label": "mobile seeker campus CV cover letter tools",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/employee/v1/cv/${Uri.encodeComponent(normalizedCvId)}/cover-letter/templates",
+          "/employee/v1/cv/${Uri.encodeComponent(normalizedCvId)}/cover-letter/preview",
+          "/employee/v1/cv/${Uri.encodeComponent(normalizedCvId)}/cover-letter/download",
+          "Future<List<SeekerCoverLetterTemplate>> fetchCoverLetterTemplates",
+          "Future<SeekerCoverLetterPreview> previewCoverLetter",
+          "Future<ApiFileDownload> downloadCoverLetter"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/seeker_cv_manager_widgets.dart",
+        "mustContain": [
+          "ValueKey('cv-cover-letter-${cv.id}')",
+          "ValueKey('cv-cover-letter-download-${cv.id}')",
+          "key: const ValueKey('cv-cover-letter-preview')",
+          "loc.ui('Cover letter')",
+          "loc.ui('Download letter')"
         ]
       }
     },
@@ -628,6 +705,201 @@
       }
     },
     {
+      "label": "mobile campus CV manager placement",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/employee/v1/cv/generate/download-url",
+          "Future<List<SeekerCvTemplate>> fetchCvTemplates",
+          "Future<List<SeekerCvFile>> fetchUploadedCvs"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+        "mustContain": [
+          "Build, upload, or review your student CV.",
+          "id: 'upload_cv'",
+          "widget.role == AppRole.campusStudent) &&",
+          "key: const ValueKey('seeker-cv-manager-screen')"
+        ]
+      }
+    },
+    {
+      "label": "mobile seeker campus AI route family placement",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/ai/v1/career-passport/score",
+          "/ai/v1/career/copilot",
+          "/ai/v1/profile/score",
+          "/ai/v1/cv/rewrite",
+          "/ai/v1/interview/practice",
+          "/ai/v1/translate/cv",
+          "/ai/v1/jobs/:jobId/match",
+          "/ai/v1/jobs/:jobId/cover-letter",
+          "Future<SeekerAiToolResult> runAiCareerTool",
+          "Future<SeekerAiToolResult> runJobAiTool"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+        "mustContain": [
+          "Campus-safe CV, interview, and readiness suggestions.",
+          "token.startsWith('campus-local:')",
+          "backend_account_required",
+          "key: const ValueKey('ai-career-tools-screen')",
+          "feature: SeekerAiToolFeature.translateCv",
+          "key: const ValueKey('cv-translation-save-draft')",
+          "key: const ValueKey('cv-translation-approve')",
+          "key: const ValueKey('job-ai-match')",
+          "key: const ValueKey('job-ai-cover-letter')",
+          "key: const ValueKey('career-passport-refresh-score')"
+        ]
+      }
+    },
+    {
+      "label": "mobile campus job alerts management placement",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/user/v1/campus/saved-searches",
+          "Future<SeekerSavedSearch> createSavedSearch",
+          "Future<SeekerSavedSearch> updateSavedSearch",
+          "Future<Map<String, dynamic>> runSavedSearchNow",
+          "Future<void> deleteSavedSearch",
+          "path: '${_savedSearchBasePath(role)}/$encodedId'",
+          "path: '${_savedSearchBasePath(role)}/$encodedId/run-now'"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+        "mustContain": [
+          "id: 'job_alerts'",
+          "onRunSavedSearch: _runSavedSearchNow",
+          "onToggleSavedSearch: _toggleSavedSearch",
+          "onDeleteSavedSearch: _deleteSavedSearch",
+          "key: const ValueKey('create-saved-search-alert')",
+          "ValueKey('saved-search-${item.id}-run')",
+          "ValueKey('saved-search-${item.id}-toggle')",
+          "ValueKey('saved-search-${item.id}-delete')"
+        ]
+      }
+    },
+    {
+      "label": "mobile company AI hiring tools placement",
+      "route": {
+        "path": "mobile/lib/src/features/company/company_dashboard_service.dart",
+        "mustContain": [
+          "/ai/v1/company/jobs/generate",
+          "/ai/v1/company/jobs/${Uri.encodeComponent(_requireRecordId(normalizedJobId, 'Open a job before asking for shortlist AI.'))}/shortlist",
+          "/ai/v1/company/messages/generate",
+          "/ai/v1/translate/job/${Uri.encodeComponent(_requireRecordId(normalizedJobId, 'Open a job before asking for translation AI.'))}",
+          "Future<CompanyAiToolResult> runAiTool"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+        "mustContain": [
+          "moduleSection('AI tools', aiModules)",
+          "title: 'AI hiring tools'",
+          "onTap: onOpenAiTools",
+          "key: const ValueKey('company-ai-hiring-tools-screen')",
+          "key: const ValueKey('company-ai-job-id-field')",
+          "key: const ValueKey('company-ai-prompt-field')",
+          "key: ValueKey('company-ai-tool-${definition.feature.backendFeature}')",
+          "onPressed: () => _runTool(definition.feature)",
+          "buttonKey: 'company-ai-job-draft'",
+          "buttonKey: 'company-ai-shortlist'",
+          "buttonKey: 'company-ai-hiring-message'",
+          "buttonKey: 'company-ai-job-translation'"
+        ],
+        "mustNotContain": [
+          "title: 'AI job drafts'",
+          "title: 'Shortlist explanations'",
+          "title: 'Hiring messages'"
+        ]
+      }
+    },
+    {
+      "label": "mobile company files placement",
+      "route": {
+        "path": "mobile/lib/src/features/company/company_dashboard_service.dart",
+        "mustContain": [
+          "/company/v1/global/profile/files",
+          "/company/v1/global/profile/files/${Uri.encodeComponent(normalizedFileName)}",
+          "/company/v1/global/profile/files/${Uri.encodeComponent(normalizedFileName)}/download",
+          "Future<List<CompanyProfileFile>> loadCompanyProfileFiles",
+          "Future<CompanyActionResult> uploadCompanyProfileFile",
+          "Future<CompanyActionResult> deleteCompanyProfileFile",
+          "Future<ApiFileDownload> downloadCompanyProfileFile"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+        "mustContain": [
+          "moduleSection('Company files', fileModules)",
+          "company-files-upload-button",
+          "company-files-download-${file.fileName}",
+          "company-files-delete-${file.fileName}"
+        ]
+      }
+    },
+    {
+      "label": "mobile company secondary admin tools placement",
+      "route": {
+        "path": "mobile/lib/src/features/company/company_dashboard_service.dart",
+        "mustContain": [
+          "/company/v1/global/support-tickets",
+          "/company/v1/global/support-tickets/$id/messages",
+          "/company/v1/global/members",
+          "/company/v1/global/question-library",
+          "/company/v1/global/message-templates",
+          "Future<CompanyActionResult> createSupportTicket",
+          "Future<CompanyActionResult> inviteCompanyMember",
+          "Future<CompanyActionResult> createQuestion",
+          "Future<CompanyActionResult> createMessageTemplate"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+        "mustContain": [
+          "moduleSection('Support', supportModules)",
+          "moduleSection('Team and templates', teamModules)",
+          "company-support-create-button",
+          "company-support-reply-button",
+          "company-member-invite-button",
+          "company-question-create-button",
+          "company-template-create-button"
+        ]
+      }
+    },
+    {
+      "label": "mobile company subscription and audit placement",
+      "route": {
+        "path": "mobile/lib/src/features/company/company_dashboard_service.dart",
+        "mustContain": [
+          "/company/v1/global/subscription/current",
+          "/company/v1/global/subscription/billing-summary",
+          "/company/v1/global/subscription/invoices",
+          "/company/v1/global/subscription/request",
+          "/company/v1/global/audit-logs",
+          "/company/v1/global/jobs/$normalizedJobId/audit-logs",
+          "Future<CompanyBillingSnapshot> loadSubscriptionBilling",
+          "Future<List<CompanyRecord>> loadCompanyAuditLogs"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+        "mustContain": [
+          "moduleSection('Account', accountModules)",
+          "company-billing-plan-request-button",
+          "company-audit-job-id-field",
+          "company-audit-application-id-field",
+          "company-audit-apply-button"
+        ]
+      }
+    },
+    {
       "label": "mobile seeker salary insights placement",
       "route": {
         "path": "mobile/lib/src/features/salary_insights/salary_service.dart",
@@ -640,7 +912,68 @@
         "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
         "mustContain": [
           "id: 'salary_insights'",
-          "SalaryInsightsScreen(baseUrl: widget.apiBaseUrl)"
+          "SalaryInsightsScreen(",
+          "baseUrl: widget.apiBaseUrl",
+          "bottomNavigationBar: _dashboardWorkflowBottomNav(context)"
+        ]
+      }
+    },
+    {
+      "label": "mobile seeker company directory and review placement",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/employee/v1/global/companies",
+          "/employee/v1/companies",
+          "/employee/v1/global/companies/$encodedId",
+          "/employee/v1/companies/$encodedId",
+          "/employee/v1/global/companies/$encodedId/review",
+          "/employee/v1/companies/$encodedId/review",
+          "Future<List<SeekerCompanySummary>> fetchCompanies",
+          "Future<SeekerCompanyDetail> fetchCompanyDetail",
+          "Future<String> reviewCompany"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+        "mustContain": [
+          "id: 'companies'",
+          "key: const ValueKey('seeker-company-directory-screen')",
+          "key: ValueKey('company-card-${company.id}')",
+          "key: const ValueKey('company-detail-about-lens')",
+          "key: const ValueKey('company-detail-jobs-lens')",
+          "key: const ValueKey('company-detail-reviews-lens')",
+          "key: const ValueKey('company-detail-salary-lens')",
+          "key: const ValueKey('company-submit-review')"
+        ]
+      }
+    },
+    {
+      "label": "mobile seeker company request placement",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/user/v1/company/get-files",
+          "/user/v1/company/join-request",
+          "/user/v1/company/upload-file",
+          "/user/v1/company/delete-file",
+          "Future<SeekerCompanyRequestSnapshot> loadCompanyRequest",
+          "Future<SeekerCompanyRequestSnapshot> submitCompanyJoinRequest",
+          "Future<SeekerCompanyRequestSnapshot> uploadCompanyRequestFile",
+          "Future<SeekerCompanyRequestSnapshot> deleteCompanyRequestFile"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+        "mustContain": [
+          "id: 'company_request'",
+          "key: const ValueKey('seeker-company-request-screen')",
+          "key: const ValueKey('company-request-name-field')",
+          "key: const ValueKey('company-request-email-field')",
+          "company-request-submit-button",
+          "company-request-upload-button",
+          "company-request-file-$fileName",
+          "company-request-delete-$fileName"
         ]
       }
     },
@@ -661,6 +994,63 @@
           "key: const ValueKey('company-job-salary-guidance-card')",
           "'country': 'Syria'",
           "'currency_code': _currencyCode"
+        ]
+      }
+    },
+    {
+      "label": "mobile seeker and campus interview response placement",
+      "route": {
+        "path": "mobile/lib/src/features/dashboard/seeker_dashboard_service.dart",
+        "mustContain": [
+          "/employee/v1/global/applications/interviews/$encodedInterviewId/respond",
+          "/employee/v1/applications/interviews/$encodedInterviewId/respond",
+          "/employee/v1/global/applications/interviews/$encodedInterviewId/reschedule-request",
+          "/employee/v1/applications/interviews/$encodedInterviewId/reschedule-request",
+          "Future<SeekerApplicationActionResult> respondToInterview",
+          "Future<SeekerApplicationActionResult> requestInterviewReschedule"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+        "mustContain": [
+          "primaryLabel: loc.ui('Accept interview')",
+          "secondaryLabel: loc.ui('Decline interview')",
+          "confirmLabel: loc.ui('Accept interview')",
+          "confirmLabel: loc.ui('Decline interview')",
+          "loc.ui('Request reschedule')",
+          "onRespondToInterview",
+          "onRequestReschedule"
+        ]
+      }
+    },
+    {
+      "label": "mobile company interview workflow placement",
+      "route": {
+        "path": "mobile/lib/src/features/company/company_dashboard_service.dart",
+        "mustContain": [
+          "/company/v1/global/interviews",
+          "/company/v1/jobs/hiring/applications/$id/interviews",
+          "/company/v1/global/interviews/$id",
+          "/company/v1/jobs/hiring/interviews/$id/status",
+          "/company/v1/interviews/$id/feedback",
+          "/company/v1/interviews/$id/mark-no-show",
+          "/company/v1/interviews/$id/send-reminder",
+          "Future<CompanyActionResult> scheduleInterview",
+          "Future<CompanyActionResult> updateInterview",
+          "Future<CompanyActionResult> submitInterviewFeedback"
+        ]
+      },
+      "ui": {
+        "path": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+        "mustContain": [
+          "company-interview-schedule-start-field",
+          "company-interview-schedule-link-field",
+          "company-interview-schedule-button",
+          "company-interview-save-button",
+          "company-interview-cancel-button",
+          "company-interview-no-show-button",
+          "company-interview-reminder-button",
+          "company-interview-feedback-button"
         ]
       }
     },
@@ -724,6 +1114,211 @@
           "'manual_whatsapp': _manualWhatsappNotifications"
         ]
       }
+    }
+  ],
+  "navigationProofs": [
+    {
+      "label": "mobile seeker More card inventory and destinations",
+      "sources": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "testWidgets('seeker more tab exposes secondary function cards'",
+            "_expectExactQuickActionKeys(tester, const [",
+            "'quick-action-career_passport'",
+            "'quick-action-upload_cv'",
+            "'quick-action-job_alerts'",
+            "'quick-action-salary_insights'",
+            "'quick-action-companies'",
+            "'quick-action-interview_prep'",
+            "'quick-action-company_request'",
+            "'quick-action-mobile_status'",
+            "testWidgets('seeker more actions open their launch destinations'",
+            "'career_passport': find.textContaining",
+            "'upload_cv': find.textContaining",
+            "'job_alerts': find.byKey(const ValueKey('create-saved-search-alert'))",
+            "'salary_insights': find.widgetWithText(TextField, 'Job title')",
+            "'companies': find.textContaining",
+            "'company_request': find.textContaining",
+            "'mobile_status': find.textContaining",
+            "find.byKey(const ValueKey('quick-action-profile')), findsNothing",
+            "find.byKey(const ValueKey('quick-action-settings')), findsNothing",
+            "_expectSeekerFollowUpChrome(tester);"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "mobile campus More card inventory and destinations",
+      "sources": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "testWidgets('campus more tab exposes student function cards'",
+            "'quick-action-career_passport'",
+            "'quick-action-upload_cv'",
+            "'quick-action-job_alerts'",
+            "'quick-action-interview_prep'",
+            "'quick-action-campus_verification'",
+            "'quick-action-mobile_status'",
+            "'quick-action-campus_resources'",
+            "testWidgets('campus more actions open their launch destinations'",
+            "'career_passport': find.byKey(const ValueKey('career-passport-screen'))",
+            "'upload_cv': find.byKey(const ValueKey('seeker-cv-manager-screen'))",
+            "'campus_verification': find.byKey",
+            "'job_alerts': find.byKey(const ValueKey('create-saved-search-alert'))",
+            "'campus_resources': find.text('CV lab for students')",
+            "'interview_prep': find.text('Interview practice pack')",
+            "'mobile_status': find.textContaining",
+            "find.byKey(const ValueKey('quick-action-profile')), findsNothing",
+            "find.byKey(const ValueKey('quick-action-settings')), findsNothing",
+            "_expectCampusFollowUpChrome(tester);"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "mobile company More and AI hiring tools destinations",
+      "sources": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "testWidgets('company AI hiring tools are grouped under More when enabled'",
+            "tester APK app path exposes grouped company AI tools without compile flag",
+            "appConfig: const AppConfig(buildMode: 'debug-apk')",
+            "'company-module-AI hiring tools'",
+            "'company-module-Company files'",
+            "'company-module-Support'",
+            "'company-module-Audit logs'",
+            "'company-module-Subscription'",
+            "'company-module-Team'",
+            "'company-module-Questions'",
+            "'company-module-Templates'",
+            "find.byKey(const ValueKey('company-ai-hiring-tools-screen'))",
+            "final toolButtons = <ValueKey<String>, CompanyAiToolFeature>{",
+            "const ValueKey('company-ai-job-draft'): CompanyAiToolFeature.jobDraft",
+            "const ValueKey('company-ai-shortlist')",
+            "CompanyAiToolFeature.candidateShortlist",
+            "const ValueKey('company-ai-hiring-message')",
+            "CompanyAiToolFeature.hiringMessage",
+            "const ValueKey('company-ai-job-translation')",
+            "CompanyAiToolFeature.jobTranslation",
+            "expect(service.aiFeatures, toolButtons.values.toList(growable: false));",
+            "testWidgets('company More module cards open their workflow screens'",
+            "'AI hiring tools': find.byKey",
+            "'Company files': find.text('Company files')",
+            "'Support': find.text('Company support')",
+            "'Audit logs': find.text('Audit logs')",
+            "'Subscription': find.text('Subscription and billing')",
+            "'Team': find.text('Team management')",
+            "'Questions': find.text('TES Talent Evaluation')",
+            "'Templates': find.text('Message templates')",
+            "_expectCompanyFollowUpChrome(tester);"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "mobile seeker campus AI tool button execution",
+      "sources": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "seeker and campus AI career tool buttons call every backend feature",
+            "'ai-tool-career_copilot'",
+            "'ai-tool-profile_score'",
+            "'ai-tool-cv_rewrite'",
+            "'ai-tool-interview_practice'",
+            "'ai-tool-translate_cv'",
+            "expect(service.aiToolFeatures,",
+            "job detail AI buttons call match and cover-letter tools",
+            "'job-ai-match'",
+            "'job-ai-cover-letter'",
+            "expect(service.aiFeatures, toolButtons.values.toList(growable: false));"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "mobile role card detail and filter route destinations",
+      "sources": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "seeker card detail and filter routes keep the locked follow-up chrome",
+            "opportunity-growth-associate",
+            "feed-open-filters",
+            "application-app-operations-analyst",
+            "resource-Interview prep pack",
+            "campus card detail and filter routes keep the locked follow-up chrome",
+            "event-CV Office Hours",
+            "resource-CV lab for students",
+            "opportunity-student-marketing-intern",
+            "application-app-student-marketing",
+            "company invitations screen manages invite workflows",
+            "company applicant screen updates status, notes, and rating",
+            "company job screen manages live job actions",
+            "company talent screens search and manage help requests"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "mobile decided chrome regression guard",
+      "sources": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "approved profile settings notification chrome stays locked for every role",
+            "_expectSeekerFollowUpChrome",
+            "_expectCampusFollowUpChrome",
+            "_expectCompanyFollowUpChrome",
+            "_expectUniversityFollowUpChrome",
+            "_expectSeekerChrome(tester)",
+            "_expectCampusChrome(tester)",
+            "_expectCompanyChrome(tester)",
+            "_expectUniversityChrome(tester)"
+          ]
+        },
+        {
+          "path": "mobile/test/mobile_chrome_contract_test.dart",
+          "mustContain": [
+            "role bottom navigation tab sets stay fixed",
+            "bottom navigation indicator stays under the icon",
+            "root headers do not expose merged account or switch actions",
+            "feature screens use locked Hala native chrome instead of raw AppBar"
+          ]
+        }
+      ]
+    },
+    {
+      "label": "mobile seeker campus CV manager lifecycle tests",
+      "sources": [
+        {
+          "path": "mobile/test/widget_test.dart",
+          "mustContain": [
+            "opens signed-in seeker CV manager with backend CVs",
+            "opens signed-in campus CV manager with backend CVs",
+            "local campus CV builder does not expire the tester session",
+            "Campus CV review mode",
+            "Use a backend campus account",
+            "campus CV profile checkpoint opens the same CV manager",
+            "generates a seeker CV download from a backend template",
+            "previews a seeker CV cover letter from backend templates",
+            "downloads a seeker CV cover letter from backend templates",
+            "seeker CV visibility uses ticked drill-in choices",
+            "seeker CV delete requires confirmation before mutation",
+            "seeker CV manager previews and confirms parsed upload",
+            "expect(service.generatedTemplateKeys, ['modern_student'])",
+            "expect(service.coverLetterPreviewCvId, 'cv-1')",
+            "expect(service.coverLetterDownloadCvId, 'cv-1')",
+            "expect(service.updatedCvVisibility, 'profile')",
+            "expect(service.deletedCvIds, ['cv-1'])",
+            "expect(service.confirmedParseJobId, 'parse-1')",
+            "expect(service.rejectedParseJobId, 'parse-1')"
+          ]
+        }
+      ]
     }
   ]
 }

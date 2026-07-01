@@ -48,7 +48,7 @@ below.
 - Notifications are owned by the header bell plus a notifications screen. Do not create separate notification dashboards in More.
 - Primary bottom-tab flows may appear in More only as small shortcuts, never as duplicated dashboard cards.
 - AI appears once per role: `AI career tools` for seeker/campus, `AI hiring tools` for company, and `AI operations` for admin.
-- CV belongs to seeker `CV Studio` on web and mobile `CV Manager`. It is not a generic document/settings feature.
+- CV belongs to seeker/campus `CV Studio` on web and mobile `CV Manager`. It is not a generic document/settings feature.
 - Manual WhatsApp belongs to communications/preferences plus contextual share actions. It is not a primary navigation tab.
 - Video interviews belong to interview/application/applicant workflows. They are not general More cards.
 - Campus mode must not duplicate profile and notifications in both header and More as full cards.
@@ -114,6 +114,7 @@ below.
 | Events | `/user/v1/campus/events*` | `Events` tab | Bottom `Events` tab plus native event detail | Do not duplicate as dashboard cards in multiple places. |
 | Resources | `/user/v1/campus/resources*` | `Resources` tab | More/resources detail | Resource library owns progress/saves. |
 | Career Passport | career passport routes | `Career Passport` tab | More/profile readiness | Same owner as seeker. |
+| CV upload/builder/library | `/employee/v1/cv/*`, CV builder/generate routes | `CV Studio` / student readiness | More `CV Builder` and profile CV status opening CV Manager plus Career Passport/readiness | Campus students use the same CV Manager surface as seekers; local tester mode may show the screen without backend generation. |
 | Talent visibility | `/user/v1/campus/talent-visibility` | `Talent Visibility` tab | More/profile/settings sub-surface | Make the current visibility state obvious. |
 | Interview prep | interview prep routes | `Interview Prep` tab | More `Interview prep` entry | Enabled by `interview_prep_enabled`; no Opportunities-tab duplicate. |
 | Job alerts | campus saved-search routes | `Job Alerts` tab | More `Job alerts` entry | Saved filters persist here. |

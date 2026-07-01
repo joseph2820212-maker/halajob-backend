@@ -55,31 +55,35 @@ function extractScope(source, start, end) {
   return source.slice(startIndex, endIndex);
 }
 
-for (const entry of contract.files || []) {
+function verifySourceExpectations(entry, labelPrefix = entry.path) {
   const source = readSource(entry.path);
-  if (!source) continue;
+  if (!source) return;
   for (const expected of entry.mustContain || []) {
-    if (!source.includes(expected)) failures.push(`${entry.path} is missing required action contract string: ${expected}`);
+    if (!source.includes(expected)) {
+      failures.push(`${labelPrefix} is missing required action contract string: ${expected}`);
+    }
   }
   for (const banned of entry.mustNotContain || []) {
-    if (source.includes(banned)) failures.push(`${entry.path} contains banned action contract string: ${banned}`);
+    if (source.includes(banned)) {
+      failures.push(`${labelPrefix} contains banned action contract string: ${banned}`);
+    }
   }
   for (const rule of entry.occurrences || []) {
     const text = rule.text || "";
     const count = countOccurrences(source, text);
     if (typeof rule.equals === "number" && count !== rule.equals) {
-      failures.push(`${entry.path} expected ${rule.equals} occurrence(s) of "${text}" but found ${count}`);
+      failures.push(`${labelPrefix} expected ${rule.equals} occurrence(s) of "${text}" but found ${count}`);
     }
     if (typeof rule.min === "number" && count < rule.min) {
-      failures.push(`${entry.path} expected at least ${rule.min} occurrence(s) of "${text}" but found ${count}`);
+      failures.push(`${labelPrefix} expected at least ${rule.min} occurrence(s) of "${text}" but found ${count}`);
     }
     if (typeof rule.max === "number" && count > rule.max) {
-      failures.push(`${entry.path} expected at most ${rule.max} occurrence(s) of "${text}" but found ${count}`);
+      failures.push(`${labelPrefix} expected at most ${rule.max} occurrence(s) of "${text}" but found ${count}`);
     }
   }
   for (const scope of entry.scopes || []) {
     const scopedSource = extractScope(source, scope.start, scope.end);
-    const scopeLabel = `${entry.path} scope ${scope.start}`;
+    const scopeLabel = `${labelPrefix} scope ${scope.start}`;
     if (scopedSource === null) {
       failures.push(`${scopeLabel} was not found`);
       continue;
@@ -106,6 +110,10 @@ for (const entry of contract.files || []) {
   }
 }
 
+for (const entry of contract.files || []) {
+  verifySourceExpectations(entry);
+}
+
 for (const pair of contract.routeUiPairs || []) {
   const label = pair.label || "unnamed route/UI pair";
   const routeSource = readSource(pair.route?.path || "");
@@ -129,10 +137,19 @@ for (const pair of contract.routeUiPairs || []) {
   }
 }
 
+for (const proof of contract.navigationProofs || []) {
+  const label = proof.label || "unnamed navigation proof";
+  for (const source of proof.sources || []) {
+    verifySourceExpectations(source, `${label} ${source.path}`);
+  }
+}
+
 if (failures.length) {
   console.error("UI action contract verification failed:");
   for (const failure of failures) console.error(`  - ${failure}`);
   process.exit(1);
 }
 
-console.log(`UI action contract verification passed for ${(contract.files || []).length} files and ${(contract.routeUiPairs || []).length} route/UI pairs.`);
+console.log(
+  `UI action contract verification passed for ${(contract.files || []).length} files, ${(contract.routeUiPairs || []).length} route/UI pairs, and ${(contract.navigationProofs || []).length} navigation proofs.`,
+);

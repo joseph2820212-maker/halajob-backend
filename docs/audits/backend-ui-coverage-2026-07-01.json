@@ -1,0 +1,603 @@
+{
+  "generatedAt": "2026-07-01T11:39:03.581Z",
+  "sourceInventory": "docs/api/HALAJOB_ROUTE_INVENTORY.json",
+  "endpointTotals": {
+    "total": 4006,
+    "anyClient": 658,
+    "mobileClient": 446,
+    "webClient": 476
+  },
+  "moduleSummary": [
+    {
+      "module": "AI",
+      "total": 12,
+      "mobile": 12,
+      "web": 12,
+      "any": 12,
+      "noClientEvidence": 0
+    },
+    {
+      "module": "Admin",
+      "total": 3338,
+      "mobile": 0,
+      "web": 141,
+      "any": 141,
+      "noClientEvidence": 3197
+    },
+    {
+      "module": "Analytics",
+      "total": 5,
+      "mobile": 3,
+      "web": 2,
+      "any": 5,
+      "noClientEvidence": 0
+    },
+    {
+      "module": "Campus",
+      "total": 18,
+      "mobile": 0,
+      "web": 0,
+      "any": 0,
+      "noClientEvidence": 18
+    },
+    {
+      "module": "Campus Student",
+      "total": 51,
+      "mobile": 42,
+      "web": 32,
+      "any": 51,
+      "noClientEvidence": 0
+    },
+    {
+      "module": "Company",
+      "total": 181,
+      "mobile": 165,
+      "web": 124,
+      "any": 181,
+      "noClientEvidence": 0
+    },
+    {
+      "module": "Files",
+      "total": 1,
+      "mobile": 1,
+      "web": 0,
+      "any": 1,
+      "noClientEvidence": 0
+    },
+    {
+      "module": "Health",
+      "total": 4,
+      "mobile": 0,
+      "web": 1,
+      "any": 1,
+      "noClientEvidence": 3
+    },
+    {
+      "module": "Jobs",
+      "total": 2,
+      "mobile": 2,
+      "web": 0,
+      "any": 2,
+      "noClientEvidence": 0
+    },
+    {
+      "module": "Legacy User",
+      "total": 205,
+      "mobile": 94,
+      "web": 71,
+      "any": 111,
+      "noClientEvidence": 94
+    },
+    {
+      "module": "Notifications",
+      "total": 20,
+      "mobile": 18,
+      "web": 16,
+      "any": 20,
+      "noClientEvidence": 0
+    },
+    {
+      "module": "Other",
+      "total": 15,
+      "mobile": 9,
+      "web": 12,
+      "any": 13,
+      "noClientEvidence": 2
+    },
+    {
+      "module": "Seeker",
+      "total": 110,
+      "mobile": 85,
+      "web": 41,
+      "any": 87,
+      "noClientEvidence": 23
+    },
+    {
+      "module": "Trust",
+      "total": 4,
+      "mobile": 1,
+      "web": 2,
+      "any": 3,
+      "noClientEvidence": 1
+    },
+    {
+      "module": "University",
+      "total": 40,
+      "mobile": 14,
+      "web": 22,
+      "any": 30,
+      "noClientEvidence": 10
+    }
+  ],
+  "mobileQuickActions": [
+    {
+      "key": "quick-action-ai_career_tools",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "quick-action-campus_verification",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "quick-action-career_passport",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "quick-action-companies",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "quick-action-company_request",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "quick-action-interview_prep",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "quick-action-job_alerts",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "quick-action-mobile_status",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "quick-action-salary_insights",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "quick-action-upload_cv",
+      "visibleInTests": true,
+      "tappedInTests": true
+    }
+  ],
+  "companyModules": [
+    {
+      "key": "company-module-AI hiring tools",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-module-Audit logs",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-module-Company files",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-module-Questions",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-module-Subscription",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-module-Support",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-module-Team",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-module-Templates",
+      "visibleInTests": true,
+      "tappedInTests": true
+    }
+  ],
+  "shellNavigation": [
+    {
+      "key": "bottom-nav-events",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "bottom-nav-home",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "bottom-nav-jobs",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "bottom-nav-more",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "bottom-nav-my-applications",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "bottom-nav-my-jobs",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "bottom-nav-opportunities",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-tab-applicants",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-tab-home",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-tab-jobs",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-tab-more",
+      "visibleInTests": true,
+      "tappedInTests": true
+    },
+    {
+      "key": "company-tab-talent",
+      "visibleInTests": true,
+      "tappedInTests": true
+    }
+  ],
+  "shellHeaders": [
+    {
+      "key": "dashboard-header-notifications",
+      "visibleInTests": true
+    },
+    {
+      "key": "dashboard-header-profile",
+      "visibleInTests": true
+    },
+    {
+      "key": "dashboard-header-settings",
+      "visibleInTests": true
+    },
+    {
+      "key": "company-header-notifications",
+      "visibleInTests": true
+    },
+    {
+      "key": "company-header-profile",
+      "visibleInTests": true
+    },
+    {
+      "key": "company-header-settings",
+      "visibleInTests": true
+    }
+  ],
+  "requiredNavigationKeys": [
+    "quick-action-ai_career_tools",
+    "quick-action-campus_verification",
+    "quick-action-career_passport",
+    "quick-action-companies",
+    "quick-action-company_request",
+    "quick-action-interview_prep",
+    "quick-action-job_alerts",
+    "quick-action-mobile_status",
+    "quick-action-salary_insights",
+    "quick-action-upload_cv",
+    "company-module-AI hiring tools",
+    "company-module-Audit logs",
+    "company-module-Company files",
+    "company-module-Questions",
+    "company-module-Subscription",
+    "company-module-Support",
+    "company-module-Team",
+    "company-module-Templates"
+  ],
+  "missingRequiredNavigation": [],
+  "missingRequiredShellNavigation": [],
+  "missingRequiredShellHeaders": [],
+  "missingPriorityClientEvidence": [
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/:cvId/set-default",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/generate/download",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/cv/generate/save",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/global/applications/applied",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/employee/v1/global/applications/offers/:invitationId/reject",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/global/applications/rejected",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/global/applications/status",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/employee/v1/global/profile/:section/:itemId",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/employee/v1/global/profile/:section/:itemId",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/global/profile/completion",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "PUT",
+      "path": "/employee/v1/global/profile/job-names",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "PUT",
+      "path": "/employee/v1/global/profile/job-types",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "PUT",
+      "path": "/employee/v1/global/profile/latest-work-experience",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "PUT",
+      "path": "/employee/v1/global/profile/min-salary",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "POST",
+      "path": "/employee/v1/global/profile/rebuild-search-filters",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/helper/currencies",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/helper/education-level",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/helper/experience-level",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/helper/industry",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/helper/job-name",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/helper/salaries",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/helper/services",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/employee/v1/helper/skills",
+      "module": "Seeker",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/analytics/outcomes",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/analytics/readiness",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/analytics/resources",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/employer-partners",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/events",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "POST",
+      "path": "/university/v1/events",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/university/v1/events/:id",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "PATCH",
+      "path": "/university/v1/events/:id",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/overview",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    },
+    {
+      "method": "GET",
+      "path": "/university/v1/verifications/:id/document",
+      "module": "University",
+      "mobileClient": false,
+      "webClient": false,
+      "anyClient": false
+    }
+  ]
+}

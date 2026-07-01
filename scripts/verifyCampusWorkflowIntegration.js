@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import mongoose from "mongoose";
 import { IntegrationMongoServer as MongoMemoryServer } from "./utils/integrationMongo.js";
+import {
+  seedCampusDemoContent,
+  verifyCampusDemoContentSeeded,
+} from "./utils/campusDemoContentSeed.js";
 
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET ||= "campus-workflow-integration-secret";
@@ -182,6 +186,14 @@ async function main() {
   await mongoose.connect(process.env.CONNECTION_URL, {
     serverSelectionTimeoutMS: 10000,
   });
+
+  const campusDemoSeed = await seedCampusDemoContent();
+  const campusDemoProof = await verifyCampusDemoContentSeeded();
+  assert.equal(campusDemoSeed.source, "demo-seed");
+  assert.ok(
+    campusDemoProof.counts.events > 0 && campusDemoProof.counts.resources > 0,
+    "campus demo content should seed event and resource payloads",
+  );
 
   const suffix = nowToken();
   const phoneSeed = suffix.slice(-8);
@@ -528,6 +540,36 @@ async function main() {
     }),
     200,
     "student context should access campus dashboard",
+  );
+
+  const campusContent = await expectStatus(
+    request(baseUrl, "GET", "/user/v1/campus/content", {
+      token: studentTokens.accessToken,
+      contextId: studentContext._id,
+    }),
+    200,
+    "student context should load DB-seeded campus content",
+  );
+  assert.equal(
+    campusContent.data?.meta?.source,
+    "database",
+    "campus content endpoint should read demo content from Mongo, not the packaged fallback",
+  );
+  assert.ok(
+    campusContent.data?.opportunities?.some(
+      (item) => item.company === "Nexa Retail",
+    ),
+    "campus content endpoint should expose the seeded Nexa Retail opportunity",
+  );
+  assert.ok(
+    campusContent.data?.events?.some((item) => item.title === "CV Office Hours"),
+    "campus content endpoint should expose the seeded CV Office Hours event",
+  );
+  assert.ok(
+    campusContent.data?.resources?.some(
+      (item) => item.title === "CV lab for students",
+    ),
+    "campus content endpoint should expose the seeded CV lab resource",
   );
   assert.equal(dashboard.data.account.type, "campus");
 

@@ -1,0 +1,410 @@
+{
+  "version": 1,
+  "description": "Machine-checkable proof that approved mobile seeker, campus, and company cards have visible inventory tests and start-to-end destination tests.",
+  "surfaces": [
+    {
+      "id": "seeker_more_default",
+      "label": "Seeker More default cards",
+      "sourcePath": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "proofPath": "mobile/test/widget_test.dart",
+      "inventoryTestName": "seeker more tab exposes secondary function cards",
+      "destinationTestName": "seeker more actions open their launch destinations",
+      "exactInventoryCall": "_expectExactQuickActionKeys",
+      "expectedVisibleKeys": [
+        "quick-action-career_passport",
+        "quick-action-upload_cv",
+        "quick-action-job_alerts",
+        "quick-action-salary_insights",
+        "quick-action-companies",
+        "quick-action-interview_prep",
+        "quick-action-company_request",
+        "quick-action-mobile_status"
+      ],
+      "absentVisibleKeys": [
+        "quick-action-profile",
+        "quick-action-settings",
+        "quick-action-notifications",
+        "quick-action-saved_jobs",
+        "quick-action-applications"
+      ],
+      "cards": [
+        {
+          "id": "career_passport",
+          "uiKey": "quick-action-career_passport",
+          "sourceMustContain": ["id: 'career_passport'", "label: 'Career Passport'"],
+          "proofMustContain": ["'career_passport': find.textContaining", "Career Passport needs a signed-in backend account", "_expectSeekerFollowUpChrome(tester);"]
+        },
+        {
+          "id": "upload_cv",
+          "uiKey": "quick-action-upload_cv",
+          "sourceMustContain": ["id: 'upload_cv'", "label: 'CV manager'"],
+          "proofMustContain": ["'upload_cv': find.textContaining", "CV Manager needs a signed-in backend account", "_expectSeekerFollowUpChrome(tester);"]
+        },
+        {
+          "id": "job_alerts",
+          "uiKey": "quick-action-job_alerts",
+          "sourceMustContain": ["id: 'job_alerts'", "label: 'Job alerts'"],
+          "proofMustContain": ["'job_alerts': find.byKey(const ValueKey('create-saved-search-alert'))", "_expectSeekerFollowUpChrome(tester);"]
+        },
+        {
+          "id": "salary_insights",
+          "uiKey": "quick-action-salary_insights",
+          "sourceMustContain": ["id: 'salary_insights'", "label: 'Salary insights'"],
+          "proofMustContain": ["'salary_insights': find.widgetWithText(TextField, 'Job title')", "_expectSeekerFollowUpChrome(tester);"]
+        },
+        {
+          "id": "companies",
+          "uiKey": "quick-action-companies",
+          "sourceMustContain": ["id: 'companies'", "label: 'Companies'"],
+          "proofMustContain": ["'companies': find.textContaining", "Sign in as a job seeker to browse company profiles", "_expectSeekerFollowUpChrome(tester);"]
+        },
+        {
+          "id": "interview_prep",
+          "uiKey": "quick-action-interview_prep",
+          "sourceMustContain": ["id: 'interview_prep'", "label: 'Interview prep'"],
+          "proofMustContain": ["'interview_prep': find.text('Interview prep pack')", "_expectSeekerFollowUpChrome(tester);"]
+        },
+        {
+          "id": "company_request",
+          "uiKey": "quick-action-company_request",
+          "sourceMustContain": ["id: 'company_request'", "label: 'Company request'"],
+          "proofMustContain": ["'company_request': find.textContaining", "Sign in as a job seeker with the live backend", "_expectSeekerFollowUpChrome(tester);"]
+        },
+        {
+          "id": "mobile_status",
+          "uiKey": "quick-action-mobile_status",
+          "sourceMustContain": ["id: 'mobile_status'", "label: 'Account status'"],
+          "proofMustContain": ["'mobile_status': find.textContaining", "Your job seeker account is connected", "_expectSeekerFollowUpChrome(tester);"]
+        }
+      ]
+    },
+    {
+      "id": "seeker_more_ai_enabled",
+      "label": "Seeker More AI career tools",
+      "sourcePath": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "proofPath": "mobile/test/widget_test.dart",
+      "destinationTestName": "seeker AI career tools screen keeps dedicated IA label",
+      "cards": [
+        {
+          "id": "ai_career_tools",
+          "uiKey": "quick-action-ai_career_tools",
+          "sourceMustContain": ["id: 'ai_career_tools'", "label: 'AI career tools'", "Career Copilot, score, CV rewrite, and interview practice."],
+          "proofMustContain": ["quick-action-ai_career_tools", "ai-career-tools-screen", "Career Copilot", "_expectSeekerFollowUpChrome(tester);"]
+        }
+      ]
+    },
+    {
+      "id": "campus_more_default",
+      "label": "Campus More default cards",
+      "sourcePath": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "proofPath": "mobile/test/widget_test.dart",
+      "inventoryTestName": "campus more tab exposes student function cards",
+      "destinationTestName": "campus more actions open their launch destinations",
+      "exactInventoryCall": "_expectExactQuickActionKeys",
+      "expectedVisibleKeys": [
+        "quick-action-career_passport",
+        "quick-action-upload_cv",
+        "quick-action-job_alerts",
+        "quick-action-interview_prep",
+        "quick-action-campus_verification",
+        "quick-action-mobile_status",
+        "quick-action-campus_resources"
+      ],
+      "absentVisibleKeys": [
+        "quick-action-profile",
+        "quick-action-settings",
+        "quick-action-notifications",
+        "quick-action-campus_feed",
+        "quick-action-browse_internships",
+        "quick-action-campus_events",
+        "quick-action-applications"
+      ],
+      "cards": [
+        {
+          "id": "career_passport",
+          "uiKey": "quick-action-career_passport",
+          "sourceMustContain": ["id: 'career_passport'", "label: 'Career Passport'"],
+          "proofMustContain": ["'career_passport': find.byKey(const ValueKey('career-passport-screen'))", "_expectCampusFollowUpChrome(tester);"]
+        },
+        {
+          "id": "upload_cv",
+          "uiKey": "quick-action-upload_cv",
+          "sourceMustContain": ["id: 'upload_cv'", "label: 'CV builder'"],
+          "proofMustContain": ["'upload_cv': find.byKey(const ValueKey('seeker-cv-manager-screen'))", "_expectCampusFollowUpChrome(tester);"]
+        },
+        {
+          "id": "job_alerts",
+          "uiKey": "quick-action-job_alerts",
+          "sourceMustContain": ["id: 'job_alerts'", "label: 'Job alerts'"],
+          "proofMustContain": ["'job_alerts': find.byKey(const ValueKey('create-saved-search-alert'))", "_expectCampusFollowUpChrome(tester);"]
+        },
+        {
+          "id": "interview_prep",
+          "uiKey": "quick-action-interview_prep",
+          "sourceMustContain": ["id: 'interview_prep'", "label: 'Interview prep'"],
+          "proofMustContain": ["'interview_prep': find.text('Interview practice pack')", "_expectCampusFollowUpChrome(tester);"]
+        },
+        {
+          "id": "campus_verification",
+          "uiKey": "quick-action-campus_verification",
+          "sourceMustContain": ["id: 'campus_verification'", "label: 'Campus verification'"],
+          "proofMustContain": ["'campus_verification': find.byKey", "campus-verification-screen", "_expectCampusFollowUpChrome(tester);"]
+        },
+        {
+          "id": "mobile_status",
+          "uiKey": "quick-action-mobile_status",
+          "sourceMustContain": ["id: 'mobile_status'", "label: 'Account status'"],
+          "proofMustContain": ["'mobile_status': find.textContaining", "Your campus student account is connected", "_expectCampusFollowUpChrome(tester);"]
+        },
+        {
+          "id": "campus_resources",
+          "uiKey": "quick-action-campus_resources",
+          "sourceMustContain": ["id: 'campus_resources'", "label: 'Career resources'"],
+          "proofMustContain": ["'campus_resources': find.text('CV lab for students')", "_expectCampusFollowUpChrome(tester);"]
+        }
+      ]
+    },
+    {
+      "id": "campus_more_ai_enabled",
+      "label": "Campus More AI career tools",
+      "sourcePath": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "proofPath": "mobile/test/widget_test.dart",
+      "destinationTestName": "campus AI career tools are grouped under More when enabled",
+      "cards": [
+        {
+          "id": "ai_career_tools",
+          "uiKey": "quick-action-ai_career_tools",
+          "sourceMustContain": ["id: 'ai_career_tools'", "label: 'AI career tools'", "Campus-safe CV, interview, and readiness suggestions."],
+          "proofMustContain": ["quick-action-ai_career_tools", "ai-career-tools-screen", "Career Copilot", "_expectCampusFollowUpChrome(tester);"]
+        }
+      ]
+    },
+    {
+      "id": "company_more_default",
+      "label": "Company More default cards",
+      "sourcePath": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+      "proofPath": "mobile/test/widget_test.dart",
+      "inventoryTestName": "company AI hiring tools are hidden by default for Syria launch",
+      "exactInventoryCall": "_expectExactCompanyModuleKeys",
+      "expectedVisibleKeys": [
+        "company-module-Company files",
+        "company-module-Support",
+        "company-module-Audit logs",
+        "company-module-Subscription",
+        "company-module-Team",
+        "company-module-Questions",
+        "company-module-Templates"
+      ],
+      "absentVisibleKeys": [
+        "company-module-AI hiring tools"
+      ],
+      "cards": []
+    },
+    {
+      "id": "company_more_ai_enabled",
+      "label": "Company More AI-enabled cards and destinations",
+      "sourcePath": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+      "proofPath": "mobile/test/widget_test.dart",
+      "inventoryTestName": "company AI hiring tools are grouped under More when enabled",
+      "destinationTestName": "company More module cards open their workflow screens",
+      "exactInventoryCall": "_expectExactCompanyModuleKeys",
+      "expectedVisibleKeys": [
+        "company-module-AI hiring tools",
+        "company-module-Company files",
+        "company-module-Support",
+        "company-module-Audit logs",
+        "company-module-Subscription",
+        "company-module-Team",
+        "company-module-Questions",
+        "company-module-Templates"
+      ],
+      "cards": [
+        {
+          "id": "AI hiring tools",
+          "uiKey": "company-module-AI hiring tools",
+          "sourceMustContain": ["title: 'AI hiring tools'", "onTap: onOpenAiTools"],
+          "proofMustContain": ["'AI hiring tools': find.byKey", "company-ai-hiring-tools-screen", "_expectCompanyFollowUpChrome(tester);"]
+        },
+        {
+          "id": "Company files",
+          "uiKey": "company-module-Company files",
+          "sourceMustContain": ["title: 'Company files'", "onTap: onOpenCompanyFiles"],
+          "proofMustContain": ["'Company files': find.text('Company files')", "_expectCompanyFollowUpChrome(tester);"]
+        },
+        {
+          "id": "Support",
+          "uiKey": "company-module-Support",
+          "sourceMustContain": ["title: 'Support'", "onOpenSupport(snapshot.supportTickets)"],
+          "proofMustContain": ["'Support': find.text('Company support')", "_expectCompanyFollowUpChrome(tester);"]
+        },
+        {
+          "id": "Audit logs",
+          "uiKey": "company-module-Audit logs",
+          "sourceMustContain": ["title: 'Audit logs'", "onTap: onOpenAuditLogs"],
+          "proofMustContain": ["'Audit logs': find.text('Audit logs')", "_expectCompanyFollowUpChrome(tester);"]
+        },
+        {
+          "id": "Subscription",
+          "uiKey": "company-module-Subscription",
+          "sourceMustContain": ["title: 'Subscription'", "onTap: onOpenSubscriptionBilling"],
+          "proofMustContain": ["'Subscription': find.text('Subscription and billing')", "_expectCompanyFollowUpChrome(tester);"]
+        },
+        {
+          "id": "Team",
+          "uiKey": "company-module-Team",
+          "sourceMustContain": ["title: 'Team'", "onOpenTeam(snapshot.members)"],
+          "proofMustContain": ["'Team': find.text('Team management')", "_expectCompanyFollowUpChrome(tester);"]
+        },
+        {
+          "id": "Questions",
+          "uiKey": "company-module-Questions",
+          "sourceMustContain": ["title: 'Questions'", "onOpenQuestions(snapshot.questionLibrary)"],
+          "proofMustContain": ["'Questions': find.text('TES Talent Evaluation')", "_expectCompanyFollowUpChrome(tester);"]
+        },
+        {
+          "id": "Templates",
+          "uiKey": "company-module-Templates",
+          "sourceMustContain": ["title: 'Templates'", "onOpenTemplates(snapshot.messageTemplates)"],
+          "proofMustContain": ["'Templates': find.text('Message templates')", "_expectCompanyFollowUpChrome(tester);"]
+        }
+      ]
+    }
+  ],
+  "flowProofs": [
+    {
+      "id": "seeker_campus_ai_button_execution",
+      "label": "Seeker and campus AI tool buttons call backend features",
+      "proofPath": "mobile/test/widget_test.dart",
+      "testName": "seeker and campus AI career tool buttons call every backend feature",
+      "mustContain": [
+        "AppRole.seeker",
+        "AppRole.campusStudent",
+        "ai-tool-career_copilot",
+        "SeekerAiToolFeature.careerCopilot",
+        "ai-tool-profile_score",
+        "SeekerAiToolFeature.profileScore",
+        "ai-tool-cv_rewrite",
+        "SeekerAiToolFeature.cvRewrite",
+        "ai-tool-interview_practice",
+        "SeekerAiToolFeature.interviewPractice",
+        "ai-tool-translate_cv",
+        "SeekerAiToolFeature.translateCv",
+        "_expectSeekerFollowUpChrome",
+        "_expectCampusFollowUpChrome"
+      ]
+    },
+    {
+      "id": "company_ai_button_execution",
+      "label": "Company AI hiring tool buttons call backend features",
+      "proofPath": "mobile/test/widget_test.dart",
+      "testName": "company AI hiring tools are grouped under More when enabled",
+      "mustContain": [
+        "company-module-AI hiring tools",
+        "company-ai-hiring-tools-screen",
+        "company-ai-job-draft",
+        "CompanyAiToolFeature.jobDraft",
+        "company-ai-shortlist",
+        "CompanyAiToolFeature.candidateShortlist",
+        "company-ai-hiring-message",
+        "CompanyAiToolFeature.hiringMessage",
+        "company-ai-job-translation",
+        "CompanyAiToolFeature.jobTranslation",
+        "_expectCompanyFollowUpChrome"
+      ]
+    },
+    {
+      "id": "tester_apk_ai_fallback",
+      "label": "Tester APK app path exposes grouped company AI tools without compile flag",
+      "proofPath": "mobile/test/widget_test.dart",
+      "testName": "tester APK app path exposes grouped company AI tools without compile flag",
+      "mustContain": [
+        "appConfig: const AppConfig(buildMode: 'debug-apk')",
+        "company-module-AI hiring tools",
+        "company-ai-hiring-tools-screen",
+        "company-ai-job-draft",
+        "_expectCompanyFollowUpChrome"
+      ]
+    },
+    {
+      "id": "local_campus_cv_builder_screen",
+      "label": "Local campus tester CV builder opens the real CV manager",
+      "proofPath": "mobile/test/widget_test.dart",
+      "testName": "local campus CV builder does not expire the tester session",
+      "mustContain": [
+        "campus-local:campus.tester@halajob.test",
+        "quick-action-upload_cv",
+        "seeker-cv-manager-screen",
+        "Campus CV review mode",
+        "Campus student CV",
+        "cv-generate-download",
+        "Use a backend campus account",
+        "_expectCampusFollowUpChrome"
+      ]
+    },
+    {
+      "id": "seeker_card_detail_routes",
+      "label": "Seeker dynamic card detail and filter routes",
+      "proofPath": "mobile/test/widget_test.dart",
+      "testName": "seeker card detail and filter routes keep the locked follow-up chrome",
+      "mustContain": [
+        "opportunity-growth-associate",
+        "feed-open-filters",
+        "application-app-operations-analyst",
+        "resource-Interview prep pack",
+        "_expectSeekerFollowUpChrome"
+      ]
+    },
+    {
+      "id": "campus_card_detail_routes",
+      "label": "Campus dynamic card detail and filter routes",
+      "proofPath": "mobile/test/widget_test.dart",
+      "testName": "campus card detail and filter routes keep the locked follow-up chrome",
+      "mustContain": [
+        "event-CV Office Hours",
+        "resource-CV lab for students",
+        "opportunity-student-marketing-intern",
+        "feed-open-filters",
+        "application-app-student-marketing",
+        "_expectCampusFollowUpChrome"
+      ]
+    },
+    {
+      "id": "company_workflow_routes",
+      "label": "Company workflow card routes",
+      "proofPath": "mobile/test/widget_test.dart",
+      "testName": "company job screen manages live job actions",
+      "mustContain": [
+        "company-job-job-1",
+        "_expectCompanyFollowUpChrome"
+      ]
+    },
+    {
+      "id": "company_applicant_routes",
+      "label": "Company applicant card routes",
+      "proofPath": "mobile/test/widget_test.dart",
+      "testName": "company applicant screen updates status, notes, and rating",
+      "mustContain": [
+        "company-application-app-1",
+        "_expectCompanyFollowUpChrome"
+      ]
+    },
+    {
+      "id": "company_talent_routes",
+      "label": "Company talent and invitation routes",
+      "proofPath": "mobile/test/widget_test.dart",
+      "testName": "company talent screens search and manage help requests",
+      "mustContain": [
+        "company-module-Talent pool",
+        "company-talent-search-field",
+        "Sara Sales",
+        "talent-2",
+        "company-talent-invite-button",
+        "company-smart-generate-button",
+        "Talent help",
+        "company-talent-help-create-button",
+        "help-1",
+        "_expectCompanyFollowUpChrome"
+      ]
+    }
+  ]
+}

@@ -76,6 +76,7 @@ import CompanyCandidateTagModel from "./CompanyCandidateTagModel.js";
 import CompanyCandidateListModel from "./CompanyCandidateListModel.js";
 import CampusEventModel from "./CampusEventModel.js";
 import CampusEventRegistrationModel from "./CampusEventRegistrationModel.js";
+import CampusContentModel from "./CampusContentModel.js";
 import CampusOpportunityModel from "./CampusOpportunityModel.js";
 import UniversityModel from "./UniversityModel.js";
 import UniversityOpportunityRequestModel from "./UniversityOpportunityRequestModel.js";
@@ -207,6 +208,7 @@ export {
   CompanyCandidateListModel,
   CampusEventModel,
   CampusEventRegistrationModel,
+  CampusContentModel,
   CampusOpportunityModel,
   UniversityModel,
   UniversityOpportunityRequestModel,

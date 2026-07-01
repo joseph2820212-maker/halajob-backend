@@ -34,6 +34,7 @@ const appShell = read("mobile/lib/src/app.dart");
 const buildAndroid = read("mobile/scripts/build-android.ps1");
 const mobileCi = read(".github/workflows/flutter-mobile-ci.yml");
 const plist = read("mobile/ios/Runner/Info.plist");
+const widgetTest = read("mobile/test/widget_test.dart");
 
 function assertContains(source, needle, label) {
   assert.ok(source.includes(needle), `${label} missing: ${needle}`);
@@ -41,6 +42,28 @@ function assertContains(source, needle, label) {
 
 function assertNotContains(source, needle, label) {
   assert.ok(!source.includes(needle), `${label} should not contain: ${needle}`);
+}
+
+function assertOccurrenceCount(source, needle, expected, label) {
+  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const count = Array.from(source.matchAll(new RegExp(escaped, "g"))).length;
+  assert.equal(
+    count,
+    expected,
+    `${label} expected ${expected} occurrence(s) of ${needle} but found ${count}`,
+  );
+}
+
+function assertTextOrder(source, ordered, label) {
+  let position = -1;
+  for (const needle of ordered) {
+    const nextPosition = source.indexOf(needle, position + 1);
+    assert.ok(
+      nextPosition >= 0,
+      `${label} missing ordered text after ${position}: ${needle}`,
+    );
+    position = nextPosition;
+  }
 }
 
 function extractClass(source, className) {
@@ -81,7 +104,20 @@ const bottomNav = extractClass(cards, "HalaBottomNav");
 const bottomNavItem = extractClass(cards, "_HalaBottomNavItem");
 const normalizedBottomNavItem = bottomNavItem.replace(/\r\n/g, "\n");
 const companyHeader = extractClass(company, "_CompanyHeader");
+const companyBottomNav = extractClass(company, "_CompanyBottomNav");
 const companyMorePanel = extractClass(company, "_CompanyMorePanel");
+const lockedChromeTestHelper = extractBetween(
+  widgetTest,
+  "void _expectLockedNavyChrome({",
+  "void _expectSeekerChrome(WidgetTester tester)",
+  "mobile locked chrome widget helper",
+);
+const followUpChromeTestHelper = extractBetween(
+  widgetTest,
+  "void _expectLockedFollowUpChrome({",
+  "void _expectSeekerFollowUpChrome(WidgetTester tester)",
+  "mobile locked follow-up chrome widget helper",
+);
 const authSignInForm = extractBetween(
   authScreen,
   "Widget _buildSignInForm(ThemeData theme)",
@@ -106,6 +142,12 @@ const mobileBuiltInContent = extractFrom(
   dashboard,
   "_DashboardContent _contentFor(AppRole role)",
   "mobile built-in dashboard content",
+);
+const dashboardTabsFor = extractBetween(
+  dashboard,
+  "List<_DashboardTab> _tabsFor(BuildContext context, AppRole role) {",
+  "_DashboardContent _contentFor(AppRole role)",
+  "dashboard bottom tab definitions",
 );
 
 assertContains(
@@ -136,8 +178,8 @@ assertContains(
 );
 
 assertContains(
-  cards,
-  "const double halaHeaderBrandMarkSize = 22;",
+  brand,
+  "fontSize: 17",
   "section 3 header constants",
 );
 assertContains(
@@ -182,8 +224,12 @@ assertContains(
   "child: Icon(icon, color: halaHeaderFg",
   "HalaHeaderMenuButton",
 );
-assertContains(brand, "size: halaHeaderBrandMarkSize", "header brand");
-assertContains(brand, "leftColor: halaCreamSoft", "header brand");
+assertContains(
+  brand,
+  "text: 'Hala'",
+  "header brand",
+);
+assertContains(brand, "text: 'Job'", "header brand");
 
 assertContains(
   cards,
@@ -244,6 +290,24 @@ assertContains(
   "key: const ValueKey('university-header-notifications')",
   "university header notifications",
 );
+assertOccurrenceCount(
+  university,
+  "key: const ValueKey('university-header-notifications')",
+  1,
+  "university header notifications action",
+);
+assertOccurrenceCount(
+  university,
+  "key: const ValueKey('university-header-profile')",
+  1,
+  "university header profile action",
+);
+assertOccurrenceCount(
+  university,
+  "key: const ValueKey('university-header-settings')",
+  1,
+  "university header settings action",
+);
 assertContains(
   university,
   "child: _UniversityNotificationsScreen(",
@@ -295,6 +359,53 @@ assertContains(
   "dashboard stable tab keys",
 );
 assertContains(dashboard, "keyId: 'more'", "dashboard stable tab keys");
+assertOccurrenceCount(
+  dashboardTabsFor,
+  "_DashboardTab(",
+  9,
+  "dashboard fixed seeker/campus bottom tab count",
+);
+assertOccurrenceCount(
+  dashboardTabsFor,
+  "keyId:",
+  9,
+  "dashboard fixed seeker/campus bottom tab keys",
+);
+assertTextOrder(
+  dashboardTabsFor,
+  [
+    "if (role == AppRole.campusStudent) {",
+    "keyId: 'home'",
+    "keyId: 'opportunities'",
+    "keyId: 'events'",
+    "keyId: 'my-applications'",
+    "keyId: 'more'",
+    "return [",
+    "keyId: 'home'",
+    "keyId: 'jobs'",
+    "keyId: 'my-jobs'",
+    "keyId: 'more'",
+  ],
+  "dashboard seeker/campus bottom tab order",
+);
+assertOccurrenceCount(
+  dashboard,
+  "key: const ValueKey('dashboard-header-notifications')",
+  1,
+  "dashboard header notifications action",
+);
+assertOccurrenceCount(
+  dashboard,
+  "key: const ValueKey('dashboard-header-profile')",
+  1,
+  "dashboard header profile action",
+);
+assertOccurrenceCount(
+  dashboard,
+  "key: const ValueKey('dashboard-header-settings')",
+  1,
+  "dashboard header settings action",
+);
 assertContains(
   dashboard,
   "key: const ValueKey('dashboard-header-notifications')",
@@ -421,6 +532,12 @@ assertContains(
   "key: const ValueKey('company-header-notifications')",
   "company header",
 );
+assertOccurrenceCount(
+  companyHeader,
+  "HalaHeaderIconButton(",
+  3,
+  "company header fixed action slots",
+);
 assertContains(
   companyHeader,
   "tooltip: loc.t('notifications')",
@@ -446,10 +563,25 @@ assertContains(
   "tooltip: loc.t('settings')",
   "company header",
 );
-assertContains(
+assertNotContains(
   companyHeader,
   "key: const ValueKey('company-header-switch-account')",
-  "company header",
+  "company header fixed action slots",
+);
+assertContains(
+  company,
+  "key: const ValueKey('company-account-switch-account-button')",
+  "company account settings switch account placement",
+);
+assertContains(
+  dashboard,
+  "key: const ValueKey('settings-switch-account-button')",
+  "dashboard settings switch account placement",
+);
+assertNotContains(
+  dashboard,
+  "key: const ValueKey('dashboard-header-switch-account')",
+  "dashboard header fixed action slots",
 );
 assertNotContains(
   companyHeader,
@@ -498,13 +630,51 @@ assertContains(
 );
 assertContains(
   company,
-  "if (talentPoolCrmEnabled) _talentTab",
-  "company talent tab feature gate",
+  "3 => const _CompanyTalentUnavailablePanel()",
+  "company canonical tab panels",
 );
 assertContains(
   company,
+  "int get _companyMoreTabIndex => 4",
+  "company locked bottom navigation",
+);
+assertContains(
+  company,
+  "const tabs = [..._primaryTabs, _talentTab, _moreTab]",
+  "company locked bottom navigation",
+);
+assertOccurrenceCount(
+  companyBottomNav,
+  "_CompanyBottomTab(",
+  5,
+  "company fixed five bottom tabs",
+);
+assertTextOrder(
+  companyBottomNav,
+  [
+    "key: ValueKey('company-tab-home')",
+    "key: ValueKey('company-tab-jobs')",
+    "key: ValueKey('company-tab-applicants')",
+    "key: ValueKey('company-tab-talent')",
+    "key: ValueKey('company-tab-more')",
+    "const tabs = [..._primaryTabs, _talentTab, _moreTab]",
+  ],
+  "company fixed bottom tab order",
+);
+assertContains(
+  company,
+  "Talent-pool CRM is currently disabled",
+  "company talent disabled panel",
+);
+assertNotContains(
+  company,
+  "if (talentPoolCrmEnabled) _talentTab",
+  "company locked bottom navigation",
+);
+assertNotContains(
+  company,
   "talentPoolCrmEnabled: widget.clientFeatureSettings.talentPoolCrmEnabled",
-  "company talent tab feature gate",
+  "company locked bottom navigation",
 );
 assertContains(
   company,
@@ -535,6 +705,41 @@ assertContains(
   companyMorePanel,
   "moduleSection('AI tools', aiModules)",
   "company AI tools stay grouped when enabled",
+);
+assertContains(
+  lockedChromeTestHelper,
+  "_expectNoMergedAccountMenu(tester)",
+  "mobile locked root chrome helper",
+);
+assertContains(
+  followUpChromeTestHelper,
+  "expect(header.showBrand, isFalse)",
+  "mobile locked follow-up chrome helper",
+);
+assertContains(
+  followUpChromeTestHelper,
+  "expect(header.leading, isA<HalaHeaderBackButton>())",
+  "mobile locked follow-up chrome helper",
+);
+assertContains(
+  followUpChromeTestHelper,
+  "expect(find.byType(HalaHeaderBackButton), findsOneWidget)",
+  "mobile locked follow-up chrome helper",
+);
+assertContains(
+  followUpChromeTestHelper,
+  "..._seekerHeaderActionKeys",
+  "mobile locked follow-up chrome helper",
+);
+assertContains(
+  followUpChromeTestHelper,
+  "..._companyHeaderActionKeys",
+  "mobile locked follow-up chrome helper",
+);
+assertContains(
+  followUpChromeTestHelper,
+  "_expectNoMergedAccountMenu(tester)",
+  "mobile locked follow-up chrome helper",
 );
 [
   "moduleSection('Company files', fileModules)",

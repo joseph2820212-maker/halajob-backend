@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "label": "Seeker and campus dashboard action keys",
+      "sourcePath": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "prefixes": [
+        "ai-tool-",
+        "company-request-",
+        "cv-",
+        "dashboard-header-",
+        "job-ai-",
+        "quick-action-"
+      ],
+      "proofPaths": [
+        "mobile/test/widget_test.dart",
+        "docs/testing/ui-action-contract.json",
+        "docs/testing/mobile-navigation-proof.json"
+      ]
+    },
+    {
+      "label": "Company dashboard action keys",
+      "sourcePath": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+      "prefixes": [
+        "company-ai-",
+        "company-application-",
+        "company-header-",
+        "company-job-",
+        "company-module-",
+        "company-tab-",
+        "company-talent-"
+      ],
+      "proofPaths": [
+        "mobile/test/widget_test.dart",
+        "docs/testing/ui-action-contract.json",
+        "docs/testing/mobile-navigation-proof.json"
+      ]
+    }
+  ],
+  "dynamicProofs": [
+    {
+      "label": "Role bottom navigation",
+      "sourcePath": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "sourceMustContain": [
+        "ValueKey('bottom-nav-${tab.keyId}')"
+      ],
+      "expectedKeys": [
+        "bottom-nav-home",
+        "bottom-nav-jobs",
+        "bottom-nav-my-jobs",
+        "bottom-nav-more",
+        "bottom-nav-opportunities",
+        "bottom-nav-events",
+        "bottom-nav-my-applications"
+      ],
+      "proofPaths": [
+        "mobile/test/widget_test.dart",
+        "docs/testing/mobile-navigation-proof.json"
+      ]
+    },
+    {
+      "label": "Dashboard quick actions",
+      "sourcePath": "mobile/lib/src/features/dashboard/dashboard_screen.dart",
+      "sourceMustContain": [
+        "ValueKey('quick-action-${action.id}')"
+      ],
+      "expectedKeys": [
+        "quick-action-ai_career_tools",
+        "quick-action-browse_internships",
+        "quick-action-campus_events",
+        "quick-action-campus_resources",
+        "quick-action-campus_verification",
+        "quick-action-career_passport",
+        "quick-action-companies",
+        "quick-action-company_request",
+        "quick-action-interview_prep",
+        "quick-action-job_alerts",
+        "quick-action-mobile_status",
+        "quick-action-salary_insights",
+        "quick-action-saved_jobs",
+        "quick-action-upload_cv"
+      ],
+      "proofPaths": [
+        "mobile/test/widget_test.dart",
+        "docs/testing/ui-action-contract.json",
+        "docs/testing/mobile-navigation-proof.json"
+      ]
+    },
+    {
+      "label": "Company dashboard cards",
+      "sourcePath": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+      "sourceMustContain": [
+        "ValueKey('company-job-${item.id}')",
+        "ValueKey('company-application-${item.id}')"
+      ],
+      "expectedKeys": [
+        "company-job-job-1",
+        "company-application-app-1"
+      ],
+      "proofPaths": [
+        "mobile/test/widget_test.dart",
+        "docs/testing/mobile-navigation-proof.json"
+      ]
+    },
+    {
+      "label": "Company AI tool buttons",
+      "sourcePath": "mobile/lib/src/features/company/company_dashboard_screen.dart",
+      "sourceMustContain": [
+        "ValueKey('company-ai-tool-${definition.feature.backendFeature}')"
+      ],
+      "expectedKeys": [
+        "company-ai-job-draft",
+        "company-ai-shortlist",
+        "company-ai-hiring-message",
+        "company-ai-job-translation"
+      ],
+      "proofPaths": [
+        "mobile/test/widget_test.dart",
+        "docs/testing/mobile-navigation-proof.json"
+      ]
+    }
+  ]
+}

@@ -520,9 +520,10 @@ const mobileApp = read("mobile/lib/src/app.dart");
 assert.match(mobileApp, /fetchClientFeatureSettings/);
 assert.match(mobileApp, /_clientFeatureSettings/);
 const aiToolsGate =
-  mobileApp.match(/bool get _aiToolsEnabled =>[\s\S]*?;/)?.[0] || "";
+  mobileApp.match(/bool get _aiToolsEnabled \{[\s\S]*?\n  \}/)?.[0] || "";
 assert.match(aiToolsGate, /_compiledAiToolsEnabled/);
 assert.match(aiToolsGate, /_clientFeatureSettings\.aiToolsEnabled/);
+assert.match(aiToolsGate, /allowsAiToolsInspectionFallback/);
 
 [
   "UserSettingsModel",
