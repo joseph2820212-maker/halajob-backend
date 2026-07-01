@@ -1,0 +1,2551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Engineering Backlog</title>
+<style>/* Hala Job — documentation theme
+ *
+ * Palette pulled directly from src/styles.css (--jf-* tokens):
+ *   Primary (navy)  #1f3654   --jf-primary / --jf-ink
+ *   Primary dark    #15263c
+ *   Primary hover   #2a4364
+ *   Accent (orange) #e38b3c   --jf-accent
+ *   Accent deep     #c26f22
+ *   Accent tint     #e3b98c
+ *   Soft cream      #fdf3e6   --jf-soft
+ *   Page cream      #fcf7ef   --jf-page
+ *   Card            #fffaf2   --jf-card
+ *   Border (tan)    #ebdac2   --jf-border
+ *   Ink soft        #3a4a5e
+ *   Muted           #5c6b7e   --jf-muted
+ *   Secondary blue  #4e6075   --jf-blue
+ *   Bronze          #9a7b4f   --jf-purple
+ *
+ * Per-repo overrides set --accent via a data-repo attribute on <body>.
+ */
+:root {
+  --navy: #1f3654;
+  --navy-dark: #15263c;
+  --navy-hover: #2a4364;
+  --orange: #e38b3c;
+  --orange-deep: #c26f22;
+  --orange-tint: #e3b98c;
+  --soft: #fdf3e6;
+  --page: #fcf7ef;
+  --card: #fffaf2;
+  --border: #ebdac2;
+  --ink: #1f3654;
+  --ink-soft: #3a4a5e;
+  --muted: #5c6b7e;
+  --blue: #4e6075;
+  --bronze: #9a7b4f;
+  --code-bg: #15263c;
+  --code-ink: #f7ecd8;
+  --danger: #ef4444;
+  --danger-soft: #fdece0;
+  --success: #2f855a;
+
+  /* Repo accent (overridden per body[data-repo]) */
+  --accent: var(--navy);
+  --accent-ink: var(--soft);
+  --accent-soft: var(--soft);
+}
+
+/* Per-repo accent overrides on <body data-repo=""> */
+body[data-repo="backend"]  { --accent: #1f3654; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="website"]  { --accent: #e38b3c; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+body[data-repo="admin"]    { --accent: #15263c; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="mobile"]   { --accent: #4e6075; --accent-ink: #fcf7ef; --accent-soft: #e9eef3; }
+body[data-repo="platform"] { --accent: #c26f22; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page shell — mimics a printed document */
+.doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 64px 64px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(31, 54, 84, 0.08);
+}
+
+/* Cover ================================================================= */
+.cover {
+  min-height: 92vh;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse at top right, rgba(227, 139, 60, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, var(--accent) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+}
+.cover-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+.cover h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-ink);
+  border: 0;
+  padding: 0;
+}
+.cover .tag {
+  font-size: 20px;
+  font-weight: 300;
+  opacity: 0.92;
+  max-width: 640px;
+  line-height: 1.4;
+}
+.cover .rule {
+  height: 4px;
+  width: 88px;
+  background: var(--orange);
+  margin: 0 0 28px;
+  border-radius: 2px;
+}
+.cover-meta {
+  border-top: 1px solid rgba(252, 247, 239, 0.28);
+  padding-top: 20px;
+  font-size: 12px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cover-meta dl { margin: 0; }
+.cover-meta dt {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+.cover-meta dd { margin: 4px 0 0; font-size: 13px; }
+.cover-logo {
+  display: inline-block;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(252, 247, 239, 0.14);
+  color: var(--accent-ink);
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(252, 247, 239, 0.24);
+}
+
+/* Typography ============================================================= */
+h1, h2, h3, h4 {
+  color: var(--navy);
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+h1 {
+  font-size: 28px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 8px;
+}
+h2 { font-size: 22px; margin-top: 40px; }
+h3 { font-size: 17px; margin-top: 28px; color: var(--ink-soft); }
+h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+p { margin: 8px 0 14px; }
+a { color: var(--orange-deep); text-decoration: none; border-bottom: 1px solid rgba(194, 111, 34, 0.25); }
+a:hover { border-bottom-color: var(--orange-deep); }
+
+ul, ol { padding-left: 20px; }
+li { margin: 4px 0; }
+
+/* Callouts / conventions ================================================= */
+.callout {
+  border-left: 4px solid var(--orange);
+  background: var(--soft);
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.callout.warn   { border-color: var(--orange-deep); background: #fdf3e6; }
+.callout.danger { border-color: var(--danger); background: var(--danger-soft); }
+.callout.info   { border-color: var(--blue); background: #edf1f6; }
+
+/* Code =================================================================== */
+code {
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  background: rgba(31, 54, 84, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--navy);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border: 1px solid var(--navy-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* Tables ================================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid var(--orange);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td { background: var(--soft); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Method chips (HTTP verbs on the endpoint cards) ======================== */
+.m {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--soft);
+}
+.m-GET     { background: var(--blue); }
+.m-POST    { background: var(--orange); color: var(--navy); }
+.m-PUT     { background: var(--orange-deep); }
+.m-PATCH   { background: var(--bronze); }
+.m-DELETE  { background: var(--danger); }
+.m-OPTIONS { background: var(--muted); }
+.m-HEAD    { background: var(--muted); }
+
+/* Auth chips ============================================================= */
+.auth {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+}
+.auth-public { color: var(--ink-soft); border-color: var(--border); background: var(--soft); }
+.auth-bearer { color: var(--navy); border-color: var(--navy); background: #e6ebf2; }
+.auth-admin  { color: var(--orange-deep); border-color: var(--orange-deep); background: var(--soft); }
+
+/* Endpoint card ========================================================== */
+.endpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background: var(--card);
+}
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.endpoint-head .path { font-weight: 600; color: var(--navy); }
+.endpoint-head .auth { margin-left: auto; }
+.endpoint-body { padding: 14px 16px; font-size: 13px; }
+.endpoint-body dl { margin: 0; }
+.endpoint-body dt {
+  font-weight: 600;
+  color: var(--navy);
+  margin: 10px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.endpoint-body dt:first-child { margin-top: 0; }
+.endpoint-body dd { margin: 0 0 6px; }
+
+/* TOC ==================================================================== */
+.toc {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 20px 0 32px;
+  page-break-after: always;
+}
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+.toc li { padding: 4px 0; border-bottom: 1px dotted rgba(31,54,84,0.12); }
+.toc li:last-child { border-bottom: 0; }
+.toc li a { border: 0; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+.toc li a::before {
+  counter-increment: sec;
+  content: counter(sec) ".";
+  color: var(--orange-deep);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  min-width: 24px;
+}
+.toc li a:hover { color: var(--orange-deep); }
+
+/* Small chips & badges */
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 20px;
+  font-size: 13px;
+  margin: 10px 0 16px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+.kv dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kv dd { margin: 0; }
+
+/* Footer on every page */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: ui-monospace, monospace;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+  @bottom-left {
+    content: "Hala Job";
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+}
+@media print {
+  html, body { background: #ffffff; }
+  .doc { box-shadow: none; padding: 0; background: #ffffff; }
+  h2 { break-after: avoid; }
+  .endpoint { break-inside: avoid; }
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  a { color: var(--ink); }
+}
+
+/* ==========================================================================
+ * RTL / Arabic layout — activated by dir="rtl" on the <html> element.
+ * English docs (default LTR) are unaffected. Code identifiers and URLs
+ * inside <code> / <pre> stay LTR so JSON, curl, and paths still read
+ * correctly.
+ * ========================================================================= */
+
+[dir="rtl"] body {
+  font-family: "SF Arabic", "Geeza Pro", "Noto Sans Arabic", "Segoe UI Arabic",
+               "Tahoma", -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
+  letter-spacing: 0; /* Arabic doesn't want negative letter-spacing */
+}
+
+/* Preserve LTR direction for anything code-like. Numbers and Latin-script
+ * technical strings inside a right-to-left paragraph would otherwise
+ * mirror-render. */
+[dir="rtl"] code,
+[dir="rtl"] pre,
+[dir="rtl"] .m,
+[dir="rtl"] .auth,
+[dir="rtl"] .badge {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+/* Flip left-anchored borders to the right */
+[dir="rtl"] .callout {
+  border-left: 0;
+  border-right: 4px solid var(--accent);
+  border-radius: 6px 0 0 6px;
+}
+[dir="rtl"] .callout.warn   { border-right-color: var(--orange-deep); }
+[dir="rtl"] .callout.danger { border-right-color: var(--danger); }
+[dir="rtl"] .callout.info   { border-right-color: var(--blue); }
+
+/* Endpoint block: swap head chip layout so method+path lead from the right */
+[dir="rtl"] .endpoint-head .auth { margin-left: 0; margin-right: auto; }
+
+/* TOC counter marker sits on the right side */
+[dir="rtl"] .toc li a::before { margin-right: 0; margin-left: 8px; }
+
+/* Lists: RTL default marker padding lives on the right */
+[dir="rtl"] ul, [dir="rtl"] ol { padding-left: 0; padding-right: 20px; }
+
+/* Tables: header + body cells left-align by default. Arabic wants
+ * right-align for prose but LTR for code cells. */
+[dir="rtl"] thead th, [dir="rtl"] tbody td { text-align: right; }
+[dir="rtl"] .kv { grid-template-columns: 200px 1fr; }
+
+/* Cover: page counter reads more naturally in the outer corner. */
+[dir="rtl"] .cover-meta { justify-content: flex-end; }
+
+/* Deck-only RTL tweaks */
+[dir="rtl"] .feature { border-left: 0; border-right: 4px solid var(--orange); }
+[dir="rtl"] .value   { border-left: 0; border-right: 6px solid var(--orange); }
+[dir="rtl"] .section-hero .highlights .chip { direction: rtl; }
+
+/* Print page counter on the outer (left) edge in RTL */
+@page :left { }
+
+
+/* extra tuning for a plan document */
+.p-tag { display:inline-block; padding:1px 8px; border-radius:4px; font-size:11px; font-weight:700; letter-spacing:0.3px; }
+.p-P0 { background: #d9534f; color:#fff; }
+.p-P1 { background: var(--orange-deep); color:#fff; }
+.p-P2 { background: var(--bronze); color:#fff; }
+.p-P3 { background: var(--muted); color:#fff; }
+.ticket { border:1px solid var(--border); border-radius:6px; padding:12px 14px; margin:10px 0; background: var(--card); page-break-inside: avoid; }
+.ticket-head { display:flex; gap:10px; align-items:center; margin-bottom:6px; flex-wrap:wrap; }
+.ticket-head .id { font-family: ui-monospace, monospace; color: var(--navy); font-weight:600; }
+.ticket-head .title { font-weight:600; color: var(--ink); flex:1 1 auto; }
+.ticket-body { font-size:12px; line-height:1.5; }
+.ticket-body dt { font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color: var(--muted); margin-top:6px; }
+.ticket-body dd { margin:2px 0 0; color: var(--ink); }
+.phase-header { background: linear-gradient(135deg, var(--soft) 0%, var(--card) 60%); padding: 20px 24px; margin: 30px -14px 20px; border-left: 6px solid var(--orange); border-radius: 0 8px 8px 0; }
+.phase-header h2 { margin:0; }
+.stats-grid { display:grid; grid-template-columns: repeat(4,1fr); gap:10px; margin:16px 0 22px; }
+.stats-grid .stat { background: var(--soft); border:1px solid var(--border); border-radius:8px; padding:14px; text-align:center; }
+.stats-grid .num { font-size:28px; font-weight:700; color: var(--navy); display:block; line-height:1; }
+.stats-grid .lbl { font-size:10px; text-transform:uppercase; letter-spacing:1px; color: var(--muted); margin-top:6px; display:block; }
+.gantt { font-family: ui-monospace, monospace; font-size:11px; background: var(--code-bg); color: var(--code-ink); padding:14px; border-radius:6px; overflow-x:auto; white-space: pre; }
+</style>
+</head>
+<body data-repo="platform">
+  <section class="cover">
+    <div>
+      <div class="cover-logo">HJ</div>
+      <div class="cover-eyebrow">Hala Job Platform</div>
+      <h1>Engineering Backlog</h1>
+      <div class="rule"></div>
+      <p class="tag">The 117-ticket register the incoming four-engineer team pulls from — deduped across 9 audit agents, with evidence pointers and fix shapes ready for JIRA/Linear import.</p>
+    </div>
+    <div class="cover-meta"><dl><dt>Total tickets</dt><dd>117</dd></dl><dl><dt>Total hours</dt><dd>~1666 engineer-hours</dd></dl><dl><dt>P0 blockers</dt><dd>10</dd></dl><dl><dt>Companion</dt><dd>IMPLEMENTATION_PLAN.pdf</dd></dl><dl><dt>Generated</dt><dd>2026-07-01</dd></dl></div>
+  </section>
+  <div class="doc">
+    <nav class="toc"><h2>Contents</h2><ol><li><a href="#intro"><span>How to use this backlog</span></a></li><li><a href="#p0"><span>P0 — Launch blockers</span></a></li><li><a href="#p1"><span>P1 — Won&#x27;t-embarrass</span></a></li><li><a href="#p2"><span>P2 — Professional bar</span></a></li><li><a href="#p3"><span>P3 — Impress-tier</span></a></li><li><a href="#sources"><span>Source audit branches</span></a></li></ol></nav>
+    <section id="intro"><h1>How to use this backlog</h1>
+    <p>This is the operational ticket register the incoming four-engineer team
+    consumes day-one. Every ticket has an ID (stable across future updates), a
+    priority tier, an owner role, a phase, an evidence pointer (file:line),
+    a one-sentence fix shape, and an engineer-hour estimate.</p>
+
+    <p><b>Import into JIRA / Linear / GitHub Projects:</b> the priority tag maps
+    directly to a label; the owner tag maps to a team; the phase tag maps to a
+    sprint or milestone. Effort is a coarse T-shirt estimate; treat it as a
+    planning number, not a commitment.</p>
+
+    <div class="stats-grid"><div class="stat"><span class="num">10</span><span class="lbl">P0 tickets</span></div><div class="stat"><span class="num">53</span><span class="lbl">P1 tickets</span></div><div class="stat"><span class="num">36</span><span class="lbl">P2 tickets</span></div><div class="stat"><span class="num">18</span><span class="lbl">P3 tickets</span></div></div>
+
+    <p>Total: <b>117 tickets · ~1666 engineer-hours</b>.</p>
+    <h3>Capacity by owner</h3><table><thead><tr><th>Owner</th><th>Tickets</th><th>Hours</th><th>Notes</th></tr></thead><tbody><tr><td>backend</td><td>74</td><td>885</td><td>Backend engineer sprint capacity</td></tr><tr><td>cross-repo</td><td>21</td><td>293</td><td>Cross-repo / needs coordination</td></tr><tr><td>flutter</td><td>10</td><td>146</td><td>Flutter engineer sprint capacity</td></tr><tr><td>web</td><td>12</td><td>342</td><td>Web engineer sprint capacity</td></tr></tbody></table></section><section id="p0"><h1>P0 — Launch blockers</h1>
+        <div class="phase-header">
+          <h2>P0 · Launch blockers (Phase 0)</h2>
+          <p>10 tickets · 37 engineer-hours</p>
+        </div>
+        
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-01</span>
+        <span class="title">Forgot-password OTP has no attempt lockout — 5-digit codes brute-forceable</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/app/Auth/PassCodeForgotPasswordController.js:82-93 (no passcode_attempts check); PassCodeController has MAX_PASSCODE_ATTEMPTS=5 but this file does not; codes are crypto.randomInt(10000, 100000) = 90k space</dd>
+          <dt>Fix</dt><dd>Copy the passcode_attempts increment + MAX_PASSCODE_ATTEMPTS lockout used in the login passcode verifier; add per-user (email/phone) key to the rate limiter</dd>
+          <dt>Source</dt><dd><code>SEC-01</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-02</span>
+        <span class="title">OTP codes stored plaintext in DB, compared with ===</span>
+        <span class="badge">5h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/app/Auth/PassCodeController.js:139-148 String(user.passcode) === String(passcode).trim(); UserModel stores passcode as plain field; RegisterController.js:421 crypto.randomInt(10000, 100000)</dd>
+          <dt>Fix</dt><dd>Store passcodes as bcrypt or HMAC(secret,code); compare with crypto.timingSafeEqual; bump codes to 6 digits</dd>
+          <dt>Source</dt><dd><code>SEC-02</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-03</span>
+        <span class="title">Public /public/v1/companies/:slug/jobs leaks recruiter emails + internal user_ids</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/public/companyPublicController.js:70-74 paginate(jobsModel,...) with no .select(); JobModel exposes emails[], user_id, created_by, updated_by, stopped_by, archived_by, trust, is_send_emails</dd>
+          <dt>Fix</dt><dd>Add explicit .select allow-list projection, or route every item through buildPublicJobPayload() serializer</dd>
+          <dt>Source</dt><dd><code>SEC-03</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-04</span>
+        <span class="title">Company sessions listing selects raw refresh token from DB</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/companyDash/Auth/loginController.js:513-533 .select(&#x27;_id loginTime expiresAt device createdAt updatedAt token&#x27;); RefreshTokenModel.token has no select:false</dd>
+          <dt>Fix</dt><dd>Drop token from the .select; add select:false to RefreshTokenModel.token; compare sessions by session_id</dd>
+          <dt>Source</dt><dd><code>API-02</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-05</span>
+        <span class="title">Rate limiters use in-memory store — broken behind &gt;1 instance, IPv6 rotation defeats entirely</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>app.js:113-144 declares globalLimiter/authLimiter/uploadLimiter with no store: option — defaults to MemoryStore; no keyGenerator (IP only); trust proxy hardcoded to 1</dd>
+          <dt>Fix</dt><dd>Switch to rate-limit-redis (redis already in deps); keyGenerator combines ipKeyGenerator(req) with normalized email/user_id; group IPv6 by /64; make trust proxy configurable via env</dd>
+          <dt>Source</dt><dd><code>SEC-04 + OPS-03</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-06</span>
+        <span class="title">CORS falls open when NODE_ENV != &#x27;production&#x27; — allows any origin with credentials</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>app.js:37 isProduction = process.env.NODE_ENV === &#x27;production&#x27;; :66-68 if (!isProduction) return callback(null, true); any deploy with NODE_ENV unset or set to &#x27;staging&#x27; reflects Access-Control-Allow-Origin for evil.com</dd>
+          <dt>Fix</dt><dd>Invert the gate: require ALLOW_ANY_CORS=true for dev; default-deny on unknown origins regardless of NODE_ENV; startup assertion that CORS_ORIGINS non-empty when NODE_ENV != &#x27;development&#x27;</dd>
+          <dt>Source</dt><dd><code>SEC-07</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-07</span>
+        <span class="title">5 GET handlers perform destructive database writes (RFC 9110 violation)</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>GET /exsel/insert → insertMany; GET /keyword/log → deleteMany + create; GET /user/v1/job/get → updateMany via markSeen; GET /user/v1/job/get-by-id/:id → same; GET /user/v1/job-information/recompute-job-rating-breakdown/:id → updateOne</dd>
+          <dt>Fix</dt><dd>Convert to POST/PATCH; keep GET aliases returning 405 or 410 for one release cycle; audit browser prefetch / crawler impact for anything that was hit</dd>
+          <dt>Source</dt><dd><code>API-01 + API-design sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-08</span>
+        <span class="title">Puppeteer runs with --no-sandbox and loads arbitrary URLs from CV HTML (SSRF)</span>
+        <span class="badge">8h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>services/cv/cvPdf.service.js:11-22 puppeteer.launch({ args: [&#x27;--no-sandbox&#x27;, &#x27;--disable-setuid-sandbox&#x27;] }); page.setContent(html, { waitUntil: &#x27;networkidle0&#x27; }); Chromium fetches every img/link src including http://169.254.169.254/</dd>
+          <dt>Fix</dt><dd>page.setRequestInterception(true), block every request not on an allow-list (data:/blob:/file: for approved asset roots); drop --no-sandbox; run in a jailed container</dd>
+          <dt>Source</dt><dd><code>SEC-06</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-09</span>
+        <span class="title">CONTRIBUTING.md tells engineers to check out a non-existent branch and build a deleted folder</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>halajob-backend/CONTRIBUTING.md:10 &#x27;Base launch work on flutter-seeker-campus&#x27; (branch does not exist in split); :44-45 &#x27;npm --prefix web ci&#x27; (web/ folder was removed in split)</dd>
+          <dt>Fix</dt><dd>Rewrite for post-split reality: base branches on main; drop --prefix web/mobile; point sibling work at the sibling repos (mirrors what&#x27;s already in CLAUDE.md and CODEX.md)</dd>
+          <dt>Source</dt><dd><code>HO-01</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P0">P0</span>
+        <span class="id">P0-10</span>
+        <span class="title">Every .env.example defaults to production https://jobzain.com — new engineers test against prod DB</span>
+        <span class="badge">1h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>halajob-website/.env.example:4 VITE_API_URL=https://jobzain.com; halajob-admin/.env.example:3 same; halajob-mobile/README.md:89 --dart-define=HALA_DEFAULT_BASE_URL=https://jobzain.com</dd>
+          <dt>Fix</dt><dd>Change .env.example defaults to http://localhost:3000; move production URL into .env.production.example with a warning; require explicit override to point at prod</dd>
+          <dt>Source</dt><dd><code>HO-23</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+        </section><section id="p1"><h1>P1 — Won&#x27;t-embarrass</h1>
+        <div class="phase-header">
+          <h2>P1 · Will-embarrass without them (Phase 1)</h2>
+          <p>53 tickets · 680 engineer-hours</p>
+        </div>
+        
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-01</span>
+        <span class="title">bcryptjs (pure JS) — 10× slower than native bcrypt, CPU-exhaustion risk</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>package.json &#x27;bcryptjs&#x27;: &#x27;^2.4.3&#x27;; hashing latency ~10× native bcrypt</dd>
+          <dt>Fix</dt><dd>Replace bcryptjs with bcrypt (native); rehash-on-login migration or wait for natural password rotation</dd>
+          <dt>Source</dt><dd><code>Round-1</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-02</span>
+        <span class="title">Login endpoint enables user enumeration via bcrypt-skip timing</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/app/Auth/LoginController.js:114-140 (not-found returns before bcrypt runs); same pattern in companyDash/Auth/loginController.js:190-214 and dash/authController.js:180-206</dd>
+          <dt>Fix</dt><dd>Always run bcrypt.compare against a fixed dummy hash on the not-found branch; return 401 with identical timing on both branches</dd>
+          <dt>Source</dt><dd><code>SEC-11 + API-03 + API-04</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-03</span>
+        <span class="title">Refresh-token rotation has no reuse detection (stolen-token replay possible)</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>services/tokenService.js:143-171 findOne({token}) → delete → issue new; no jti/family tracking, no revoke-on-reuse</dd>
+          <dt>Fix</dt><dd>Store rotation lineage (family_id + previous jti); if verifyRefreshToken called with a token whose jti already rotated, revoke the entire family + force re-login</dd>
+          <dt>Source</dt><dd><code>SEC-12</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-04</span>
+        <span class="title">Refresh token accepted from body/header on top of httpOnly cookie — negates cookie protection</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>services/authCookie.service.js:74-83 returns req.body.refreshToken || req.get(&#x27;x-refresh-token&#x27;) before cookie fallback; CORS whitelists X-Refresh-Token</dd>
+          <dt>Fix</dt><dd>For web requests (identified by X-Web-Client header or cookie presence), require the httpOnly cookie only; return 400 if body/header refresh token also present</dd>
+          <dt>Source</dt><dd><code>SEC-22 + API-05</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-05</span>
+        <span class="title">public_download_token stored plaintext, string-compared</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>app.js:253-265 expectedToken = String(cv.public_download_token || &#x27;&#x27;).trim(); if (generatedCvTokenFromRequest(req) !== expectedToken)</dd>
+          <dt>Fix</dt><dd>Store SHA-256 of the token, compare via crypto.timingSafeEqual over equal-length Buffers</dd>
+          <dt>Source</dt><dd><code>SEC-09</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-06</span>
+        <span class="title">Upload filters trust client MIME/extension — no magic-byte validation</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>utils/multer.js:30-51 hasAllowedMime returns true when file.mimetype absent; utils/multerCv.js:25-32 same; no file-type sniffing</dd>
+          <dt>Fix</dt><dd>Add file-type magic-bytes verification after multer writes each file; reject on mismatch; consider AV scan on CVs</dd>
+          <dt>Source</dt><dd><code>SEC-08</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-07</span>
+        <span class="title">Mongoose 6.x is EOL (Sep 30 2024); helmet 5 stale; express-mongo-sanitize unmaintained</span>
+        <span class="badge">24h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>package.json mongoose ^6.2.9, helmet ^5.0.2, express-mongo-sanitize ^2.2.0 (last release 2021)</dd>
+          <dt>Fix</dt><dd>Upgrade mongoose to 8.x (breaking changes tractable); helmet to 7.x; replace express-mongo-sanitize with a small schema-based sanitizer</dd>
+          <dt>Source</dt><dd><code>SEC-10</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-08</span>
+        <span class="title">Zero transactions on multi-collection writes — auth/apply/subscribe leave orphans on partial failure</span>
+        <span class="badge">16h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>RegisterController.js:702-747 writes User+EmployeeModel sequentially; ApplyingJobController.js:684-756 writes 5 collections in Promise.all; companySubscriptionController.js:83-90; CreateJobController.js:345</dd>
+          <dt>Fix</dt><dd>Wrap each multi-write flow in session.withTransaction; comment ApplyingJobController.js:200 explicitly acknowledges the omission</dd>
+          <dt>Source</dt><dd><code>DB-N+1-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-09</span>
+        <span class="title">9 models lack timestamps (ColorModel, FontModel, LanguageModel, KeywordModel, BannerModel, CountryModel, AppSettingsModel, CityModel)</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep of models/ for schema definitions without {timestamps:true}</dd>
+          <dt>Fix</dt><dd>Add {timestamps:true} to each schema; write a one-off script to backfill createdAt from _id.getTimestamp()</dd>
+          <dt>Source</dt><dd><code>DB-retention-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-10</span>
+        <span class="title">Missing TTL where it should be: StudentVerificationModel (OTP!), ScheduledJobLockModel, EmailLog, JobAlertLog, CommunicationDeliveryLog</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep for expireAfterSeconds returns 5 hits (RefreshToken, CvParseJob, Notification, AnalyticsEvent, SearchHistory) — the flagged models have no TTL index</dd>
+          <dt>Fix</dt><dd>Add TTL index on StudentVerificationModel.expiresAt (24h), ScheduledJobLockModel (lease-window), EmailLog/JobAlertLog/CommunicationDeliveryLog (180-400 days)</dd>
+          <dt>Source</dt><dd><code>DB-retention-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-11</span>
+        <span class="title">~90-100 dead or redundant indexes across jobs (83), companies (68), employees (107)</span>
+        <span class="badge">20h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Boolean-only indexes (is_hiring, is_verified, is_free_for_work, is_for_students, etc.); duplicate compound prefixes; indexes on denormalized stats (employees_count, views_count, followers_count) never used as filter</dd>
+          <dt>Fix</dt><dd>1) Enable MongoDB profiler in staging for 1 week to identify unused indexes; 2) Drop by explain-plan evidence; 3) Reduce boolean indexes to partial or drop entirely</dd>
+          <dt>Source</dt><dd><code>DB-dead-index-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-12</span>
+        <span class="title">3 missing critical indexes on hot query paths</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>PrivacyRequestModel needs {userId:1, status:1, createdAt:-1}; ApplicationStatusHistoryModel needs {user_id:1, application_id:1, createdAt:-1}</dd>
+          <dt>Fix</dt><dd>Add the 3 compound indexes; wrap in a one-off migration</dd>
+          <dt>Source</dt><dd><code>DB-missing-index-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-13</span>
+        <span class="title">campusController.js is 4,759 lines with 53 async functions; 5 other files over 1,300</span>
+        <span class="badge">40h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>campusController 4,759 / companyJobHiring 1,712 / adminResource 1,400 / employeeInformation 1,391 / companyWithJobs 1,347</dd>
+          <dt>Fix</dt><dd>Split each into domain sub-controllers (events, opportunities, verification, etc.); extract common helpers to helper/</dd>
+          <dt>Source</dt><dd><code>CQ-02 + CQ-14</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-14</span>
+        <span class="title">340+ console.log/error calls despite winston being configured</span>
+        <span class="badge">12h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>config/logger.js has winston-console setup; grep for console.log/error returns 340 hits across controllers/services; morgan is disabled in production (app.js:185-187)</dd>
+          <dt>Fix</dt><dd>Add eslint no-console rule; sweep controllers/services to logger.*; switch logger.format to JSON with request-id + user-id fields; enable morgan JSON in prod</dd>
+          <dt>Source</dt><dd><code>CQ-03 + OPS-07 + OPS-22</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-15</span>
+        <span class="title">Silent catch(_){} in auth save() paths — PassCodeController and ForgotPasswordController</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/app/Auth/PassCodeController.js:263 catch(_){}; ForgotPasswordController.js:130 same — silently ignores user.save() failures</dd>
+          <dt>Fix</dt><dd>Log and either re-throw or return 500; never silently swallow user.save() in auth-critical paths</dd>
+          <dt>Source</dt><dd><code>CQ-01</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-16</span>
+        <span class="title">27 env-var fallback patterns without validation at boot</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>notification/dashboardRoutes.js — process.env.COMPANY_DASHBOARD_URL || &#x27;https://company.jobzain.com/&#x27;; joi is in deps but not applied to process.env</dd>
+          <dt>Fix</dt><dd>Add config/env.js with a joi/zod schema for every env var used; validate at boot; process.exit(1) with full error list if missing/invalid; delete fallback strings for production URLs</dd>
+          <dt>Source</dt><dd><code>CQ-06 + OPS-10</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-17</span>
+        <span class="title">app.set(&#x27;trust proxy&#x27;, 1) hardcoded — breaks rate-limit + IP logging behind CDN + LB (2+ hops)</span>
+        <span class="badge">1h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>app.js:39</dd>
+          <dt>Fix</dt><dd>Read hop count from env: app.set(&#x27;trust proxy&#x27;, Number(process.env.TRUST_PROXY_HOPS) || 1)</dd>
+          <dt>Source</dt><dd><code>Round-1</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-18</span>
+        <span class="title">SIGTERM immediately closes server — no drain window, in-flight PDF/CV parse killed mid-response</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>index.js:90-93 SIGTERM handler calls exitHandler(0) → server.close + mongoose.connection.close(false)</dd>
+          <dt>Fix</dt><dd>On SIGTERM: flip /health/ready to 503, wait N seconds for in-flight requests to drain, then close; use &#x27;stoppable&#x27; package or custom drainer</dd>
+          <dt>Source</dt><dd><code>OPS-11</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-19</span>
+        <span class="title">Three competing response envelopes coexist; 30+ bare res.json() payloads</span>
+        <span class="badge">24h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>helper/ReturnAppData {status,message,data}; helper/employeeDash {success,message,data,meta}; middlewares/error.js {statusCode,message,type,uuid}; controllers/app/FcmToken/FcmTokenController.js:22 bare {items,nextCursor}</dd>
+          <dt>Fix</dt><dd>Add a single response wrapper middleware emitting {ok, code, message, data, meta, errors}; migrate handlers over 4 sprints; lint check to block new bare res.json</dd>
+          <dt>Source</dt><dd><code>API-08</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-20</span>
+        <span class="title">Login returns 400 for wrong password AND unknown user; OTP verify returns 400 for wrong code</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/app/Auth/LoginController.js:118-140 status:400 both branches; same pattern in companyDash + dash; PassCodeController.js:112-118 and :265-269 return 400</dd>
+          <dt>Fix</dt><dd>Return 401 for credential/OTP rejection; keep 400 for schema validation failures only; add per-error stable codes (invalid_credentials, invalid_otp, otp_expired)</dd>
+          <dt>Source</dt><dd><code>API-15 + API-16</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-21</span>
+        <span class="title">OpenAPI spec is a route skeleton — 95% drift from actual controllers</span>
+        <span class="badge">40h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>docs/api/HALAJOB_OPENAPI.yaml has 949 occurrences of &#x27;Generated route skeleton&#x27;; every requestBody is type:object required:false; /user/v1/auth/login schema does not match the controller</dd>
+          <dt>Fix</dt><dd>Replace generator with a schema-first workflow: hand-author component schemas for the top ~50 endpoints; wire yup/joi validators to emit them; ship an OpenAPI diff check in CI</dd>
+          <dt>Source</dt><dd><code>API-07</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-22</span>
+        <span class="title">Yup validation errors flattened to joined string — per-field detail lost</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>middlewares/error.js:32-37 err.errors?.join(&#x27;, &#x27;) on ValidationError; err.inner[] path/type/message discarded</dd>
+          <dt>Fix</dt><dd>Emit errors: err.inner.map(e =&gt; ({path, rule:e.type, message})) under a stable errors key on 400 responses; frontends can then highlight per-field</dd>
+          <dt>Source</dt><dd><code>API-10</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-23</span>
+        <span class="title">No stable machine-readable error codes — all errors are localized prose</span>
+        <span class="badge">40h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>LoginController.js:93-139 &#x27;Email and password are required.&#x27; / &#x27;The data sent is incorrect.&#x27;; middlewares/error.js:19-24 emits no code field; every ApiError uses free-form message</dd>
+          <dt>Fix</dt><dd>Add stable error_code (AUTH_INVALID_CREDENTIALS, VALIDATION_MISSING_FIELDS, …) on every ApiError; expose alongside message; publish a code registry</dd>
+          <dt>Source</dt><dd><code>API-09</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-24</span>
+        <span class="title">No X-Request-Id middleware, no correlation ID in errors or logs</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep for x-request-id in backend returns zero runtime hits; error.js:22-27 uses internal uuid only for non-ApiError exceptions; never sets X-Request-Id response header</dd>
+          <dt>Fix</dt><dd>Add middleware: req.id = req.get(&#x27;x-request-id&#x27;) || uuid(); echo as X-Request-Id; include in ApiError body and logger context</dd>
+          <dt>Source</dt><dd><code>API-23</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-25</span>
+        <span class="title">No Idempotency-Key anywhere — retries create duplicate tickets, subscriptions, applications</span>
+        <span class="badge">16h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep for Idempotency-Key returns 0 across backend; support ticket creation duplicates on retry; subscription upgrade creates N tickets</dd>
+          <dt>Fix</dt><dd>Add generic middleware: read Idempotency-Key, stash {key,userId,route,responseHash} in Redis TTL 24h, short-circuit duplicates with cached response</dd>
+          <dt>Source</dt><dd><code>API-11 + API-12 + API-33</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-26</span>
+        <span class="title">Pagination is skip-limit; unbounded on some listings; two competing helpers with different meta shapes</span>
+        <span class="badge">12h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>helper/companyDash returns {items, meta:{page,limit,total,pages,has_next,has_prev}} capped 100; adminOperationsController returns {items,pagination:{…}} capped 200; dash/CompanyController + JobController hand-roll skip/limit unbounded</dd>
+          <dt>Fix</dt><dd>Consolidate on ONE paginate helper with cursor-based pagination and one meta shape; migrate hand-rolled to it; cap limit at 100</dd>
+          <dt>Source</dt><dd><code>API-20 + API-21</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-27</span>
+        <span class="title">Zero error tracking anywhere (no Sentry/Datadog/Crashlytics on any repo)</span>
+        <span class="badge">12h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep Sentry|@sentry|datadog|opentelemetry across all 4 repos returns 0 application hits</dd>
+          <dt>Fix</dt><dd>@sentry/node in backend + Express integration; @sentry/react in website/admin; sentry_flutter in mobile; upload source maps in CI; unified DSN per env</dd>
+          <dt>Source</dt><dd><code>OPS-01 + OPS-09 + Impress WOW-03</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-28</span>
+        <span class="title">No /metrics endpoint, no prom-client, no request/latency/error metrics</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep for prom-client/metrics returns 0</dd>
+          <dt>Fix</dt><dd>Add prom-client, mount token-guarded GET /metrics, wrap Express with middleware emitting request_count / request_duration_seconds / mongo_query_duration histograms</dd>
+          <dt>Source</dt><dd><code>OPS-02</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-29</span>
+        <span class="title">No CD pipeline anywhere — every deploy is a human running npm start</span>
+        <span class="badge">10h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>4 ci.yml workflows lint/test/build only; no deploy job; docs/DEPLOYMENT.md steps 1-9 all manual</dd>
+          <dt>Fix</dt><dd>Add deploy workflows: website/admin → Vercel action on merge; backend → Vercel/Render/Fly with health-gate; Slack notifications</dd>
+          <dt>Source</dt><dd><code>OPS-04</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-30</span>
+        <span class="title">No rollback automation — no immutable artifact, no `deploy revert` command</span>
+        <span class="badge">8h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>DEPLOYMENT.md discusses forward steps only; no rollback.sh, no tagged image, no Vercel promote-previous step</dd>
+          <dt>Fix</dt><dd>Tag every backend build with immutable version; store artifacts in registry; document/wire `deploy rollback &lt;tag&gt;` path</dd>
+          <dt>Source</dt><dd><code>OPS-05</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-31</span>
+        <span class="title">No Dockerfile, no docker-compose for dev, no k8s/helm</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>No Dockerfile in halajob-backend; only search-local/docker-compose.yml exists (Mongo+Meili+Redis, hidden, unreferenced)</dd>
+          <dt>Fix</dt><dd>Hardened Dockerfile (node:20-alpine, --omit=dev, non-root, HEALTHCHECK); docker-compose.dev.yml at repo root (mongo+backend+seed); document in README as the one-liner path</dd>
+          <dt>Source</dt><dd><code>OPS-06 + HO-03</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-32</span>
+        <span class="title">No migration framework — schema evolves by mongoose implicit + one-off scripts</span>
+        <span class="badge">8h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>scripts/migrations/ has 1 file; ad-hoc migrate:* scripts in package.json; no migrations collection, no up/down contract</dd>
+          <dt>Fix</dt><dd>Adopt migrate-mongo, create migrations/, track migrations collection; wrap the 2 existing scripts as v001/v002</dd>
+          <dt>Source</dt><dd><code>OPS-12 + DB-missing-index-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-33</span>
+        <span class="title">No CONTRIBUTING.md, PR template, or CODEOWNERS in website/admin/mobile</span>
+        <span class="badge">4h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Only halajob-backend has CONTRIBUTING; other 3 repos have nothing</dd>
+          <dt>Fix</dt><dd>Add short CONTRIBUTING.md + .github/pull_request_template.md + CODEOWNERS in each of the 3 repos</dd>
+          <dt>Source</dt><dd><code>HO-02</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-34</span>
+        <span class="title">No editor config (.editorconfig / .prettierrc / .eslintrc / .vscode) in any repo</span>
+        <span class="badge">3h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>find -name .editorconfig in all 4 roots = 0; no .vscode/</dd>
+          <dt>Fix</dt><dd>Add shared .editorconfig + .prettierrc + .eslintrc.cjs (or biome) at each repo root; .vscode/extensions.json recommending Prettier/ESLint/Dart</dd>
+          <dt>Source</dt><dd><code>HO-09 + FE-12</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-35</span>
+        <span class="title">No debugger recipe (.vscode/launch.json) for backend / web / admin / Flutter</span>
+        <span class="badge">3h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>find -name launch.json in all 4 roots = 0</dd>
+          <dt>Fix</dt><dd>Node attach launch.json for backend; Chrome debug for website/admin; Flutter run/attach for mobile</dd>
+          <dt>Source</dt><dd><code>HO-10</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-36</span>
+        <span class="title">Demo seed exists (loginable credentials) but README never mentions it; docker-compose absent from docs</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>npm run seed:demo produces seeker@demo.halajob.local / Demo@1234 / passcode 123456; README doesn&#x27;t cite; docker compose hidden under search-local/</dd>
+          <dt>Fix</dt><dd>Add &#x27;Quickstart&#x27; section to backend README: docker compose up mongo, npm ci, npm run seed, npm run seed:demo, npm run dev — with demo credentials</dd>
+          <dt>Source</dt><dd><code>HO-03 + HO-04</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-37</span>
+        <span class="title">No Glossary — Seeker/Employee/User/Candidate terms used interchangeably across routes/models</span>
+        <span class="badge">3h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>/employee/v1/* and /user/v1/* both serve the seeker persona; BACKEND_MODULE_MAP.md line 14 says &#x27;Seeker/mobile user | routesEmployee/&#x27; — no explanation of the legacy alias</dd>
+          <dt>Fix</dt><dd>Add docs/GLOSSARY.md defining Seeker/Employee/User/Candidate/Company/Campus/University with the /employee/v1 legacy explanation</dd>
+          <dt>Source</dt><dd><code>HO-06</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-38</span>
+        <span class="title">No ARCHITECTURE.md, no ADR log — &#x27;why 4 repos, why Mongo, why manual payments&#x27; scattered across HTML</span>
+        <span class="badge">4h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>No ARCHITECTURE.md or docs/adr/ in any repo</dd>
+          <dt>Fix</dt><dd>Add ARCHITECTURE.md at backend repo root pulling 6-8 major decisions into one-page ADR summary; cross-link deeper HTML/MD files</dd>
+          <dt>Source</dt><dd><code>HO-07</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-39</span>
+        <span class="title">No cross-repo bootstrap guide + no TROUBLESHOOTING.md</span>
+        <span class="badge">6h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>README shows sibling repo names but no boot order; no docs/DEV_QUICKSTART.md; no TROUBLESHOOTING.md</dd>
+          <dt>Fix</dt><dd>Add docs/DEV_QUICKSTART.md (canonical clone order, local base URLs localhost:3000/5173/5174/dart-define, demo accounts); add docs/TROUBLESHOOTING.md with top-8 first-day failures</dd>
+          <dt>Source</dt><dd><code>HO-05 + HO-12</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-40</span>
+        <span class="title">No CHANGELOG.md, no tagged release discipline, no documented rollback</span>
+        <span class="badge">4h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>ls CHANGELOG* in all 4 roots = None; DEPLOYMENT.md has no &#x27;how to tag / how to roll back&#x27; section</dd>
+          <dt>Fix</dt><dd>Add CHANGELOG.md (Keep-a-Changelog format) to each repo; document `git tag vX.Y.Z` + Vercel/host rollback in DEPLOYMENT.md; adopt semver</dd>
+          <dt>Source</dt><dd><code>HO-13</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-41</span>
+        <span class="title">No day-1 access checklist (Vercel/Mongo Atlas/Firebase/SMTP/Play/App Store)</span>
+        <span class="badge">3h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>DEPLOYMENT_ACCESS_AUDIT.md is an audit of existing prod access, not a day-1 request checklist</dd>
+          <dt>Fix</dt><dd>docs/ACCESS_CHECKLIST.md: per role, list GitHub orgs, Vercel projects, Atlas cluster, Firebase project, SMTP host, Play/App Store, analytics tools, plus owner contact</dd>
+          <dt>Source</dt><dd><code>HO-11</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-42</span>
+        <span class="title">On-call runbook has &#x27;Escalate: Backend on-call/Owner&#x27; with no name, phone, pager, or rotation</span>
+        <span class="badge">3h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>PLATFORM_OVERVIEW runbook table lists symptoms but no real escalation ladder</dd>
+          <dt>Fix</dt><dd>docs/ON_CALL.md: rotation policy, primary/secondary, tools (log dashboards, Sentry, Atlas monitoring), SLOs, escalation ladder</dd>
+          <dt>Source</dt><dd><code>HO-16</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-43</span>
+        <span class="title">api.ts is 4,201 lines, DUPLICATED word-for-word between website and admin</span>
+        <span class="badge">40h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>halajob-website/src/shared/api.ts = halajob-admin/src/shared/api.ts (identical); i18n.ts, settings.tsx, resources.tsx, workflows.tsx, interviewPrep.tsx, dashboard.tsx, mappers.ts all copies too — ~12,850 duplicated lines</dd>
+          <dt>Fix</dt><dd>Extract to @halajob/shared-frontend workspace (pnpm workspace or npm workspace); or monorepo the two clients; or publish to npm registry</dd>
+          <dt>Source</dt><dd><code>FE-04 + FE-07</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-44</span>
+        <span class="title">Website mega-components: CompanyScreen 2,835 / CampusScreen 2,267 / SeekerScreen 1,443</span>
+        <span class="badge">48h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>wc -l src/{company,campus,seeker}/screens.tsx</dd>
+          <dt>Fix</dt><dd>Split each into feature modules (JobGrid, MetricGrid, QueueDetail, AuthBox, SettingsPanel etc.); move domain logic to hooks/services</dd>
+          <dt>Source</dt><dd><code>FE-02</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-45</span>
+        <span class="title">TypeScript strict is a lie: 830 `any` in website, 412 in admin; 229 Record&lt;string,unknown&gt; in api.ts</span>
+        <span class="badge">40h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep any/Record&lt;string,unknown&gt; counts</dd>
+          <dt>Fix</dt><dd>Enable noImplicitAny (already on via strict); create discriminated union types per endpoint; replace Record&lt;string,unknown&gt; incrementally by domain</dd>
+          <dt>Source</dt><dd><code>FE-01</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-46</span>
+        <span class="title">86 .catch(()=&gt;[]) swallow patterns in company/screens.tsx alone — &#x27;no data&#x27; state is often a hidden error</span>
+        <span class="badge">24h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep &#x27;.catch(() =&gt;&#x27; in company/screens.tsx = 86 hits</dd>
+          <dt>Fix</dt><dd>Introduce &lt;ErrorState /&gt; component; adopt Tanstack Query or SWR for consistent error/loading states; refactor swallow patterns to surface + retry</dd>
+          <dt>Source</dt><dd><code>FE-06 + FE-20</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-47</span>
+        <span class="title">A11y non-existent: 34 aria-* in website, 5 in admin; zero &lt;label htmlFor&gt; bindings</span>
+        <span class="badge">24h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep aria-/htmlFor in src/</dd>
+          <dt>Fix</dt><dd>Add aria-label/aria-labelledby to all interactive elements; pair &lt;label htmlFor&gt; with inputs; add @axe-core/react + axe-core CI check</dd>
+          <dt>Source</dt><dd><code>FE-03</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-48</span>
+        <span class="title">dashboard_screen.dart = 22,493 lines, 95 nested widget classes; company_dashboard = 13,000 / 62 classes</span>
+        <span class="badge">48h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>wc -l lib/src/features/{dashboard,company}/*.dart</dd>
+          <dt>Fix</dt><dd>Extract widgets into lib/src/features/{feature}/widgets/*.dart; adopt domain/data/presentation layer separation over 3 sprints</dd>
+          <dt>Source</dt><dd><code>MB-01 + MB-02 + MB-03 + MB-21</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-49</span>
+        <span class="title">239+ StatefulWidgets using raw setState — no Provider/Riverpod/Bloc</span>
+        <span class="badge">32h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep StatefulWidget count</dd>
+          <dt>Fix</dt><dd>Adopt Riverpod for new features; migrate existing critical flows (auth, dashboard) over 2 sprints</dd>
+          <dt>Source</dt><dd><code>MB-04</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-50</span>
+        <span class="title">Raw HttpClient in app_api_client.dart; no dio, no interceptors, no automatic auth refresh</span>
+        <span class="badge">8h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>lib/src/core/network/app_api_client.dart</dd>
+          <dt>Fix</dt><dd>Migrate to Dio; add interceptor for token refresh, request/response logging, error normalization</dd>
+          <dt>Source</dt><dd><code>MB-05</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-51</span>
+        <span class="title">Manual fromJson/toJson boilerplate everywhere; no json_serializable / freezed</span>
+        <span class="badge">16h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>lib/src/features/legal_help/legal_help_service.dart, salary_service.dart, auth_screen.dart</dd>
+          <dt>Fix</dt><dd>Adopt freezed + json_serializable; convert models one feature per sprint</dd>
+          <dt>Source</dt><dd><code>MB-06</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-52</span>
+        <span class="title">iOS build not tested in CI; only Android APK built</span>
+        <span class="badge">4h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>.github/workflows/ci.yml only Android</dd>
+          <dt>Fix</dt><dd>Add iOS build step: flutter build ios --release --analyze-size; document provisioning; require it green before release</dd>
+          <dt>Source</dt><dd><code>MB-15</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P1">P1</span>
+        <span class="id">P1-53</span>
+        <span class="title">Mobile has no cert pinning, no jailbreak/root detection</span>
+        <span class="badge">10h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep across lib/ for SecurityContext/badCertificateCallback/flutter_jailbreak_detection = 0</dd>
+          <dt>Fix</dt><dd>Add HTTP-client cert pinning (SHA-256 leaf + intermediate); add flutter_jailbreak_detection; send signal to backend as risk factor</dd>
+          <dt>Source</dt><dd><code>SEC-13 + MB-quality</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+        </section><section id="p2"><h1>P2 — Professional bar</h1>
+        <div class="phase-header">
+          <h2>P2 · Professional bar (Phase 2)</h2>
+          <p>36 tickets · 309 engineer-hours</p>
+        </div>
+        
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-01</span>
+        <span class="title">puppeteer (200MB Chromium bundle) in production dependencies for PDF generation</span>
+        <span class="badge">16h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>package.json puppeteer ^24.43.1</dd>
+          <dt>Fix</dt><dd>Move PDF generation to a dedicated microservice (Cloud Run/Lambda); backend calls it via HTTPS; slims container 200MB</dd>
+          <dt>Source</dt><dd><code>Round-1 + WOW-30</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-02</span>
+        <span class="title">Legacy /user/v1 uses POST for delete and update</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>routesUser/CompanyRote.js:25 POST /delete-file; FcmRote.js:12-13 POST /update-tokens/:id + /delete-tokens/:id; JobRote.js:18 POST /update/:id</dd>
+          <dt>Fix</dt><dd>Introduce PATCH/DELETE aliases; keep POST as deprecated aliases (Sunset + Deprecation headers) while mobile migrates</dd>
+          <dt>Source</dt><dd><code>API-14 + API-28</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-03</span>
+        <span class="title">DELETE /notifications/v1/device-token requires a JSON body (RFC 9110 §9.3.5)</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>routesNotifications/index.js:19 DELETE with express.json() + validate; validation marks body required</dd>
+          <dt>Fix</dt><dd>Move identifier to URL: DELETE /device-token/:id; keep POST /device-token/delete as legacy alias</dd>
+          <dt>Source</dt><dd><code>API-13</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-04</span>
+        <span class="title">Ambient language header naming fragmented: lan / x-language / lang / x-lang inconsistently honored</span>
+        <span class="badge">8h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>app.js:81-96 whitelists only lan/x-language; controllers use req.get(lan)||req.get(x-language)||req.get(lang) with different defaults (en vs ar)</dd>
+          <dt>Fix</dt><dd>Add requestLanguage middleware normalizing to req.lang; refactor controllers to use it; whitelist x-lang in CORS; pick single fallback (en) and delete per-controller defaults</dd>
+          <dt>Source</dt><dd><code>API-24 + API-25</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-05</span>
+        <span class="title">Public content/help/FAQ/legal listings return full collection with no pagination</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/public/contentController.js:37,67,79,105 unbounded finds; controllers/app/banner/bannerController.js:11 unbounded</dd>
+          <dt>Fix</dt><dd>Wrap in shared paginate helper (or hard cap 100) with page/limit params</dd>
+          <dt>Source</dt><dd><code>API-21</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-06</span>
+        <span class="title">parseSort accepts unwhitelisted sort field from client — DoS via unindexed sort scans, potential ordering leaks</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>helper/companyDash/companyDashHelpers.js:743 sort = parseSort(req.query.sort); returns any field</dd>
+          <dt>Fix</dt><dd>Require an allow-list per route; refuse callers without one; enforce per-route whitelists</dd>
+          <dt>Source</dt><dd><code>API-22</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-07</span>
+        <span class="title">No Deprecation/Sunset headers on legacy /v1 mounts</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>app.js:363-376 mounts legacy aliases; grep for Deprecation/Sunset returns 0</dd>
+          <dt>Fix</dt><dd>Middleware on legacy aliases that sets Deprecation: true, Sunset: &lt;date&gt;, Link: &lt;newRoute&gt;; rel=&#x27;successor-version&#x27; (RFC 8594)</dd>
+          <dt>Source</dt><dd><code>API-26</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-08</span>
+        <span class="title">No 405 Method Not Allowed handler — wrong verb collapses to 404</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>app.js:363-380 falls through to error.notFound</dd>
+          <dt>Fix</dt><dd>After each router mount add router.all(&#x27;*&#x27;, methodNotAllowed) returning 405 with an Allow header from registered methods for that path</dd>
+          <dt>Source</dt><dd><code>API-27</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-09</span>
+        <span class="title">PUT and PATCH aliased to identical handler on several resources — semantic ambiguity</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>routesUser/CommunicationRote.js:16-27 PATCH+PUT /preferences → same fn; routes/index.js:189-200 same for /platform/settings; :934-947 same for /resources/:resource/:id</dd>
+          <dt>Fix</dt><dd>Standardize on PATCH; delete PUT alias or split into a real full-replace handler</dd>
+          <dt>Source</dt><dd><code>API-29</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-10</span>
+        <span class="title">JobModel = 261 fields / 83 indexes; wide schema needs normalization</span>
+        <span class="badge">32h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>models/JobModel.js line count + inline audit — job_*, candidate_target_*, salary_*, score_*, *_norm/_tokens, *_info clusters</dd>
+          <dt>Fix</dt><dd>Extract candidate_target_*, score_*, salary_norm_* into typed sub-schemas; consider splitting search-index derived fields into a JobSearchIndex collection with TTL/regen</dd>
+          <dt>Source</dt><dd><code>Round-1 + DB-wide-collection-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-11</span>
+        <span class="title">59 Schema.Types.Mixed fields platform-wide; PlatformSettings(11), UniversitySettings(8), CompanySettings(7), UserSettings(6)</span>
+        <span class="badge">24h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep Schema.Types.Mixed across models/</dd>
+          <dt>Fix</dt><dd>Convert Settings models to typed nested schemas (PlanLimitsSchema pattern from SubscriptionPlanModel); audit-log integrity fields become typed sub-doc</dd>
+          <dt>Source</dt><dd><code>DB-wide-collection-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-12</span>
+        <span class="title">Reference integrity ad-hoc: company_id, skill_id[], language_id[] accepted from body with no existence check</span>
+        <span class="badge">12h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>CreateJobController.js:345; RegisterController.js:132-144</dd>
+          <dt>Fix</dt><dd>For creates that reference other collections, .find({_id:{$in:ids}}) validate before insert; return 400 with unknown_reference error</dd>
+          <dt>Source</dt><dd><code>DB-N+1-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-13</span>
+        <span class="title">State-machine transitions not encoded — 8 status enums (CvParseJob, Interview, Application) allow any→any</span>
+        <span class="badge">16h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>CvParseJob 7 values (pending→processing→parsed/failed/…→confirmed/rejected/expired), Interview 7 values allows no_show→scheduled</dd>
+          <dt>Fix</dt><dd>Add pre(&#x27;save&#x27;) hook that validates status transitions against a declarative table per model; write with $set + $inc + audit log</dd>
+          <dt>Source</dt><dd><code>DB-retention-sub-agent</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-14</span>
+        <span class="title">Admin populate() calls include raw User doc with device/OTP timing metadata; company login returns full raw Company</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>dash/CompanyController.js:105 populate(&#x27;owner_user_id&#x27;) no select; dash/adminSearchController.js:80 misses passcode_expires_at etc; companyDash/Auth/loginController.js:344-352 returns raw company</dd>
+          <dt>Fix</dt><dd>SAFE_USER_SELECT / SAFE_COMPANY_SELECT constants; serializeCompanyForDashboard() with explicit whitelist; use everywhere the models are populated</dd>
+          <dt>Source</dt><dd><code>API-06 + API-18 + API-19</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-15</span>
+        <span class="title">Applicant list populates employee_id with no projection — bypasses candidate visibility toggles</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/companyDash/companyWithApplicants/companyWithApplicantsController.js:53-58</dd>
+          <dt>Fix</dt><dd>Explicit .select on populate; gate contact/CV fields behind employee.campus_visibility.visible_fields</dd>
+          <dt>Source</dt><dd><code>API-17</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-16</span>
+        <span class="title">bulkUpdateJobs doesn&#x27;t count-check ids — existence oracle risk</span>
+        <span class="badge">3h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>companyDash/companyWithJobs/companyWithJobsController.js:~1277 updateMany({_id:{$in:ids},company_id:me})</dd>
+          <dt>Fix</dt><dd>Pre-check: findAndCount({_id:{$in:ids},company_id:me}); reject if requested.length !== found.length; log mismatch as security event</dd>
+          <dt>Source</dt><dd><code>SEC-15</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-17</span>
+        <span class="title">EJS CV template renders untrusted employee fields; &lt;%- %&gt; unescaped tags allowed</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>services/cv/cvPdf.service.js:4-9 ejs.render(template.html, data) no escape option</dd>
+          <dt>Fix</dt><dd>ejs.render(html, data, { escape: htmlEscape }); lint templates to forbid &lt;%- %&gt;; whitelist formatter for each field</dd>
+          <dt>Source</dt><dd><code>SEC-17</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-18</span>
+        <span class="title">console.error(err) dumps request-derived data (emails, phones, error strings) in prod logs</span>
+        <span class="badge">4h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/app/Auth/LoginController.js:183, ForGotPasswordResetPasswordController.js:201, services/currency.service.js:188-191</dd>
+          <dt>Fix</dt><dd>logger.error({redacted:...}) wrapper; forbid direct console.* via eslint rule</dd>
+          <dt>Source</dt><dd><code>SEC-19</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-19</span>
+        <span class="title">Config drift: 27 process.env fallback strings + hardcoded URLs (jobzain.com defaults)</span>
+        <span class="badge">8h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>notification/dashboardRoutes.js hardcoded &#x27;https://company.jobzain.com/&#x27;; .env.example .env.production defaults to prod domain</dd>
+          <dt>Fix</dt><dd>One config module (config/index.js) that consumes validated env; delete all inline fallbacks; migrate away from jobzain.com to halajob.com API domain (coordinated release)</dd>
+          <dt>Source</dt><dd><code>CQ-06 + FE-09 + Round-1</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-20</span>
+        <span class="title">Scheduled job lock uses hostname-pid — clashes on same-host multi-process; may double-run data-retention-cleanup</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>jobs/jobLock.js:5 OWNER = `${os.hostname()}-${process.pid}`</dd>
+          <dt>Fix</dt><dd>Replace pid with per-boot UUID (randomUUID()); strict owner verify on lock renew</dd>
+          <dt>Source</dt><dd><code>OPS-23</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-21</span>
+        <span class="title">No startup probe — orchestrator can&#x27;t distinguish &#x27;still connecting to Mongo&#x27; from &#x27;broken&#x27;</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>routesHealth/index.js exposes /live and /ready only</dd>
+          <dt>Fix</dt><dd>Add /health/startup that returns 200 only when startScheduledJobs completed and pending migrations done</dd>
+          <dt>Source</dt><dd><code>OPS-19</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-22</span>
+        <span class="title">Access-token TTL 30min with no revocation on password reset (only refresh tokens deleted)</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>services/tokenService.js:107 ACCESS_TOKEN_EXPIRATION_MINUTES||30; ForGotPasswordResetPasswordController.js:161 RefreshTokenModel.deleteMany({userRef})</dd>
+          <dt>Fix</dt><dd>Bump user.token_version on password reset; JWT includes token_version; reject payload.token_version &lt; user.token_version</dd>
+          <dt>Source</dt><dd><code>SEC-20 + SEC-05</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-23</span>
+        <span class="title">authUser omits scope check — access token minted in one webAuthScope carries into another</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>middlewares/userAuth.js:22-49; services/authCookie.service.js uses scope only for cookie naming</dd>
+          <dt>Fix</dt><dd>Include intended-scope claim in access token; reject when request&#x27;s active scope differs</dd>
+          <dt>Source</dt><dd><code>SEC-27</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-24</span>
+        <span class="title">No linter/formatter in CI (JS repos); no CodeQL, no SAST, no license scan, no gitleaks</span>
+        <span class="badge">8h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>backend CI runs npm audit + custom checks; website CI runs typecheck/test/build/audit; no eslint, prettier --check, github/codeql-action, license-checker, gitleaks</dd>
+          <dt>Fix</dt><dd>eslint + prettier --check per repo; github/codeql-action/analyze on push; gitleaks-action; license-checker CI job</dd>
+          <dt>Source</dt><dd><code>OPS-14</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-25</span>
+        <span class="title">No a11y test, no Lighthouse, no visual regression in web/admin CI</span>
+        <span class="badge">12h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>.github/workflows/ci.yml lack axe-core/playwright, lhci, chromatic/percy</dd>
+          <dt>Fix</dt><dd>Playwright + @axe-core/playwright asserting zero WCAG-AA on 5 canonical routes; lhci autorun with perf budget</dd>
+          <dt>Source</dt><dd><code>OPS-15 + FE-11</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-26</span>
+        <span class="title">Mobile CI: no integration tests, no golden/screenshot tests, no device farm</span>
+        <span class="badge">16h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>no integration_test/; ci.yml runs analyze/test/outdated only</dd>
+          <dt>Fix</dt><dd>Add integration_test/ with smoke (login→browse→apply); wire Firebase Test Lab in workflow_dispatch APK job; add golden tests for 8 core screens</dd>
+          <dt>Source</dt><dd><code>OPS-16 + MB-19 + MB-24</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-27</span>
+        <span class="title">APK workflow hardcodes HALA_LOCAL_DEBUG_RELEASE_SIGNING=true — CI artifacts are debug-signed</span>
+        <span class="badge">4h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>.github/workflows/ci.yml:71 hardcode; artifact signingMode debug-local</dd>
+          <dt>Fix</dt><dd>Split into ci-tester (debug-signed) and release (workflow_dispatch requiring HALAJOB_KEYSTORE_BASE64+PASSWORD secrets); reject false flag in release path</dd>
+          <dt>Source</dt><dd><code>OPS-17</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-28</span>
+        <span class="title">CI runs on one Node version + one Mongo — no matrix; every doc commit re-runs full integration</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>strategy.matrix absent; on:push has no paths-ignore</dd>
+          <dt>Fix</dt><dd>matrix.node-version: [20, 22]; mongo-image: [mongo:7, mongo:8]; paths-ignore: [docs/**, &#x27;**.md&#x27;]</dd>
+          <dt>Source</dt><dd><code>OPS-13 + OPS-27</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-29</span>
+        <span class="title">Backup is manual mongodump; no automation, no RPO/RTO, no restore drill</span>
+        <span class="badge">8h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>docs/BACKUP_RESTORE.md</dd>
+          <dt>Fix</dt><dd>Use Atlas/managed continuous backup (RPO≤5min); or add scripts/backup.sh cron + monthly restore-and-smoke drill; publish RPO=5m/RTO=1h</dd>
+          <dt>Source</dt><dd><code>OPS-08</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-30</span>
+        <span class="title">No JWT-key rotation flow — leaked JWT_SECRET means invalidate every session at once</span>
+        <span class="badge">6h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>index.js:19 single static JWT_SECRET; no kid; no rolling key window</dd>
+          <dt>Fix</dt><dd>JWT_SECRETS=[{kid,secret,activeUntil}] rolling verify + single sign; document quarterly rotation runbook; reminder if primary &gt;90d old</dd>
+          <dt>Source</dt><dd><code>OPS-21</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-31</span>
+        <span class="title">OTP resend rate-limit is per-account only, no IP throttle; response leaks retry_after_seconds</span>
+        <span class="badge">4h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>controllers/app/Auth/ResendOtpController.js:88</dd>
+          <dt>Fix</dt><dd>Per-IP+per-email token bucket (5/min/IP, 3/hour/email); remove retry_after_seconds from body (Retry-After header only)</dd>
+          <dt>Source</dt><dd><code>API-30</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-32</span>
+        <span class="title">Ticket numbers guessable (Date.now() base36 + 4-digit rand)</span>
+        <span class="badge">2h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>SupportController.js:9 HS-${Date.now().toString(36)}-${randomInt(1000,9999)}; PrivacyRequestController.js:15 same; LegalReportController.js:10 same</dd>
+          <dt>Fix</dt><dd>crypto.randomBytes(6).toString(&#x27;base32url&#x27;); never use ticket number as authorization token</dd>
+          <dt>Source</dt><dd><code>SEC-14</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-33</span>
+        <span class="title">198 useState across screens; no store; custom hash router; no form library</span>
+        <span class="badge">40h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>grep useState 198 hits; shared/appState.ts custom surfaceFromPath; no react-router; no react-hook-form</dd>
+          <dt>Fix</dt><dd>Adopt Tanstack Query for server state + Zustand for client state; migrate custom router to react-router v6; adopt react-hook-form + Zod</dd>
+          <dt>Source</dt><dd><code>FE-05 + FE-10 + FE-14</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-34</span>
+        <span class="title">styles.css monolithic (2,618 website, 2,411 admin); no theme layer; no dark mode</span>
+        <span class="badge">24h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>wc -l src/styles.css</dd>
+          <dt>Fix</dt><dd>Extract per-component styles (CSS Modules or CSS-in-JS); support theme toggle via CSS-var; add dark variant</dd>
+          <dt>Source</dt><dd><code>FE-19</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-35</span>
+        <span class="title">Custom HalaJobLocalizations with manual string maps; ARB files exist but AppLocalizations not regenerated</span>
+        <span class="badge">4h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>lib/src/l10n/hala_job_localizations.dart hand-maintained; app_en/app_ar.arb defined</dd>
+          <dt>Fix</dt><dd>flutter gen-l10n; replace HalaJobLocalizations with generated AppLocalizations; enable strict-mode</dd>
+          <dt>Source</dt><dd><code>MB-10</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P2">P2</span>
+        <span class="id">P2-36</span>
+        <span class="title">analysis_options.yaml only includes flutter_lints; no strict lints</span>
+        <span class="badge">4h</span>
+        <span class="badge">flutter</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>lib/analysis_options.yaml</dd>
+          <dt>Fix</dt><dd>Add prefer_const_constructors, avoid_dynamic_calls, prefer_final_parameters, unnecessary_getters_setters, always_declare_return_types</dd>
+          <dt>Source</dt><dd><code>MB-12</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+        </section><section id="p3"><h1>P3 — Impress-tier</h1>
+        <div class="phase-header">
+          <h2>P3 · Impress-tier (Phase 4)</h2>
+          <p>18 tickets · 640 engineer-hours</p>
+        </div>
+        
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-01</span>
+        <span class="title">OpenTelemetry fleet tracing (traces + metrics + logs)</span>
+        <span class="badge">80h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-01</dd>
+          <dt>Fix</dt><dd>@opentelemetry packages in backend + React SDKs in web/admin + Dart in mobile; export to self-hosted Tempo or vendor (Honeycomb)</dd>
+          <dt>Source</dt><dd><code>WOW-01</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-02</span>
+        <span class="title">Type-safe API contract via ts-rest codegen — replace hand-written api.ts</span>
+        <span class="badge">120h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-02</dd>
+          <dt>Fix</dt><dd>ts-rest schema on backend; generate TS client for website+admin; retrofit 50 endpoints over 2-3 sprints</dd>
+          <dt>Source</dt><dd><code>WOW-02</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-03</span>
+        <span class="title">PostHog / Unleash feature flags — per-user targeting, gradual rollout</span>
+        <span class="badge">50h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-05</dd>
+          <dt>Fix</dt><dd>Self-hosted PostHog or Unleash; replace 16 env-var flags with per-user targeting; kill-switch semantics</dd>
+          <dt>Source</dt><dd><code>WOW-05 + OPS-20</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-04</span>
+        <span class="title">Storybook / Ladle for component library</span>
+        <span class="badge">60h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-06</dd>
+          <dt>Fix</dt><dd>Ladle (Vite-native) for web + admin; .stories.tsx for FixedChoiceRow, Button, Modal, Form; auto-deploy to GitHub Pages</dd>
+          <dt>Source</dt><dd><code>WOW-06</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-05</span>
+        <span class="title">Pact.io API contract tests — backend + each client emit + check</span>
+        <span class="badge">70h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-07</dd>
+          <dt>Fix</dt><dd>Backend provider tests for top 20 endpoints; frontend consumer tests for the same; Pact broker (PactFlow or self-hosted)</dd>
+          <dt>Source</dt><dd><code>WOW-07</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-06</span>
+        <span class="title">k6 load tests as code with regression budgets</span>
+        <span class="badge">50h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-08</dd>
+          <dt>Fix</dt><dd>scripts/load/*.js scenarios (browse jobs, apply, admin analytics); thresholds p95&lt;300ms; nightly CI + tagged commits</dd>
+          <dt>Source</dt><dd><code>WOW-08 + OPS-18</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-07</span>
+        <span class="title">Chain-hashed audit log integrity (each row hashes previous)</span>
+        <span class="badge">30h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-13</dd>
+          <dt>Fix</dt><dd>Add hash_chain field on audit_log insert; include hash of previous record; verify chain integrity in admin dashboard</dd>
+          <dt>Source</dt><dd><code>WOW-13</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-08</span>
+        <span class="title">Preview environments per PR (Vercel + ephemeral backend on Fly.io)</span>
+        <span class="badge">60h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-22</dd>
+          <dt>Fix</dt><dd>GH Action on PR: Vercel preview for website/admin + Fly.io ephemeral backend with demo DB seed; post URL to PR</dd>
+          <dt>Source</dt><dd><code>WOW-22</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-09</span>
+        <span class="title">Renovate/Dependabot with grouped PRs + automerge for patches</span>
+        <span class="badge">4h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-19</dd>
+          <dt>Fix</dt><dd>renovate.json per repo; group patches/minor/major; automerge patches if CI green</dd>
+          <dt>Source</dt><dd><code>WOW-19</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-10</span>
+        <span class="title">Precommit hooks (husky + lint-staged) block bad commits locally</span>
+        <span class="badge">6h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-20</dd>
+          <dt>Fix</dt><dd>husky + lint-staged per repo; format+lint on changed files; catches issues before push</dd>
+          <dt>Source</dt><dd><code>WOW-20</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-11</span>
+        <span class="title">CODEOWNERS per directory — auto-request the right reviewer</span>
+        <span class="badge">2h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-21</dd>
+          <dt>Fix</dt><dd>.github/CODEOWNERS routes based on path (auth/*, controllers/payment/*)</dd>
+          <dt>Source</dt><dd><code>WOW-21</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-12</span>
+        <span class="title">Playwright tests for critical customer journeys (auth + apply-for-job)</span>
+        <span class="badge">20h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-27</dd>
+          <dt>Fix</dt><dd>Playwright suite: seeker auth flow, job detail, apply, company auth flow, job posting; run nightly + pre-release</dd>
+          <dt>Source</dt><dd><code>WOW-27</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-13</span>
+        <span class="title">Lighthouse CI budget for website (perf/SEO thresholds)</span>
+        <span class="badge">4h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-15</dd>
+          <dt>Fix</dt><dd>@lhci/cli with budget; if perf&lt;85 or FCP&gt;2s CI fails; posts score diff on PR</dd>
+          <dt>Source</dt><dd><code>WOW-15</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-14</span>
+        <span class="title">Bundle size budgets enforced in CI + type-coverage metric</span>
+        <span class="badge">6h</span>
+        <span class="badge">web</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-17 + WOW-18</dd>
+          <dt>Fix</dt><dd>bundlesize (250KB budget); typescript-coverage-report (80%+ target); trend visible per PR</dd>
+          <dt>Source</dt><dd><code>WOW-17 + WOW-18</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-15</span>
+        <span class="title">PII/secret scanner in CI (detect-secrets or trufflehog)</span>
+        <span class="badge">3h</span>
+        <span class="badge">cross-repo</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-29</dd>
+          <dt>Fix</dt><dd>detect-secrets pre-commit + CI step; complements existing check:secrets scripts</dd>
+          <dt>Source</dt><dd><code>WOW-29</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-16</span>
+        <span class="title">Backend response caching layer (Redis + Cache-Control) on public endpoints</span>
+        <span class="badge">40h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-30</dd>
+          <dt>Fix</dt><dd>Cache middleware: hash (URL + auth level) → Redis TTL; apply to top 10 endpoints (jobs list, company profile, public content)</dd>
+          <dt>Source</dt><dd><code>WOW-30</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-17</span>
+        <span class="title">Dashboards + alerts defined as code (Grafana JSONs + Alertmanager rules)</span>
+        <span class="badge">20h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW + OPS-26</dd>
+          <dt>Fix</dt><dd>Commit dashboards + alerts to /ops in halajob-backend; render on merge; once metrics/logs exist (P1-28, P1-14)</dd>
+          <dt>Source</dt><dd><code>OPS-26</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="ticket">
+      <div class="ticket-head">
+        <span class="p-tag p-P3">P3</span>
+        <span class="id">P3-18</span>
+        <span class="title">Auto-generated ERD (visualise the 71 collections) + API changelog from OpenAPI diffs</span>
+        <span class="badge">15h</span>
+        <span class="badge">backend</span>
+      </div>
+      <div class="ticket-body">
+        <dl>
+          <dt>Evidence</dt><dd>Impress WOW-23 + WOW-24</dd>
+          <dt>Fix</dt><dd>mongoose-schema-graph → SVG; openapi-diff between tags → CHANGELOG.md</dd>
+          <dt>Source</dt><dd><code>WOW-23 + WOW-24</code></dd>
+        </dl>
+      </div>
+    </div>
+    
+        </section><section id="sources"><h1>Source audit branches</h1>
+    <p>Each ticket cites its origin audit branch. Multiple sources means multiple
+    agents independently flagged the same underlying issue — treat those as
+    higher-confidence findings.</p>
+    <table><thead><tr><th>Source tag</th><th>Audit branch</th></tr></thead><tbody><tr><td><code>SEC-*</code></td><td>Security deep audit (30 findings)</td></tr><tr><td><code>DB-*-sub-agent</code></td><td>Database quality audit (4 sub-agents)</td></tr><tr><td><code>API-*</code></td><td>API design consistency audit (35 findings)</td></tr><tr><td><code>CQ-*</code></td><td>Backend code quality audit (15 findings)</td></tr><tr><td><code>FE-*</code></td><td>Frontend web + admin audit (20 findings)</td></tr><tr><td><code>MB-*</code></td><td>Flutter mobile audit (35 findings)</td></tr><tr><td><code>OPS-*</code></td><td>DevOps + operations audit (28 findings)</td></tr><tr><td><code>HO-*</code></td><td>Handover readiness audit (25 findings)</td></tr><tr><td><code>WOW-*</code></td><td>Impress-tier suggestions (30 items)</td></tr><tr><td><code>Round-1</code></td><td>Manual audit surfaced in the earlier chat pass</td></tr></tbody></table></section>
+    <footer class="doc-footer">
+      <span>Hala Job — Engineering Backlog</span>
+      <span>Generated 2026-07-01</span>
+    </footer>
+  </div>
+</body>
+</html>
