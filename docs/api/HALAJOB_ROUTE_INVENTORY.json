@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-01T11:33:20.740Z",
+  "generatedAt": "2026-07-01T11:35:30.273Z",
   "records": [
     {
       "method": "PATCH",
@@ -13626,81 +13626,6 @@
     },
     {
       "method": "GET",
-      "path": "/employee/v1/helper/currencies",
-      "module": "Seeker",
-      "middlewares": [
-        "multerMiddleware",
-        "getCurrencies"
-      ],
-      "inferredGuards": [
-        "inferred:employeeAccountGuard"
-      ],
-      "hasAuthGuard": true,
-      "guardSource": "inferred-parent-mount",
-      "knownPublic": false
-    },
-    {
-      "method": "GET",
-      "path": "/employee/v1/helper/education-level",
-      "module": "Seeker",
-      "middlewares": [
-        "multerMiddleware",
-        "educationLevel"
-      ],
-      "inferredGuards": [
-        "inferred:employeeAccountGuard"
-      ],
-      "hasAuthGuard": true,
-      "guardSource": "inferred-parent-mount",
-      "knownPublic": false
-    },
-    {
-      "method": "GET",
-      "path": "/employee/v1/helper/experience-level",
-      "module": "Seeker",
-      "middlewares": [
-        "multerMiddleware",
-        "experienceLevel"
-      ],
-      "inferredGuards": [
-        "inferred:employeeAccountGuard"
-      ],
-      "hasAuthGuard": true,
-      "guardSource": "inferred-parent-mount",
-      "knownPublic": false
-    },
-    {
-      "method": "GET",
-      "path": "/employee/v1/helper/industry",
-      "module": "Seeker",
-      "middlewares": [
-        "multerMiddleware",
-        "industry"
-      ],
-      "inferredGuards": [
-        "inferred:employeeAccountGuard"
-      ],
-      "hasAuthGuard": true,
-      "guardSource": "inferred-parent-mount",
-      "knownPublic": false
-    },
-    {
-      "method": "GET",
-      "path": "/employee/v1/helper/job-name",
-      "module": "Seeker",
-      "middlewares": [
-        "multerMiddleware",
-        "anonymous"
-      ],
-      "inferredGuards": [
-        "inferred:employeeAccountGuard"
-      ],
-      "hasAuthGuard": true,
-      "guardSource": "inferred-parent-mount",
-      "knownPublic": false
-    },
-    {
-      "method": "GET",
       "path": "/employee/v1/helper/job-types",
       "module": "Seeker",
       "middlewares": [
@@ -13721,51 +13646,6 @@
       "middlewares": [
         "multerMiddleware",
         "getLanguages"
-      ],
-      "inferredGuards": [
-        "inferred:employeeAccountGuard"
-      ],
-      "hasAuthGuard": true,
-      "guardSource": "inferred-parent-mount",
-      "knownPublic": false
-    },
-    {
-      "method": "GET",
-      "path": "/employee/v1/helper/salaries",
-      "module": "Seeker",
-      "middlewares": [
-        "multerMiddleware",
-        "salaryType"
-      ],
-      "inferredGuards": [
-        "inferred:employeeAccountGuard"
-      ],
-      "hasAuthGuard": true,
-      "guardSource": "inferred-parent-mount",
-      "knownPublic": false
-    },
-    {
-      "method": "GET",
-      "path": "/employee/v1/helper/services",
-      "module": "Seeker",
-      "middlewares": [
-        "multerMiddleware",
-        "services"
-      ],
-      "inferredGuards": [
-        "inferred:employeeAccountGuard"
-      ],
-      "hasAuthGuard": true,
-      "guardSource": "inferred-parent-mount",
-      "knownPublic": false
-    },
-    {
-      "method": "GET",
-      "path": "/employee/v1/helper/skills",
-      "module": "Seeker",
-      "middlewares": [
-        "multerMiddleware",
-        "skills"
       ],
       "inferredGuards": [
         "inferred:employeeAccountGuard"

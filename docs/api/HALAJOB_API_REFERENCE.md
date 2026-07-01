@@ -1,6 +1,6 @@
 # Hala Job API Reference
 
-Generated: 2026-07-01T11:33:36.671Z
+Generated: 2026-07-01T11:35:37.094Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -34,7 +34,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Legacy User | 205 |
 | Notifications | 20 |
 | Other | 15 |
-| Seeker | 110 |
+| Seeker | 102 |
 | Trust | 4 |
 | University | 40 |
 
@@ -998,16 +998,8 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/employee/v1/global/profile/rebuild-search-filters` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, validateRequest, rebuildMySearchFilters |
 | PUT | `/employee/v1/global/profile/work-preferences` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, validateRequest, updateWorkPreferences |
 | GET | `/employee/v1/helper/cities` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, cities |
-| GET | `/employee/v1/helper/currencies` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, getCurrencies |
-| GET | `/employee/v1/helper/education-level` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, educationLevel |
-| GET | `/employee/v1/helper/experience-level` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, experienceLevel |
-| GET | `/employee/v1/helper/industry` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, industry |
-| GET | `/employee/v1/helper/job-name` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, anonymous |
 | GET | `/employee/v1/helper/job-types` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, getJobType |
 | GET | `/employee/v1/helper/languages` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, getLanguages |
-| GET | `/employee/v1/helper/salaries` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, salaryType |
-| GET | `/employee/v1/helper/services` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, services |
-| GET | `/employee/v1/helper/skills` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, skills |
 | GET | `/employee/v1/helper/work-mode` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, workMode |
 | GET | `/employee/v1/helper/work-time` | Bearer token | inferred-parent-mount | inferred:employeeAccountGuard, multerMiddleware, workTime |
 | POST | `/employee/v1/jobs/:jobId/apply` | Bearer token | explicit | authUser, anonymous, multerMiddleware, validateRequest, applyToJob |
