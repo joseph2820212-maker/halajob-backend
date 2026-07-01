@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
+import { readRepoFile } from "./utils/repoPaths.js";
 
-const root = process.cwd();
-const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const read = (file) => readRepoFile(file);
 
 const app = read("mobile/lib/src/app.dart");
 const cards = read("mobile/lib/src/widgets/hala_cards.dart");
@@ -200,7 +198,7 @@ assertContains(
 );
 assertContains(
   header,
-  "halaOrange.withValues(alpha: 0.28)",
+  "const BorderSide(color: halaHeaderLine)",
   "HalaNativeHeader",
 );
 assertContains(
@@ -824,7 +822,7 @@ assertContains(
 );
 assertContains(authSignInForm, "enabled: !_loading", "auth login fields enabled state");
 assertContains(authSignInForm, "style: halaInputTextStyle", "auth editable text style");
-assertContains(authSignInForm, "cursorColor: halaOrange", "auth login cursor color");
+assertContains(authSignInForm, "cursorColor: halaNavy", "auth login cursor color");
 assertContains(authSignInForm, "textInputAction: TextInputAction.next", "auth login identifier next action");
 assertContains(
   authSignInForm,

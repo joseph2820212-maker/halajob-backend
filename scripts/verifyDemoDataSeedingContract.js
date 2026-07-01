@@ -1,8 +1,5 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
-
-const repoRoot = process.cwd();
+import { listRepoFiles, readRepoFile } from "./utils/repoPaths.js";
 
 const demoNeedles = [
   "Nexa Retail",
@@ -21,24 +18,11 @@ const mobileShippedRoots = [
 ];
 
 function readText(relativePath) {
-  return fs.readFileSync(path.join(repoRoot, relativePath), "utf8");
+  return readRepoFile(relativePath);
 }
 
 function walkFiles(relativeRoot) {
-  const absoluteRoot = path.join(repoRoot, relativeRoot);
-  const results = [];
-  if (!fs.existsSync(absoluteRoot)) return results;
-
-  for (const entry of fs.readdirSync(absoluteRoot, { withFileTypes: true })) {
-    const absolutePath = path.join(absoluteRoot, entry.name);
-    const relativePath = path.relative(repoRoot, absolutePath);
-    if (entry.isDirectory()) {
-      results.push(...walkFiles(relativePath));
-    } else if (entry.isFile()) {
-      results.push(relativePath);
-    }
-  }
-  return results;
+  return listRepoFiles(relativeRoot);
 }
 
 function isTextFile(relativePath) {

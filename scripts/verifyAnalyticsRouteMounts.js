@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
 import listEndpoints from "express-list-endpoints";
 import app from "../app.js";
+import { readRepoFile } from "./utils/repoPaths.js";
 import {
   ANALYTICS_EVENT_GROUPS,
   analyticsGroupForEvent,
@@ -10,7 +10,7 @@ import {
 
 const endpoints = listEndpoints(app);
 const endpointByPath = new Map(endpoints.map((endpoint) => [endpoint.path, endpoint]));
-const readSource = (path) => fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const readSource = (path) => readRepoFile(path);
 
 const appSource = readSource("app.js");
 const routeSource = readSource("routesAnalytics/index.js");

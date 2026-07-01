@@ -1,7 +1,6 @@
-import fs from "node:fs";
 import path from "node:path";
+import { existsRepoPath, listRepoFiles, readRepoFile } from "./utils/repoPaths.js";
 
-const root = process.cwd();
 const flutterActionNamePattern =
   "(?:Pressed|Tap|LongPress|Submitted|FieldSubmitted|Changed|Selected|Select[A-Za-z0-9_]*)";
 const sameFlutterCallback =
@@ -79,26 +78,15 @@ const targets = [
 
 const failures = [];
 
-function walk(dir, extensions, files = []) {
-  const fullDir = path.join(root, dir);
-  if (!fs.existsSync(fullDir)) {
+function walk(dir, extensions) {
+  if (!existsRepoPath(dir)) {
     failures.push(`${dir} does not exist`);
-    return files;
+    return [];
   }
 
-  for (const entry of fs.readdirSync(fullDir, { withFileTypes: true })) {
-    const fullPath = path.join(fullDir, entry.name);
-    const relativePath = path.relative(root, fullPath).replaceAll(path.sep, "/");
-    if (entry.isDirectory()) {
-      walk(relativePath, extensions, files);
-      continue;
-    }
-    if (entry.isFile() && extensions.has(path.extname(entry.name))) {
-      files.push(relativePath);
-    }
-  }
-
-  return files;
+  return listRepoFiles(dir).filter((file) =>
+    extensions.has(path.extname(file)),
+  );
 }
 
 function lineForIndex(source, index) {
@@ -216,7 +204,7 @@ function hasExplicitActionBranch(expression, action) {
 
 for (const target of targets) {
   for (const file of walk(target.dir, target.extensions)) {
-    const source = fs.readFileSync(path.join(root, file), "utf8");
+    const source = readRepoFile(file);
     for (const pattern of target.patterns) {
       pattern.re.lastIndex = 0;
       let match;

@@ -14,6 +14,7 @@ const ALLOWED_MIXED_FIELDS = {
   "audit_logs.metadata": "audit metadata varies by entity/action",
   "audit_logs.new_value": "redacted before/after audit value can be any safe JSON shape",
   "audit_logs.old_value": "redacted before/after audit value can be any safe JSON shape",
+  "campus_content.payload": "packaged campus content sections (metrics/opportunities/events/resources) are versioned JSON that mirrors the mobile asset contract",
   "career_passports.snapshot": "career-passport export snapshot intentionally stores denormalized sections",
   "communication_delivery_logs.payload_redacted": "redacted per-channel/provider delivery payload differs by channel and never stores raw secrets",
   "company_invoices.metadata": "payment/manual billing provider metadata",

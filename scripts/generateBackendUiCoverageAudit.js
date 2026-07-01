@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { listRepoFiles, resolveRepoPath } from "./utils/repoPaths.js";
 
 const root = process.cwd();
 const checkOnly = process.argv.includes("--check");
@@ -13,33 +14,21 @@ const sourceDirs = {
   web: ["web/src"],
 };
 
-const testFile = path.join(root, "mobile", "test", "widget_test.dart");
-const dashboardScreen = path.join(root, "mobile", "lib", "src", "features", "dashboard", "dashboard_screen.dart");
-const companyScreen = path.join(root, "mobile", "lib", "src", "features", "company", "company_dashboard_screen.dart");
+const testFile = "mobile/test/widget_test.dart";
+const dashboardScreen = "mobile/lib/src/features/dashboard/dashboard_screen.dart";
+const companyScreen = "mobile/lib/src/features/company/company_dashboard_screen.dart";
 
 function read(relativeOrAbsolutePath) {
   const filePath = path.isAbsolute(relativeOrAbsolutePath)
     ? relativeOrAbsolutePath
-    : path.join(root, relativeOrAbsolutePath);
+    : resolveRepoPath(relativeOrAbsolutePath);
   return fs.existsSync(filePath) ? fs.readFileSync(filePath, "utf8") : "";
 }
 
-function walkFiles(dir, extensions, files = []) {
-  const fullDir = path.join(root, dir);
-  if (!fs.existsSync(fullDir)) return files;
-
-  for (const entry of fs.readdirSync(fullDir, { withFileTypes: true })) {
-    const fullPath = path.join(fullDir, entry.name);
-    const relativePath = path.relative(root, fullPath).replaceAll(path.sep, "/");
-    if (entry.isDirectory()) {
-      walkFiles(relativePath, extensions, files);
-      continue;
-    }
-    if (entry.isFile() && extensions.has(path.extname(entry.name))) {
-      files.push(relativePath);
-    }
-  }
-  return files;
+function walkFiles(dir, extensions) {
+  return listRepoFiles(dir).filter((file) =>
+    extensions.has(path.extname(file)),
+  );
 }
 
 function readSourceBundle(dirs, extensions) {

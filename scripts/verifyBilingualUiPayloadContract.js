@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
+import { readRepoFile } from "./utils/repoPaths.js";
 
-const root = process.cwd();
-const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const read = (file) => readRepoFile(file);
 
 const webI18n = read("web/src/shared/i18n.ts");
 const webApi = read("web/src/shared/api.ts");

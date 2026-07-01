@@ -93,7 +93,10 @@ and deploy instructions:
 - Admin console: `joseph2820212-maker/halajob-admin`
 - Mobile (Flutter): `joseph2820212-maker/halajob-mobile`
 
-The root `vercel.json` here deploys the backend API.
+The backend is a long-running Express + MongoDB server: deploy it with
+`npm start` on a Node host (see `docs/DEPLOYMENT.md`). It is not a Vercel
+static/serverless deployment; the frontends carry their own `vercel.json`
+in their own repos.
 
 ## Verification
 

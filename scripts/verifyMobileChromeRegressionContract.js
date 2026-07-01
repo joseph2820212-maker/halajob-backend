@@ -1,9 +1,7 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
+import { readRepoFile } from "./utils/repoPaths.js";
 
-const root = process.cwd();
-const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
+const read = (file) => readRepoFile(file);
 
 const widgets = read("mobile/lib/src/widgets/hala_cards.dart");
 const dashboard = read("mobile/lib/src/features/dashboard/dashboard_screen.dart");
@@ -101,8 +99,8 @@ const universityWorkflowPage = extractClass(university, "_UniversityWorkflowPage
 assertContains(nativeHeader, "color: halaNavy", "native header navy shell");
 assertContains(
   nativeHeader,
-  "bottom: BorderSide(color: halaOrange.withValues(alpha: 0.28))",
-  "native header orange bottom hairline",
+  "bottom: const BorderSide(color: halaHeaderLine)",
+  "native header navy bottom hairline",
 );
 assertContains(headerBrand, "fontSize: 17", "locked HalaJob logo size");
 assertContains(headerBrand, "letterSpacing: 0", "locked HalaJob logo spacing");

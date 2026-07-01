@@ -61,15 +61,10 @@ area.
 
 ## Web Deploy Steps
 
-The deployable frontend lives in `web/`.
-
-```bash
-npm --prefix web ci --ignore-scripts
-npm --prefix web run build
-```
-
-For Vercel, the root `vercel.json` builds `web/` and outputs `web/dist`.
-Configure:
+The website and admin frontends live in their own repos
+(`halajob-website`, `halajob-admin`), each with its own `vercel.json`
+and README deploy section. Deploy each repo as its own Vercel project
+with the repo root as the project root:
 
 ```text
 VITE_API_URL=https://jobzain.com
@@ -87,8 +82,9 @@ Production CORS must include the exact deployed web origin.
 - Campus tester mode can use local-device auth for UI QA only.
 - Production campus auth must use the backend.
 
-For mobile commands and tester packaging, use scripts under `mobile/scripts/`
-and the checks in `docs/TESTING_GUIDE.md`.
+For mobile commands and tester packaging, use the `halajob-mobile` repo
+(its CI builds tester APKs via workflow dispatch) and the checks in
+`docs/TESTING_GUIDE.md`.
 
 ## Payment Launch Rule
 
