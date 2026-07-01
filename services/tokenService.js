@@ -228,6 +228,13 @@ const verifyRefreshToken = async (token) => {
 // same family. Reuse detection: if the presented token maps to a row that
 // was already rotated (is_active: false), every row in the family is
 // deleted and the caller is forced to re-authenticate.
+//
+// Race safety: the retire step uses a CONDITIONAL updateOne (is_active:true
+// in the filter) so two concurrent legitimate rotations both hit the DB but
+// only ONE modifies the row. The loser sees modifiedCount === 0 and takes
+// the "already retired" branch, which triggers reuse detection and kills
+// the family. That's the correct outcome — if two callers hold the same
+// token and both try to rotate, they can't both continue.
 const rotateRefreshToken = async (token) => {
   const tokenPayload = await verify(token, process.env.JWT_SECRET);
 
@@ -240,12 +247,9 @@ const rotateRefreshToken = async (token) => {
     throw new APIError(httpStatus.FORBIDDEN, 'Invalid Refresh Token - logout');
   }
 
-  // ==== Reuse detection ====
-  // The presented token maps to a row that has already been rotated out.
-  // That only happens if two callers hold the same token (rare, legit if
-  // client raced with itself) or if one caller is replaying a stolen token
-  // whose successor has already been used. We can't tell them apart, so
-  // the safer default is: kill the whole family. The legit user re-logs in.
+  // ==== Reuse detection (path 1: row already retired at read time) ====
+  // The presented token maps to a row that has already been rotated out
+  // by an earlier request. Kill the whole family.
   if (tokenDoc.is_active === false) {
     if (tokenDoc.family_id) {
       await RefreshTokenModel.deleteMany({
@@ -265,10 +269,11 @@ const rotateRefreshToken = async (token) => {
   // new family. Otherwise carry the family_id forward.
   const familyId = tokenDoc.family_id || crypto.randomUUID();
 
-  // Retire the current row: mark it inactive and record the retirement
-  // timestamp. Don't delete — we need the row to detect a later replay.
-  await RefreshTokenModel.updateOne(
-    { _id: tokenDoc._id },
+  // Conditional retire — only proceeds if the row is still active. If a
+  // concurrent rotate has already flipped is_active to false, modifiedCount
+  // is 0 and we fall through to the reuse-detection branch below.
+  const retireResult = await RefreshTokenModel.updateOne(
+    { _id: tokenDoc._id, is_active: true },
     {
       $set: {
         is_active: false,
@@ -277,6 +282,20 @@ const rotateRefreshToken = async (token) => {
       },
     },
   );
+
+  // ==== Reuse detection (path 2: lost the retire race) ====
+  // Another rotation of the same token beat us to the retire step. The
+  // presented token is being used twice — kill the whole family.
+  if (retireResult.modifiedCount !== 1) {
+    await RefreshTokenModel.deleteMany({
+      userRef: tokenDoc.userRef,
+      family_id: familyId,
+    });
+    throw new APIError(
+      httpStatus.FORBIDDEN,
+      'Refresh token reuse detected - session revoked',
+    );
+  }
 
   const tokens = await generateAuthTokens(
     { _id: tokenPayload.userId },

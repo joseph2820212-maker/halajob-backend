@@ -15,10 +15,25 @@
 
 import crypto from "crypto";
 
-const SECRET =
-  process.env.PASSCODE_SECRET ||
-  process.env.JWT_SECRET ||
-  ""; // JWT_SECRET is asserted on boot; empty here means non-runtime import.
+// Resolve the HMAC key at every call rather than once at module import
+// time. Scripts, seeders, and test harnesses often import controllers
+// before dotenv.config() has run — capturing SECRET at import time meant
+// hashPasscode silently used the empty string as the key, producing a
+// hash that verifyPasscode could never match after env vars later
+// populated. Lazy resolution keeps every caller in step with the live
+// env and lets us fail loudly if neither PASSCODE_SECRET nor JWT_SECRET
+// is set at the moment we actually need to hash.
+const resolveSecret = () => {
+  const s = process.env.PASSCODE_SECRET || process.env.JWT_SECRET || "";
+  if (!s || s.length < 16) {
+    throw new Error(
+      "passcodeHash: neither PASSCODE_SECRET nor JWT_SECRET is set to " +
+        "a >= 16-char value. Refusing to hash — a short/empty key means the " +
+        "OTP hash is trivially reversible via a 900k rainbow of inputs.",
+    );
+  }
+  return s;
+};
 
 // New codes are 6 digits. Legacy 5-digit codes issued before this deploy
 // remain valid until they expire (max 10 min after the deploy landed).
@@ -37,7 +52,7 @@ const HEX64_RE = /^[a-f0-9]{64}$/i;
 export const hashPasscode = (code) => {
   if (!code) return "";
   return crypto
-    .createHmac("sha256", SECRET)
+    .createHmac("sha256", resolveSecret())
     .update(String(code).trim())
     .digest("hex");
 };
