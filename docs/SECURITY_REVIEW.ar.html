@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>المراجعة الأمنية</title>
+<style>/* Hala Job — documentation theme
+ *
+ * Palette pulled directly from src/styles.css (--jf-* tokens):
+ *   Primary (navy)  #1f3654   --jf-primary / --jf-ink
+ *   Primary dark    #15263c
+ *   Primary hover   #2a4364
+ *   Accent (orange) #e38b3c   --jf-accent
+ *   Accent deep     #c26f22
+ *   Accent tint     #e3b98c
+ *   Soft cream      #fdf3e6   --jf-soft
+ *   Page cream      #fcf7ef   --jf-page
+ *   Card            #fffaf2   --jf-card
+ *   Border (tan)    #ebdac2   --jf-border
+ *   Ink soft        #3a4a5e
+ *   Muted           #5c6b7e   --jf-muted
+ *   Secondary blue  #4e6075   --jf-blue
+ *   Bronze          #9a7b4f   --jf-purple
+ *
+ * Per-repo overrides set --accent via a data-repo attribute on <body>.
+ */
+:root {
+  --navy: #1f3654;
+  --navy-dark: #15263c;
+  --navy-hover: #2a4364;
+  --orange: #e38b3c;
+  --orange-deep: #c26f22;
+  --orange-tint: #e3b98c;
+  --soft: #fdf3e6;
+  --page: #fcf7ef;
+  --card: #fffaf2;
+  --border: #ebdac2;
+  --ink: #1f3654;
+  --ink-soft: #3a4a5e;
+  --muted: #5c6b7e;
+  --blue: #4e6075;
+  --bronze: #9a7b4f;
+  --code-bg: #15263c;
+  --code-ink: #f7ecd8;
+  --danger: #ef4444;
+  --danger-soft: #fdece0;
+  --success: #2f855a;
+
+  /* Repo accent (overridden per body[data-repo]) */
+  --accent: var(--navy);
+  --accent-ink: var(--soft);
+  --accent-soft: var(--soft);
+}
+
+/* Per-repo accent overrides on <body data-repo=""> */
+body[data-repo="backend"]  { --accent: #1f3654; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="website"]  { --accent: #e38b3c; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+body[data-repo="admin"]    { --accent: #15263c; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="mobile"]   { --accent: #4e6075; --accent-ink: #fcf7ef; --accent-soft: #e9eef3; }
+body[data-repo="platform"] { --accent: #c26f22; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page shell — mimics a printed document */
+.doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 64px 64px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(31, 54, 84, 0.08);
+}
+
+/* Cover ================================================================= */
+.cover {
+  min-height: 92vh;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse at top right, rgba(227, 139, 60, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, var(--accent) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+}
+.cover-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+.cover h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-ink);
+  border: 0;
+  padding: 0;
+}
+.cover .tag {
+  font-size: 20px;
+  font-weight: 300;
+  opacity: 0.92;
+  max-width: 640px;
+  line-height: 1.4;
+}
+.cover .rule {
+  height: 4px;
+  width: 88px;
+  background: var(--orange);
+  margin: 0 0 28px;
+  border-radius: 2px;
+}
+.cover-meta {
+  border-top: 1px solid rgba(252, 247, 239, 0.28);
+  padding-top: 20px;
+  font-size: 12px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cover-meta dl { margin: 0; }
+.cover-meta dt {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+.cover-meta dd { margin: 4px 0 0; font-size: 13px; }
+.cover-logo {
+  display: inline-block;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(252, 247, 239, 0.14);
+  color: var(--accent-ink);
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(252, 247, 239, 0.24);
+}
+
+/* Typography ============================================================= */
+h1, h2, h3, h4 {
+  color: var(--navy);
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+h1 {
+  font-size: 28px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 8px;
+}
+h2 { font-size: 22px; margin-top: 40px; }
+h3 { font-size: 17px; margin-top: 28px; color: var(--ink-soft); }
+h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+p { margin: 8px 0 14px; }
+a { color: var(--orange-deep); text-decoration: none; border-bottom: 1px solid rgba(194, 111, 34, 0.25); }
+a:hover { border-bottom-color: var(--orange-deep); }
+
+ul, ol { padding-left: 20px; }
+li { margin: 4px 0; }
+
+/* Callouts / conventions ================================================= */
+.callout {
+  border-left: 4px solid var(--orange);
+  background: var(--soft);
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.callout.warn   { border-color: var(--orange-deep); background: #fdf3e6; }
+.callout.danger { border-color: var(--danger); background: var(--danger-soft); }
+.callout.info   { border-color: var(--blue); background: #edf1f6; }
+
+/* Code =================================================================== */
+code {
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  background: rgba(31, 54, 84, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--navy);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border: 1px solid var(--navy-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* Tables ================================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid var(--orange);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td { background: var(--soft); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Method chips (HTTP verbs on the endpoint cards) ======================== */
+.m {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--soft);
+}
+.m-GET     { background: var(--blue); }
+.m-POST    { background: var(--orange); color: var(--navy); }
+.m-PUT     { background: var(--orange-deep); }
+.m-PATCH   { background: var(--bronze); }
+.m-DELETE  { background: var(--danger); }
+.m-OPTIONS { background: var(--muted); }
+.m-HEAD    { background: var(--muted); }
+
+/* Auth chips ============================================================= */
+.auth {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+}
+.auth-public { color: var(--ink-soft); border-color: var(--border); background: var(--soft); }
+.auth-bearer { color: var(--navy); border-color: var(--navy); background: #e6ebf2; }
+.auth-admin  { color: var(--orange-deep); border-color: var(--orange-deep); background: var(--soft); }
+
+/* Endpoint card ========================================================== */
+.endpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background: var(--card);
+}
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.endpoint-head .path { font-weight: 600; color: var(--navy); }
+.endpoint-head .auth { margin-left: auto; }
+.endpoint-body { padding: 14px 16px; font-size: 13px; }
+.endpoint-body dl { margin: 0; }
+.endpoint-body dt {
+  font-weight: 600;
+  color: var(--navy);
+  margin: 10px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.endpoint-body dt:first-child { margin-top: 0; }
+.endpoint-body dd { margin: 0 0 6px; }
+
+/* TOC ==================================================================== */
+.toc {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 20px 0 32px;
+  page-break-after: always;
+}
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+.toc li { padding: 4px 0; border-bottom: 1px dotted rgba(31,54,84,0.12); }
+.toc li:last-child { border-bottom: 0; }
+.toc li a { border: 0; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+.toc li a::before {
+  counter-increment: sec;
+  content: counter(sec) ".";
+  color: var(--orange-deep);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  min-width: 24px;
+}
+.toc li a:hover { color: var(--orange-deep); }
+
+/* Small chips & badges */
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 20px;
+  font-size: 13px;
+  margin: 10px 0 16px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+.kv dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kv dd { margin: 0; }
+
+/* Footer on every page */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: ui-monospace, monospace;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+  @bottom-left {
+    content: "Hala Job";
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+}
+@media print {
+  html, body { background: #ffffff; }
+  .doc { box-shadow: none; padding: 0; background: #ffffff; }
+  h2 { break-after: avoid; }
+  .endpoint { break-inside: avoid; }
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  a { color: var(--ink); }
+}
+
+/* ==========================================================================
+ * RTL / Arabic layout — activated by dir="rtl" on the <html> element.
+ * English docs (default LTR) are unaffected. Code identifiers and URLs
+ * inside <code> / <pre> stay LTR so JSON, curl, and paths still read
+ * correctly.
+ * ========================================================================= */
+
+[dir="rtl"] body {
+  font-family: "SF Arabic", "Geeza Pro", "Noto Sans Arabic", "Segoe UI Arabic",
+               "Tahoma", -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
+  letter-spacing: 0; /* Arabic doesn't want negative letter-spacing */
+}
+
+/* Preserve LTR direction for anything code-like. Numbers and Latin-script
+ * technical strings inside a right-to-left paragraph would otherwise
+ * mirror-render. */
+[dir="rtl"] code,
+[dir="rtl"] pre,
+[dir="rtl"] .m,
+[dir="rtl"] .auth,
+[dir="rtl"] .badge {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+/* Flip left-anchored borders to the right */
+[dir="rtl"] .callout {
+  border-left: 0;
+  border-right: 4px solid var(--accent);
+  border-radius: 6px 0 0 6px;
+}
+[dir="rtl"] .callout.warn   { border-right-color: var(--orange-deep); }
+[dir="rtl"] .callout.danger { border-right-color: var(--danger); }
+[dir="rtl"] .callout.info   { border-right-color: var(--blue); }
+
+/* Endpoint block: swap head chip layout so method+path lead from the right */
+[dir="rtl"] .endpoint-head .auth { margin-left: 0; margin-right: auto; }
+
+/* TOC counter marker sits on the right side */
+[dir="rtl"] .toc li a::before { margin-right: 0; margin-left: 8px; }
+
+/* Lists: RTL default marker padding lives on the right */
+[dir="rtl"] ul, [dir="rtl"] ol { padding-left: 0; padding-right: 20px; }
+
+/* Tables: header + body cells left-align by default. Arabic wants
+ * right-align for prose but LTR for code cells. */
+[dir="rtl"] thead th, [dir="rtl"] tbody td { text-align: right; }
+[dir="rtl"] .kv { grid-template-columns: 200px 1fr; }
+
+/* Cover: page counter reads more naturally in the outer corner. */
+[dir="rtl"] .cover-meta { justify-content: flex-end; }
+
+/* Deck-only RTL tweaks */
+[dir="rtl"] .feature { border-left: 0; border-right: 4px solid var(--orange); }
+[dir="rtl"] .value   { border-left: 0; border-right: 6px solid var(--orange); }
+[dir="rtl"] .section-hero .highlights .chip { direction: rtl; }
+
+/* Print page counter on the outer (left) edge in RTL */
+@page :left { }
+
+</style>
+</head>
+<body data-repo="backend">
+  <section class="cover">
+    <div>
+      <div class="cover-logo">HJ</div>
+      <div class="cover-eyebrow">منصة هلا جوب</div>
+      <h1>المراجعة الأمنية</h1>
+      <div class="rule"></div>
+      <p class="tag">ضوابط عبر المستودعات، أدلة في الكود، والمخاطر المتبقية التي يجب أن يعرفها المالك قبل الموافقة على الإطلاق.</p>
+    </div>
+    <div class="cover-meta"><dl><dt>التغطية</dt><dd>الخادم + الموقع + الإدارة + الجوال</dd></dl><dl><dt>أُعدَّت لـ</dt><dd>المالك + المراجعة الأمنية</dd></dl><dl><dt>آخر تدقيق تبعيات</dt><dd>0 ثغرات (جميع المستودعات الثلاثة، عالية/حرجة)</dd></dl><dl><dt>التاريخ</dt><dd>2026-07-01</dd></dl></div>
+  </section>
+  <div class="doc">
+    <nav class="toc"><h2>المحتويات</h2><ol><li><a href="#intro"><span>النطاق</span></a></li><li><a href="#backend"><span>وضع الخادم</span></a></li><li><a href="#frontend"><span>وضع الواجهات الأمامية</span></a></li><li><a href="#mobile"><span>وضع الجوال</span></a></li><li><a href="#threats"><span>نموذج التهديد + المخاطر المتبقية</span></a></li><li><a href="#closing"><span>بوابات الموافقة</span></a></li></ol></nav>
+    <section id="intro"><h1>النطاق</h1>
+        <p>الوضع الأمني عبر المستودعات عند التسليم. يغطي الخادم، الواجهتين
+        الأماميتين، وتطبيق الجوال. نموذج التهديد في النهاية يغطي فئات
+        الهجمات التي تعالجها الضوابط الحالية وأين لا تزال المخاطر المتبقية.</p>
+        <div class="callout info"><b>كل شيء هنا يعمل اليوم.</b> هذه ليست
+        قائمة أمنيات. الدليل في <code>app.js</code>، <code>vercel.json</code>،
+        <code>AndroidManifest.xml</code>، وسير CI للمستودعات الأربعة.</div>
+      </section><section id="backend"><h1>وضع الخادم</h1><table><thead><tr><th>الضابط</th><th>كيف</th><th>أين</th></tr></thead><tbody><tr><td>فرض TLS</td><td>helmet HSTS سنة preload</td><td><code>app.js</code></td></tr><tr><td>CORS</td><td>قائمة سماح + أنماط بدل؛ الإنتاج يرجع 403 على المصادر غير المعروفة</td><td><code>app.js</code></td></tr><tr><td>تقييد المعدل</td><td>عام 300/15د، مصادقة 20/15د، رفع 60/15د</td><td><code>app.js</code></td></tr><tr><td>حقن NoSQL</td><td><code>express-mongo-sanitize</code> يزيل <code>$</code> و<code>.</code></td><td><code>app.js</code></td></tr><tr><td>تلوث البارامترات</td><td><code>hpp</code> مع قائمة سماح</td><td><code>app.js</code></td></tr><tr><td>حدود الجسم</td><td>2 ميجابايت افتراضياً على JSON و urlencoded</td><td><code>app.js</code></td></tr><tr><td>الرفع الثابت</td><td>nosniff، <code>attachment</code> للأنواع غير المدرجة، CSP للأنواع النشطة، رفض المخفية</td><td><code>app.js</code></td></tr><tr><td>تحميلات السير المولّدة</td><td>توكن لكل ملف مع انتهاء صلاحية، حماية عبور المسار، 410 عند الانتهاء</td><td><code>app.js</code></td></tr><tr><td>المصادقة</td><td>توكن JWT حسب النطاق (باحث/شركة/جامعي/إدارة)</td><td><code>routes*/auth/*</code></td></tr><tr><td>RBAC الإداري</td><td><code>roles</code> + <code>permissions</code> + وسيط فحص الصلاحيات. حماية من قفل الذات</td><td><code>controllers/adminResourceController.js</code></td></tr><tr><td>نظافة الأسرار</td><td><code>check:secrets</code> في CI؛ <code>.env</code> مُتجاهل</td><td><code>scripts/verifyNoSecrets.js</code></td></tr><tr><td>سلسلة التوريد</td><td><code>npm ci --ignore-scripts</code> + بوابة <code>npm audit</code></td><td><code>.github/workflows/ci.yml</code></td></tr><tr><td>سجل التدقيق</td><td><code>audit_logs</code> إلحاقي مع TTL حسب الفئة</td><td><code>middlewares/writeAdminResourceAudit.js</code></td></tr></tbody></table></section><section id="frontend"><h1>وضع الواجهات الأمامية</h1><table><thead><tr><th>الضابط</th><th>الموقع</th><th>الإدارة</th></tr></thead><tbody><tr><td><code>Content-Security-Policy</code></td><td>لا <code>unsafe-eval</code>؛ سكربت مضمّن واحد مثبت بـ sha256</td><td>لا <code>unsafe-inline</code> ولا <code>unsafe-eval</code> في <code>script-src</code></td></tr><tr><td><code>X-Frame-Options</code></td><td><code>DENY</code></td><td><code>DENY</code></td></tr><tr><td><code>X-Content-Type-Options</code></td><td><code>nosniff</code></td><td><code>nosniff</code></td></tr><tr><td><code>Referrer-Policy</code></td><td><code>strict-origin-when-cross-origin</code></td><td><code>no-referrer</code></td></tr><tr><td><code>Permissions-Policy</code></td><td>ميكروفون/كاميرا/موقع/دفع معطلة</td><td>نفسها</td></tr><tr><td><code>Strict-Transport-Security</code></td><td>سنتان includeSubDomains preload</td><td>نفسها</td></tr><tr><td>Robots</td><td><code>index,follow</code></td><td><code>noindex,nofollow</code></td></tr><tr><td>حاجز المصادقة</td><td>لا سطح إدارة في الحزمة</td><td>حاجز على العميل يمنع تركيب لوحة الإدارة</td></tr><tr><td>تدقيق التبعيات</td><td><code>npm audit --omit=dev --audit-level=high</code></td><td>نفسها</td></tr></tbody></table></section><section id="mobile"><h1>وضع الجوال</h1><table><thead><tr><th>الضابط</th><th>كيف</th></tr></thead><tbody><tr><td>منع النقل غير المشفر</td><td><code>usesCleartextTraffic=&quot;false&quot;</code> + <code>network_security_config.xml</code></td></tr><tr><td>تخزين التوكن</td><td><code>flutter_secure_storage</code> (EncryptedSharedPreferences / Keychain)</td></tr><tr><td>تعرض النسخ الاحتياطي</td><td><code>allowBackup=&quot;false&quot;</code>، <code>dataExtractionRules</code> مضبوطة</td></tr><tr><td>اختطاف المهام</td><td><code>taskAffinity=&quot;&quot;</code></td></tr><tr><td>الأذونات</td><td><code>INTERNET</code> + <code>POST_NOTIFICATIONS</code> فقط</td></tr><tr><td>توقيع الإصدار</td><td>البناء يرفض توقيع الإصدار بدون keystore أو مفتاح الهروب الصريح</td></tr><tr><td>الإبهام</td><td><code>--obfuscate --split-debug-info=build/symbols</code>؛ الرموز أثر منفصل لمدة 90 يوماً</td></tr><tr><td>انحراف التبعيات</td><td><code>flutter analyze --fatal-warnings</code>؛ <code>flutter pub outdated</code> غير مانع</td></tr></tbody></table></section><section id="threats"><h1>نموذج التهديد + المخاطر المتبقية</h1><table><thead><tr><th>الفئة</th><th>التهديد</th><th>التخفيف</th><th>المخاطر المتبقية</th></tr></thead><tbody><tr><td>المصادقة</td><td>حشو كلمات المرور</td><td>محدد مصادقة (20/15د)، تحقق OTP، قفل الحساب عند التكرار</td><td>تعتمد قوة كلمة المرور على المستخدم؛ فكّر بـ MFA إلزامي للإدارة.</td></tr><tr><td>المصادقة</td><td>سرقة JWT</td><td>HTTPS فقط، TTL قصير + تدفق تحديث، إشارة الجلسة في localStorage (ليس التوكن)</td><td>التوكنات لا تزال في تخزين المتصفح؛ XSS مُخفَّف بـ CSP لا مُلغى.</td></tr><tr><td>الحقن</td><td>حقن معاملات NoSQL</td><td><code>express-mongo-sanitize</code> يزيل <code>$</code>/<code>.</code></td><td>يطبَّق على body/query/params؛ استخدام <code>$where</code> مباشر في الكود سيتجاوزه — غير موجود حالياً.</td></tr><tr><td>الحقن</td><td>HPP عبر تكرار مفاتيح الاستعلام</td><td><code>hpp</code> مع قائمة سماح</td><td>مفاتيح السماح آمنة للتكرار عمداً.</td></tr><tr><td>التحكم بالوصول</td><td>المسؤول يتصرف على حسابه</td><td>الخادم يمنع تغيير role_id/permissions الذاتية أو حذف الذات/الدور الذاتي</td><td>يتطلب مسؤولَين على الأقل لتغيير دور المسؤول الأخير بأمان.</td></tr><tr><td>البيانات</td><td>تسريب PII عبر تنزيلات الملفات</td><td><code>/uploads</code> يقدم <code>attachment</code>؛ تنزيلات السير المولّدة تتطلب توكن مع انتهاء</td><td>التوكن في الرابط؛ عالج الروابط المنتهية كحساسة في السجلات.</td></tr><tr><td>البيانات</td><td>عبور المسار في اسم ملف السيرة</td><td>فحص صريح <code>startsWith</code></td><td>الحماية مختبَرة؛ حافظ عليها عند إعادة الهيكلة.</td></tr><tr><td>العميل</td><td>XSS عبر محتوى المستخدم</td><td>React يهرب تلقائياً؛ <code>dompurify</code> للـ HTML الخام؛ CSP <code>script-src 'self'</code></td><td>السكربتات الجديدة تفشل check:entry دون تجزئة CSP.</td></tr><tr><td>العميل</td><td>Clickjacking / تضمين iframe</td><td><code>frame-ancestors 'none'</code> + <code>X-Frame-Options: DENY</code></td><td>لا شيء متوقع.</td></tr><tr><td>العميل</td><td>فهرسة لوحة الإدارة</td><td><code>meta robots noindex,nofollow</code> + لوحة على نطاق منفصل</td><td>على المالك عدم توجيه نطاق العملاء إلى بناء الإدارة عن طريق الخطأ.</td></tr><tr><td>الجوال</td><td>MITM / خفض إلى غير مشفر</td><td>المانفست + <code>network_security_config.xml</code></td><td>تجاوزات debug تثق بشهادات المستخدم — لا تُفعَّل أبداً في الإصدار.</td></tr><tr><td>الجوال</td><td>الهندسة العكسية لـ APK</td><td><code>--obfuscate</code> + <code>--split-debug-info</code></td><td>الإبهام يرفع السقف، لا يمنع مهاجم مصمم؛ احتفظ بالأسرار على الخادم.</td></tr><tr><td>سلسلة التوريد</td><td>postinstall خبيث في npm</td><td><code>npm ci --ignore-scripts</code> في CI</td><td>Sharp/puppeteer prebuilts لا تزال تُستخدم — راجع الترقيات.</td></tr><tr><td>سلسلة التوريد</td><td>CVE معروفة في التبعيات</td><td>بوابة <code>npm audit</code> — 0 ثغرات حالياً</td><td>التدقيق عند push؛ تحذير جديد بين الدفعات قد يُشحن.</td></tr><tr><td>تشغيلي</td><td>أسرار في شجرة المستودع</td><td><code>check:secrets</code> في CI؛ <code>.gitignore</code></td><td>على المالك عدم إضافة ملفات .env الإنتاجية محلياً.</td></tr><tr><td>تشغيلي</td><td>حجم سجلات غير محكوم</td><td>سجل التدقيق مضغوط لكل عملية؛ TTL يمسح السجلات القديمة</td><td>راقب حجم <code>audit_logs</code> بعد الإطلاق.</td></tr></tbody></table></section><section id="closing"><h1>بوابات الموافقة</h1>
+        <p>الإطلاق العام مُقيَّد بإجراءات المالك التالية (لا يمكن للمهندس إتمامها):</p>
+        <ol>
+          <li>تدوير أسرار الإنتاج (JWT_SECRET، اعتمادات SMTP، مفاتيح المزودين) وأرشفة القديمة.</li>
+          <li>مراجعة مستخدمي القاعدة الحية الإداريين (<code>npm run security:audit-users</code>).</li>
+          <li>تأكيد سلسلة HTTPS + HSTS على المصادر الأربعة العامة.</li>
+          <li>تأكيد أن CI أخضر عبر المستودعات الأربعة.</li>
+        </ol>
+      </section>
+    <footer class="doc-footer">
+      <span>هلا جوب — المراجعة الأمنية</span>
+      <span>تاريخ الإصدار 2026-07-01</span>
+    </footer>
+  </div>
+</body>
+</html>

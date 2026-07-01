@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>منصة هلا جوب</title>
+<style>/* Hala Job — documentation theme
+ *
+ * Palette pulled directly from src/styles.css (--jf-* tokens):
+ *   Primary (navy)  #1f3654   --jf-primary / --jf-ink
+ *   Primary dark    #15263c
+ *   Primary hover   #2a4364
+ *   Accent (orange) #e38b3c   --jf-accent
+ *   Accent deep     #c26f22
+ *   Accent tint     #e3b98c
+ *   Soft cream      #fdf3e6   --jf-soft
+ *   Page cream      #fcf7ef   --jf-page
+ *   Card            #fffaf2   --jf-card
+ *   Border (tan)    #ebdac2   --jf-border
+ *   Ink soft        #3a4a5e
+ *   Muted           #5c6b7e   --jf-muted
+ *   Secondary blue  #4e6075   --jf-blue
+ *   Bronze          #9a7b4f   --jf-purple
+ *
+ * Per-repo overrides set --accent via a data-repo attribute on <body>.
+ */
+:root {
+  --navy: #1f3654;
+  --navy-dark: #15263c;
+  --navy-hover: #2a4364;
+  --orange: #e38b3c;
+  --orange-deep: #c26f22;
+  --orange-tint: #e3b98c;
+  --soft: #fdf3e6;
+  --page: #fcf7ef;
+  --card: #fffaf2;
+  --border: #ebdac2;
+  --ink: #1f3654;
+  --ink-soft: #3a4a5e;
+  --muted: #5c6b7e;
+  --blue: #4e6075;
+  --bronze: #9a7b4f;
+  --code-bg: #15263c;
+  --code-ink: #f7ecd8;
+  --danger: #ef4444;
+  --danger-soft: #fdece0;
+  --success: #2f855a;
+
+  /* Repo accent (overridden per body[data-repo]) */
+  --accent: var(--navy);
+  --accent-ink: var(--soft);
+  --accent-soft: var(--soft);
+}
+
+/* Per-repo accent overrides on <body data-repo=""> */
+body[data-repo="backend"]  { --accent: #1f3654; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="website"]  { --accent: #e38b3c; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+body[data-repo="admin"]    { --accent: #15263c; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="mobile"]   { --accent: #4e6075; --accent-ink: #fcf7ef; --accent-soft: #e9eef3; }
+body[data-repo="platform"] { --accent: #c26f22; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page shell — mimics a printed document */
+.doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 64px 64px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(31, 54, 84, 0.08);
+}
+
+/* Cover ================================================================= */
+.cover {
+  min-height: 92vh;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse at top right, rgba(227, 139, 60, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, var(--accent) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+}
+.cover-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+.cover h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-ink);
+  border: 0;
+  padding: 0;
+}
+.cover .tag {
+  font-size: 20px;
+  font-weight: 300;
+  opacity: 0.92;
+  max-width: 640px;
+  line-height: 1.4;
+}
+.cover .rule {
+  height: 4px;
+  width: 88px;
+  background: var(--orange);
+  margin: 0 0 28px;
+  border-radius: 2px;
+}
+.cover-meta {
+  border-top: 1px solid rgba(252, 247, 239, 0.28);
+  padding-top: 20px;
+  font-size: 12px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cover-meta dl { margin: 0; }
+.cover-meta dt {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+.cover-meta dd { margin: 4px 0 0; font-size: 13px; }
+.cover-logo {
+  display: inline-block;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(252, 247, 239, 0.14);
+  color: var(--accent-ink);
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(252, 247, 239, 0.24);
+}
+
+/* Typography ============================================================= */
+h1, h2, h3, h4 {
+  color: var(--navy);
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+h1 {
+  font-size: 28px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 8px;
+}
+h2 { font-size: 22px; margin-top: 40px; }
+h3 { font-size: 17px; margin-top: 28px; color: var(--ink-soft); }
+h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+p { margin: 8px 0 14px; }
+a { color: var(--orange-deep); text-decoration: none; border-bottom: 1px solid rgba(194, 111, 34, 0.25); }
+a:hover { border-bottom-color: var(--orange-deep); }
+
+ul, ol { padding-left: 20px; }
+li { margin: 4px 0; }
+
+/* Callouts / conventions ================================================= */
+.callout {
+  border-left: 4px solid var(--orange);
+  background: var(--soft);
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.callout.warn   { border-color: var(--orange-deep); background: #fdf3e6; }
+.callout.danger { border-color: var(--danger); background: var(--danger-soft); }
+.callout.info   { border-color: var(--blue); background: #edf1f6; }
+
+/* Code =================================================================== */
+code {
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  background: rgba(31, 54, 84, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--navy);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border: 1px solid var(--navy-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* Tables ================================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid var(--orange);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td { background: var(--soft); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Method chips (HTTP verbs on the endpoint cards) ======================== */
+.m {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--soft);
+}
+.m-GET     { background: var(--blue); }
+.m-POST    { background: var(--orange); color: var(--navy); }
+.m-PUT     { background: var(--orange-deep); }
+.m-PATCH   { background: var(--bronze); }
+.m-DELETE  { background: var(--danger); }
+.m-OPTIONS { background: var(--muted); }
+.m-HEAD    { background: var(--muted); }
+
+/* Auth chips ============================================================= */
+.auth {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+}
+.auth-public { color: var(--ink-soft); border-color: var(--border); background: var(--soft); }
+.auth-bearer { color: var(--navy); border-color: var(--navy); background: #e6ebf2; }
+.auth-admin  { color: var(--orange-deep); border-color: var(--orange-deep); background: var(--soft); }
+
+/* Endpoint card ========================================================== */
+.endpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background: var(--card);
+}
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.endpoint-head .path { font-weight: 600; color: var(--navy); }
+.endpoint-head .auth { margin-left: auto; }
+.endpoint-body { padding: 14px 16px; font-size: 13px; }
+.endpoint-body dl { margin: 0; }
+.endpoint-body dt {
+  font-weight: 600;
+  color: var(--navy);
+  margin: 10px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.endpoint-body dt:first-child { margin-top: 0; }
+.endpoint-body dd { margin: 0 0 6px; }
+
+/* TOC ==================================================================== */
+.toc {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 20px 0 32px;
+  page-break-after: always;
+}
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+.toc li { padding: 4px 0; border-bottom: 1px dotted rgba(31,54,84,0.12); }
+.toc li:last-child { border-bottom: 0; }
+.toc li a { border: 0; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+.toc li a::before {
+  counter-increment: sec;
+  content: counter(sec) ".";
+  color: var(--orange-deep);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  min-width: 24px;
+}
+.toc li a:hover { color: var(--orange-deep); }
+
+/* Small chips & badges */
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 20px;
+  font-size: 13px;
+  margin: 10px 0 16px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+.kv dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kv dd { margin: 0; }
+
+/* Footer on every page */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: ui-monospace, monospace;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+  @bottom-left {
+    content: "Hala Job";
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+}
+@media print {
+  html, body { background: #ffffff; }
+  .doc { box-shadow: none; padding: 0; background: #ffffff; }
+  h2 { break-after: avoid; }
+  .endpoint { break-inside: avoid; }
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  a { color: var(--ink); }
+}
+
+/* ==========================================================================
+ * RTL / Arabic layout — activated by dir="rtl" on the <html> element.
+ * English docs (default LTR) are unaffected. Code identifiers and URLs
+ * inside <code> / <pre> stay LTR so JSON, curl, and paths still read
+ * correctly.
+ * ========================================================================= */
+
+[dir="rtl"] body {
+  font-family: "SF Arabic", "Geeza Pro", "Noto Sans Arabic", "Segoe UI Arabic",
+               "Tahoma", -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
+  letter-spacing: 0; /* Arabic doesn't want negative letter-spacing */
+}
+
+/* Preserve LTR direction for anything code-like. Numbers and Latin-script
+ * technical strings inside a right-to-left paragraph would otherwise
+ * mirror-render. */
+[dir="rtl"] code,
+[dir="rtl"] pre,
+[dir="rtl"] .m,
+[dir="rtl"] .auth,
+[dir="rtl"] .badge {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+/* Flip left-anchored borders to the right */
+[dir="rtl"] .callout {
+  border-left: 0;
+  border-right: 4px solid var(--accent);
+  border-radius: 6px 0 0 6px;
+}
+[dir="rtl"] .callout.warn   { border-right-color: var(--orange-deep); }
+[dir="rtl"] .callout.danger { border-right-color: var(--danger); }
+[dir="rtl"] .callout.info   { border-right-color: var(--blue); }
+
+/* Endpoint block: swap head chip layout so method+path lead from the right */
+[dir="rtl"] .endpoint-head .auth { margin-left: 0; margin-right: auto; }
+
+/* TOC counter marker sits on the right side */
+[dir="rtl"] .toc li a::before { margin-right: 0; margin-left: 8px; }
+
+/* Lists: RTL default marker padding lives on the right */
+[dir="rtl"] ul, [dir="rtl"] ol { padding-left: 0; padding-right: 20px; }
+
+/* Tables: header + body cells left-align by default. Arabic wants
+ * right-align for prose but LTR for code cells. */
+[dir="rtl"] thead th, [dir="rtl"] tbody td { text-align: right; }
+[dir="rtl"] .kv { grid-template-columns: 200px 1fr; }
+
+/* Cover: page counter reads more naturally in the outer corner. */
+[dir="rtl"] .cover-meta { justify-content: flex-end; }
+
+/* Deck-only RTL tweaks */
+[dir="rtl"] .feature { border-left: 0; border-right: 4px solid var(--orange); }
+[dir="rtl"] .value   { border-left: 0; border-right: 6px solid var(--orange); }
+[dir="rtl"] .section-hero .highlights .chip { direction: rtl; }
+
+/* Print page counter on the outer (left) edge in RTL */
+@page :left { }
+
+
+
+body.deck { font-size: 15px; line-height: 1.75; }
+body.deck .doc { padding: 56px 72px 72px; max-width: 960px; }
+.section-hero {
+  padding: 56px 56px 44px; margin: 40px -72px 28px;
+  background: linear-gradient(135deg, var(--soft) 0%, var(--card) 60%);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  page-break-before: always;
+}
+.section-hero .eyebrow {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--orange-deep); font-weight: 700; margin-bottom: 10px;
+}
+.section-hero h1 {
+  font-size: 40px; line-height: 1.15; margin: 0 0 12px;
+  padding: 0; border: 0; color: var(--navy); font-weight: 700;
+}
+.section-hero .lede {
+  font-size: 18px; color: var(--ink-soft); max-width: 720px;
+  margin: 0 0 20px; font-weight: 400;
+}
+.section-hero .highlights { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.section-hero .highlights .chip {
+  background: var(--navy); color: var(--soft);
+  padding: 8px 14px; border-radius: 999px;
+  font-size: 12px; font-weight: 600;
+  border: 2px solid var(--orange);
+}
+.feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0 28px; }
+.feature { background: var(--card); border: 1px solid var(--border);
+  border-right: 4px solid var(--orange); border-radius: 8px;
+  padding: 14px 18px; }
+.feature h4 { color: var(--navy); margin: 0 0 6px; font-size: 15px; font-weight: 600; text-transform: none; letter-spacing: 0; }
+.feature p { color: var(--ink-soft); margin: 0; font-size: 13px; line-height: 1.6; }
+.value { background: var(--navy); color: var(--soft); padding: 20px 26px;
+  border-radius: 10px; margin: 24px 0 32px;
+  border-right: 6px solid var(--orange); }
+.value .label { text-transform: uppercase; letter-spacing: 2px; font-size: 10px; opacity: 0.75; margin-bottom: 6px; }
+.value h3 { color: var(--soft); margin: 0 0 8px; font-size: 20px; }
+.value p { margin: 0; font-size: 14px; opacity: 0.94; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 20px 0 24px; }
+.stat { text-align: center; padding: 18px 12px; background: var(--soft); border: 1px solid var(--border); border-radius: 8px; }
+.stat .num { font-size: 30px; font-weight: 700; color: var(--navy); line-height: 1; display: block; }
+.stat .lbl { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-top: 6px; }
+body.deck .cover h1 { font-size: 52px; }
+body.deck .cover .tag { font-size: 22px; }
+</style>
+</head>
+<body class="deck" data-repo="platform">
+  <section class="cover">
+    <div>
+      <div class="cover-logo">HJ</div>
+      <div class="cover-eyebrow">هلا جوب — نظرة للمستثمر</div>
+      <h1>منصة هلا جوب</h1>
+      <div class="rule"></div>
+      <p class="tag">منصة توظيف سورية-أولاً وثنائية اللغة للباحثين عن عمل والجامعات وأصحاب العمل ومشغّلي المنصة — أربعة تطبيقات وخادم واحد مصلَّب.</p>
+    </div>
+    <div class="cover-meta"><dl><dt>أُعدَّت لـ</dt><dd>المستثمر / مراجعة أصحاب المصلحة</dd></dl><dl><dt>التغطية</dt><dd>الباحث · الجامعي · الشركة · الإدارة</dd></dl><dl><dt>يُشحن اليوم</dt><dd>4 تطبيقات · 4,004 نقطة · 71 مجموعة</dd></dl><dl><dt>التاريخ</dt><dd>2026-07-01</dd></dl></div>
+  </section>
+  <div class="doc">
+    
+          <section id="opener">
+            <div class="section-hero">
+              <div class="eyebrow">نظرة عامة</div>
+              <h1>المنتج</h1>
+              <p class="lede">أربعة تطبيقات، خادم واحد، غلاف لغة واحد. كل ما يلي يعمل اليوم، وليس بنداً في خارطة طريق.</p>
+              <div class="highlights"><span class="chip">ثنائي اللغة افتراضياً</span><span class="chip">فوترة يدوية وإلكترونية</span><span class="chip">جوال + ويب + إدارة</span><span class="chip">خادم مصلَّب</span></div>
+            </div>
+            
+      <h2>المنتج في فقرة واحدة</h2>
+      <p>هلا جوب منصة توظيف تعطي الأولوية للسوق السوري: ثنائية اللغة
+      (عربي + إنجليزي) افتراضياً، مع تركيز على الجوال، وبوضع مدفوعات
+      يدوي يسمح للاشتراكات بالإطلاق قبل جاهزية مزود إلكتروني. الباحثون
+      عن عمل، الطلاب، أصحاب العمل، والجامعات، لكل منهم تطبيق مخصص — كلها
+      خلف API واحد ومصلَّب.</p>
+
+      <div class="stats"><div class="stat"><span class="num">4</span><span class="lbl">تطبيقات مشحونة</span></div><div class="stat"><span class="num">4,004</span><span class="lbl">نقاط الخادم</span></div><div class="stat"><span class="num">71</span><span class="lbl">مجموعات البيانات</span></div><div class="stat"><span class="num">2</span><span class="lbl">لغات (AR + EN)</span></div></div>
+
+      <h2>ما يُشحن اليوم</h2>
+      <div class="feature-grid"><div class="feature"><h4>موقع العملاء</h4><p>الوظائف العامة والحرم الجامعي وبوابات الباحث وصاحب العمل في نشر واحد. يعمل على halajob.com؛ المسارات المجهولة تعود بأمان للرئيسية.</p></div><div class="feature"><h4>لوحة الإدارة</h4><p>تطبيق مشغّل مخصص على نطاق منفصل. حاجز مصادقة على العميل — لا محتوى إداري في المتصفح دون جلسة.</p></div><div class="feature"><h4>تطبيق الجوال (Flutter)</h4><p>تطبيق أصلي للباحثين والطلاب الجامعيين. متحمل لانقطاع الشبكة، بناءات إصدار مُبهَمة، منع النقل غير المشفر على مستوى النظام.</p></div><div class="feature"><h4>خادم API</h4><p>Express + MongoDB. حدود معدل، قائمة CORS، mongo-sanitize، hpp، حراس رفع الملفات. صفر ثغرات تبعيات في تدقيق الإنتاج.</p></div></div>
+
+      <div class="value"><div class="label">لماذا الفصل مهم</div><h3>اشحن أي جزء من المنتج بجدوله الخاص.</h3><p>التطبيقات الأربعة تُنشَر باستقلال. تعديل تصميم على موقع العملاء لا ينتظر إصداراً للخادم. إصلاح خادم عاجل لا يشغّل إرسالاً لـ Play Store. هذا يعني تكراراً أسرع، وCI أرخص، ومنطقة انفجار أصغر عند وقوع مشكلة.</p></div>
+    
+          </section>
+        
+          <section id="seeker">
+            <div class="section-hero">
+              <div class="eyebrow">الدور · باحث</div>
+              <h1>الباحثون عن عمل</h1>
+              <p class="lede">كل ما يحتاجه المرشح للعثور على وظيفة والتقدم إليها والإعداد لها — مع بقاء بياناته تحت سيطرته.</p>
+              <div class="highlights"><span class="chip">استوديو + قارئ سيرة</span><span class="chip">محرك مطابقة</span><span class="chip">إعداد للمقابلات</span><span class="chip">جواز مهني</span><span class="chip">مركز خصوصية</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>بحث عام عن الوظائف</h4><p>بحث نصي كامل مع فلاتر للمدينة، الفئة، نوع العقد، العمل عن بُعد، ونطاق الراتب. لا حاجة لحساب للتصفح.</p></div><div class="feature"><h4>استوديو السيرة الذاتية</h4><p>منشئ موجّه بقوالب متعددة، معاينة حية، وخصوصية لكل سيرة (رابط عام، للتقديمات فقط، أو خاصة).</p></div><div class="feature"><h4>قراءة السيرة الذاتية</h4><p>ارفع سيرة موجودة (PDF/DOCX/نص) وتستخرج المنصة الحقول المهيكلة (الاسم، الاتصال، المهارات، الروابط) مع درجة ثقة.</p></div><div class="feature"><h4>مطابقة الوظائف والتوصيات</h4><p>محرك مطابقة على الخادم يُظهر الوظائف المناسبة لملف الباحث، مع درجة توافق لكل وظيفة.</p></div><div class="feature"><h4>متتبع التقديمات</h4><p>كل تقديم في مكان واحد مع سجل الحالة (مراجعة → قائمة قصيرة → مقابلة → عرض → مرفوض).</p></div><div class="feature"><h4>الوظائف وعمليات البحث المحفوظة</h4><p>احفظ الوظائف؛ احفظ عمليات البحث مع تنبيهات مُلخَّصة.</p></div><div class="feature"><h4>الإعداد للمقابلات</h4><p>مكتبة أسئلة، تدفق مقابلة تجريبية، وجدولة مقابلات مربوطة بتقويم الشركة.</p></div><div class="feature"><h4>جواز السفر المهني</h4><p>ملف عام قابل للمشاركة يحتوي على المهارات والاعتمادات والسيرة — بالرابط فقط، لا حاجة لتسجيل دخول لعرضه.</p></div><div class="feature"><h4>مولّد رسالة التغطية</h4><p>رسائل تغطية خاصة بالوظيفة (بمساعدة الذكاء الاصطناعي عند تفعيله؛ قائمة على قوالب خلاف ذلك).</p></div><div class="feature"><h4>رؤى الرواتب</h4><p>ودجت رواتب تجميعي حسب الدور والمدينة، مع حد أدنى لحجم العينة.</p></div><div class="feature"><h4>الإشعارات</h4><p>داخل التطبيق + بريد + دفع (Firebase). تفضيلات لكل فئة.</p></div><div class="feature"><h4>مركز إمكانية الوصول والخصوصية</h4><p>طلبات تصدير/حذف/تصحيح البيانات مع صفحة حالة حية؛ نموذج طلب إمكانية وصول لتحسينات المنصة.</p></div></div><div class="value"><div class="label">لماذا يعمل للباحثين</div><h3>السيرة التي تغادر المنصة تبقى تعمل — والخصوصية تبقى بيد المستخدم.</h3><p>كل أصل باحث (سيرة، جواز مهني، رسالة تغطية) قابل للتصدير. طلبات الخصوصية يبدأها المستخدم ويمكن إلغاؤها أثناء التنفيذ. عمليات البحث المحفوظة تعني أن المنصة تُحضر الوظائف للباحث؛ الباحث لا يحتاج للعودة باستمرار.</p></div>
+          </section>
+        
+          <section id="campus">
+            <div class="section-hero">
+              <div class="eyebrow">الدور · جامعي + جامعة</div>
+              <h1>الحرم الجامعي والجامعات</h1>
+              <p class="lede">تحصل مراكز الوظائف على أدوات إدارة، تحليلات، وتحكم بالشركاء. يحصل الطلاب على قناة فرص منتقاة تحترم موافقتهم.</p>
+              <div class="highlights"><span class="chip">التحقق من الطلاب</span><span class="chip">إدارة مركز الوظائف</span><span class="chip">تحليلات التوظيف</span><span class="chip">شبكة شركاء</span><span class="chip">RBAC لموظفي الجامعة</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>تسجيل الطلاب والتحقق</h4><p>حسابات طلاب مدعومة بالخادم مع تسجيل خاص بكل جامعة. وضع مصادقة على الجهاز متاح للأجهزة الاختبارية عندما لا تكون جامعة على الخادم جاهزة.</p></div><div class="feature"><h4>تغذية الفرص</h4><p>تدريبات وأدوار للخريجين الجدد من أصحاب العمل الشركاء، بالإضافة لمنشورات الجامعة.</p></div><div class="feature"><h4>إدارة مركز الوظائف (الجامعات)</h4><p>موظفو الجامعة يمكنهم نشر التدريب، إدارة الفعاليات، إدارة الأعضاء بأدوار (مالك، مسؤول، مركز وظائف، مستشار، مشاهد).</p></div><div class="feature"><h4>الفعاليات وورش العمل</h4><p>سجّل لفعاليات مركز الوظائف؛ تظهر في تغذية الباحث والطالب.</p></div><div class="feature"><h4>جواز السفر المهني للطلاب</h4><p>نفس الملف العام القابل للمشاركة، مضبوط للطلاب — الشهادات، الدفعة، التخرج المتوقع.</p></div><div class="feature"><h4>تحليلات لمراكز الوظائف</h4><p>عدادات التوظيف، حضور الفعاليات، قمع التقديم، نشاط الشركاء.</p></div><div class="feature"><h4>شبكة الشركاء</h4><p>الجامعات تستطيع دعوة شركات كشركاء معتمدين وحجز رؤية المواهب لطلابها.</p></div><div class="feature"><h4>تحكم بظهور المواهب</h4><p>الجامعات تختار أي الشركاء يرون سير طلابهم.</p></div><div class="feature"><h4>التحققات</h4><p>طلبات التحقق من الشهادات/الوثائق المرفقة بملفات الطلاب.</p></div><div class="feature"><h4>الأعضاء ومقاعد الفريق</h4><p>مقاعد لموظفي مركز الوظائف بدورة حياة نشط / مدعو / معلق.</p></div><div class="feature"><h4>الإشعارات والتقارير</h4><p>ملخصات الفعاليات، تحديثات التقديم، تقارير توظيف شهرية.</p></div><div class="feature"><h4>مكتبة الموارد</h4><p>أدلة مهنية، قوالب سيرة، ومواد مقابلات.</p></div></div><div class="value"><div class="label">لماذا يعمل للجامعات</div><h3>مركز وظائف في صندوق — بأرقام حقيقية تُقدَّم للعميد.</h3><p>تحليلات مركز الوظائف تحوّل ما هو عادةً تمرين على Excel إلى لوحة قيادة: معدلات التوظيف، حضور الفعاليات، تفاعل أصحاب العمل. تحكم رؤية المواهب يعني أن الجامعات يمكنها احترام التزامات خصوصية الطلاب مع القيام بالتواصل مع أصحاب العمل.</p></div>
+          </section>
+        
+          <section id="company">
+            <div class="section-hero">
+              <div class="eyebrow">الدور · شركة</div>
+              <h1>الشركات وأصحاب العمل</h1>
+              <p class="lede">حلقة التوظيف الكاملة — البحث، الفحص، الجدولة، العرض، المراجعة — مع RBAC للفريق وصفحة علامة تجارية عامة.</p>
+              <div class="highlights"><span class="chip">قمع كانبان</span><span class="chip">CRM للمواهب</span><span class="chip">جدولة المقابلات</span><span class="chip">RBAC للفريق</span><span class="chip">صفحة علامة تجارية عامة</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>نشر وإدارة الوظائف</h4><p>محرر وظائف غني بأوصاف متعددة اللغات، نطاقات رواتب، عملات (SYP/USD/EUR)، متطلبات، وعلامات عن بُعد/هجين/في الموقع.</p></div><div class="feature"><h4>قمع المتقدمين</h4><p>قمع بأسلوب كانبان: مراجعة → قائمة قصيرة → مقابلة → عرض → مرفوض. حرّك المتقدمين بنقرة واحدة؛ سجل تدقيق يسجل كل انتقال.</p></div><div class="feature"><h4>CRM لتجمع المواهب</h4><p>احفظ المرشحين خارج سياق الوظيفة، ضع علامات، أضف ملاحظات خاصة، وأعد التواصل معهم لأدوار مستقبلية.</p></div><div class="feature"><h4>جدولة المقابلات</h4><p>حجز مقابلات مع المرشحين؛ مراعية للمناطق الزمنية، مربوطة بالتقديمات.</p></div><div class="feature"><h4>قوالب الرسائل</h4><p>قوالب تواصل قابلة لإعادة الاستخدام — متعددة اللغات.</p></div><div class="feature"><h4>مكتبة الأسئلة</h4><p>بنك أسئلة مقابلات مملوك للشركة؛ اربطها بأدوار محددة.</p></div><div class="feature"><h4>مقاعد فريق مع RBAC</h4><p>أدوار مسؤول / مدير موارد بشرية / مسؤول توظيف / مشاهد؛ دعوات لكل مقعد.</p></div><div class="feature"><h4>الصفحة العامة للشركة</h4><p>صفحة علامة تجارية لصاحب العمل: شعار، غلاف، وصف، مزايا، قائمة وظائف — تُقدَّم على <code>halajob.com/companies/&lt;slug&gt;</code>.</p></div><div class="feature"><h4>المراجعات العامة</h4><p>الموظفون والمرشحون يستطيعون ترك مراجعات؛ مالك الشركة يستطيع الرد.</p></div><div class="feature"><h4>النشر الجامعي</h4><p>انشر أدوار تدريب وخريجين جدد تظهر في مراكز الوظائف الجامعية.</p></div><div class="feature"><h4>لوحة التحليلات</h4><p>مشاهدات الوظائف، قمع التقديم، إسناد المصدر، وقت التوظيف.</p></div><div class="feature"><h4>إرشاد الرواتب</h4><p>الوجه الآخر لرؤى رواتب الباحث — انظر ما يدفعه السوق قبل أن تنشر.</p></div><div class="feature"><h4>أدوات الذكاء الاصطناعي (اختياري)</h4><p>خلف علامة ميزة: مولّد وصف الوظيفة، مولّد قائمة قصيرة، ملحّن الرسائل. تُشحن معطلة — تُفعَّل عند تكوين المزود.</p></div><div class="feature"><h4>اشتراكات يدوية اليوم، جاهزة للإلكترونية</h4><p>المسؤول يعين/يعدل مستويات الاشتراك. عند اختيار مزود دفع إلكتروني، <code>FEATURE_PAYMENTS_MODE=online</code> تنقلب دون إعادة تصميم.</p></div><div class="feature"><h4>دعم الشركات</h4><p>تذاكر دعم مباشر مع توجيه بأولوية وتتبع الحالة.</p></div><div class="feature"><h4>فواتير الشركات</h4><p>سجل الفواتير، بيانات قابلة للتنزيل — حتى للاشتراكات اليدوية.</p></div><div class="feature"><h4>دعوات المواهب</h4><p>ادعُ مرشحين محددين للتقديم لدور، أو اطلب توصيات مواهب من المنصة.</p></div></div><div class="value"><div class="label">لماذا يعمل لأصحاب العمل</div><h3>حلقة التوظيف كاملة في مكان واحد — تجنيد، فحص، جدولة، توظيف، مراجعة.</h3><p>الشركات التي تقسم التوظيف عبر البريد وExcel ولوحة موقع وظائف تدمجها في منتج واحد. CRM لتجمع المواهب يحوّل المرشحين المرفوضين-لكن-الجيدين إلى قناة للدور التالي.</p></div>
+          </section>
+        
+          <section id="admin">
+            <div class="section-hero">
+              <div class="eyebrow">الدور · مسؤول</div>
+              <h1>إدارة المنصة</h1>
+              <p class="lede">كل سطح مشغّل — الموافقات، المراجعة، RBAC، مراجعة المحتوى، الاشتراكات، التحليلات — مع سجل تدقيق غير قابل للتعديل خلف كل شيء.</p>
+              <div class="highlights"><span class="chip">6 قوائم موافقات</span><span class="chip">سجل تدقيق غير قابل للتعديل</span><span class="chip">حماية من قفل الذات</span><span class="chip">تدفق مراجعة قانونية</span><span class="chip">كونسول علامات الميزات</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>قوائم الموافقات</h4><p>مكان واحد للموافقة على الوظائف، الشركات، البلاغات القانونية، طلبات الخصوصية، طلبات الوصول، صفحات المحتوى.</p></div><div class="feature"><h4>المراجعة والثقة</h4><p>قائمة مراجعة الثقة والسلامة: علامة آمن، طلب وثائق، تعليق. كل إجراء مسجل.</p></div><div class="feature"><h4>إدارة المحتوى</h4><p>إدارة الصفحات القانونية (شروط، خصوصية، ملفات تعريف الارتباط، إرشادات المجتمع، الثقة والسلامة)، مقالات مركز المساعدة، الأسئلة الشائعة. تدفق المراجعة القانونية: مسودة → يحتاج مراجعة → معتمد → منشور. الإنتاج يرفض تقديم صفحات قانونية غير مراجعة عند تفعيل علامة الإنفاذ.</p></div><div class="feature"><h4>الأدوار والصلاحيات (RBAC)</h4><p>عرّف أدوار الإدارة، عيّن صلاحيات دقيقة، وراجع من يحمل أي دور. الخادم يفرض حماية من قفل الذات: لا يستطيع المسؤول تخفيض أو حذف نفسه.</p></div><div class="feature"><h4>قائمة دعم المستخدم</h4><p>مقسمة بين دعم المستخدم العام ودعم الشركات لتخصص فرق العمليات.</p></div><div class="feature"><h4>الاشتراكات والفوترة</h4><p>عيّن اشتراكات يدوية، عدّل المستويات، اعرض فواتير الشركات. جاهز للتبديل إلى مدفوعات إلكترونية عند اختيار مزود.</p></div><div class="feature"><h4>إدارة الجامعات</h4><p>إدماج الجامعات الشريكة؛ تعيين مسؤولي مراكز الوظائف.</p></div><div class="feature"><h4>إدارة رؤى الرواتب</h4><p>عيّن حدود حجم العينة، راجع القيم الشاذة، اضبط العملة الافتراضية.</p></div><div class="feature"><h4>إدارة الذكاء الاصطناعي</h4><p>شغّل أو أوقف ميزات الذكاء الاصطناعي لكل وحدة من الكونسول — لا إعادة نشر.</p></div><div class="feature"><h4>إدارة مكتبة الإعداد للمقابلات</h4><p>قم بتنسيق بنك أسئلة المقابلة التجريبية للباحثين.</p></div><div class="feature"><h4>إدارة مكتبة الموارد</h4><p>انشر مقالات مهنية، قوالب سيرة، وأدلة.</p></div><div class="feature"><h4>مراجعة الملفات العامة</h4><p>راجع وأدر الصفحات العامة للشركات وجوازات السفر المهنية للباحثين.</p></div><div class="feature"><h4>الترجمات والتدويل</h4><p>أدر سلاسل المحتوى ثنائية اللغة من كونسول الإدارة.</p></div><div class="feature"><h4>سجلات الاتصالات</h4><p>تغذية للقراءة فقط للرسائل الصادرة وواتساب — للامتثال واستكشاف الأخطاء.</p></div><div class="feature"><h4>التحليلات</h4><p>لوحات على مستوى المنصة: نمو المستخدمين، الوظائف الحية، التقديمات المنشورة، اتجاه الإيرادات.</p></div><div class="feature"><h4>سجل التدقيق</h4><p>سجل تدقيق غير قابل للتعديل مع TTLs احتفاظ لكل فئة (المصادقة سنتان · البيانات/الإدارة 3 سنوات · النظام سنة).</p></div><div class="feature"><h4>إعدادات المنصة</h4><p>علامات الميزات، العملة، تكوين المهام المجدولة، وتوجيه البريد كلها قابلة للتعديل دون إعادة نشر.</p></div></div><div class="value"><div class="label">لماذا يعمل للمشغّلين</div><h3>كونسول واحد، تدقيق غير قابل للتعديل، ولا طريقة لقفل نفسك عن طريق الخطأ.</h3><p>كل إجراء إداري يكتب في سجل تدقيق إلحاقي. تغييرات الأدوار مفروضة على الخادم بحيث لا يستطيع المسؤول رفع صلاحياته أو حذف حسابه بصمت. قوائم الدعم والمراجعة مقسمة حسب الاهتمام لتخصص فرق العمليات.</p></div>
+          </section>
+        
+          <section id="tech">
+            <div class="section-hero">
+              <div class="eyebrow">الأساس</div>
+              <h1>التقنية والأمان</h1>
+              <p class="lede">الأشياء التي تفحصها فعلاً العناية التقنية الواجبة. كل ما هنا موجود في الكود المشحون ومفروض في CI.</p>
+              <div class="highlights"><span class="chip">helmet + HSTS</span><span class="chip">CSP صارمة</span><span class="chip">HTTPS على مستوى النظام</span><span class="chip">0 CVE معروفة</span><span class="chip">تدقيق غير قابل للتعديل</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>ثنائي اللغة افتراضياً</h4><p>كل مخطط يخزن المحتوى كـ <code>{ en, ar }</code>. كل عميل يختار اللغة عند الإقلاع. كل استجابة خادم تحترم <code>x-lang</code>.</p></div><div class="feature"><h4>عملات واتصالات سورية-أولاً</h4><p>SYP + USD + EUR مدعومة في عقد الإطلاق. مشاركة واتساب اليدوية مفعلة؛ SMS وواتساب الرسمي خلف إعداد المزود.</p></div><div class="feature"><h4>خادم مصلَّب</h4><p>helmet + HSTS preload، قائمة CORS، حدود معدل حسب البادئة، mongo-sanitize، hpp، حدود حجم ونوع الرفع، توكنات تنزيل السير مع انتهاء صلاحية.</p></div><div class="feature"><h4>عملاء مصلَّبون</h4><p>الموقع + الإدارة يشحنان بـ CSP صارمة بدون <code>unsafe-eval</code>؛ السكربتات المضمنة مثبتة بـ sha256. الإدارة تضيف حاجز مصادقة على العميل.</p></div><div class="feature"><h4>جوال مصلَّب</h4><p>منع النقل غير المشفر على مستوى النظام عبر <code>network_security_config.xml</code>؛ APK إصدار مُبهَم مع أرشيف رموز خاص؛ تخزين توكن آمن.</p></div><div class="feature"><h4>سجل تدقيق غير قابل للتعديل</h4><p>كل تغيير حالة إداري مسجل. TTL احتفاظ لكل فئة. لا PII في صفوف التدقيق.</p></div><div class="feature"><h4>صفر ثغرات تبعيات إنتاجية</h4><p><code>npm audit --omit=dev --audit-level=high</code> بوابة CI في المستودعات الثلاثة. أخضر اليوم؛ تحذير جديد يمنع PR التالي.</p></div><div class="feature"><h4>غلاف علامات ميزات</h4><p>16 علامة خادم مكشوفة للعملاء عبر <code>GET /public/v1/client-settings</code> — كل قرار إطلاق هو تغيير تكوين واحد.</p></div><div class="feature"><h4>استقلال النشر</h4><p>أربعة خطوط CI مستقلة. تعديل تصميم على الموقع لا يشغّل بناء APK. CI الإدارة أقل من دقيقة.</p></div></div>
+          </section>
+        
+          <section id="launch">
+            <div class="section-hero">
+              <div class="eyebrow">أين نحن</div>
+              <h1>حالة الإطلاق والمزايا</h1>
+              <p class="lede">لقطة لما هو جاهز للإنتاج اليوم، وما لا يزال يحتاج مدخل مالك، وما يجعل هذه المنصة منتجاً قابلاً للدفاع عنه.</p>
+              <div class="highlights"><span class="chip">مصلَّب للإنتاج</span><span class="chip">موانع المالك موثقة</span><span class="chip">ثنائي اللغة + سوري-أولاً</span><span class="chip">توثيق كامل مشحون</span></div>
+            </div>
+            
+      <h2>ما هو جاهز للإطلاق اليوم</h2>
+      <ul>
+        <li>التطبيقات الأربعة تُشحن، تتحقق نوعياً، تُختبر، تُبنى، وتُدقَّق أخضر في CI.</li>
+        <li>الخادم يقدم 4,004 نقطة موزعة على وحدات الباحث، الشركة، الجامعي، الجامعة، الإدارة، الثقة، الإشعارات، الذكاء الاصطناعي، التحليلات، والعامة.</li>
+        <li>محتوى ثنائي اللغة عبر التطبيقات الأربعة مع أسطح قانونية، مساعدة، أسئلة شائعة، اتصال، إمكانية وصول، خصوصية، دعم، وبلاغات.</li>
+        <li>الاشتراكات اليدوية/الإدارية تُشحن في اليوم الأول. المدفوعات الإلكترونية تحتاج مزوداً يختاره المالك — التبديل علامة تكوين واحدة.</li>
+        <li>ميزات الذكاء الاصطناعي تُشحن معطلة افتراضياً؛ كل مسار كود ذكاء اصطناعي يتراجع بأناقة إلى استجابة "غير مُكوَّن".</li>
+      </ul>
+
+      <h2>ما لا يزال يحتاج المالك (وليس المهندسين)</h2>
+      <ul>
+        <li>تدوير أسرار الإنتاج، تدقيق مسؤولي القاعدة الحية، واختبار دخان إنتاجي حي.</li>
+        <li>إعداد حسابات حقيقية لـ SMTP، Firebase، التخزين، الاستضافة، والنسخ الاحتياطي/الاستعادة.</li>
+        <li>قرار المدفوعات (قبول اليدوي للإطلاق، أو اختيار مزود إلكتروني).</li>
+        <li>قرار استراتيجية توقيع/حزم/تحديث أندرويد.</li>
+      </ul>
+
+      <div class="value"><div class="label">الخلاصة</div><h3>المنصة قابلة للبناء، قابلة للإطلاق، ومصلَّبة. ما تبقى قرارات عمل واعتمادات مشغّل — ليس كوداً.</h3><p>التسليم الهندسي منتهي. كل مانع إطلاق في المراجعة الأمنية هو خيار من جانب المالك أو اعتماد لا تستطيع المنصة توفيره لنفسها.</p></div>
+
+      <h2>مزايا رئيسية في شاشة واحدة</h2>
+      <div class="feature-grid"><div class="feature"><h4>تطبيقات مستقلة، API واحد</h4><p>أربعة عملاء قابلون للنشر بشكل منفصل، عقد خادم واحد. تكرار أسرع، منطقة انفجار أصغر، CI أرخص.</p></div><div class="feature"><h4>ثنائي اللغة + سوري-أولاً</h4><p>ليس ترجمة لاحقة. AR/EN و SYP/USD/EUR درجة أولى عبر المخطط وAPI والواجهة.</p></div><div class="feature"><h4>فوترة صديقة للإطلاق</h4><p>اشحن باشتراكات يدوية اليوم؛ بدّل للمدفوعات الإلكترونية دون إعادة تصميم.</p></div><div class="feature"><h4>سطح إدارة شامل</h4><p>ست قوائم موافقات، RBAC مع حماية قفل الذات، وسجل تدقيق غير قابل للتعديل — جاهز لفريق عمليات حقيقي.</p></div><div class="feature"><h4>مدعوم بأدلة تصلب</h4><p>كل ضابط يعود إلى سطر محدد في <code>app.js</code>، <code>vercel.json</code>، <code>AndroidManifest.xml</code>، أو CI.</p></div><div class="feature"><h4>توثيق كامل للحزمة</h4><p>11 مستنداً مرجعياً مضبوطاً حسب الجمهور (هذا واحد منها) ليصبح المهندس أو المشغّل الجديد منتجاً في يوم.</p></div></div>
+    
+          </section>
+        
+    <footer class="doc-footer">
+      <span>هلا جوب — نظرة للمستثمر</span>
+      <span>تاريخ الإعداد 2026-07-01</span>
+    </footer>
+  </div>
+</body>
+</html>

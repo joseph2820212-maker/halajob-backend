@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مرجع نموذج البيانات</title>
+<style>/* Hala Job — documentation theme
+ *
+ * Palette pulled directly from src/styles.css (--jf-* tokens):
+ *   Primary (navy)  #1f3654   --jf-primary / --jf-ink
+ *   Primary dark    #15263c
+ *   Primary hover   #2a4364
+ *   Accent (orange) #e38b3c   --jf-accent
+ *   Accent deep     #c26f22
+ *   Accent tint     #e3b98c
+ *   Soft cream      #fdf3e6   --jf-soft
+ *   Page cream      #fcf7ef   --jf-page
+ *   Card            #fffaf2   --jf-card
+ *   Border (tan)    #ebdac2   --jf-border
+ *   Ink soft        #3a4a5e
+ *   Muted           #5c6b7e   --jf-muted
+ *   Secondary blue  #4e6075   --jf-blue
+ *   Bronze          #9a7b4f   --jf-purple
+ *
+ * Per-repo overrides set --accent via a data-repo attribute on <body>.
+ */
+:root {
+  --navy: #1f3654;
+  --navy-dark: #15263c;
+  --navy-hover: #2a4364;
+  --orange: #e38b3c;
+  --orange-deep: #c26f22;
+  --orange-tint: #e3b98c;
+  --soft: #fdf3e6;
+  --page: #fcf7ef;
+  --card: #fffaf2;
+  --border: #ebdac2;
+  --ink: #1f3654;
+  --ink-soft: #3a4a5e;
+  --muted: #5c6b7e;
+  --blue: #4e6075;
+  --bronze: #9a7b4f;
+  --code-bg: #15263c;
+  --code-ink: #f7ecd8;
+  --danger: #ef4444;
+  --danger-soft: #fdece0;
+  --success: #2f855a;
+
+  /* Repo accent (overridden per body[data-repo]) */
+  --accent: var(--navy);
+  --accent-ink: var(--soft);
+  --accent-soft: var(--soft);
+}
+
+/* Per-repo accent overrides on <body data-repo=""> */
+body[data-repo="backend"]  { --accent: #1f3654; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="website"]  { --accent: #e38b3c; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+body[data-repo="admin"]    { --accent: #15263c; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="mobile"]   { --accent: #4e6075; --accent-ink: #fcf7ef; --accent-soft: #e9eef3; }
+body[data-repo="platform"] { --accent: #c26f22; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page shell — mimics a printed document */
+.doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 64px 64px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(31, 54, 84, 0.08);
+}
+
+/* Cover ================================================================= */
+.cover {
+  min-height: 92vh;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse at top right, rgba(227, 139, 60, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, var(--accent) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+}
+.cover-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+.cover h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-ink);
+  border: 0;
+  padding: 0;
+}
+.cover .tag {
+  font-size: 20px;
+  font-weight: 300;
+  opacity: 0.92;
+  max-width: 640px;
+  line-height: 1.4;
+}
+.cover .rule {
+  height: 4px;
+  width: 88px;
+  background: var(--orange);
+  margin: 0 0 28px;
+  border-radius: 2px;
+}
+.cover-meta {
+  border-top: 1px solid rgba(252, 247, 239, 0.28);
+  padding-top: 20px;
+  font-size: 12px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cover-meta dl { margin: 0; }
+.cover-meta dt {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+.cover-meta dd { margin: 4px 0 0; font-size: 13px; }
+.cover-logo {
+  display: inline-block;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(252, 247, 239, 0.14);
+  color: var(--accent-ink);
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(252, 247, 239, 0.24);
+}
+
+/* Typography ============================================================= */
+h1, h2, h3, h4 {
+  color: var(--navy);
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+h1 {
+  font-size: 28px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 8px;
+}
+h2 { font-size: 22px; margin-top: 40px; }
+h3 { font-size: 17px; margin-top: 28px; color: var(--ink-soft); }
+h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+p { margin: 8px 0 14px; }
+a { color: var(--orange-deep); text-decoration: none; border-bottom: 1px solid rgba(194, 111, 34, 0.25); }
+a:hover { border-bottom-color: var(--orange-deep); }
+
+ul, ol { padding-left: 20px; }
+li { margin: 4px 0; }
+
+/* Callouts / conventions ================================================= */
+.callout {
+  border-left: 4px solid var(--orange);
+  background: var(--soft);
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.callout.warn   { border-color: var(--orange-deep); background: #fdf3e6; }
+.callout.danger { border-color: var(--danger); background: var(--danger-soft); }
+.callout.info   { border-color: var(--blue); background: #edf1f6; }
+
+/* Code =================================================================== */
+code {
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  background: rgba(31, 54, 84, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--navy);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border: 1px solid var(--navy-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* Tables ================================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid var(--orange);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td { background: var(--soft); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Method chips (HTTP verbs on the endpoint cards) ======================== */
+.m {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--soft);
+}
+.m-GET     { background: var(--blue); }
+.m-POST    { background: var(--orange); color: var(--navy); }
+.m-PUT     { background: var(--orange-deep); }
+.m-PATCH   { background: var(--bronze); }
+.m-DELETE  { background: var(--danger); }
+.m-OPTIONS { background: var(--muted); }
+.m-HEAD    { background: var(--muted); }
+
+/* Auth chips ============================================================= */
+.auth {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+}
+.auth-public { color: var(--ink-soft); border-color: var(--border); background: var(--soft); }
+.auth-bearer { color: var(--navy); border-color: var(--navy); background: #e6ebf2; }
+.auth-admin  { color: var(--orange-deep); border-color: var(--orange-deep); background: var(--soft); }
+
+/* Endpoint card ========================================================== */
+.endpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background: var(--card);
+}
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.endpoint-head .path { font-weight: 600; color: var(--navy); }
+.endpoint-head .auth { margin-left: auto; }
+.endpoint-body { padding: 14px 16px; font-size: 13px; }
+.endpoint-body dl { margin: 0; }
+.endpoint-body dt {
+  font-weight: 600;
+  color: var(--navy);
+  margin: 10px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.endpoint-body dt:first-child { margin-top: 0; }
+.endpoint-body dd { margin: 0 0 6px; }
+
+/* TOC ==================================================================== */
+.toc {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 20px 0 32px;
+  page-break-after: always;
+}
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+.toc li { padding: 4px 0; border-bottom: 1px dotted rgba(31,54,84,0.12); }
+.toc li:last-child { border-bottom: 0; }
+.toc li a { border: 0; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+.toc li a::before {
+  counter-increment: sec;
+  content: counter(sec) ".";
+  color: var(--orange-deep);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  min-width: 24px;
+}
+.toc li a:hover { color: var(--orange-deep); }
+
+/* Small chips & badges */
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 20px;
+  font-size: 13px;
+  margin: 10px 0 16px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+.kv dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kv dd { margin: 0; }
+
+/* Footer on every page */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: ui-monospace, monospace;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+  @bottom-left {
+    content: "Hala Job";
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+}
+@media print {
+  html, body { background: #ffffff; }
+  .doc { box-shadow: none; padding: 0; background: #ffffff; }
+  h2 { break-after: avoid; }
+  .endpoint { break-inside: avoid; }
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  a { color: var(--ink); }
+}
+
+/* ==========================================================================
+ * RTL / Arabic layout — activated by dir="rtl" on the <html> element.
+ * English docs (default LTR) are unaffected. Code identifiers and URLs
+ * inside <code> / <pre> stay LTR so JSON, curl, and paths still read
+ * correctly.
+ * ========================================================================= */
+
+[dir="rtl"] body {
+  font-family: "SF Arabic", "Geeza Pro", "Noto Sans Arabic", "Segoe UI Arabic",
+               "Tahoma", -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
+  letter-spacing: 0; /* Arabic doesn't want negative letter-spacing */
+}
+
+/* Preserve LTR direction for anything code-like. Numbers and Latin-script
+ * technical strings inside a right-to-left paragraph would otherwise
+ * mirror-render. */
+[dir="rtl"] code,
+[dir="rtl"] pre,
+[dir="rtl"] .m,
+[dir="rtl"] .auth,
+[dir="rtl"] .badge {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+/* Flip left-anchored borders to the right */
+[dir="rtl"] .callout {
+  border-left: 0;
+  border-right: 4px solid var(--accent);
+  border-radius: 6px 0 0 6px;
+}
+[dir="rtl"] .callout.warn   { border-right-color: var(--orange-deep); }
+[dir="rtl"] .callout.danger { border-right-color: var(--danger); }
+[dir="rtl"] .callout.info   { border-right-color: var(--blue); }
+
+/* Endpoint block: swap head chip layout so method+path lead from the right */
+[dir="rtl"] .endpoint-head .auth { margin-left: 0; margin-right: auto; }
+
+/* TOC counter marker sits on the right side */
+[dir="rtl"] .toc li a::before { margin-right: 0; margin-left: 8px; }
+
+/* Lists: RTL default marker padding lives on the right */
+[dir="rtl"] ul, [dir="rtl"] ol { padding-left: 0; padding-right: 20px; }
+
+/* Tables: header + body cells left-align by default. Arabic wants
+ * right-align for prose but LTR for code cells. */
+[dir="rtl"] thead th, [dir="rtl"] tbody td { text-align: right; }
+[dir="rtl"] .kv { grid-template-columns: 200px 1fr; }
+
+/* Cover: page counter reads more naturally in the outer corner. */
+[dir="rtl"] .cover-meta { justify-content: flex-end; }
+
+/* Deck-only RTL tweaks */
+[dir="rtl"] .feature { border-left: 0; border-right: 4px solid var(--orange); }
+[dir="rtl"] .value   { border-left: 0; border-right: 6px solid var(--orange); }
+[dir="rtl"] .section-hero .highlights .chip { direction: rtl; }
+
+/* Print page counter on the outer (left) edge in RTL */
+@page :left { }
+
+</style>
+</head>
+<body data-repo="backend">
+  <section class="cover">
+    <div>
+      <div class="cover-logo">HJ</div>
+      <div class="cover-eyebrow">منصة هلا جوب</div>
+      <h1>مرجع نموذج البيانات</h1>
+      <div class="rule"></div>
+      <p class="tag">كل مجموعة MongoDB يستخدمها الخادم، مجمَّعة حسب المجال الوظيفي، مع الجداول المرساة والاصطلاحات التي يحتاج المهندس معرفتها قبل كتابة استعلام.</p>
+    </div>
+    <div class="cover-meta"><dl><dt>المصدر</dt><dd>docs/DATABASE_MODELS.md (مولَّد من مخططات Mongoose الحية)</dd></dl><dl><dt>المجموعات</dt><dd>71</dd></dl><dl><dt>مخطط المعرف</dt><dd>MongoDB ObjectId</dd></dl><dl><dt>التوطين</dt><dd>حقول { en, ar } مضمَّنة</dd></dl><dl><dt>التاريخ</dt><dd>2026-07-01</dd></dl></div>
+  </section>
+  <div class="doc">
+    <nav class="toc"><h2>المحتويات</h2><ol><li><a href="#conventions"><span>الاصطلاحات</span></a></li><li><a href="#relations"><span>مجموعات المرساة</span></a></li><li><a href="#domains"><span>حسب المجال الوظيفي</span></a></li><li><a href="#summary"><span>فهرس المجموعات الكامل</span></a></li></ol></nav>
+    <section id="conventions"><h1>الاصطلاحات</h1><dl class="kv"><dt>مخطط المعرف</dt><dd>MongoDB ObjectId (24 حرفاً hex). المراجع بين المجموعات تُخزَّن كـ ObjectId، ليست نصاً.</dd><dt>الطوابع الزمنية</dt><dd>كل مخطط يستخدم <code>{ timestamps: true }</code> — <code>createdAt</code> و<code>updatedAt</code> يديرهما Mongoose.</dd><dt>الحقول متعددة اللغات</dt><dd>مُخزَّنة كوثائق مضمَّنة: <code>{ en: '…', ar: '…' }</code>. مساعد التوطين يختار اللغة المطلوبة مع احتياط إلى الإنجليزية.</dd><dt>الحذف الناعم</dt><dd>معظم المجموعات المرتبطة بالمستخدم تستخدم علامة <code>isArchived</code> / <code>status</code> بدلاً من الحذف الفعلي.</dd><dt>سجل التدقيق</dt><dd>مجموعة <code>audit_logs</code> إلحاقية فقط. TTL <code>expiresAt</code> لكل فئة (AUTH سنتان، DATA/ADMIN 3 سنوات، PHI 7 سنوات، SYSTEM سنة).</dd><dt>الاحتفاظ</dt><dd>مهام <code>data-retention</code> تنظف السجلات القديمة المُخفَاة الهوية ليلياً (<code>scheduled:data-retention-cleanup</code>).</dd></dl></section><section id="relations"><h1>مجموعات المرساة</h1>
+    <p>المراسي الثلاث التي تشير إليها معظم المجموعات الأخرى:</p>
+    <ul>
+      <li><code>employees</code> — حسابات الباحث/الطالب. مُشار إليها من <code>jobs</code> (المتقدمين)، <code>employee_cvs</code>، <code>career_passports</code>، مجموعات الوظائف المحفوظة، الإشعارات، وسجلات التدقيق.</li>
+      <li><code>companies</code> — حسابات أصحاب العمل. مُشار إليها من <code>jobs</code>، <code>company_members</code> (مقاعد الفريق)، <code>company_subscriptions</code>، <code>company_invoices</code>، و<code>interviews</code>.</li>
+      <li><code>jobs</code> — إعلانات الوظائف. مُشار إليها من <code>job_employee_matches</code>، <code>job_invitations</code>، <code>job_reports</code>، <code>interviews</code>، وكل مجموعات تدفق التقديم.</li>
+    </ul>
+    <p>مراجع النمط الأجنبي مُطبَّقة على طبقة Mongoose (<code>ref</code> في المخطط بالإضافة إلى <code>populate</code> اختيارياً). MongoDB لا يفرضها عند الكتابة — <code>npm run test:model-integrity</code> في CI هو شبكة الأمان.</p>
+    </section><section id="domains"><h1>حسب المجال الوظيفي</h1><p>مجمَّعة حسب المجال الوظيفي (تخطيط تقديري من أسماء المجموعات — راجع <code>DATABASE_MODELS.md</code> الأصلي للعلاقات النهائية).</p><h3>الهوية والجلسات <span class='badge'>4</span></h3><p><code>account_contexts</code>, <code>companies</code>, <code>company_members</code>, <code>employees</code></p><h3>الوظائف والتقديمات <span class='badge'>10</span></h3><p><code>application_status_history</code>, <code>job_employee_matches</code>, <code>job_invitations</code>, <code>job_matches</code>, <code>job_name</code>, <code>job_reports</code>, <code>job_salary</code>, <code>job_service</code>, <code>job_type</code>, <code>jobs</code></p><h3>أدوات الباحث / السيرة الذاتية <span class='badge'>3</span></h3><p><code>career_passports</code>, <code>cv_templates</code>, <code>employee_cvs</code></p><h3>الحرم الجامعي <span class='badge'>2</span></h3><p><code>campus_event_registrations</code>, <code>universities</code></p><h3>عمليات الشركة <span class='badge'>8</span></h3><p><code>company_invoices</code>, <code>company_message_templates</code>, <code>company_question_library</code>, <code>company_reviews</code>, <code>company_subscriptions</code>, <code>company_support_tickets</code>, <code>interviews</code>, <code>jobzain_talent_requests</code></p><h3>المحتوى والتدويل <span class='badge'>3</span></h3><p><code>banner</code>, <code>content_translations</code>, <code>pages</code></p><h3>الثقة والامتثال <span class='badge'>1</span></h3><p><code>audit_logs</code></p><h3>إعدادات المنصة <span class='badge'>17</span></h3><p><code>app_settings</code>, <code>cities</code>, <code>colors</code>, <code>countries</code>, <code>currencies</code>, <code>education_levels</code>, <code>experience_levels</code>, <code>fonts</code>, <code>industries</code>, <code>job_name</code>, <code>job_salary</code>, <code>job_service</code>, <code>job_type</code>, <code>keyword</code>, <code>languages</code>, <code>permissions</code>, <code>roles</code></p><h3>الذكاء الاصطناعي والتحليلات <span class='badge'>3</span></h3><p><code>ai_requests</code>, <code>ai_usage_limits</code>, <code>analytics_events</code></p></section><section id="summary"><h1>فهرس المجموعات الكامل</h1><table><thead><tr><th>النموذج</th><th>المجموعة</th><th>الحقول</th><th>الفهارس</th></tr></thead><tbody><tr><td><code>account_contexts</code></td><td>`account_contexts`</td><td>16</td><td>8</td></tr><tr><td><code>ai_requests</code></td><td>`ai_requests`</td><td>25</td><td>12</td></tr><tr><td><code>ai_usage_limits</code></td><td>`ai_usage_limits`</td><td>14</td><td>6</td></tr><tr><td><code>analytics_events</code></td><td>`analytics_events`</td><td>20</td><td>16</td></tr><tr><td><code>app_settings</code></td><td>`app_settings`</td><td>5</td><td>2</td></tr><tr><td><code>application_status_history</code></td><td>`application_status_history`</td><td>17</td><td>8</td></tr><tr><td><code>audit_logs</code></td><td>`audit_logs`</td><td>18</td><td>12</td></tr><tr><td><code>banner</code></td><td>`banner`</td><td>5</td><td>0</td></tr><tr><td><code>campus_event_registrations</code></td><td>`campus_event_registrations`</td><td>15</td><td>9</td></tr><tr><td><code>career_passports</code></td><td>`career_passports`</td><td>22</td><td>9</td></tr><tr><td><code>cities</code></td><td>`countries`</td><td>7</td><td>1</td></tr><tr><td><code>colors</code></td><td>`colors`</td><td>5</td><td>0</td></tr><tr><td><code>companies</code></td><td>`companies`</td><td>85</td><td>68</td></tr><tr><td><code>company_invoices</code></td><td>`company_invoices`</td><td>25</td><td>10</td></tr><tr><td><code>company_members</code></td><td>`company_members`</td><td>13</td><td>6</td></tr><tr><td><code>company_message_templates</code></td><td>`company_message_templates`</td><td>13</td><td>6</td></tr><tr><td><code>company_question_library</code></td><td>`company_question_library`</td><td>19</td><td>9</td></tr><tr><td><code>company_reviews</code></td><td>`company_reviews`</td><td>10</td><td>5</td></tr><tr><td><code>company_subscriptions</code></td><td>`company_subscriptions`</td><td>18</td><td>9</td></tr><tr><td><code>company_support_tickets</code></td><td>`company_support_tickets`</td><td>20</td><td>9</td></tr><tr><td><code>content_translations</code></td><td>`content_translations`</td><td>24</td><td>15</td></tr><tr><td><code>countries</code></td><td>`countries`</td><td>7</td><td>1</td></tr><tr><td><code>currencies</code></td><td>`currencies`</td><td>15</td><td>4</td></tr><tr><td><code>cv_templates</code></td><td>`cv_templates`</td><td>23</td><td>3</td></tr><tr><td><code>education_levels</code></td><td>`education_levels`</td><td>12</td><td>3</td></tr><tr><td><code>employee_cvs</code></td><td>`employee_cvs`</td><td>32</td><td>7</td></tr><tr><td><code>employees</code></td><td>`employees`</td><td>62</td><td>107</td></tr><tr><td><code>experience_levels</code></td><td>`experience_levels`</td><td>14</td><td>3</td></tr><tr><td><code>FcmToken</code></td><td>`fcm_tokens`</td><td>18</td><td>4</td></tr><tr><td><code>fonts</code></td><td>`fonts`</td><td>5</td><td>0</td></tr><tr><td><code>industries</code></td><td>`industries`</td><td>11</td><td>3</td></tr><tr><td><code>interviews</code></td><td>`interviews`</td><td>31</td><td>10</td></tr><tr><td><code>job_employee_matches</code></td><td>`job_employee_matches`</td><td>23</td><td>13</td></tr><tr><td><code>job_invitations</code></td><td>`job_invitations`</td><td>15</td><td>8</td></tr><tr><td><code>job_matches</code></td><td>`job_matches`</td><td>14</td><td>7</td></tr><tr><td><code>job_name</code></td><td>`job_name`</td><td>14</td><td>3</td></tr><tr><td><code>job_reports</code></td><td>`job_reports`</td><td>12</td><td>6</td></tr><tr><td><code>job_salary</code></td><td>`job_salary`</td><td>10</td><td>3</td></tr><tr><td><code>job_service</code></td><td>`job_service`</td><td>10</td><td>3</td></tr><tr><td><code>job_type</code></td><td>`job_type`</td><td>10</td><td>3</td></tr><tr><td><code>jobs</code></td><td>`jobs`</td><td>176</td><td>84</td></tr><tr><td><code>jobzain_talent_requests</code></td><td>`jobzain_talent_requests`</td><td>28</td><td>12</td></tr><tr><td><code>keyword</code></td><td>`Keywords`</td><td>4</td><td>2</td></tr><tr><td><code>languages</code></td><td>`languages`</td><td>5</td><td>1</td></tr><tr><td><code>Notification</code></td><td>`notification`</td><td>19</td><td>8</td></tr><tr><td><code>NotificationPreference</code></td><td>`notification_preferences`</td><td>10</td><td>1</td></tr><tr><td><code>pages</code></td><td>`pages`</td><td>13</td><td>3</td></tr><tr><td><code>permissions</code></td><td>`permissions`</td><td>12</td><td>5</td></tr><tr><td><code>RefreshToken</code></td><td>`refreshtokens`</td><td>6</td><td>2</td></tr><tr><td><code>resumes</code></td><td>`resumes`</td><td>12</td><td>1</td></tr><tr><td><code>roles</code></td><td>`roles`</td><td>12</td><td>6</td></tr><tr><td><code>scheduled_job_locks</code></td><td>`scheduled_job_locks`</td><td>14</td><td>3</td></tr><tr><td><code>search_history</code></td><td>`search_history`</td><td>12</td><td>5</td></tr><tr><td><code>sheet</code></td><td>`sheets`</td><td>6</td><td>1</td></tr><tr><td><code>skills</code></td><td>`skills`</td><td>12</td><td>5</td></tr><tr><td><code>student_verifications</code></td><td>`student_verifications`</td><td>25</td><td>10</td></tr><tr><td><code>subscription_plans</code></td><td>`subscription_plans`</td><td>20</td><td>9</td></tr><tr><td><code>universities</code></td><td>`universities`</td><td>16</td><td>9</td></tr><tr><td><code>university_memberships</code></td><td>`university_memberships`</td><td>11</td><td>6</td></tr><tr><td><code>university_opportunity_requests</code></td><td>`university_opportunity_requests`</td><td>12</td><td>6</td></tr><tr><td><code>user_applying_job</code></td><td>`user_applying_job`</td><td>54</td><td>17</td></tr><tr><td><code>user_out_side_applying_job</code></td><td>`user_out_side_applying_job`</td><td>6</td><td>4</td></tr><tr><td><code>user_rating_job</code></td><td>`user_rating_job`</td><td>7</td><td>4</td></tr><tr><td><code>user_resumes</code></td><td>`user_resumes`</td><td>9</td><td>0</td></tr><tr><td><code>user_review_job</code></td><td>`user_review_job`</td><td>7</td><td>4</td></tr><tr><td><code>user_saved_job</code></td><td>`user_saved_job`</td><td>6</td><td>4</td></tr><tr><td><code>user_show_job</code></td><td>`user_show_job`</td><td>6</td><td>5</td></tr><tr><td><code>users</code></td><td>`users`</td><td>35</td><td>13</td></tr><tr><td><code>work_location</code></td><td>`work_location`</td><td>10</td><td>3</td></tr><tr><td><code>work_modes</code></td><td>`work_modes`</td><td>13</td><td>3</td></tr><tr><td><code>work_time</code></td><td>`work_time`</td><td>11</td><td>3</td></tr></tbody></table><p><b>الإجمالي: 71 مجموعة.</b> المخزون الكامل للحقول والفهارس في <code>docs/DATABASE_MODELS.md</code>.</p></section>
+    <footer class="doc-footer">
+      <span>هلا جوب — مرجع نموذج البيانات</span>
+      <span>تاريخ الإصدار 2026-07-01</span>
+    </footer>
+  </div>
+</body>
+</html>

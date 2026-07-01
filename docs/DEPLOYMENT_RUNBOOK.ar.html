@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>دليل النشر</title>
+<style>/* Hala Job — documentation theme
+ *
+ * Palette pulled directly from src/styles.css (--jf-* tokens):
+ *   Primary (navy)  #1f3654   --jf-primary / --jf-ink
+ *   Primary dark    #15263c
+ *   Primary hover   #2a4364
+ *   Accent (orange) #e38b3c   --jf-accent
+ *   Accent deep     #c26f22
+ *   Accent tint     #e3b98c
+ *   Soft cream      #fdf3e6   --jf-soft
+ *   Page cream      #fcf7ef   --jf-page
+ *   Card            #fffaf2   --jf-card
+ *   Border (tan)    #ebdac2   --jf-border
+ *   Ink soft        #3a4a5e
+ *   Muted           #5c6b7e   --jf-muted
+ *   Secondary blue  #4e6075   --jf-blue
+ *   Bronze          #9a7b4f   --jf-purple
+ *
+ * Per-repo overrides set --accent via a data-repo attribute on <body>.
+ */
+:root {
+  --navy: #1f3654;
+  --navy-dark: #15263c;
+  --navy-hover: #2a4364;
+  --orange: #e38b3c;
+  --orange-deep: #c26f22;
+  --orange-tint: #e3b98c;
+  --soft: #fdf3e6;
+  --page: #fcf7ef;
+  --card: #fffaf2;
+  --border: #ebdac2;
+  --ink: #1f3654;
+  --ink-soft: #3a4a5e;
+  --muted: #5c6b7e;
+  --blue: #4e6075;
+  --bronze: #9a7b4f;
+  --code-bg: #15263c;
+  --code-ink: #f7ecd8;
+  --danger: #ef4444;
+  --danger-soft: #fdece0;
+  --success: #2f855a;
+
+  /* Repo accent (overridden per body[data-repo]) */
+  --accent: var(--navy);
+  --accent-ink: var(--soft);
+  --accent-soft: var(--soft);
+}
+
+/* Per-repo accent overrides on <body data-repo=""> */
+body[data-repo="backend"]  { --accent: #1f3654; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="website"]  { --accent: #e38b3c; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+body[data-repo="admin"]    { --accent: #15263c; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="mobile"]   { --accent: #4e6075; --accent-ink: #fcf7ef; --accent-soft: #e9eef3; }
+body[data-repo="platform"] { --accent: #c26f22; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page shell — mimics a printed document */
+.doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 64px 64px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(31, 54, 84, 0.08);
+}
+
+/* Cover ================================================================= */
+.cover {
+  min-height: 92vh;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse at top right, rgba(227, 139, 60, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, var(--accent) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+}
+.cover-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+.cover h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-ink);
+  border: 0;
+  padding: 0;
+}
+.cover .tag {
+  font-size: 20px;
+  font-weight: 300;
+  opacity: 0.92;
+  max-width: 640px;
+  line-height: 1.4;
+}
+.cover .rule {
+  height: 4px;
+  width: 88px;
+  background: var(--orange);
+  margin: 0 0 28px;
+  border-radius: 2px;
+}
+.cover-meta {
+  border-top: 1px solid rgba(252, 247, 239, 0.28);
+  padding-top: 20px;
+  font-size: 12px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cover-meta dl { margin: 0; }
+.cover-meta dt {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+.cover-meta dd { margin: 4px 0 0; font-size: 13px; }
+.cover-logo {
+  display: inline-block;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(252, 247, 239, 0.14);
+  color: var(--accent-ink);
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(252, 247, 239, 0.24);
+}
+
+/* Typography ============================================================= */
+h1, h2, h3, h4 {
+  color: var(--navy);
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+h1 {
+  font-size: 28px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 8px;
+}
+h2 { font-size: 22px; margin-top: 40px; }
+h3 { font-size: 17px; margin-top: 28px; color: var(--ink-soft); }
+h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+p { margin: 8px 0 14px; }
+a { color: var(--orange-deep); text-decoration: none; border-bottom: 1px solid rgba(194, 111, 34, 0.25); }
+a:hover { border-bottom-color: var(--orange-deep); }
+
+ul, ol { padding-left: 20px; }
+li { margin: 4px 0; }
+
+/* Callouts / conventions ================================================= */
+.callout {
+  border-left: 4px solid var(--orange);
+  background: var(--soft);
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.callout.warn   { border-color: var(--orange-deep); background: #fdf3e6; }
+.callout.danger { border-color: var(--danger); background: var(--danger-soft); }
+.callout.info   { border-color: var(--blue); background: #edf1f6; }
+
+/* Code =================================================================== */
+code {
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  background: rgba(31, 54, 84, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--navy);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border: 1px solid var(--navy-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* Tables ================================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid var(--orange);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td { background: var(--soft); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Method chips (HTTP verbs on the endpoint cards) ======================== */
+.m {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--soft);
+}
+.m-GET     { background: var(--blue); }
+.m-POST    { background: var(--orange); color: var(--navy); }
+.m-PUT     { background: var(--orange-deep); }
+.m-PATCH   { background: var(--bronze); }
+.m-DELETE  { background: var(--danger); }
+.m-OPTIONS { background: var(--muted); }
+.m-HEAD    { background: var(--muted); }
+
+/* Auth chips ============================================================= */
+.auth {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+}
+.auth-public { color: var(--ink-soft); border-color: var(--border); background: var(--soft); }
+.auth-bearer { color: var(--navy); border-color: var(--navy); background: #e6ebf2; }
+.auth-admin  { color: var(--orange-deep); border-color: var(--orange-deep); background: var(--soft); }
+
+/* Endpoint card ========================================================== */
+.endpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background: var(--card);
+}
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.endpoint-head .path { font-weight: 600; color: var(--navy); }
+.endpoint-head .auth { margin-left: auto; }
+.endpoint-body { padding: 14px 16px; font-size: 13px; }
+.endpoint-body dl { margin: 0; }
+.endpoint-body dt {
+  font-weight: 600;
+  color: var(--navy);
+  margin: 10px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.endpoint-body dt:first-child { margin-top: 0; }
+.endpoint-body dd { margin: 0 0 6px; }
+
+/* TOC ==================================================================== */
+.toc {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 20px 0 32px;
+  page-break-after: always;
+}
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+.toc li { padding: 4px 0; border-bottom: 1px dotted rgba(31,54,84,0.12); }
+.toc li:last-child { border-bottom: 0; }
+.toc li a { border: 0; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+.toc li a::before {
+  counter-increment: sec;
+  content: counter(sec) ".";
+  color: var(--orange-deep);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  min-width: 24px;
+}
+.toc li a:hover { color: var(--orange-deep); }
+
+/* Small chips & badges */
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 20px;
+  font-size: 13px;
+  margin: 10px 0 16px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+.kv dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kv dd { margin: 0; }
+
+/* Footer on every page */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: ui-monospace, monospace;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+  @bottom-left {
+    content: "Hala Job";
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+}
+@media print {
+  html, body { background: #ffffff; }
+  .doc { box-shadow: none; padding: 0; background: #ffffff; }
+  h2 { break-after: avoid; }
+  .endpoint { break-inside: avoid; }
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  a { color: var(--ink); }
+}
+
+/* ==========================================================================
+ * RTL / Arabic layout — activated by dir="rtl" on the <html> element.
+ * English docs (default LTR) are unaffected. Code identifiers and URLs
+ * inside <code> / <pre> stay LTR so JSON, curl, and paths still read
+ * correctly.
+ * ========================================================================= */
+
+[dir="rtl"] body {
+  font-family: "SF Arabic", "Geeza Pro", "Noto Sans Arabic", "Segoe UI Arabic",
+               "Tahoma", -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+[dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4 {
+  letter-spacing: 0; /* Arabic doesn't want negative letter-spacing */
+}
+
+/* Preserve LTR direction for anything code-like. Numbers and Latin-script
+ * technical strings inside a right-to-left paragraph would otherwise
+ * mirror-render. */
+[dir="rtl"] code,
+[dir="rtl"] pre,
+[dir="rtl"] .m,
+[dir="rtl"] .auth,
+[dir="rtl"] .badge {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
+/* Flip left-anchored borders to the right */
+[dir="rtl"] .callout {
+  border-left: 0;
+  border-right: 4px solid var(--accent);
+  border-radius: 6px 0 0 6px;
+}
+[dir="rtl"] .callout.warn   { border-right-color: var(--orange-deep); }
+[dir="rtl"] .callout.danger { border-right-color: var(--danger); }
+[dir="rtl"] .callout.info   { border-right-color: var(--blue); }
+
+/* Endpoint block: swap head chip layout so method+path lead from the right */
+[dir="rtl"] .endpoint-head .auth { margin-left: 0; margin-right: auto; }
+
+/* TOC counter marker sits on the right side */
+[dir="rtl"] .toc li a::before { margin-right: 0; margin-left: 8px; }
+
+/* Lists: RTL default marker padding lives on the right */
+[dir="rtl"] ul, [dir="rtl"] ol { padding-left: 0; padding-right: 20px; }
+
+/* Tables: header + body cells left-align by default. Arabic wants
+ * right-align for prose but LTR for code cells. */
+[dir="rtl"] thead th, [dir="rtl"] tbody td { text-align: right; }
+[dir="rtl"] .kv { grid-template-columns: 200px 1fr; }
+
+/* Cover: page counter reads more naturally in the outer corner. */
+[dir="rtl"] .cover-meta { justify-content: flex-end; }
+
+/* Deck-only RTL tweaks */
+[dir="rtl"] .feature { border-left: 0; border-right: 4px solid var(--orange); }
+[dir="rtl"] .value   { border-left: 0; border-right: 6px solid var(--orange); }
+[dir="rtl"] .section-hero .highlights .chip { direction: rtl; }
+
+/* Print page counter on the outer (left) edge in RTL */
+@page :left { }
+
+</style>
+</head>
+<body data-repo="platform">
+  <section class="cover">
+    <div>
+      <div class="cover-logo">HJ</div>
+      <div class="cover-eyebrow">منصة هلا جوب</div>
+      <h1>دليل النشر</h1>
+      <div class="rule"></div>
+      <p class="tag">إجراء إحياء الإنتاج خطوة بخطوة لكل مستودع من المستودعات الأربعة، بالإضافة إلى القواعد التي تحافظ على اتساقها.</p>
+    </div>
+    <div class="cover-meta"><dl><dt>المستودعات المغطاة</dt><dd>الخادم + الموقع + الإدارة + الجوال</dd></dl><dl><dt>الترتيب</dt><dd>الخادم أولاً، ثم أي من العملاء الثلاثة</dd></dl><dl><dt>خطة التراجع</dt><dd>أعد نشر الـ commit السابق (الخادم) أو Promote to production (Vercel)</dd></dl><dl><dt>التاريخ</dt><dd>2026-07-01</dd></dl></div>
+  </section>
+  <div class="doc">
+    <nav class="toc"><h2>المحتويات</h2><ol><li><a href="#common"><span>قواعد الطريق</span></a></li><li><a href="#backend"><span>halajob-backend → مضيف Node</span></a></li><li><a href="#website"><span>halajob-website → Vercel</span></a></li><li><a href="#admin"><span>halajob-admin → Vercel (مشروع منفصل)</span></a></li><li><a href="#mobile"><span>halajob-mobile → Play / App Store</span></a></li></ol></nav>
+    <section id="common"><h1>قواعد الطريق</h1>
+    <p>كل مستودع يُنشَر باستقلال. لا خطوة بناء مشتركة ولا أدوات monorepo.
+    القيد الوحيد بين المستودعات هو عقد الخادم: بمجرد أن تصبح نسخة جديدة
+    من الخادم حية، يمكن إعادة نشر المستودعات الثلاثة الأخرى بأي ترتيب.</p>
+
+    <div class="callout warn"><b>انشر الخادم أولاً.</b> عندما يكون هناك
+    تغيير خادم وتغيير عميل، اشحن الخادم أولاً. العملاء يتحملون
+    superset (حقول جديدة غير مستخدمة)، لكن عميلاً يتوقع سلوك خادم جديد
+    سيكسر حتى يلحق الخادم.</div>
+    </section><section id="backend"><h1>halajob-backend → مضيف Node</h1>
+    <h3>المتطلبات</h3>
+    <ul>
+      <li>Node.js ≥ 20 على المضيف (مثبّت في <code>.nvmrc</code>).</li>
+      <li>MongoDB قابل للوصول من المضيف — سلسلة الاتصال لـ <code>CONNECTION_URL</code>.</li>
+      <li>حساب SMTP للبريد المعاملاتي — <code>SMTP_*</code> و<code>HALAJOB_EMAIL_*</code>.</li>
+      <li>مجدول المهام مفعل افتراضياً (<code>SCHEDULED_JOBS_ENABLED=true</code>).</li>
+    </ul>
+
+    <h3>الخطوات</h3>
+    <ol>
+      <li>استنسخ المستودع على الـ commit الموسوم.</li>
+      <li>انسخ <code>.env.example</code> → <code>.env</code> واملأ كل المتغيرات غير الاختيارية.</li>
+      <li><code>npm ci --ignore-scripts</code></li>
+      <li>شغّل الدخان: <code>npm run smoke:import &amp;&amp; npm run smoke:http</code></li>
+      <li>تحقق من العقد: <code>npm run test:route-validation &amp;&amp; npm run test:response-codes</code></li>
+      <li>ابدأ: <code>npm start</code> (خلف مدير عمليات، مثل pm2 / systemd).</li>
+      <li>تحقق من الحيوية: <code>curl https://&lt;host&gt;/health</code> → <code>{"status": true, "message": "OK"}</code></li>
+      <li>تحقق من CORS من عميل حقيقي.</li>
+    </ol>
+
+    <h3>نشر متجدد</h3>
+    <ol>
+      <li>ارفع العملية الجديدة على منفذ احتياطي.</li>
+      <li>افحص حيوية المنفذ الجديد.</li>
+      <li>بدّل upstream في البروكسي العكسي.</li>
+      <li>أوقف العملية القديمة.</li>
+    </ol>
+
+    <h3>التراجع</h3>
+    <p>أعد نشر الـ commit السابق الموسوم. ترحيلات القاعدة إضافية — لا يجب
+    أن يتطلب التراجع استعادة بيانات في الإصدارات العادية.</p>
+    </section><section id="website"><h1>halajob-website → Vercel</h1>
+    <h3>مشروع Vercel</h3>
+    <dl class="kv"><dt>Framework preset</dt><dd>Vite</dd><dt>Build Command</dt><dd><code>npm run build</code></dd><dt>Output Directory</dt><dd><code>dist</code></dd><dt>Install Command</dt><dd><code>npm ci</code></dd><dt>Node version</dt><dd>20 (عبر <code>.nvmrc</code>)</dd></dl>
+    <h3>متغيرات البيئة</h3>
+    <table><thead><tr><th>المتغير</th><th>قيمة الإنتاج</th></tr></thead><tbody><tr><td><code>VITE_API_URL</code></td><td><code>https://jobzain.com</code></td></tr><tr><td><code>VITE_SITE_URL</code></td><td><code>https://halajob.com</code></td></tr><tr><td><code>VITE_ENABLE_UNIVERSITY_PREVIEW</code></td><td><code>false</code></td></tr></tbody></table>
+    <h3>فحص ما بعد النشر</h3>
+    <ol>
+      <li>حمّل <code>https://halajob.com/</code> — الترويسة يجب أن تظهر <code>API live</code>.</li>
+      <li>curl لرؤوس الأمان: <code>curl -I https://halajob.com/</code> — تحقق من CSP، HSTS، XFO.</li>
+      <li>تأكد أن السير المسبق قدم العنوان والوصف الصحيحين لـ <code>/jobs</code>، <code>/legal</code>، <code>/help</code>.</li>
+    </ol>
+
+    <h3>التراجع</h3>
+    <p>Vercel يحتفظ بكل نشر. استخدم "Promote to production" على النشر السابق.</p>
+    </section><section id="admin"><h1>halajob-admin → Vercel (مشروع منفصل)</h1>
+    <h3>مشروع Vercel (منفصل عن الموقع)</h3>
+    <dl class="kv"><dt>Framework preset</dt><dd>Vite</dd><dt>Build Command</dt><dd><code>npm run build</code></dd><dt>Output Directory</dt><dd><code>dist</code></dd><dt>Install Command</dt><dd><code>npm ci</code></dd><dt>Node version</dt><dd>20 (عبر <code>.nvmrc</code>)</dd><dt>النطاق</dt><dd>نطاق فرعي مخصص للإدارة (مثل admin.halajob.com). لا تشارك نطاق العملاء أبداً.</dd><dt>Robots</dt><dd>meta هي <code>noindex,nofollow</code>. لا تضف مصدر الإدارة إلى أي sitemap.</dd></dl>
+    <h3>متغيرات البيئة</h3>
+    <table><thead><tr><th>المتغير</th><th>قيمة الإنتاج</th></tr></thead><tbody><tr><td><code>VITE_API_URL</code></td><td><code>https://jobzain.com</code></td></tr><tr><td><code>VITE_ENABLE_UNIVERSITY_PREVIEW</code></td><td><code>false</code></td></tr></tbody></table>
+    <h3>فحص ما بعد النشر</h3>
+    <ol>
+      <li>حمّل نطاق الإدارة — يجب أن تظهر بطاقة تسجيل دخول مقفلة، ليس اللوحة.</li>
+      <li>سجّل دخول بحساب مسؤول مُصدَر من بذور الخادم.</li>
+      <li>تأكد أن تبويب اللوحة يحمل بدون أخطاء.</li>
+      <li>سجّل خروج، حدّث — الحاجز يجب أن يظهر مجدداً.</li>
+    </ol>
+    </section><section id="mobile"><h1>halajob-mobile → Play / App Store</h1>
+    <h3>APK (للاختبار)</h3>
+    <p>يُنتج من مهمة <code>workflow_dispatch</code> اليدوية.</p>
+    <ol>
+      <li>شغّل <b>Mobile CI → apk</b> في GitHub Actions.</li>
+      <li>وفّر <b>base_url</b> و<b>local_campus_auth</b> = false للبناء العادي.</li>
+      <li>نزّل أثر <code>halajob-mobile-apk</code>.</li>
+      <li>نزّل أيضاً <code>halajob-mobile-apk-symbols</code> واحفظه مع الإصدار — تحتاجه لرمز أي تعطل.</li>
+    </ol>
+
+    <h3>حزمة Play Store</h3>
+    <p>تدفق محلي باستخدام سكربتات PowerShell:</p>
+    <pre><code># إعداد التوقيع مرة واحدة
+.\scripts\setup-android-signing.ps1
+
+# بناء AAB إنتاجي
+.\scripts\build-android.ps1 -BuildTarget release-aab -BaseUrl https://jobzain.com
+
+# تحقق من البيانات الوصفية قبل رفع Play Console
+.\scripts\assert-mobile-playstore-release.ps1 \
+  -ArtifactName halajob-mobile-latest-release.aab \
+  -ExpectedBaseUrl https://jobzain.com \
+  -RequirePreflightSummary</code></pre>
+    <h3>فحص ما بعد التثبيت</h3>
+    <ol>
+      <li>سجّل دخول كباحث؛ تأكد أن اللوحة تعرض بيانات حقيقية.</li>
+      <li>أطفئ Wi-Fi، أغلق التطبيق قسراً، أعد فتحه — يجب أن تعرض اللوحة المخبأة.</li>
+      <li>تحقق أن التطبيق لا يستطيع الوصول إلى <code>http://</code> عادي.</li>
+    </ol>
+    </section>
+    <footer class="doc-footer">
+      <span>هلا جوب — دليل النشر</span>
+      <span>تاريخ الإصدار 2026-07-01</span>
+    </footer>
+  </div>
+</body>
+</html>
