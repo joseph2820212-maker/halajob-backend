@@ -1,6 +1,6 @@
 # Hala Job API Reference
 
-Generated: 2026-07-01T11:35:37.094Z
+Generated: 2026-07-01T14:14:57.811Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -23,7 +23,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Module | Endpoints |
 | --- | --- |
 | AI | 12 |
-| Admin | 290 |
+| Admin | 295 |
 | Analytics | 5 |
 | Campus | 18 |
 | Campus Student | 51 |
@@ -31,7 +31,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Files | 1 |
 | Health | 3 |
 | Jobs | 2 |
-| Legacy User | 205 |
+| Legacy User | 207 |
 | Notifications | 20 |
 | Other | 15 |
 | Seeker | 102 |
@@ -166,10 +166,12 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/dash/v1/excel/csv` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, csv |
 | POST | `/dash/v1/excel/exsel` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, uploadExcel |
 | GET | `/dash/v1/excel/insert` | Bearer token | inferred-parent-mount | inferred:isAdmin, insert |
+| POST | `/dash/v1/excel/insert` | Bearer token | inferred-parent-mount | inferred:isAdmin, insert |
 | POST | `/dash/v1/exsel/create` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, create |
 | POST | `/dash/v1/exsel/csv` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, csv |
 | POST | `/dash/v1/exsel/exsel` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, uploadExcel |
 | GET | `/dash/v1/exsel/insert` | Bearer token | inferred-parent-mount | inferred:isAdmin, insert |
+| POST | `/dash/v1/exsel/insert` | Bearer token | inferred-parent-mount | inferred:isAdmin, insert |
 | GET | `/dash/v1/file/:name` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, anonymous |
 | GET | `/dash/v1/global-search` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, globalSearch |
 | GET | `/dash/v1/image/:name` | Public/system | none | anonymous |
@@ -178,6 +180,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | POST | `/dash/v1/import/csv` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, csv |
 | POST | `/dash/v1/import/exsel` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, uploadExcel |
 | GET | `/dash/v1/import/insert` | Bearer token | inferred-parent-mount | inferred:isAdmin, insert |
+| POST | `/dash/v1/import/insert` | Bearer token | inferred-parent-mount | inferred:isAdmin, insert |
 | GET | `/dash/v1/interview-prep/questions` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, listQuestions |
 | POST | `/dash/v1/interview-prep/questions` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, listQuestions |
 | DELETE | `/dash/v1/interview-prep/questions/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, multerMiddleware, validateRequest, updateQuestion |
@@ -200,7 +203,9 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/dash/v1/keyword/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, get |
 | GET | `/dash/v1/Keyword/get` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, get |
 | GET | `/dash/v1/keyword/log` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, logKeyword |
+| POST | `/dash/v1/keyword/log` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, logKeyword |
 | GET | `/dash/v1/Keyword/log` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, logKeyword |
+| POST | `/dash/v1/Keyword/log` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, logKeyword |
 | POST | `/dash/v1/keyword/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, updateKeyWord |
 | POST | `/dash/v1/Keyword/update/:id` | Bearer token | inferred-parent-mount | inferred:isAdmin, multerMiddleware, validateRequest, updateKeyWord |
 | GET | `/dash/v1/learning-resource-categories` | Bearer token | inferred-parent-mount | inferred:isAdmin, checkPermissionMiddleware, validateRequest, listCategories |
@@ -765,6 +770,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/user/v1/job-information/list-job-savers/:id` | Bearer token | explicit | authUser, anonymous, listJobSavers |
 | POST | `/user/v1/job-information/rate-job/:id` | Bearer token | explicit | authUser, anonymous, validateRequest, rateJob |
 | GET | `/user/v1/job-information/recompute-job-rating-breakdown/:id` | Bearer token | explicit | authUser, anonymous, recomputeJobRatingBreakdown |
+| POST | `/user/v1/job-information/recompute-job-rating-breakdown/:id` | Bearer token | explicit | authUser, anonymous, recomputeJobRatingBreakdown |
 | POST | `/user/v1/job-information/report-job/:id` | Bearer token | explicit | authUser, anonymous, validateRequest, reportJob |
 | POST | `/user/v1/job-information/review-job/:id` | Bearer token | explicit | authUser, anonymous, validateRequest, reviewJob |
 | POST | `/user/v1/job-information/toggle-save-job/:id` | Bearer token | explicit | authUser, anonymous, validateRequest, toggleSaveJob |
@@ -785,6 +791,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | GET | `/user/v1/job/get-popular` | Public/system | none | optionalAuthUser, get |
 | GET | `/user/v1/job/get-single-job/:id` | Public/system | none | optionalAuthUser, getById |
 | GET | `/user/v1/job/job-role` | Bearer token | explicit | authUser, anonymous, whatIsMyRole |
+| POST | `/user/v1/job/mark-seen` | Bearer token | explicit | authUser, markJobsSeen |
 | POST | `/user/v1/job/update/:id` | Bearer token | explicit | authUser, anonymous, validateRequest, update |
 | GET | `/user/v1/keyword/get` | Public/system | none | get |
 | GET | `/user/v1/legal-reports` | Public/system | none | optionalAuthUser, jsonParser, validateRequest, createReport |

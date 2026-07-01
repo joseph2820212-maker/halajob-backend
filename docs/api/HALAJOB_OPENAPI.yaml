@@ -7315,6 +7315,28 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/excel/insert"
+      operationId: "admin_post_dash_v1_excel_insert"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/dash/v1/exsel/create":
     post:
       tags: ["Admin"]
@@ -7392,6 +7414,28 @@ paths:
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
       security:
         - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/exsel/insert"
+      operationId: "admin_post_dash_v1_exsel_insert"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           description: Successful response
@@ -7552,6 +7596,28 @@ paths:
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
       security:
         - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/import/insert"
+      operationId: "admin_post_dash_v1_import_insert"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           description: Successful response
@@ -8066,6 +8132,28 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/keyword/log"
+      operationId: "admin_post_dash_v1_keyword_log"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/dash/v1/Keyword/log":
     get:
       tags: ["Admin"]
@@ -8074,6 +8162,28 @@ paths:
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
       security:
         - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+    post:
+      tags: ["Admin"]
+      summary: "POST /dash/v1/Keyword/log"
+      operationId: "admin_post_dash_v1_keyword_log_2"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           description: Successful response
@@ -18716,6 +18826,34 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+    post:
+      tags: ["Legacy User"]
+      summary: "POST /user/v1/job-information/recompute-job-rating-breakdown/:id"
+      operationId: "legacy_user_post_user_v1_job_information_recompute_job_rating_breakdown_id"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "id"
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
   "/user/v1/job-information/report-job/{id}":
     post:
       tags: ["Legacy User"]
@@ -19101,6 +19239,29 @@ paths:
       description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
       security:
         - bearerAuth: []
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Forbidden
+  "/user/v1/job/mark-seen":
+    post:
+      tags: ["Legacy User"]
+      summary: "POST /user/v1/job/mark-seen"
+      operationId: "legacy_user_post_user_v1_job_mark_seen"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           description: Successful response

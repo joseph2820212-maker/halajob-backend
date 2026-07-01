@@ -1,15 +1,15 @@
 # Route Verification Report
 
-Generated: 2026-07-01T11:35:30.273Z
+Generated: 2026-07-01T14:14:28.217Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 766 |
-| Unique method/path endpoints | 950 |
-| Endpoints with detected auth/role guard | 834 |
+| Raw Express endpoint entries | 767 |
+| Unique method/path endpoints | 957 |
+| Endpoints with detected auth/role guard | 841 |
 | Known public/system endpoints | 116 |
 | Unguarded endpoints needing manual classification | 0 |
 
@@ -23,7 +23,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 
 | Module | Total | Protected | Known public | Needs classification |
 | --- | --- | --- | --- | --- |
-| Admin | 290 | 285 | 5 | 0 |
+| Admin | 295 | 290 | 5 | 0 |
 | AI | 12 | 12 | 0 | 0 |
 | Analytics | 5 | 5 | 0 | 0 |
 | Campus | 18 | 16 | 2 | 0 |
@@ -32,7 +32,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Files | 1 | 0 | 1 | 0 |
 | Health | 4 | 0 | 4 | 0 |
 | Jobs | 2 | 2 | 0 | 0 |
-| Legacy User | 205 | 127 | 78 | 0 |
+| Legacy User | 207 | 129 | 78 | 0 |
 | Notifications | 20 | 20 | 0 | 0 |
 | Other | 15 | 0 | 15 | 0 |
 | Seeker | 102 | 101 | 1 | 0 |
@@ -317,6 +317,7 @@ markAllRead
 markDoNotContact
 markInterviewNoShow
 markJobSafe
+markJobsSeen
 markRead
 markUnread
 matchEmployeeWithJob

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-01T11:35:30.273Z",
+  "generatedAt": "2026-07-01T14:14:28.217Z",
   "records": [
     {
       "method": "PATCH",
@@ -1699,6 +1699,20 @@
     },
     {
       "method": "POST",
+      "path": "/dash/v1/excel/insert",
+      "module": "Admin",
+      "middlewares": [
+        "insert"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
       "path": "/dash/v1/exsel/create",
       "module": "Admin",
       "middlewares": [
@@ -1747,6 +1761,20 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/exsel/insert",
+      "module": "Admin",
+      "middlewares": [
+        "insert"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
       "path": "/dash/v1/exsel/insert",
       "module": "Admin",
       "middlewares": [
@@ -1863,6 +1891,20 @@
     },
     {
       "method": "GET",
+      "path": "/dash/v1/import/insert",
+      "module": "Admin",
+      "middlewares": [
+        "insert"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
       "path": "/dash/v1/import/insert",
       "module": "Admin",
       "middlewares": [
@@ -2231,7 +2273,37 @@
       "knownPublic": false
     },
     {
+      "method": "POST",
+      "path": "/dash/v1/keyword/log",
+      "module": "Admin",
+      "middlewares": [
+        "multerMiddleware",
+        "logKeyword"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
       "method": "GET",
+      "path": "/dash/v1/Keyword/log",
+      "module": "Admin",
+      "middlewares": [
+        "multerMiddleware",
+        "logKeyword"
+      ],
+      "inferredGuards": [
+        "inferred:isAdmin"
+      ],
+      "hasAuthGuard": true,
+      "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
       "path": "/dash/v1/Keyword/log",
       "module": "Admin",
       "middlewares": [
@@ -10483,6 +10555,20 @@
     },
     {
       "method": "POST",
+      "path": "/user/v1/job-information/recompute-job-rating-breakdown/:id",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "anonymous",
+        "recomputeJobRatingBreakdown"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
       "path": "/user/v1/job-information/report-job/:id",
       "module": "Legacy User",
       "middlewares": [
@@ -10754,6 +10840,19 @@
         "authUser",
         "anonymous",
         "whatIsMyRole"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": true,
+      "guardSource": "explicit",
+      "knownPublic": false
+    },
+    {
+      "method": "POST",
+      "path": "/user/v1/job/mark-seen",
+      "module": "Legacy User",
+      "middlewares": [
+        "authUser",
+        "markJobsSeen"
       ],
       "inferredGuards": [],
       "hasAuthGuard": true,

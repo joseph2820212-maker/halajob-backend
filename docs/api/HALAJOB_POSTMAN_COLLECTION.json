@@ -4003,6 +4003,39 @@
           }
         },
         {
+          "name": "POST /dash/v1/excel/insert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/excel/insert",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "excel",
+                "insert"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "POST /dash/v1/exsel/create",
           "request": {
             "method": "POST",
@@ -4105,6 +4138,39 @@
           "name": "GET /dash/v1/exsel/insert",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/exsel/insert",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "exsel",
+                "insert"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/exsel/insert",
+          "request": {
+            "method": "POST",
             "header": [
               {
                 "key": "Accept",
@@ -4361,6 +4427,39 @@
           "name": "GET /dash/v1/import/insert",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/import/insert",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "import",
+                "insert"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/import/insert",
+          "request": {
+            "method": "POST",
             "header": [
               {
                 "key": "Accept",
@@ -5121,9 +5220,75 @@
           }
         },
         {
+          "name": "POST /dash/v1/keyword/log",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/keyword/log",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "keyword",
+                "log"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
           "name": "GET /dash/v1/Keyword/log",
           "request": {
             "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dash/v1/Keyword/log",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "dash",
+                "v1",
+                "Keyword",
+                "log"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Admin. Guard source: inferred-parent-mount."
+          }
+        },
+        {
+          "name": "POST /dash/v1/Keyword/log",
+          "request": {
+            "method": "POST",
             "header": [
               {
                 "key": "Accept",
@@ -22459,6 +22624,40 @@
           }
         },
         {
+          "name": "POST /user/v1/job-information/recompute-job-rating-breakdown/:id",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/job-information/recompute-job-rating-breakdown/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "job-information",
+                "recompute-job-rating-breakdown",
+                ":id"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
           "name": "POST /user/v1/job-information/report-job/:id",
           "request": {
             "method": "POST",
@@ -23103,6 +23302,39 @@
                 "v1",
                 "job",
                 "job-role"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."
+          }
+        },
+        {
+          "name": "POST /user/v1/job/mark-seen",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/v1/job/mark-seen",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "v1",
+                "job",
+                "mark-seen"
               ]
             },
             "description": "Generated from live route inventory. Module: Legacy User. Guard source: explicit."

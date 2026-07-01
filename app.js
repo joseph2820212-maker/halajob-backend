@@ -74,15 +74,28 @@ const allowedOriginPatterns = parseOrigins(process.env.CORS_ORIGIN_PATTERNS).map
 const isAllowedOrigin = (origin) =>
   allowedOrigins.includes(origin) || allowedOriginPatterns.some((pattern) => pattern.test(origin));
 
-// Assert we're not accidentally left with an empty CORS_ORIGINS in a real
-// deploy. In development that's a hint. Anywhere else it's fatal.
-if (!isDevelopment && allowedOrigins.length === 0 && allowedOriginPatterns.length === 0 && !allowAnyCors) {
-  // eslint-disable-next-line no-console
-  console.error(
-    "[cors] refusing to boot: CORS_ORIGINS is empty and ALLOW_ANY_CORS!=true. " +
-      "Set CORS_ORIGINS to the comma-separated list of allowed origins.",
-  );
-  process.exit(1);
+// Boot-time assertion: production deploys must have a non-empty CORS_ORIGINS
+// (or the explicit ALLOW_ANY_CORS bypass) so we never silently reflect
+// Access-Control-Allow-Origin for the world. Non-production (staging,
+// docs / verify scripts that import app.js, test runners) get a warning
+// instead of a fatal — those contexts don't serve real traffic.
+if (
+  allowedOrigins.length === 0 &&
+  allowedOriginPatterns.length === 0 &&
+  !allowAnyCors
+) {
+  const msg =
+    "[cors] CORS_ORIGINS is empty and ALLOW_ANY_CORS!=true. All cross-origin " +
+    "requests will be denied. Set CORS_ORIGINS to the comma-separated list of " +
+    "allowed origins.";
+  if (isProduction) {
+    // eslint-disable-next-line no-console
+    console.error(`[cors] refusing to boot: ${msg}`);
+    process.exit(1);
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn(msg);
+  }
 }
 
 const corsOptions = {
