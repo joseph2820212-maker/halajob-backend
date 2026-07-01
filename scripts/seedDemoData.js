@@ -365,6 +365,22 @@ async function teardown() {
 }
 
 (async () => {
+  // Hard production guard: this seed creates loginable accounts with a
+  // published password (`Demo@1234`) and a pre-set passcode valid until 2035.
+  // It must never run against a production database. Seeding (not teardown)
+  // is refused when NODE_ENV=production unless ALLOW_DEMO_SEED=true is set
+  // explicitly by an operator who has accepted the risk.
+  if (
+    !isTeardown &&
+    process.env.NODE_ENV === "production" &&
+    String(process.env.ALLOW_DEMO_SEED).toLowerCase() !== "true"
+  ) {
+    console.error(
+      "[demo-seed] refused: NODE_ENV=production. Demo accounts use a published password/passcode and must not exist in production. Set ALLOW_DEMO_SEED=true only if you accept this, or run with --teardown to remove demo data.",
+    );
+    process.exitCode = 1;
+    return;
+  }
   if (!process.env.CONNECTION_URL && !process.env.MONGODB_URI) {
     log("WARNING: CONNECTION_URL not set; falling back to local mongo at 127.0.0.1.");
   }

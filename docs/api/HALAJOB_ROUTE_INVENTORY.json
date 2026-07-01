@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-01T16:43:13.829Z",
+  "generatedAt": "2026-07-01T23:35:09.925Z",
   "records": [
     {
       "method": "PATCH",
@@ -550,6 +550,7 @@
       "module": "Admin",
       "middlewares": [
         "isAdmin",
+        "checkPermissionMiddleware",
         "multerMiddleware",
         "validateRequest",
         "createDashboardUser"
@@ -567,6 +568,7 @@
       "module": "Admin",
       "middlewares": [
         "isAdmin",
+        "checkPermissionMiddleware",
         "multerMiddleware",
         "validateRequest",
         "createDashboardUser"
@@ -1688,6 +1690,7 @@
       "path": "/dash/v1/excel/insert",
       "module": "Admin",
       "middlewares": [
+        "validateRequest",
         "insert"
       ],
       "inferredGuards": [
@@ -1702,6 +1705,7 @@
       "path": "/dash/v1/excel/insert",
       "module": "Admin",
       "middlewares": [
+        "validateRequest",
         "insert"
       ],
       "inferredGuards": [
@@ -1764,6 +1768,7 @@
       "path": "/dash/v1/exsel/insert",
       "module": "Admin",
       "middlewares": [
+        "validateRequest",
         "insert"
       ],
       "inferredGuards": [
@@ -1778,6 +1783,7 @@
       "path": "/dash/v1/exsel/insert",
       "module": "Admin",
       "middlewares": [
+        "validateRequest",
         "insert"
       ],
       "inferredGuards": [
@@ -1894,6 +1900,7 @@
       "path": "/dash/v1/import/insert",
       "module": "Admin",
       "middlewares": [
+        "validateRequest",
         "insert"
       ],
       "inferredGuards": [
@@ -1908,6 +1915,7 @@
       "path": "/dash/v1/import/insert",
       "module": "Admin",
       "middlewares": [
+        "validateRequest",
         "insert"
       ],
       "inferredGuards": [
@@ -2263,6 +2271,7 @@
       "module": "Admin",
       "middlewares": [
         "multerMiddleware",
+        "validateRequest",
         "logKeyword"
       ],
       "inferredGuards": [
@@ -2278,6 +2287,7 @@
       "module": "Admin",
       "middlewares": [
         "multerMiddleware",
+        "validateRequest",
         "logKeyword"
       ],
       "inferredGuards": [
@@ -2293,6 +2303,7 @@
       "module": "Admin",
       "middlewares": [
         "multerMiddleware",
+        "validateRequest",
         "logKeyword"
       ],
       "inferredGuards": [
@@ -2308,6 +2319,7 @@
       "module": "Admin",
       "middlewares": [
         "multerMiddleware",
+        "validateRequest",
         "logKeyword"
       ],
       "inferredGuards": [
@@ -10546,6 +10558,7 @@
       "middlewares": [
         "authUser",
         "anonymous",
+        "validateRequest",
         "recomputeJobRatingBreakdown"
       ],
       "inferredGuards": [],
@@ -10560,6 +10573,7 @@
       "middlewares": [
         "authUser",
         "anonymous",
+        "validateRequest",
         "recomputeJobRatingBreakdown"
       ],
       "inferredGuards": [],
@@ -10852,6 +10866,7 @@
       "module": "Legacy User",
       "middlewares": [
         "authUser",
+        "validateRequest",
         "markJobsSeen"
       ],
       "inferredGuards": [],
