@@ -7,6 +7,7 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
 import mongoose from "mongoose";
+import { logger } from "../../../services/logger.service.js";
 
 const strongPasswordRe =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -762,7 +763,7 @@ const register = async (req, res, next) => {
     try {
       await sendRecoveryEmail({ to: emailNorm, passcode });
     } catch (emailErr) {
-      console.error("register email error:", emailErr);
+      logger.error("register email error", { err: emailErr });
       return ReturnAppData.createError({
         res,
         status: 502,
@@ -794,7 +795,7 @@ const register = async (req, res, next) => {
           : "The employee account has been created successfully. Please enter the verification code sent to your email.",
     });
   } catch (err) {
-    console.error("register error:", err);
+    logger.error("register error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,

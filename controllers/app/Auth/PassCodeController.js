@@ -12,6 +12,7 @@ import { syncAccountContextsForUser } from "../../../services/accountContext.ser
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
 import { setRefreshCookie, webAuthScope } from "../../../services/authCookie.service.js";
 import { verifyPasscode } from "../../../services/passcodeHash.service.js";
+import { logger } from "../../../services/logger.service.js";
 
 const MAX_PASSCODE_ATTEMPTS = 5;
 
@@ -269,7 +270,7 @@ export const passcodeVerify = async (req, res, next) => {
       message: lan === "ar" ? "رمز غير صحيح أو منتهي الصلاحية." : "Invalid or expired code.",
     });
   } catch (err) {
-    console.error("passcodeVerify error:", err);
+    logger.error("passcodeVerify error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,

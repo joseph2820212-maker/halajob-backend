@@ -10,6 +10,7 @@ import {
   generateAuthTokens,
   rotateRefreshToken,
 } from "../../../services/tokenService.js";
+import { logger } from "../../../services/logger.service.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
@@ -239,7 +240,7 @@ const login = async (req, res, next) => {
           : "New device detected. We sent a verification code to your email. Enter it to complete sign-in.",
     });
   } catch (err) {
-    console.error("login error:", err);
+    logger.error("login error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,
@@ -266,7 +267,7 @@ const logout = async (req, res, next) => {
       message: lan === "ar" ? "تم تسجيل الخروج بنجاح." : "Successfully logged out.",
     });
   } catch (err) {
-    console.error("logout error:", err);
+    logger.error("logout error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,

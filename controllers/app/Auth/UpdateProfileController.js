@@ -3,6 +3,7 @@ import { UserModel, RefreshTokenModel } from "../../../models/index.js";
 import bcryptjs from "bcrypt";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { deleteImage } from "../../../services/imageService.js";
+import { logger } from "../../../services/logger.service.js";
 
 // Helper to join base URL safely with a relative path
 function buildPublicUrl(base, rel) {
@@ -57,7 +58,7 @@ export const updateImage = async (req, res, next) => {
       message: lan === "ar" ? "تم تحديث الصورة بنجاح." : "Image updated successfully.",
     });
   } catch (err) {
-    console.error("updateImage error:", err);
+    logger.error("updateImage error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,
@@ -309,7 +310,7 @@ function parseBirthday(value) {
         : (lan === "ar" ? "تم تحديث البيانات بنجاح." : "Profile updated successfully."),
     });
   } catch (err) {
-    console.error("updateProfile error:", err);
+    logger.error("updateProfile error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,

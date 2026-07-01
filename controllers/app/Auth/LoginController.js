@@ -25,6 +25,7 @@ import {
   setRefreshCookie,
   webAuthScope,
 } from "../../../services/authCookie.service.js";
+import { logger } from "../../../services/logger.service.js";
 
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
 const normEmail = (e) => (e || "").trim().toLowerCase();
@@ -187,7 +188,7 @@ const login = async (req, res, next) => {
           : "We sent a verification code to your email.",
     });
   } catch (err) {
-    console.error("login error:", err);
+    logger.error("login error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,
@@ -220,7 +221,7 @@ const logout = async (req, res, next) => {
       message: lan === "ar" ? "تم تسجيل الخروج بنجاح." : "Successfully logged out.",
     });
   } catch (err) {
-    console.error("logout error:", err);
+    logger.error("logout error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,
@@ -257,7 +258,7 @@ const logoutAll = async (req, res, next) => {
       data: { revoked_sessions: result?.deletedCount || 0 },
     });
   } catch (err) {
-    console.error("logoutAll error:", err);
+    logger.error("logoutAll error", { err: err });
     return next(err);
   }
 };

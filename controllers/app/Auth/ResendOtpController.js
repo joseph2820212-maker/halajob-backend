@@ -3,6 +3,7 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { UserModel } from "../../../models/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
+import { logger } from "../../../services/logger.service.js";
 
 const normEmail = (e) => (e || "").trim().toLowerCase();
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
@@ -155,7 +156,7 @@ if (
       message: lan === "ar" ? "تم إرسال الرمز مرة أخرى." : "OTP has been resent.",
     });
   } catch (err) {
-    console.error("resendOtp error:", err);
+    logger.error("resendOtp error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,

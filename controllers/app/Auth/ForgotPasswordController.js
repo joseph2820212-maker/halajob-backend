@@ -2,6 +2,7 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { UserModel } from "../../../models/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
+import { logger } from "../../../services/logger.service.js";
 
 /** تطبيع السلاسل */
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
@@ -175,7 +176,7 @@ const forgotPassword = async (req, res, next) => {
           : "New device detected. We sent a verification code to your email. Enter it to continue.",
     });
   } catch (err) {
-    console.error("forgotPassword error:", err);
+    logger.error("forgotPassword error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,

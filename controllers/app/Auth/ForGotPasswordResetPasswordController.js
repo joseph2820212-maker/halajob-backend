@@ -10,6 +10,7 @@ import {
 } from "../../../services/appAccount.service.js";
 import bcryptjs from "bcrypt";
 import { setRefreshCookie, webAuthScope } from "../../../services/authCookie.service.js";
+import { logger } from "../../../services/logger.service.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 const safeStr = (v) => (typeof v === "string" ? v.trim() : "");
@@ -198,7 +199,7 @@ export const resetPassword = async (req, res, next) => {
           : "Password updated and device info refreshed.",
     });
   } catch (err) {
-    console.error("resetPassword error:", err);
+    logger.error("resetPassword error", { err: err });
     return ReturnAppData.createError({
       res, status: 500,
       message: lan === "ar" ? "حدث خطأ غير متوقع." : "An unexpected error occurred.",

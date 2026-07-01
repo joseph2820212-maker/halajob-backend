@@ -1,6 +1,7 @@
 import { UserModel } from "../../../models/index.js";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { verifyPasscode } from "../../../services/passcodeHash.service.js";
+import { logger } from "../../../services/logger.service.js";
 
 // Match the sibling PassCodeController lockout budget. Five wrong tries while
 // the same code is still valid → the caller must request a new code. Without
@@ -193,7 +194,7 @@ export const passcodeVerify = async (req, res, next) => {
       message: lan === "ar" ? "رمز غير صحيح أو منتهي الصلاحية." : "Invalid or expired code.",
     });
   } catch (err) {
-    console.error("forgot passcodeVerify error:", err);
+    logger.error("forgot passcodeVerify error", { err: err });
     return ReturnAppData.createError({
       res,
       status: 500,

@@ -3,6 +3,7 @@ import { UserModel } from "../../../models/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
 import { setRefreshCookie, webAuthScope } from "../../../services/authCookie.service.js";
 import { verifyPasscode } from "../../../services/passcodeHash.service.js";
+import { logger } from "../../../services/logger.service.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 
@@ -121,7 +122,7 @@ export const verifyNewDevice = async (req, res) => {
       message: lan === "ar" ? "تم اعتماد الجهاز وإضافته إلى قائمة الأجهزة." : "Device verified and added."
     });
   } catch (err) {
-    console.error("verifyNewDevice error:", err);
+    logger.error("verifyNewDevice error", { err: err });
     return ReturnAppData.createError({
       res, status: 500,
       message: lan === "ar" ? "حدث خطأ غير متوقع." : "An unexpected error occurred."
