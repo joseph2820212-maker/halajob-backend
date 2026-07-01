@@ -40,6 +40,7 @@ jobs:
       - run: npm run check:imports
       - run: npm run check:permissions
       - run: npm run smoke:import
+      - run: npm run test:unit
       - run: npm run test:route-validation
       - run: npm run test:response-codes
       - run: npm run test:model-integrity

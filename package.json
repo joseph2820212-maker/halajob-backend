@@ -11,6 +11,7 @@
     "start": "node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "seed": "node seeders/index.js",
+    "test:unit": "node --test test/unit/*.test.js",
     "seed:content": "node seeders/index.js content",
     "seed:demo": "node scripts/seedDemoData.js",
     "seed:demo:teardown": "node scripts/seedDemoData.js --teardown",
