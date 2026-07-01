@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Platform Overview &amp; Runbook</title>
+<style>/* Hala Job — documentation theme
+ *
+ * Palette pulled directly from src/styles.css (--jf-* tokens):
+ *   Primary (navy)  #1f3654   --jf-primary / --jf-ink
+ *   Primary dark    #15263c
+ *   Primary hover   #2a4364
+ *   Accent (orange) #e38b3c   --jf-accent
+ *   Accent deep     #c26f22
+ *   Accent tint     #e3b98c
+ *   Soft cream      #fdf3e6   --jf-soft
+ *   Page cream      #fcf7ef   --jf-page
+ *   Card            #fffaf2   --jf-card
+ *   Border (tan)    #ebdac2   --jf-border
+ *   Ink soft        #3a4a5e
+ *   Muted           #5c6b7e   --jf-muted
+ *   Secondary blue  #4e6075   --jf-blue
+ *   Bronze          #9a7b4f   --jf-purple
+ *
+ * Per-repo overrides set --accent via a data-repo attribute on <body>.
+ */
+:root {
+  --navy: #1f3654;
+  --navy-dark: #15263c;
+  --navy-hover: #2a4364;
+  --orange: #e38b3c;
+  --orange-deep: #c26f22;
+  --orange-tint: #e3b98c;
+  --soft: #fdf3e6;
+  --page: #fcf7ef;
+  --card: #fffaf2;
+  --border: #ebdac2;
+  --ink: #1f3654;
+  --ink-soft: #3a4a5e;
+  --muted: #5c6b7e;
+  --blue: #4e6075;
+  --bronze: #9a7b4f;
+  --code-bg: #15263c;
+  --code-ink: #f7ecd8;
+  --danger: #ef4444;
+  --danger-soft: #fdece0;
+  --success: #2f855a;
+
+  /* Repo accent (overridden per body[data-repo]) */
+  --accent: var(--navy);
+  --accent-ink: var(--soft);
+  --accent-soft: var(--soft);
+}
+
+/* Per-repo accent overrides on <body data-repo=""> */
+body[data-repo="backend"]  { --accent: #1f3654; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="website"]  { --accent: #e38b3c; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+body[data-repo="admin"]    { --accent: #15263c; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="mobile"]   { --accent: #4e6075; --accent-ink: #fcf7ef; --accent-soft: #e9eef3; }
+body[data-repo="platform"] { --accent: #c26f22; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page shell — mimics a printed document */
+.doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 64px 64px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(31, 54, 84, 0.08);
+}
+
+/* Cover ================================================================= */
+.cover {
+  min-height: 92vh;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse at top right, rgba(227, 139, 60, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, var(--accent) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+}
+.cover-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+.cover h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-ink);
+  border: 0;
+  padding: 0;
+}
+.cover .tag {
+  font-size: 20px;
+  font-weight: 300;
+  opacity: 0.92;
+  max-width: 640px;
+  line-height: 1.4;
+}
+.cover .rule {
+  height: 4px;
+  width: 88px;
+  background: var(--orange);
+  margin: 0 0 28px;
+  border-radius: 2px;
+}
+.cover-meta {
+  border-top: 1px solid rgba(252, 247, 239, 0.28);
+  padding-top: 20px;
+  font-size: 12px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cover-meta dl { margin: 0; }
+.cover-meta dt {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+.cover-meta dd { margin: 4px 0 0; font-size: 13px; }
+.cover-logo {
+  display: inline-block;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(252, 247, 239, 0.14);
+  color: var(--accent-ink);
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(252, 247, 239, 0.24);
+}
+
+/* Typography ============================================================= */
+h1, h2, h3, h4 {
+  color: var(--navy);
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+h1 {
+  font-size: 28px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 8px;
+}
+h2 { font-size: 22px; margin-top: 40px; }
+h3 { font-size: 17px; margin-top: 28px; color: var(--ink-soft); }
+h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+p { margin: 8px 0 14px; }
+a { color: var(--orange-deep); text-decoration: none; border-bottom: 1px solid rgba(194, 111, 34, 0.25); }
+a:hover { border-bottom-color: var(--orange-deep); }
+
+ul, ol { padding-left: 20px; }
+li { margin: 4px 0; }
+
+/* Callouts / conventions ================================================= */
+.callout {
+  border-left: 4px solid var(--orange);
+  background: var(--soft);
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.callout.warn   { border-color: var(--orange-deep); background: #fdf3e6; }
+.callout.danger { border-color: var(--danger); background: var(--danger-soft); }
+.callout.info   { border-color: var(--blue); background: #edf1f6; }
+
+/* Code =================================================================== */
+code {
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  background: rgba(31, 54, 84, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--navy);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border: 1px solid var(--navy-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* Tables ================================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid var(--orange);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td { background: var(--soft); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Method chips (HTTP verbs on the endpoint cards) ======================== */
+.m {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--soft);
+}
+.m-GET     { background: var(--blue); }
+.m-POST    { background: var(--orange); color: var(--navy); }
+.m-PUT     { background: var(--orange-deep); }
+.m-PATCH   { background: var(--bronze); }
+.m-DELETE  { background: var(--danger); }
+.m-OPTIONS { background: var(--muted); }
+.m-HEAD    { background: var(--muted); }
+
+/* Auth chips ============================================================= */
+.auth {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+}
+.auth-public { color: var(--ink-soft); border-color: var(--border); background: var(--soft); }
+.auth-bearer { color: var(--navy); border-color: var(--navy); background: #e6ebf2; }
+.auth-admin  { color: var(--orange-deep); border-color: var(--orange-deep); background: var(--soft); }
+
+/* Endpoint card ========================================================== */
+.endpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background: var(--card);
+}
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.endpoint-head .path { font-weight: 600; color: var(--navy); }
+.endpoint-head .auth { margin-left: auto; }
+.endpoint-body { padding: 14px 16px; font-size: 13px; }
+.endpoint-body dl { margin: 0; }
+.endpoint-body dt {
+  font-weight: 600;
+  color: var(--navy);
+  margin: 10px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.endpoint-body dt:first-child { margin-top: 0; }
+.endpoint-body dd { margin: 0 0 6px; }
+
+/* TOC ==================================================================== */
+.toc {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 20px 0 32px;
+  page-break-after: always;
+}
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+.toc li { padding: 4px 0; border-bottom: 1px dotted rgba(31,54,84,0.12); }
+.toc li:last-child { border-bottom: 0; }
+.toc li a { border: 0; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+.toc li a::before {
+  counter-increment: sec;
+  content: counter(sec) ".";
+  color: var(--orange-deep);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  min-width: 24px;
+}
+.toc li a:hover { color: var(--orange-deep); }
+
+/* Small chips & badges */
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 20px;
+  font-size: 13px;
+  margin: 10px 0 16px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+.kv dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kv dd { margin: 0; }
+
+/* Footer on every page */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: ui-monospace, monospace;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+  @bottom-left {
+    content: "Hala Job";
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+}
+@media print {
+  html, body { background: #ffffff; }
+  .doc { box-shadow: none; padding: 0; background: #ffffff; }
+  h2 { break-after: avoid; }
+  .endpoint { break-inside: avoid; }
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  a { color: var(--ink); }
+}
+</style>
+</head>
+<body data-repo="platform">
+  <section class="cover">
+    <div>
+      <div class="cover-logo">HJ</div>
+      <div class="cover-eyebrow">Hala Job Platform</div>
+      <h1>Platform Overview &amp; Runbook</h1>
+      <div class="rule"></div>
+      <p class="tag">How halajob-backend, halajob-website, halajob-admin, and halajob-mobile fit together — plus the on-call runbook that ties them.</p>
+    </div>
+    <div class="cover-meta"><dl><dt>Coverage</dt><dd>halajob-backend, -website, -admin, -mobile</dd></dl><dl><dt>Purpose</dt><dd>Cross-repo architecture + incident playbook</dd></dl><dl><dt>Audience</dt><dd>New engineers, on-call, integrations</dd></dl><dl><dt>Generated</dt><dd>2026-07-01</dd></dl></div>
+  </section>
+  <div class="doc">
+    <nav class="toc">
+      <h2>Contents</h2>
+      <ol><li><a href="#map"><span>Platform map</span><span class="dots"></span><span class="pg"></span></a></li><li><a href="#posture"><span>Cross-repo posture</span><span class="dots"></span><span class="pg"></span></a></li><li><a href="#env"><span>Environment / secret matrix</span><span class="dots"></span><span class="pg"></span></a></li><li><a href="#runbook"><span>On-call runbook</span><span class="dots"></span><span class="pg"></span></a></li></ol>
+    </nav>
+    <section id="map"><h1>Platform map</h1>
+<pre><code>
+                             ┌──────────────────────────┐
+                             │      Public internet     │
+                             └───────────┬──────────────┘
+                                         │
+             ┌───────────────────────────┼───────────────────────────┐
+             ▼                           ▼                           ▼
+   ┌───────────────────┐      ┌───────────────────┐      ┌───────────────────┐
+   │  halajob-website  │      │   halajob-admin   │      │  halajob-mobile   │
+   │  Vercel — public  │      │  Vercel — noindex │      │  Play/App Store   │
+   │  robots: index    │      │  gate: session    │      │  --obfuscate      │
+   │  CSP + hash guard │      │  CSP + XFO DENY   │      │  no cleartext     │
+   └────────┬──────────┘      └────────┬──────────┘      └────────┬──────────┘
+            │                          │                          │
+            │  HTTPS               HTTPS                         HTTPS
+            │  /public/v1/*             /dash/v1/*              /user/v1/*
+            │  /user/v1/*                                       /campus/v1/*
+            │  /company/v1/*                                    /trust/v1/*
+            │  /campus/v1/*
+            └──────────────┬───────────┴────────────┬─────────────┘
+                           ▼                        ▼
+                     ┌──────────────────────────────────────┐
+                     │           halajob-backend            │
+                     │      Node.js + Express (single)      │
+                     │  helmet · cors allow-list · rate-lim │
+                     │  hpp · mongo-sanitize · body-limits  │
+                     └───────────┬──────────────────┬───────┘
+                                 ▼                  ▼
+                          ┌─────────────┐    ┌────────────┐
+                          │  MongoDB    │    │  SMTP /    │
+                          │  (primary)  │    │  Firebase  │
+                          └─────────────┘    └────────────┘
+</code></pre>
+
+        <p>Four repositories, one product. The website, admin console, and
+        mobile app all consume the same Express backend over HTTPS. There is no
+        service-to-service traffic — the backend is the only stateful tier.</p>
+      </section><section id="posture"><h1>Cross-repo posture</h1><table><thead><tr><th>Concern</th><th>Backend</th><th>Website</th><th>Admin</th><th>Mobile</th></tr></thead><tbody><tr><td>Trunk branch</td><td><code>main</code></td><td><code>main</code></td><td><code>main</code></td><td><code>main</code></td></tr><tr><td>Runtime</td><td>Node ≥ 20</td><td>Static (Vite)</td><td>Static (Vite)</td><td>Flutter</td></tr><tr><td>Deploy target</td><td>Node host + Mongo</td><td>Vercel</td><td>Vercel</td><td>Play / App Store</td></tr><tr><td>Auth</td><td>issues JWT bearers</td><td>carries seeker/company/campus bearer</td><td>carries admin bearer + gate</td><td>flutter_secure_storage bearer</td></tr><tr><td>Robots</td><td>n/a</td><td><code>index,follow</code></td><td><code>noindex,nofollow</code></td><td>n/a</td></tr><tr><td>HSTS</td><td>helmet 1y preload</td><td>vercel 2y preload</td><td>vercel 2y preload</td><td>cleartext blocked at OS</td></tr><tr><td>Dep audit</td><td><code>npm audit --omit=dev</code></td><td><code>npm audit --omit=dev</code></td><td><code>npm audit --omit=dev</code></td><td><code>flutter pub outdated</code> (informational)</td></tr><tr><td>Node pin</td><td><code>.nvmrc</code> = 20</td><td><code>.nvmrc</code> = 20</td><td><code>.nvmrc</code> = 20</td><td>n/a</td></tr></tbody></table></section><section id="env"><h1>Environment / secret matrix</h1><table><thead><tr><th>Where</th><th>Variable</th><th>Purpose</th></tr></thead><tbody><tr><td>backend</td><td><code>CONNECTION_URL</code></td><td>Mongo connection</td></tr><tr><td>backend</td><td><code>JWT_SECRET</code></td><td>Token signing</td></tr><tr><td>backend</td><td><code>CORS_ORIGINS</code> / <code>CORS_ORIGIN_PATTERNS</code></td><td>Prod allow-list</td></tr><tr><td>backend</td><td><code>SMTP_*</code>, <code>HALAJOB_EMAIL_*</code></td><td>Transactional mail</td></tr><tr><td>backend</td><td><code>HALA_AI_*</code></td><td>AI provider (defaults disabled)</td></tr><tr><td>backend</td><td><code>SCHEDULED_JOBS_*</code></td><td>Cron scheduler</td></tr><tr><td>website</td><td><code>VITE_API_URL</code></td><td>Backend base</td></tr><tr><td>website</td><td><code>VITE_SITE_URL</code></td><td>Public domain (SEO)</td></tr><tr><td>website</td><td><code>VITE_ENABLE_UNIVERSITY_PREVIEW</code></td><td>Preview toggle</td></tr><tr><td>admin</td><td><code>VITE_API_URL</code></td><td>Backend base</td></tr><tr><td>admin</td><td><code>VITE_ENABLE_UNIVERSITY_PREVIEW</code></td><td>Preview toggle</td></tr><tr><td>mobile</td><td><code>HALA_DEFAULT_BASE_URL</code></td><td>Backend base (dart-define)</td></tr><tr><td>mobile</td><td><code>HALA_APP_BUILD_MODE</code> / <code>_COMMIT</code></td><td>APK metadata</td></tr><tr><td>mobile</td><td><code>HALA_SHOW_DIAGNOSTICS</code></td><td>Tester diagnostics</td></tr><tr><td>mobile</td><td><code>HALA_ENABLE_REMOTE_CAMPUS_AUTH</code></td><td>Backend vs on-device campus</td></tr><tr><td>mobile</td><td><code>FEATURE_AI_TOOLS_ENABLED</code></td><td>AI tools compile flag</td></tr></tbody></table></section><section id="runbook"><h1>On-call runbook</h1><p>First-response playbook for the common incidents. Every symptom starts as a client-side symptom — always confirm the backend is reachable before assuming a client bug.</p><table><thead><tr><th>Symptom</th><th>Likely cause</th><th>First checks</th><th>Escalate</th></tr></thead><tbody><tr><td>Website shows <code>API offline</code></td><td>CORS or backend down</td><td><code>curl https://jobzain.com/health</code>; check <code>CORS_ORIGINS</code></td><td>Backend on-call</td></tr><tr><td>Admin locked out for everyone</td><td>JWT_SECRET rotated or DB migration</td><td>Login <code>/dash/v1/auth/login</code> from curl; check Mongo replica health</td><td>Backend on-call + owner</td></tr><tr><td>Mobile can't reach API on cellular</td><td>Cleartext or TLS chain issue</td><td>Confirm server presents valid cert; verify only HTTPS URL is compiled in</td><td>Backend + mobile owner</td></tr><tr><td>APK crashes with Dart stack in Play Console</td><td>Obfuscated symbols</td><td>Fetch matching <code>halajob-mobile-apk-symbols</code> artifact for the build SHA; feed to <code>flutter symbolize</code></td><td>Mobile owner</td></tr><tr><td>Legal reports queue frozen</td><td>Admin role missing perm</td><td>Check <code>GET /dash/v1/roles</code>; run <code>check:permissions</code></td><td>Backend + product owner</td></tr><tr><td>File uploads fail with 429</td><td>Upload rate limiter</td><td>Confirm from response headers; tune <code>uploadLimiter</code> if design intent has changed</td><td>Backend on-call</td></tr><tr><td>Mail not delivered</td><td>SMTP creds or mailbox</td><td>Send from same env with <code>swaks</code>; check spam</td><td>Ops owner</td></tr><tr><td>Cron jobs silent</td><td>Scheduler flag off</td><td><code>SCHEDULED_JOBS_ENABLED</code>, worker logs, DB counters</td><td>Backend on-call</td></tr></tbody></table></section>
+    <footer class="doc-footer">
+      <span>Hala Job — Platform Overview &amp; Runbook</span>
+      <span>Generated 2026-07-01</span>
+    </footer>
+  </div>
+</body>
+</html>
