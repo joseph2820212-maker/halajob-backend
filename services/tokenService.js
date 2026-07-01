@@ -38,6 +38,9 @@ const buildDeviceFingerprint = (device = {}) => {
   ].join('|');
 };
 
+// Only match ACTIVE rows so we never overwrite a retired row's audit
+// record. Retired rows must stay put (with is_active:false) so a later
+// replay of the same JWT can be detected in rotateRefreshToken.
 const buildDeviceQuery = (userId, device = {}) => {
   const normalized = normalizeDevice(device);
 
@@ -46,25 +49,56 @@ const buildDeviceQuery = (userId, device = {}) => {
     'device.brand': normalized.brand,
     'device.model_name': normalized.model_name,
     'device.is_device': normalized.is_device,
+    is_active: true,
   };
 };
 
-const generateToken = async (userId, loginTime, expires, type) => {
+const generateToken = async (userId, loginTime, expires, type, jti) => {
   const payload = {
     userId,
     loginTime: new Date(loginTime.valueOf()),
     exp: expires.unix(),
     type,
-    jti: crypto.randomUUID(),
+    jti: jti || crypto.randomUUID(),
   };
 
   return sign(payload, process.env.JWT_SECRET);
 };
 
-const saveRefreshToken = async (userId, loginTime, token, device = {}, expiresAt) => {
+// Decode a refresh token to recover its jti/userId without re-verifying
+// signature (the caller already verified).
+const decodeJti = async (token) => {
+  const payload = await verify(token, process.env.JWT_SECRET);
+  return payload;
+};
+
+// Save the row for a freshly-issued refresh token.
+// - If familyId is null we generate a new family (fresh login).
+// - If familyId is set we're rotating; caller is responsible for retiring
+//   the previous row before calling this.
+const saveRefreshToken = async (
+  userId,
+  loginTime,
+  token,
+  device = {},
+  expiresAt,
+  familyId,
+  jti,
+) => {
   const normalizedDevice = normalizeDevice(device);
   const deviceFingerprint = buildDeviceFingerprint(normalizedDevice);
-  const tokenExpiresAt = expiresAt ? new Date(expiresAt.valueOf ? expiresAt.valueOf() : expiresAt) : new Date(Date.now() + Number(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || 30) * 24 * 60 * 60 * 1000);
+  const tokenExpiresAt = expiresAt
+    ? new Date(expiresAt.valueOf ? expiresAt.valueOf() : expiresAt)
+    : new Date(
+        Date.now() +
+          Number(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || 30) *
+            24 *
+            60 *
+            60 *
+            1000,
+      );
+
+  const resolvedFamilyId = familyId || crypto.randomUUID();
 
   await RefreshTokenModel.findOneAndUpdate(
     buildDeviceQuery(userId, normalizedDevice),
@@ -77,6 +111,10 @@ const saveRefreshToken = async (userId, loginTime, token, device = {}, expiresAt
         device: normalizedDevice,
         device_fingerprint: deviceFingerprint,
         updated_at: new Date(),
+        family_id: resolvedFamilyId,
+        jti,
+        is_active: true,
+        retired_at: null,
       },
       $setOnInsert: {
         created_at: new Date(),
@@ -86,8 +124,10 @@ const saveRefreshToken = async (userId, loginTime, token, device = {}, expiresAt
       upsert: true,
       new: true,
       setDefaultsOnInsert: true,
-    }
+    },
   );
+
+  return { familyId: resolvedFamilyId };
 };
 
 const clearRefreshToken = async (token) => {
@@ -95,27 +135,42 @@ const clearRefreshToken = async (token) => {
   await RefreshTokenModel.findOneAndDelete({ token });
 };
 
-const generateAuthTokens = async (user, device = {}) => {
+const generateAuthTokens = async (user, device = {}, opts = {}) => {
   const loginTime = moment();
   const refreshTokenExpiresAt = loginTime
     .clone()
     .add(Number(process.env.REFRESH_TOKEN_EXPIRATION_DAYS || 30), 'days');
 
+  const accessJti = crypto.randomUUID();
+  const refreshJti = crypto.randomUUID();
+
   const accessToken = await generateToken(
     user._id,
     loginTime,
-    loginTime.clone().add(Number(process.env.ACCESS_TOKEN_EXPIRATION_MINUTES || 30), 'minutes'),
-    tokenTypes.ACCESS
+    loginTime
+      .clone()
+      .add(Number(process.env.ACCESS_TOKEN_EXPIRATION_MINUTES || 30), 'minutes'),
+    tokenTypes.ACCESS,
+    accessJti,
   );
 
   const refreshToken = await generateToken(
     user._id,
     loginTime,
     refreshTokenExpiresAt,
-    tokenTypes.REFRESH
+    tokenTypes.REFRESH,
+    refreshJti,
   );
 
-  await saveRefreshToken(user._id, loginTime, refreshToken, device, refreshTokenExpiresAt);
+  await saveRefreshToken(
+    user._id,
+    loginTime,
+    refreshToken,
+    device,
+    refreshTokenExpiresAt,
+    opts.familyId || null,
+    refreshJti,
+  );
 
   return {
     accessToken,
@@ -127,10 +182,15 @@ const generateAccessTokenFromRefreshTokenPayload = async ({ userId, loginTime })
   const now = moment();
   const accessTokenExpiresAt = now.clone().add(
     Number(process.env.ACCESS_TOKEN_EXPIRATION_MINUTES || 30),
-    'minutes'
+    'minutes',
   );
 
-  return generateToken(userId, moment(loginTime), accessTokenExpiresAt, tokenTypes.ACCESS);
+  return generateToken(
+    userId,
+    moment(loginTime),
+    accessTokenExpiresAt,
+    tokenTypes.ACCESS,
+  );
 };
 
 const verifyRefreshToken = async (token) => {
@@ -145,9 +205,29 @@ const verifyRefreshToken = async (token) => {
     throw new APIError(httpStatus.FORBIDDEN, 'Invalid Refresh Token - logout');
   }
 
+  // A row that's been rotated out is not valid. If someone is presenting it
+  // to verifyRefreshToken they either kept a stale reference or the token
+  // has been stolen — the safer read is "revoke everything in this family".
+  if (tokenDoc.is_active === false) {
+    if (tokenDoc.family_id) {
+      await RefreshTokenModel.deleteMany({
+        userRef: tokenDoc.userRef,
+        family_id: tokenDoc.family_id,
+      });
+    }
+    throw new APIError(
+      httpStatus.FORBIDDEN,
+      'Refresh token reuse detected - session revoked',
+    );
+  }
+
   return tokenPayload;
 };
 
+// Rotate a refresh token: retire the current row, issue a new one on the
+// same family. Reuse detection: if the presented token maps to a row that
+// was already rotated (is_active: false), every row in the family is
+// deleted and the caller is forced to re-authenticate.
 const rotateRefreshToken = async (token) => {
   const tokenPayload = await verify(token, process.env.JWT_SECRET);
 
@@ -155,19 +235,65 @@ const rotateRefreshToken = async (token) => {
     throw new APIError(httpStatus.FORBIDDEN, 'Invalid Refresh Token - logout');
   }
 
-  const tokenDoc = await RefreshTokenModel.findOne({ token }).lean();
+  const tokenDoc = await RefreshTokenModel.findOne({ token });
   if (!tokenDoc) {
     throw new APIError(httpStatus.FORBIDDEN, 'Invalid Refresh Token - logout');
   }
 
-  await RefreshTokenModel.findOneAndDelete({ token });
+  // ==== Reuse detection ====
+  // The presented token maps to a row that has already been rotated out.
+  // That only happens if two callers hold the same token (rare, legit if
+  // client raced with itself) or if one caller is replaying a stolen token
+  // whose successor has already been used. We can't tell them apart, so
+  // the safer default is: kill the whole family. The legit user re-logs in.
+  if (tokenDoc.is_active === false) {
+    if (tokenDoc.family_id) {
+      await RefreshTokenModel.deleteMany({
+        userRef: tokenDoc.userRef,
+        family_id: tokenDoc.family_id,
+      });
+    } else {
+      await RefreshTokenModel.findOneAndDelete({ _id: tokenDoc._id });
+    }
+    throw new APIError(
+      httpStatus.FORBIDDEN,
+      'Refresh token reuse detected - session revoked',
+    );
+  }
+
+  // Legacy row without a family_id (pre-migration): back-fill by starting a
+  // new family. Otherwise carry the family_id forward.
+  const familyId = tokenDoc.family_id || crypto.randomUUID();
+
+  // Retire the current row: mark it inactive and record the retirement
+  // timestamp. Don't delete — we need the row to detect a later replay.
+  await RefreshTokenModel.updateOne(
+    { _id: tokenDoc._id },
+    {
+      $set: {
+        is_active: false,
+        retired_at: new Date(),
+        family_id: familyId,
+      },
+    },
+  );
 
   const tokens = await generateAuthTokens(
     { _id: tokenPayload.userId },
-    tokenDoc.device || {}
+    tokenDoc.device || {},
+    { familyId },
   );
 
   return { tokenPayload, tokens };
+};
+
+// Revoke every session in the caller's family — used from a "logout
+// everywhere" endpoint. Prefer this over deleting a single row because
+// once we're keeping retired rows for reuse detection, a single delete
+// leaves the family alive.
+const revokeRefreshFamily = async (familyId) => {
+  if (!familyId) return;
+  await RefreshTokenModel.deleteMany({ family_id: familyId });
 };
 
 export {
@@ -175,7 +301,9 @@ export {
   clearRefreshToken,
   verifyRefreshToken,
   rotateRefreshToken,
+  revokeRefreshFamily,
   generateAccessTokenFromRefreshTokenPayload,
   normalizeDevice,
   buildDeviceFingerprint,
+  decodeJti,
 };
