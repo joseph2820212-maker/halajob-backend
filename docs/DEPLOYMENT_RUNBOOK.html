@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deployment Runbook</title><style>/* Hala Job — documentation theme
+ *
+ * Palette pulled directly from src/styles.css (--jf-* tokens):
+ *   Primary (navy)  #1f3654   --jf-primary / --jf-ink
+ *   Primary dark    #15263c
+ *   Primary hover   #2a4364
+ *   Accent (orange) #e38b3c   --jf-accent
+ *   Accent deep     #c26f22
+ *   Accent tint     #e3b98c
+ *   Soft cream      #fdf3e6   --jf-soft
+ *   Page cream      #fcf7ef   --jf-page
+ *   Card            #fffaf2   --jf-card
+ *   Border (tan)    #ebdac2   --jf-border
+ *   Ink soft        #3a4a5e
+ *   Muted           #5c6b7e   --jf-muted
+ *   Secondary blue  #4e6075   --jf-blue
+ *   Bronze          #9a7b4f   --jf-purple
+ *
+ * Per-repo overrides set --accent via a data-repo attribute on <body>.
+ */
+:root {
+  --navy: #1f3654;
+  --navy-dark: #15263c;
+  --navy-hover: #2a4364;
+  --orange: #e38b3c;
+  --orange-deep: #c26f22;
+  --orange-tint: #e3b98c;
+  --soft: #fdf3e6;
+  --page: #fcf7ef;
+  --card: #fffaf2;
+  --border: #ebdac2;
+  --ink: #1f3654;
+  --ink-soft: #3a4a5e;
+  --muted: #5c6b7e;
+  --blue: #4e6075;
+  --bronze: #9a7b4f;
+  --code-bg: #15263c;
+  --code-ink: #f7ecd8;
+  --danger: #ef4444;
+  --danger-soft: #fdece0;
+  --success: #2f855a;
+
+  /* Repo accent (overridden per body[data-repo]) */
+  --accent: var(--navy);
+  --accent-ink: var(--soft);
+  --accent-soft: var(--soft);
+}
+
+/* Per-repo accent overrides on <body data-repo=""> */
+body[data-repo="backend"]  { --accent: #1f3654; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="website"]  { --accent: #e38b3c; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+body[data-repo="admin"]    { --accent: #15263c; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="mobile"]   { --accent: #4e6075; --accent-ink: #fcf7ef; --accent-soft: #e9eef3; }
+body[data-repo="platform"] { --accent: #c26f22; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page shell — mimics a printed document */
+.doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 64px 64px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(31, 54, 84, 0.08);
+}
+
+/* Cover ================================================================= */
+.cover {
+  min-height: 92vh;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse at top right, rgba(227, 139, 60, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, var(--accent) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+}
+.cover-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+.cover h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-ink);
+  border: 0;
+  padding: 0;
+}
+.cover .tag {
+  font-size: 20px;
+  font-weight: 300;
+  opacity: 0.92;
+  max-width: 640px;
+  line-height: 1.4;
+}
+.cover .rule {
+  height: 4px;
+  width: 88px;
+  background: var(--orange);
+  margin: 0 0 28px;
+  border-radius: 2px;
+}
+.cover-meta {
+  border-top: 1px solid rgba(252, 247, 239, 0.28);
+  padding-top: 20px;
+  font-size: 12px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cover-meta dl { margin: 0; }
+.cover-meta dt {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+.cover-meta dd { margin: 4px 0 0; font-size: 13px; }
+.cover-logo {
+  display: inline-block;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(252, 247, 239, 0.14);
+  color: var(--accent-ink);
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(252, 247, 239, 0.24);
+}
+
+/* Typography ============================================================= */
+h1, h2, h3, h4 {
+  color: var(--navy);
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+h1 {
+  font-size: 28px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 8px;
+}
+h2 { font-size: 22px; margin-top: 40px; }
+h3 { font-size: 17px; margin-top: 28px; color: var(--ink-soft); }
+h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+p { margin: 8px 0 14px; }
+a { color: var(--orange-deep); text-decoration: none; border-bottom: 1px solid rgba(194, 111, 34, 0.25); }
+a:hover { border-bottom-color: var(--orange-deep); }
+
+ul, ol { padding-left: 20px; }
+li { margin: 4px 0; }
+
+/* Callouts / conventions ================================================= */
+.callout {
+  border-left: 4px solid var(--orange);
+  background: var(--soft);
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.callout.warn   { border-color: var(--orange-deep); background: #fdf3e6; }
+.callout.danger { border-color: var(--danger); background: var(--danger-soft); }
+.callout.info   { border-color: var(--blue); background: #edf1f6; }
+
+/* Code =================================================================== */
+code {
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  background: rgba(31, 54, 84, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--navy);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border: 1px solid var(--navy-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* Tables ================================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid var(--orange);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td { background: var(--soft); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Method chips (HTTP verbs on the endpoint cards) ======================== */
+.m {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--soft);
+}
+.m-GET     { background: var(--blue); }
+.m-POST    { background: var(--orange); color: var(--navy); }
+.m-PUT     { background: var(--orange-deep); }
+.m-PATCH   { background: var(--bronze); }
+.m-DELETE  { background: var(--danger); }
+.m-OPTIONS { background: var(--muted); }
+.m-HEAD    { background: var(--muted); }
+
+/* Auth chips ============================================================= */
+.auth {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+}
+.auth-public { color: var(--ink-soft); border-color: var(--border); background: var(--soft); }
+.auth-bearer { color: var(--navy); border-color: var(--navy); background: #e6ebf2; }
+.auth-admin  { color: var(--orange-deep); border-color: var(--orange-deep); background: var(--soft); }
+
+/* Endpoint card ========================================================== */
+.endpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background: var(--card);
+}
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.endpoint-head .path { font-weight: 600; color: var(--navy); }
+.endpoint-head .auth { margin-left: auto; }
+.endpoint-body { padding: 14px 16px; font-size: 13px; }
+.endpoint-body dl { margin: 0; }
+.endpoint-body dt {
+  font-weight: 600;
+  color: var(--navy);
+  margin: 10px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.endpoint-body dt:first-child { margin-top: 0; }
+.endpoint-body dd { margin: 0 0 6px; }
+
+/* TOC ==================================================================== */
+.toc {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 20px 0 32px;
+  page-break-after: always;
+}
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+.toc li { padding: 4px 0; border-bottom: 1px dotted rgba(31,54,84,0.12); }
+.toc li:last-child { border-bottom: 0; }
+.toc li a { border: 0; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+.toc li a::before {
+  counter-increment: sec;
+  content: counter(sec) ".";
+  color: var(--orange-deep);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  min-width: 24px;
+}
+.toc li a:hover { color: var(--orange-deep); }
+
+/* Small chips & badges */
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 20px;
+  font-size: 13px;
+  margin: 10px 0 16px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+.kv dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kv dd { margin: 0; }
+
+/* Footer on every page */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: ui-monospace, monospace;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+  @bottom-left {
+    content: "Hala Job";
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+}
+@media print {
+  html, body { background: #ffffff; }
+  .doc { box-shadow: none; padding: 0; background: #ffffff; }
+  h2 { break-after: avoid; }
+  .endpoint { break-inside: avoid; }
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  a { color: var(--ink); }
+}
+</style></head>
+<body data-repo="platform">
+  <section class="cover">
+    <div>
+      <div class="cover-logo">HJ</div>
+      <div class="cover-eyebrow">Hala Job Platform</div>
+      <h1>Deployment Runbook</h1>
+      <div class="rule"></div>
+      <p class="tag">Step-by-step go-live procedure for each of the four repositories, plus the rules that keep them consistent.</p>
+    </div>
+    <div class="cover-meta"><dl><dt>Repos covered</dt><dd>backend + website + admin + mobile</dd></dl><dl><dt>Order</dt><dd>Backend first, then any of the three clients</dd></dl><dl><dt>Backout plan</dt><dd>Redeploy previous tagged commit (backend) or Promote to production (Vercel)</dd></dl><dl><dt>Generated</dt><dd>2026-07-01</dd></dl></div>
+  </section>
+  <div class="doc">
+    <nav class="toc"><h2>Contents</h2><ol><li><a href="#common"><span>Rules of the road</span></a></li><li><a href="#backend"><span>halajob-backend → Node host</span></a></li><li><a href="#website"><span>halajob-website → Vercel</span></a></li><li><a href="#admin"><span>halajob-admin → Vercel (separate project)</span></a></li><li><a href="#mobile"><span>halajob-mobile → Play Store / App Store</span></a></li></ol></nav>
+    <section id="common"><h1>Rules of the road</h1>
+    <p>Each repo deploys independently. There is no shared build step and no
+    monorepo tooling. The only cross-repo constraint is the backend contract:
+    once a new backend version is live, the other three repos can be redeployed
+    in any order.</p>
+
+    <div class="callout warn"><b>Deploy backend first.</b> When both a backend
+    change and a client change are queued, ship the backend first. Clients
+    tolerate a superset (unused new fields), but a client that expects new
+    backend behaviour will break until the backend catches up.</div>
+    </section><section id="backend"><h1>halajob-backend → Node host</h1>
+    <h3>Prerequisites</h3>
+    <ul>
+      <li>Node.js ≥ 20 on the host (pinned in <code>.nvmrc</code>).</li>
+      <li>MongoDB reachable from the host — connection URL for <code>CONNECTION_URL</code>.</li>
+      <li>SMTP account for transactional mail — <code>SMTP_*</code> and <code>HALAJOB_EMAIL_*</code>.</li>
+      <li>Cron scheduler enabled by default (<code>SCHEDULED_JOBS_ENABLED=true</code>). Set to <code>false</code> if a separate worker will run cron.</li>
+    </ul>
+
+    <h3>Steps</h3>
+    <ol>
+      <li>Clone the repo at the tagged commit.</li>
+      <li>Copy <code>.env.example</code> → <code>.env</code> and fill in every non-optional variable (see the Environment section of the API reference).</li>
+      <li><code>npm ci --ignore-scripts</code></li>
+      <li>Run smoke: <code>npm run smoke:import &amp;&amp; npm run smoke:http</code></li>
+      <li>Verify contract: <code>npm run test:route-validation &amp;&amp; npm run test:response-codes</code></li>
+      <li>Start: <code>npm start</code> (behind your process manager, e.g. pm2 / systemd).</li>
+      <li>Verify liveness: <code>curl https://&lt;host&gt;/health</code> → <code>{"status": true, "message": "OK"}</code></li>
+      <li>Verify CORS from a real client origin (should 204 on OPTIONS, 200 on GET).</li>
+    </ol>
+
+    <h3>Rolling deploy</h3>
+    <ol>
+      <li>Bring up the new process on a spare port.</li>
+      <li>Health-check the new port.</li>
+      <li>Swap the reverse-proxy upstream.</li>
+      <li>Drain and stop the old process.</li>
+    </ol>
+
+    <h3>Rollback</h3>
+    <p>Redeploy the previous tagged commit. Database migrations are additive
+    (Mongoose schemas accept unknown fields by default) — a rollback should
+    not require a data-restore in normal releases.</p>
+    </section><section id="website"><h1>halajob-website → Vercel</h1>
+    <h3>Vercel project</h3>
+    <dl class="kv"><dt>Framework preset</dt><dd>Vite</dd><dt>Build Command</dt><dd><code>npm run build</code></dd><dt>Output Directory</dt><dd><code>dist</code></dd><dt>Install Command</dt><dd><code>npm ci</code></dd><dt>Node version</dt><dd>20 (via <code>.nvmrc</code>)</dd></dl>
+    <h3>Environment variables (Vercel Project Settings)</h3>
+    <table><thead><tr><th>Variable</th><th>Production value</th></tr></thead><tbody><tr><td><code>VITE_API_URL</code></td><td><code>https://jobzain.com</code></td></tr><tr><td><code>VITE_SITE_URL</code></td><td><code>https://halajob.com</code></td></tr><tr><td><code>VITE_ENABLE_UNIVERSITY_PREVIEW</code></td><td><code>false</code></td></tr></tbody></table>
+    <h3>Post-deploy check</h3>
+    <ol>
+      <li>Load <code>https://halajob.com/</code> — header should show <code>API live</code> chip.</li>
+      <li>curl the security headers: <code>curl -I https://halajob.com/</code> — verify <code>Content-Security-Policy</code>, <code>Strict-Transport-Security</code>, <code>X-Frame-Options: DENY</code>.</li>
+      <li>Verify the SEO prerender served the correct <code>&lt;title&gt;</code> and <code>&lt;meta description&gt;</code> for <code>/jobs</code>, <code>/legal</code>, <code>/help</code>.</li>
+    </ol>
+
+    <h3>Rollback</h3>
+    <p>Vercel keeps every deployment. Use "Promote to production" on the
+    previous deployment.</p>
+    </section><section id="admin"><h1>halajob-admin → Vercel (separate project)</h1>
+    <h3>Vercel project (separate from website)</h3>
+    <dl class="kv"><dt>Framework preset</dt><dd>Vite</dd><dt>Build Command</dt><dd><code>npm run build</code></dd><dt>Output Directory</dt><dd><code>dist</code></dd><dt>Install Command</dt><dd><code>npm ci</code></dd><dt>Node version</dt><dd>20 (via <code>.nvmrc</code>)</dd><dt>Domain</dt><dd>Dedicated admin subdomain (e.g. admin.halajob.com). Never share the customer domain.</dd><dt>Robots</dt><dd>Meta is <code>noindex,nofollow</code>. Do not add the admin origin to any sitemap.</dd></dl>
+    <h3>Environment variables</h3>
+    <table><thead><tr><th>Variable</th><th>Production value</th></tr></thead><tbody><tr><td><code>VITE_API_URL</code></td><td><code>https://jobzain.com</code></td></tr><tr><td><code>VITE_ENABLE_UNIVERSITY_PREVIEW</code></td><td><code>false</code></td></tr></tbody></table>
+    <h3>Post-deploy check</h3>
+    <ol>
+      <li>Load the admin domain — should show a locked login card, not the dashboard.</li>
+      <li>Log in with an admin account issued by the backend seed.</li>
+      <li>Confirm the dashboard tab loads without errors.</li>
+      <li>Log out, refresh — gate should re-appear.</li>
+    </ol>
+    </section><section id="mobile"><h1>halajob-mobile → Play Store / App Store</h1>
+    <h3>APK (tester)</h3>
+    <p>Produced by the manual <code>workflow_dispatch</code> job in
+    <code>halajob-mobile/.github/workflows/ci.yml</code>.</p>
+    <ol>
+      <li>Trigger <b>Mobile CI → apk</b> in GitHub Actions.</li>
+      <li>Provide <b>base_url</b> (backend URL) and <b>local_campus_auth</b> = false for a normal tester build.</li>
+      <li>Download <code>halajob-mobile-apk</code> artifact after the job completes.</li>
+      <li>Also download <code>halajob-mobile-apk-symbols</code> and store it with the release — you will need it to symbolize any crash trace for this APK.</li>
+    </ol>
+
+    <h3>Play Store bundle</h3>
+    <p>Local flow using the PowerShell scripts under <code>halajob-mobile/scripts/</code>:</p>
+    <pre><code># One-time signing setup (creates keystore/ + android/key.properties)
+.\scripts\setup-android-signing.ps1
+
+# Build a production AAB
+.\scripts\build-android.ps1 -BuildTarget release-aab -BaseUrl https://jobzain.com
+
+# Verify metadata before Play Console upload
+.\scripts\assert-mobile-playstore-release.ps1 \
+  -ArtifactName halajob-mobile-latest-release.aab \
+  -ExpectedBaseUrl https://jobzain.com \
+  -RequirePreflightSummary</code></pre>
+    <h3>Post-install check on device</h3>
+    <ol>
+      <li>Sign in as a seeker; confirm the dashboard loads real data.</li>
+      <li>Turn wifi off, force-close, reopen — cached dashboard should still show (no crash).</li>
+      <li>Verify the app cannot reach a plain <code>http://</code> URL (network_security_config).</li>
+    </ol>
+    </section>
+    <footer class="doc-footer">
+      <span>Hala Job — Deployment Runbook</span>
+      <span>Generated 2026-07-01</span>
+    </footer>
+  </div>
+</body></html>

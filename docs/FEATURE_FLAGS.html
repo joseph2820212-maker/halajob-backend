@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Feature Flag Reference</title><style>/* Hala Job — documentation theme
+ *
+ * Palette pulled directly from src/styles.css (--jf-* tokens):
+ *   Primary (navy)  #1f3654   --jf-primary / --jf-ink
+ *   Primary dark    #15263c
+ *   Primary hover   #2a4364
+ *   Accent (orange) #e38b3c   --jf-accent
+ *   Accent deep     #c26f22
+ *   Accent tint     #e3b98c
+ *   Soft cream      #fdf3e6   --jf-soft
+ *   Page cream      #fcf7ef   --jf-page
+ *   Card            #fffaf2   --jf-card
+ *   Border (tan)    #ebdac2   --jf-border
+ *   Ink soft        #3a4a5e
+ *   Muted           #5c6b7e   --jf-muted
+ *   Secondary blue  #4e6075   --jf-blue
+ *   Bronze          #9a7b4f   --jf-purple
+ *
+ * Per-repo overrides set --accent via a data-repo attribute on <body>.
+ */
+:root {
+  --navy: #1f3654;
+  --navy-dark: #15263c;
+  --navy-hover: #2a4364;
+  --orange: #e38b3c;
+  --orange-deep: #c26f22;
+  --orange-tint: #e3b98c;
+  --soft: #fdf3e6;
+  --page: #fcf7ef;
+  --card: #fffaf2;
+  --border: #ebdac2;
+  --ink: #1f3654;
+  --ink-soft: #3a4a5e;
+  --muted: #5c6b7e;
+  --blue: #4e6075;
+  --bronze: #9a7b4f;
+  --code-bg: #15263c;
+  --code-ink: #f7ecd8;
+  --danger: #ef4444;
+  --danger-soft: #fdece0;
+  --success: #2f855a;
+
+  /* Repo accent (overridden per body[data-repo]) */
+  --accent: var(--navy);
+  --accent-ink: var(--soft);
+  --accent-soft: var(--soft);
+}
+
+/* Per-repo accent overrides on <body data-repo=""> */
+body[data-repo="backend"]  { --accent: #1f3654; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="website"]  { --accent: #e38b3c; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+body[data-repo="admin"]    { --accent: #15263c; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="mobile"]   { --accent: #4e6075; --accent-ink: #fcf7ef; --accent-soft: #e9eef3; }
+body[data-repo="platform"] { --accent: #c26f22; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page shell — mimics a printed document */
+.doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 64px 64px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(31, 54, 84, 0.08);
+}
+
+/* Cover ================================================================= */
+.cover {
+  min-height: 92vh;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse at top right, rgba(227, 139, 60, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, var(--accent) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+}
+.cover-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+.cover h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-ink);
+  border: 0;
+  padding: 0;
+}
+.cover .tag {
+  font-size: 20px;
+  font-weight: 300;
+  opacity: 0.92;
+  max-width: 640px;
+  line-height: 1.4;
+}
+.cover .rule {
+  height: 4px;
+  width: 88px;
+  background: var(--orange);
+  margin: 0 0 28px;
+  border-radius: 2px;
+}
+.cover-meta {
+  border-top: 1px solid rgba(252, 247, 239, 0.28);
+  padding-top: 20px;
+  font-size: 12px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cover-meta dl { margin: 0; }
+.cover-meta dt {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+.cover-meta dd { margin: 4px 0 0; font-size: 13px; }
+.cover-logo {
+  display: inline-block;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(252, 247, 239, 0.14);
+  color: var(--accent-ink);
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(252, 247, 239, 0.24);
+}
+
+/* Typography ============================================================= */
+h1, h2, h3, h4 {
+  color: var(--navy);
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+h1 {
+  font-size: 28px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 8px;
+}
+h2 { font-size: 22px; margin-top: 40px; }
+h3 { font-size: 17px; margin-top: 28px; color: var(--ink-soft); }
+h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+p { margin: 8px 0 14px; }
+a { color: var(--orange-deep); text-decoration: none; border-bottom: 1px solid rgba(194, 111, 34, 0.25); }
+a:hover { border-bottom-color: var(--orange-deep); }
+
+ul, ol { padding-left: 20px; }
+li { margin: 4px 0; }
+
+/* Callouts / conventions ================================================= */
+.callout {
+  border-left: 4px solid var(--orange);
+  background: var(--soft);
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.callout.warn   { border-color: var(--orange-deep); background: #fdf3e6; }
+.callout.danger { border-color: var(--danger); background: var(--danger-soft); }
+.callout.info   { border-color: var(--blue); background: #edf1f6; }
+
+/* Code =================================================================== */
+code {
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  background: rgba(31, 54, 84, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--navy);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border: 1px solid var(--navy-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* Tables ================================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid var(--orange);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td { background: var(--soft); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Method chips (HTTP verbs on the endpoint cards) ======================== */
+.m {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--soft);
+}
+.m-GET     { background: var(--blue); }
+.m-POST    { background: var(--orange); color: var(--navy); }
+.m-PUT     { background: var(--orange-deep); }
+.m-PATCH   { background: var(--bronze); }
+.m-DELETE  { background: var(--danger); }
+.m-OPTIONS { background: var(--muted); }
+.m-HEAD    { background: var(--muted); }
+
+/* Auth chips ============================================================= */
+.auth {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+}
+.auth-public { color: var(--ink-soft); border-color: var(--border); background: var(--soft); }
+.auth-bearer { color: var(--navy); border-color: var(--navy); background: #e6ebf2; }
+.auth-admin  { color: var(--orange-deep); border-color: var(--orange-deep); background: var(--soft); }
+
+/* Endpoint card ========================================================== */
+.endpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background: var(--card);
+}
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.endpoint-head .path { font-weight: 600; color: var(--navy); }
+.endpoint-head .auth { margin-left: auto; }
+.endpoint-body { padding: 14px 16px; font-size: 13px; }
+.endpoint-body dl { margin: 0; }
+.endpoint-body dt {
+  font-weight: 600;
+  color: var(--navy);
+  margin: 10px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.endpoint-body dt:first-child { margin-top: 0; }
+.endpoint-body dd { margin: 0 0 6px; }
+
+/* TOC ==================================================================== */
+.toc {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 20px 0 32px;
+  page-break-after: always;
+}
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+.toc li { padding: 4px 0; border-bottom: 1px dotted rgba(31,54,84,0.12); }
+.toc li:last-child { border-bottom: 0; }
+.toc li a { border: 0; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+.toc li a::before {
+  counter-increment: sec;
+  content: counter(sec) ".";
+  color: var(--orange-deep);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  min-width: 24px;
+}
+.toc li a:hover { color: var(--orange-deep); }
+
+/* Small chips & badges */
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 20px;
+  font-size: 13px;
+  margin: 10px 0 16px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+.kv dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kv dd { margin: 0; }
+
+/* Footer on every page */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: ui-monospace, monospace;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+  @bottom-left {
+    content: "Hala Job";
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+}
+@media print {
+  html, body { background: #ffffff; }
+  .doc { box-shadow: none; padding: 0; background: #ffffff; }
+  h2 { break-after: avoid; }
+  .endpoint { break-inside: avoid; }
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  a { color: var(--ink); }
+}
+</style></head>
+<body data-repo="platform">
+  <section class="cover">
+    <div>
+      <div class="cover-logo">HJ</div>
+      <div class="cover-eyebrow">Hala Job Platform</div>
+      <h1>Feature Flag Reference</h1>
+      <div class="rule"></div>
+      <p class="tag">Every FEATURE_* flag on the backend, its default, its purpose, and whether it needs an owner decision before launch.</p>
+    </div>
+    <div class="cover-meta"><dl><dt>Total flags</dt><dd>16</dd></dl><dl><dt>Delivery</dt><dd>GET /public/v1/client-settings (clients read at boot)</dd></dl><dl><dt>Payments default</dt><dd>manual</dd></dl><dl><dt>AI default</dt><dd>disabled</dd></dl><dl><dt>Generated</dt><dd>2026-07-01</dd></dl></div>
+  </section>
+  <div class="doc">
+    <nav class="toc"><h2>Contents</h2><ol><li><a href="#intro"><span>How flags work</span></a></li><li><a href="#flags"><span>Backend flag envelope</span></a></li><li><a href="#ai"><span>AI provider deep-dive</span></a></li><li><a href="#payments"><span>Payments deep-dive</span></a></li></ol></nav>
+    <section id="intro"><h1>How flags work</h1>
+    <p>Every feature flag lives in the backend's <code>.env</code> and is surfaced
+    to clients via <code>GET /public/v1/client-settings</code>. Clients read the
+    flags at boot; changing a flag on the backend requires clients to refetch
+    settings (all three clients do this at app start).</p>
+
+    <div class="callout"><b>Naming convention:</b> <code>FEATURE_&lt;NAME&gt;_ENABLED=true|false</code>.
+    A few flags carry a value (<code>FEATURE_PAYMENTS_MODE=manual|online</code>) — treat those
+    as enum flags.</div>
+    </section><section id="flags"><h1>Backend flag envelope</h1><table><thead><tr><th>Flag</th><th>Default</th><th>Purpose</th><th>Owner decision needed?</th></tr></thead><tbody><tr><td><code>FEATURE_AI_TOOLS_ENABLED</code></td><td><code>false</code></td><td>Master switch for AI tools (seeker career copilot, company job generation, message generation)</td><td>Yes — needs an AI provider + budget</td></tr><tr><td><code>FEATURE_CV_PARSING_ENABLED</code></td><td><code>true</code></td><td>Enables CV upload &amp; structured extraction via <code>CV_PARSER_PROVIDER</code></td><td>Only if switching from <code>local</code> to an external parser</td></tr><tr><td><code>FEATURE_CV_STUDIO_ENABLED</code></td><td><code>true</code></td><td>Enables the seeker CV builder / template picker</td><td>No</td></tr><tr><td><code>FEATURE_RESOURCE_LIBRARY_ENABLED</code></td><td><code>true</code></td><td>Career resources listing (articles, guides) on seeker portal</td><td>No</td></tr><tr><td><code>FEATURE_INTERVIEW_PREP_ENABLED</code></td><td><code>true</code></td><td>Interview prep hub (question library, mock-interview flow)</td><td>No</td></tr><tr><td><code>FEATURE_SAVED_SEARCHES_ENABLED</code></td><td><code>true</code></td><td>Saved job searches with alert digests</td><td>No</td></tr><tr><td><code>FEATURE_SMS_ENABLED</code></td><td><code>false</code></td><td>SMS delivery for OTPs / alerts</td><td>Yes — needs an SMS provider</td></tr><tr><td><code>FEATURE_SALARY_INSIGHTS_ENABLED</code></td><td><code>true</code></td><td>Salary insights widget (aggregate, needs min <code>SALARY_INSIGHTS_MIN_SAMPLE_SIZE</code> data points)</td><td>No</td></tr><tr><td><code>FEATURE_CAMPUS_CAREER_CENTER_ENABLED</code></td><td><code>true</code></td><td>University career-center admin surfaces</td><td>No</td></tr><tr><td><code>FEATURE_VIDEO_INTERVIEWS_ENABLED</code></td><td><code>true</code></td><td>Video-interview scheduling / recording flow</td><td>Yes if using a video provider</td></tr><tr><td><code>FEATURE_TALENT_POOL_CRM_ENABLED</code></td><td><code>true</code></td><td>Company talent-pool CRM (tags, notes, pipelines)</td><td>No</td></tr><tr><td><code>FEATURE_EMPLOYER_BRANDING_ENABLED</code></td><td><code>true</code></td><td>Employer branding pages (public company profile customisation)</td><td>No</td></tr><tr><td><code>FEATURE_MANUAL_WHATSAPP_SHARE_ENABLED</code></td><td><code>true</code></td><td>Allows share-to-WhatsApp links for company recruiters</td><td>No</td></tr><tr><td><code>FEATURE_OFFICIAL_WHATSAPP_PROVIDER_ENABLED</code></td><td><code>false</code></td><td>Enables integrated WhatsApp Business API (vs manual share links)</td><td>Yes — needs WhatsApp Business setup</td></tr><tr><td><code>FEATURE_PAYMENTS_MODE</code></td><td><code>manual</code></td><td><code>manual</code> = admin-assigned subscriptions; <code>online</code> = payment provider integration (not yet enabled)</td><td>Yes — provider or manual for launch</td></tr><tr><td><code>FEATURE_COMPANY_SELF_REGISTER_ENABLED</code></td><td><code>true</code></td><td>Allow companies to self-register (vs admin-only creation)</td><td>No</td></tr></tbody></table></section><section id="ai"><h1>AI provider deep-dive</h1>
+    <p>AI is disabled by default. Turning on <code>FEATURE_AI_TOOLS_ENABLED</code>
+    without configuring a provider will surface features that fall back to
+    <code>cv_parser_not_configured</code> / <code>ai_provider_not_configured</code>
+    errors to the client.</p>
+    <dl class="kv"><dt>&lt;code&gt;HALA_AI_ENABLED&lt;/code&gt;</dt><dd>Master AI switch on the provider layer. Must be true for anything downstream.</dd><dt>&lt;code&gt;HALA_AI_PROVIDER&lt;/code&gt;</dt><dd>Provider slug (owner supplies).</dd><dt>&lt;code&gt;HALA_AI_MODEL&lt;/code&gt;</dt><dd>Model name.</dd><dt>&lt;code&gt;HALA_AI_API_KEY&lt;/code&gt;</dt><dd>Provider API key.</dd><dt>&lt;code&gt;HALA_AI_BASE_URL&lt;/code&gt;</dt><dd>Provider base URL. Defaults to OpenAI.</dd><dt>&lt;code&gt;HALA_AI_TIMEOUT_MS&lt;/code&gt;</dt><dd>Request timeout (default 30 s).</dd><dt>&lt;code&gt;HALA_AI_DAILY_LIMIT&lt;/code&gt; / &lt;code&gt;_MONTHLY_LIMIT&lt;/code&gt;</dt><dd>Per-account rate cap on AI calls.</dd><dt>&lt;code&gt;HALA_AI_ALLOW_MOCK_PROVIDER&lt;/code&gt;</dt><dd><b>Local verification only.</b> Prod ignores this unless explicitly true. Mock output must never be labelled real AI.</dd></dl>
+    <div class="callout warn"><b>Do not label mock AI as real AI.</b> This is a
+    handoff rule. The mock provider is for local dev only; production output
+    must be from a live provider.</div>
+    </section><section id="payments"><h1>Payments deep-dive</h1>
+    <p><code>FEATURE_PAYMENTS_MODE</code> is the single most product-visible
+    flag. Two supported values:</p>
+    <ul>
+      <li><code>manual</code> — admins assign / adjust subscriptions in the admin console; there is no online checkout. This is the launch default.</li>
+      <li><code>online</code> — payment provider integration. Currently no provider is enabled; enabling this without a provider will cause checkout flows to fail.</li>
+    </ul>
+    <div class="callout warn"><b>Do not label manual/admin subscriptions as
+    online payment.</b> This is a handoff rule.</div>
+    </section>
+    <footer class="doc-footer">
+      <span>Hala Job — Feature Flag Reference</span>
+      <span>Generated 2026-07-01</span>
+    </footer>
+  </div>
+</body></html>
