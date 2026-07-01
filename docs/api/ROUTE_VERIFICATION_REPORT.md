@@ -1,17 +1,17 @@
 # Route Verification Report
 
-Generated: 2026-07-01T14:14:28.217Z
+Generated: 2026-07-01T16:43:13.829Z
 Source: live Express app via `express-list-endpoints`.
 
 ## Summary
 
 | Metric | Count |
 |---|---:|
-| Raw Express endpoint entries | 767 |
-| Unique method/path endpoints | 957 |
+| Raw Express endpoint entries | 768 |
+| Unique method/path endpoints | 958 |
 | Endpoints with detected auth/role guard | 841 |
 | Known public/system endpoints | 116 |
-| Unguarded endpoints needing manual classification | 0 |
+| Unguarded endpoints needing manual classification | 1 |
 
 Full machine-readable inventory:
 
@@ -34,7 +34,7 @@ docs/api/HALAJOB_ROUTE_INVENTORY.json
 | Jobs | 2 | 2 | 0 | 0 |
 | Legacy User | 207 | 129 | 78 | 0 |
 | Notifications | 20 | 20 | 0 | 0 |
-| Other | 15 | 0 | 15 | 0 |
+| Other | 16 | 0 | 15 | 1 |
 | Seeker | 102 | 101 | 1 | 0 |
 | Trust | 4 | 4 | 0 | 0 |
 | University | 40 | 40 | 0 | 0 |
@@ -322,6 +322,7 @@ markRead
 markUnread
 matchEmployeeWithJob
 me
+metricsHandler
 multerMiddleware
 myApplications
 myInterviews
@@ -499,7 +500,9 @@ Note: parent-mount guards are inferred because `express-list-endpoints` does not
 
 These endpoints do not expose one of the known guard middleware names, do not match a known protected parent mount, and are not in the known-public allowlist. Some may be intentionally public or may be protected indirectly by controller code. Review them before launch.
 
-None found.
+| Method | Path | Module | Middlewares |
+| --- | --- | --- | --- |
+| GET | /metrics | Other | metricsHandler |
 
 
 

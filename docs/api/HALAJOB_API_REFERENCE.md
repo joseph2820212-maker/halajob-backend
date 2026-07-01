@@ -1,6 +1,6 @@
 # Hala Job API Reference
 
-Generated: 2026-07-01T14:14:57.811Z
+Generated: 2026-07-01T16:43:14.165Z
 Source: `docs/api/HALAJOB_ROUTE_INVENTORY.json`.
 
 This is a route-level API reference skeleton. It documents the live Express route surface, authentication classification, and guard evidence. Detailed request bodies, response examples, validation schemas, audit events, and business rules still need to be filled route-by-route before the backend can be called fully documented.
@@ -33,7 +33,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 | Jobs | 2 |
 | Legacy User | 207 |
 | Notifications | 20 |
-| Other | 15 |
+| Other | 16 |
 | Seeker | 102 |
 | Trust | 4 |
 | University | 40 |
@@ -892,6 +892,7 @@ This is a route-level API reference skeleton. It documents the live Express rout
 
 | Method | Path | Auth | Guard source | Middleware/guards |
 | --- | --- | --- | --- | --- |
+| GET | `/metrics` | Review | none | metricsHandler |
 | GET | `/public/v1/client-settings` | Public/system | none | getClientSettings |
 | GET | `/public/v1/companies` | Public/system | none | listCompanies |
 | GET | `/public/v1/companies/:slugOrId` | Public/system | none | getCompany |

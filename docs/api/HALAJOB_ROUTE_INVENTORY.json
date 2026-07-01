@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-01T14:14:28.217Z",
+  "generatedAt": "2026-07-01T16:43:13.829Z",
   "records": [
     {
       "method": "PATCH",
@@ -12148,6 +12148,18 @@
       ],
       "hasAuthGuard": true,
       "guardSource": "inferred-parent-mount",
+      "knownPublic": false
+    },
+    {
+      "method": "GET",
+      "path": "/metrics",
+      "module": "Other",
+      "middlewares": [
+        "metricsHandler"
+      ],
+      "inferredGuards": [],
+      "hasAuthGuard": false,
+      "guardSource": "none",
       "knownPublic": false
     },
     {

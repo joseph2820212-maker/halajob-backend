@@ -14160,6 +14160,17 @@ paths:
           description: Missing or invalid token
         "403":
           description: Forbidden
+  "/metrics":
+    get:
+      tags: ["Other"]
+      summary: "GET /metrics"
+      operationId: "other_get_metrics"
+      description: "Generated route skeleton. Fill request/response schema and business rules before launch documentation is considered complete."
+      responses:
+        "200":
+          description: Successful response
+        "400":
+          description: Validation or request error
   "/notifications/v1":
     get:
       tags: ["Notifications"]

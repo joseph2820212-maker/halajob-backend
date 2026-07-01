@@ -43,6 +43,10 @@ import {
   CurrencyModel,
   CountryModel,
 } from "../models/index.js";
+import {
+  seedCampusDemoContent,
+  teardownCampusDemoContent,
+} from "./utils/campusDemoContentSeed.js";
 
 dotenv.config();
 
@@ -315,11 +319,16 @@ async function seed() {
     { new: true, upsert: true, setDefaultsOnInsert: true },
   );
 
+  const campusContent = await seedCampusDemoContent();
+
   log("Demo data seeded.");
   log(`  Seeker : seeker@${DEMO_DOMAIN}  / ${DEMO_PASSWORD}`);
   log(`  Company: company@${DEMO_DOMAIN} / ${DEMO_PASSWORD}`);
   log(`  Passcode (pre-set, single-use): ${DEMO_PASSCODE} — re-run this seed to refresh it.`);
   log(`  Jobs: ${jobs.length}, applications: ${applications.length}.`);
+  log(
+    `  Campus content: ${campusContent.key} (${campusContent.version}) seeded into backend DB.`,
+  );
 }
 
 async function teardown() {
@@ -350,6 +359,7 @@ async function teardown() {
   removed.companies = (await CompanyModel.deleteMany({ _id: { $in: companyIds } })).deletedCount;
   removed.employees = (await EmployeeModel.deleteMany({ user_id: { $in: userIds } })).deletedCount;
   removed.users = (await UserModel.deleteMany({ _id: { $in: userIds } })).deletedCount;
+  removed.campusContent = (await teardownCampusDemoContent()).deletedCount;
 
   log("Demo data removed:", JSON.stringify(removed));
 }

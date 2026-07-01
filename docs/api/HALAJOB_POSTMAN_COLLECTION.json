@@ -26303,6 +26303,32 @@
       "name": "Other",
       "item": [
         {
+          "name": "GET /metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "lan",
+                "value": "{{lang}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/metrics",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "metrics"
+              ]
+            },
+            "description": "Generated from live route inventory. Module: Other. Guard source: none."
+          }
+        },
+        {
           "name": "GET /public/v1/client-settings",
           "request": {
             "method": "GET",
