@@ -2,17 +2,22 @@
 // to import from anywhere and is safe to run in local dev without any
 // Sentry account.
 //
-// When enabled:
-//   - Sentry.init picks up SENTRY_DSN, SENTRY_ENVIRONMENT (defaults to
-//     NODE_ENV or "development"), and SENTRY_TRACES_SAMPLE_RATE (default
-//     0.1 = 10% of requests traced).
-//   - initSentryHttpHooks(app) wires the request handler + tracing handler
-//     so every request auto-creates a transaction; call BEFORE the app's
-//     route stack.
-//   - initSentryErrorHook(app) wires the error handler; call AFTER routes
-//     but BEFORE any custom error middleware.
-//   - captureException(err, extra) is the manual API to record an error
-//     that was already caught (matches Sentry.captureException's shape).
+// @sentry/node v8+ retired the v7 Handlers.requestHandler / tracingHandler
+// API. What we actually get from v10:
+//   - Sentry.init() must run BEFORE the express import chain for auto-
+//     instrumentation to see all the routes.
+//   - Sentry.setupExpressErrorHandler(app) — the only handler we need to
+//     mount on the app. Auto-instrumentation via OpenTelemetry handles
+//     request/tracing under the hood; there's no requestHandler middleware
+//     to mount.
+//
+// Because index.js already runs `import app from './app.js'` at the top,
+// perfect init ordering (init BEFORE any import) would require moving init
+// into a --import instrument.js file (see docs/OBSERVABILITY.md for the
+// canonical setup). For the launch-hardening pass we ship the pragmatic
+// path: init once on first import, capture errors via
+// setupExpressErrorHandler, and warn the operator that tracing spans may
+// not attach to inbound HTTP if init lands after express is imported.
 
 import * as Sentry from "@sentry/node";
 
@@ -38,8 +43,6 @@ const ensureInit = () => {
     dsn: DSN,
     environment,
     tracesSampleRate,
-    // Keep the fingerprint tight — Sentry's defaults for the express
-    // integration are fine.
   });
   initialised = true;
 };
@@ -68,36 +71,22 @@ export const captureException = (err, extra) => {
   }
 };
 
-// Attach Sentry's express handlers. Called from app.js.
-//
-// - initSentryHttpHooks runs before all route middleware so every request
-//   gets a Sentry transaction (assuming tracesSampleRate > 0).
-// - initSentryErrorHook runs after all routes so it sees unhandled errors
-//   from the route stack.
-export const initSentryHttpHooks = (app) => {
+// v8+ no longer exposes request/tracing handlers as middleware. Kept as a
+// no-op entry point so the existing app.js callsite doesn't have to change
+// — and so that if we later move to --import instrument.js we can rewire
+// the init here without touching app.js.
+export const initSentryHttpHooks = (_app) => {
   if (!ENABLED) return;
   ensureInit();
-  // v8+ integrates via the http integration by default; the request /
-  // tracing handlers are exposed under Sentry.Handlers only in v7. Try
-  // v7 first; fall through to v8's setupExpressErrorHandler-only path.
-  const handlers = Sentry.Handlers;
-  if (handlers?.requestHandler) {
-    app.use(handlers.requestHandler());
-  }
-  if (handlers?.tracingHandler) {
-    app.use(handlers.tracingHandler());
-  }
 };
 
+// Attach Sentry's express error handler AFTER the route stack. Must run
+// BEFORE the app's own error middleware so Sentry sees the raw exception,
+// not a serialised HTTP response.
 export const initSentryErrorHook = (app) => {
   if (!ENABLED) return;
   ensureInit();
   if (typeof Sentry.setupExpressErrorHandler === "function") {
     Sentry.setupExpressErrorHandler(app);
-    return;
-  }
-  const handlers = Sentry.Handlers;
-  if (handlers?.errorHandler) {
-    app.use(handlers.errorHandler());
   }
 };

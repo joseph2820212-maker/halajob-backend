@@ -5,8 +5,11 @@
 // plus the default node process metrics that prom-client ships (CPU,
 // memory, event-loop lag, GC pauses, etc).
 //
-// Route labels use the express route pattern (e.g. "/user/v1/job/:id")
+// Route label uses the express route pattern (e.g. "/user/v1/job/:id")
 // rather than the raw path so metrics don't cardinality-explode on IDs.
+// Unmatched requests (404s, bot scans, static /uploads/*) are labelled
+// as "unmatched" for the same reason — feeding user-controlled path into
+// a Prometheus label unbounds memory.
 
 import client from "prom-client";
 
@@ -41,31 +44,53 @@ const ensureInitialised = () => {
 
 export const isMetricsEnabled = () => METRICS_ENABLED;
 
+// Resolve the route label without letting user-controlled URL pieces
+// leak into the Prometheus label set.
+const routeLabelFor = (req) => {
+  if (!req.route || !req.route.path) return "unmatched";
+  // req.baseUrl is the mount prefix set by app.use("/prefix", router).
+  // Combined with req.route.path this yields the parameterised template
+  // "/user/v1/job/:id" — safe cardinality.
+  return `${req.baseUrl || ""}${req.route.path}`;
+};
+
 // Express middleware — records the duration of each request and increments
-// the counter on completion. Must be mounted BEFORE the app's routes so the
-// req.route reference is populated by the matched handler.
+// the counter on completion. Must be mounted BEFORE the app's routes so
+// req.route is populated by the matched handler.
+//
+// Records on BOTH 'finish' and 'close' so client-aborted / upstream-
+// disconnected requests are still counted (finish alone silently under-
+// counts real traffic and Grafana error rates look artificially healthy).
 export const httpMetricsMiddleware = (req, res, next) => {
   if (!METRICS_ENABLED) return next();
   ensureInitialised();
   const start = process.hrtime.bigint();
-  res.on("finish", () => {
+  let recorded = false;
+
+  const record = (status) => {
+    if (recorded) return;
+    recorded = true;
     const nanos = Number(process.hrtime.bigint() - start);
     const seconds = nanos / 1e9;
-    // req.route is populated by express when a route matches; falls back to
-    // req.baseUrl + req.path when nothing matched (404 catch-all).
-    const routePattern = req.route
-      ? `${req.baseUrl || ""}${req.route.path}`
-      : `${req.baseUrl || ""}${req.path}`;
     const labels = {
       method: req.method,
-      route: routePattern || "unknown",
-      status: String(res.statusCode),
+      route: routeLabelFor(req),
+      status: String(status),
     };
     httpRequestsTotal.inc(labels);
     httpDurationSeconds.observe(
       { method: labels.method, route: labels.route },
       seconds,
     );
+  };
+
+  res.on("finish", () => record(res.statusCode));
+  // "close" fires when the underlying connection closes before finish —
+  // client abort, mid-response timeout, upstream reset. Record with a
+  // sentinel 499 (nginx convention for "client closed request") so these
+  // don't vanish from the count.
+  res.on("close", () => {
+    if (!res.writableEnded) record(499);
   });
   next();
 };

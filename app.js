@@ -150,13 +150,16 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// Sentry request + tracing handlers must be the FIRST middleware so
-// every request is captured, including ones that die inside CORS / rate
-// limit. No-op when SENTRY_DSN is unset.
+// Sentry init runs on import; the http-hooks call is a no-op in v8+ but
+// the entry point is kept so we can rewire ordering later without touching
+// app.js. No-op when SENTRY_DSN is unset.
 initSentryHttpHooks(app);
 if (isSentryEnabled()) {
   // eslint-disable-next-line no-console
-  console.log("[sentry] request tracing enabled");
+  console.log(
+    "[sentry] error reporting enabled — auto-instrumentation attaches " +
+      "to inbound HTTP via setupExpressErrorHandler.",
+  );
 }
 
 app.use(cors(corsOptions));
@@ -175,12 +178,9 @@ if (isMetricsEnabled()) {
   console.log("[metrics] GET /metrics enabled");
 }
 
-/* ----------------------------- Idempotency ----------------------------- */
-
-// Middleware is a no-op unless the request is a POST AND carries an
-// Idempotency-Key header AND REDIS_URL is reachable. On a match, replays
-// the cached response instead of running the handler.
-app.use(idempotencyMiddleware);
+// (Idempotency middleware moved lower in the stack, after helmet + rate
+// limits, so a cache-hit replay doesn't bypass those. See the
+// /Idempotency/ block further down.)
 
 /* ----------------------------- Rate Limits ----------------------------- */
 
@@ -317,6 +317,14 @@ app.use(
     ],
   })
 );
+
+/* ----------------------------- Idempotency ----------------------------- */
+
+// No-op unless the request is a POST AND carries an Idempotency-Key header
+// AND REDIS_URL is reachable. Mounted AFTER helmet/rate-limits/parsers so a
+// cache-hit still counts against the global rate limiter (the limiter runs
+// first) and carries the standard security headers helmet sets.
+app.use(idempotencyMiddleware);
 
 /* ----------------------------- Static Uploads ----------------------------- */
 
