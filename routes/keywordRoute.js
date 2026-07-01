@@ -18,7 +18,7 @@ router.post('/update/:id', upload.none(), validate(adminSchemas.keywordUpdateSch
 // bundled ar/en JSON. Was a GET; moved to POST because the operation writes
 // to the DB and would be triggered by any browser prefetch or link crawler.
 // GET returns 410 for one release cycle to surface stale callers.
-router.post('/log', upload.none(), controller.logKeyword);
+router.post('/log', upload.none(), validate(adminSchemas.importUploadSchema), controller.logKeyword);
 router.get('/log', (_req, res) =>
   res.status(410).json({
     success: false,

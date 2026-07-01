@@ -16,7 +16,7 @@ router.get("/list-job-reviews/:id", JobInformationController.listJobReviews);
 // Recomputing the rating breakdown writes updateOne to the job document.
 // Moved from GET to POST so browser prefetch/crawlers can't trigger writes.
 // GET returns 410 for one release cycle to surface stale admin/CRM callers.
-router.post("/recompute-job-rating-breakdown/:id", authUser, requireAppAccount("company"), JobInformationController.recomputeJobRatingBreakdown);
+router.post("/recompute-job-rating-breakdown/:id", authUser, requireAppAccount("company"), validate(seekerSchemas.legacyJobBodySchema), JobInformationController.recomputeJobRatingBreakdown);
 router.get("/recompute-job-rating-breakdown/:id", (_req, res) =>
   res.status(410).json({
     success: false,

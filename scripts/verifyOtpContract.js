@@ -1,18 +1,16 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import { readRepoFile } from "./utils/repoPaths.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, "..");
-
-const read = (relativePath) => fs.readFileSync(path.join(ROOT, relativePath), "utf8");
+const read = readRepoFile;
 
 const requiredPatterns = [
-  ["controllers/app/Auth/authController.js", /randomInt\(10000,\s*100000\)/],
-  ["controllers/app/Auth/ForgotPasswordController.js", /randomInt\(10000,\s*100000\)/],
-  ["controllers/app/Auth/LoginController.js", /randomInt\(10000,\s*100000\)/],
-  ["controllers/app/Auth/RegisterController.js", /randomInt\(10000,\s*100000\)/],
-  ["controllers/app/Auth/ResendOtpController.js", /randomInt\(10000,\s*100000\)/],
+  ["services/passcodeHash.service.js", /const OTP_MIN = 10000;/],
+  ["services/passcodeHash.service.js", /const OTP_MAX = 100000;/],
+  ["services/passcodeHash.service.js", /crypto\.randomInt\(OTP_MIN,\s*OTP_MAX\)/],
+  ["controllers/app/Auth/authController.js", /createPasscode = generatePasscode/],
+  ["controllers/app/Auth/ForgotPasswordController.js", /generatePasscode\(\)/],
+  ["controllers/app/Auth/LoginController.js", /createPasscode = generatePasscode/],
+  ["controllers/app/Auth/RegisterController.js", /createPasscode = generatePasscode/],
+  ["controllers/app/Auth/ResendOtpController.js", /createPasscode = generatePasscode/],
   ["controllers/app/campus/campusController.js", /randomInt\(10000,\s*100000\)/],
   ["validations/authValidations.js", /\\d\{5\}/],
   ["mobile/lib/src/features/auth/auth_screen.dart", /const _passcodeLength = 5;/],
@@ -22,6 +20,7 @@ const requiredPatterns = [
 ];
 
 const forbiddenPatterns = [
+  ["services/passcodeHash.service.js", /const OTP_MIN = 100000;|const OTP_MAX = 1000000;/],
   ["controllers/app/Auth/authController.js", /randomInt\(100000,\s*1000000\)/],
   ["controllers/app/Auth/ForgotPasswordController.js", /randomInt\(100000,\s*1000000\)/],
   ["controllers/app/Auth/LoginController.js", /randomInt\(100000,\s*1000000\)/],

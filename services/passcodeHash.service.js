@@ -11,7 +11,7 @@
 // or JWT_SECRET as a fallback so the deploy doesn't need a second env yet),
 // and verifies via crypto.timingSafeEqual over equal-length buffers.
 //
-// It also generates 6-digit codes now (was 5 = ~90k space; 6 = 900k).
+// It also centralizes the 5-digit issuer so backend and mobile stay aligned.
 
 import crypto from "crypto";
 
@@ -29,16 +29,15 @@ const resolveSecret = () => {
     throw new Error(
       "passcodeHash: neither PASSCODE_SECRET nor JWT_SECRET is set to " +
         "a >= 16-char value. Refusing to hash — a short/empty key means the " +
-        "OTP hash is trivially reversible via a 900k rainbow of inputs.",
+        "OTP hash is trivially reversible via a 90k rainbow of inputs.",
     );
   }
   return s;
 };
 
-// New codes are 6 digits. Legacy 5-digit codes issued before this deploy
-// remain valid until they expire (max 10 min after the deploy landed).
-const OTP_MIN = 100000;
-const OTP_MAX = 1000000;
+// New codes are 5 digits; mobile and backend contracts both enforce this.
+const OTP_MIN = 10000;
+const OTP_MAX = 100000;
 
 export const generatePasscode = () =>
   String(crypto.randomInt(OTP_MIN, OTP_MAX));

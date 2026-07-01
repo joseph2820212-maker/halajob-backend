@@ -22,7 +22,7 @@ router.post('/exsel', upload.single("file"), validate(adminSchemas.importUploadS
 // because it does insertMany (writes) and browsers/crawlers can prefetch GETs.
 // The GET responds 410 for one release cycle to surface any stale caller.
 if (process.env.NODE_ENV !== 'production') {
-  router.post('/insert', InsertDemoDataController.insert);
+  router.post('/insert', validate(adminSchemas.importUploadSchema), InsertDemoDataController.insert);
   router.get('/insert', (_req, res) =>
     res.status(410).json({
       success: false,

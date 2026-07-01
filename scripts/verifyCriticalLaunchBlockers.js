@@ -1,19 +1,15 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import {
+  existsRepoPath,
+  listRepoFiles,
+  readRepoFile,
+} from "./utils/repoPaths.js";
 
 const root = process.cwd();
-const read = (path) => readFileSync(join(root, path), "utf8");
-const exists = (path) => existsSync(join(root, path));
-const listFiles = (relativePath) => {
-  const absolutePath = join(root, relativePath);
-  if (!existsSync(absolutePath)) return [];
-  return readdirSync(absolutePath, { withFileTypes: true }).flatMap((entry) => {
-    const entryPath = `${relativePath}/${entry.name}`;
-    return entry.isDirectory() ? listFiles(entryPath) : [entryPath];
-  });
-};
+const read = readRepoFile;
+const exists = existsRepoPath;
+const listFiles = listRepoFiles;
 
 const assertNoFile = (relativePath, message) => {
   assert.equal(exists(relativePath), false, message);

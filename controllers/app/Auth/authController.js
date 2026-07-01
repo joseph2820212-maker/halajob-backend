@@ -51,7 +51,7 @@ function makeDefaultDevice(user, idx) {
   user.device = user.device.map((d, i) => ({ ...d, is_default: i === idx }));
 }
 
-// Shared 6-digit issuer; matches every other OTP-issuing controller.
+// Shared 5-digit issuer; matches every other OTP-issuing controller.
 const createPasscode = generatePasscode;
 
 function buildUserDto(user) {

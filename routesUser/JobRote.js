@@ -25,7 +25,7 @@ router.get("/get-by-id/:id", optionalAuthUser, GetJobController.getById);
 // Beacon for the mark-seen side effect that ?mark_seen=true used to trigger
 // on the list GET. Clients should call this AFTER rendering a batch of jobs
 // so browser prefetch / crawler traffic no longer inflates view counters.
-router.post("/mark-seen", authUser, GetJobController.markJobsSeen);
+router.post("/mark-seen", authUser, validate(seekerSchemas.markJobsSeenSchema), GetJobController.markJobsSeen);
 
 router.get("/get-popular", optionalAuthUser, GetPopularController.get);
 

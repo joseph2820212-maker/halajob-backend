@@ -9,41 +9,41 @@ process.env.PASSCODE_SECRET = "test-secret-do-not-use-in-prod";
 const { generatePasscode, hashPasscode, verifyPasscode, isHashedPasscode } =
   await import("../../services/passcodeHash.service.js");
 
-test("generatePasscode returns 6-digit string", () => {
+test("generatePasscode returns 5-digit string", () => {
   for (let i = 0; i < 50; i++) {
     const code = generatePasscode();
     assert.equal(typeof code, "string");
-    assert.match(code, /^\d{6}$/);
+    assert.match(code, /^\d{5}$/);
   }
 });
 
 test("hashPasscode returns 64-char hex", () => {
-  const h = hashPasscode("123456");
+  const h = hashPasscode("12345");
   assert.match(h, /^[a-f0-9]{64}$/);
   assert.equal(isHashedPasscode(h), true);
 });
 
 test("hashPasscode is deterministic with same secret", () => {
-  const a = hashPasscode("123456");
-  const b = hashPasscode("123456");
+  const a = hashPasscode("12345");
+  const b = hashPasscode("12345");
   assert.equal(a, b);
 });
 
 test("hashPasscode differs across different codes", () => {
-  const a = hashPasscode("123456");
-  const b = hashPasscode("123457");
+  const a = hashPasscode("12345");
+  const b = hashPasscode("12346");
   assert.notEqual(a, b);
 });
 
 test("verifyPasscode accepts correct code against hash", () => {
-  const code = "654321";
+  const code = "65432";
   const hash = hashPasscode(code);
   assert.equal(verifyPasscode(code, hash), true);
 });
 
 test("verifyPasscode rejects wrong code against hash", () => {
-  const hash = hashPasscode("654321");
-  assert.equal(verifyPasscode("654322", hash), false);
+  const hash = hashPasscode("65432");
+  assert.equal(verifyPasscode("65433", hash), false);
 });
 
 test("verifyPasscode falls back to plaintext for legacy rows", () => {
@@ -62,7 +62,7 @@ test("verifyPasscode returns false for empty inputs", () => {
 });
 
 test("verifyPasscode trims whitespace on candidate", () => {
-  const code = "111111";
+  const code = "11111";
   const hash = hashPasscode(code);
-  assert.equal(verifyPasscode("  111111  ", hash), true);
+  assert.equal(verifyPasscode("  11111  ", hash), true);
 });

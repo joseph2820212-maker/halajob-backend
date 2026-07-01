@@ -52,7 +52,7 @@ function ensureDeviceArray(user) {
 }
 
 // OTP generation delegated to services/passcodeHash so every issuer stays
-// on the same 6-digit space and every stored code is HMAC-hashed.
+// on the same 5-digit space and every stored code is HMAC-hashed.
 const createPasscode = generatePasscode;
 
 async function buildAuthPayload(user, device) {

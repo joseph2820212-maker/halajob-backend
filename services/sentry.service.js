@@ -11,7 +11,7 @@
 //     request/tracing under the hood; there's no requestHandler middleware
 //     to mount.
 //
-// Because index.js already runs `import app from './app.js'` at the top,
+// Because index.js already imports the Express app at the top,
 // perfect init ordering (init BEFORE any import) would require moving init
 // into a --import instrument.js file (see docs/OBSERVABILITY.md for the
 // canonical setup). For the launch-hardening pass we ship the pragmatic

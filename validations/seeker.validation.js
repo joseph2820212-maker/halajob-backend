@@ -382,6 +382,12 @@ const schemas = {
     body: bodyObject,
   }),
 
+  markJobsSeenSchema: yup.object({
+    body: bodyObject.shape({
+      job_ids: yup.array().of(objectId).max(200),
+    }),
+  }),
+
   legacyIdActionSchema: yup.object({
     params: params.id,
     body: bodyObject,

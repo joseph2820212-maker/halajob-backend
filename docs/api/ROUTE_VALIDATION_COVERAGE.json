@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-06-29T00:45:52.936Z",
+  "generatedAt": "2026-07-01T20:17:52.115Z",
   "totals": {
-    "totalEndpoints": 3990,
+    "totalEndpoints": 958,
     "publicSystemEndpoints": 5,
-    "readOnlyEndpointsAllowedWithoutBodyValidator": 305,
-    "writeUpdateDeleteEndpoints": 2526,
-    "writeUpdateDeleteEndpointsWithValidator": 2526,
+    "readOnlyEndpointsAllowedWithoutBodyValidator": 299,
+    "writeUpdateDeleteEndpoints": 519,
+    "writeUpdateDeleteEndpointsWithValidator": 519,
     "writeUpdateDeleteEndpointsMissingValidator": 0,
     "writeValidationCoveragePercent": 100,
     "coreAuthAccountMissingValidators": 0
@@ -20,9 +20,9 @@
     },
     {
       "module": "admin",
-      "total": 3321,
-      "writes": 2192,
-      "writesWithValidator": 2192,
+      "total": 288,
+      "writes": 179,
+      "writesWithValidator": 179,
       "writesMissingValidator": 0
     },
     {
@@ -69,9 +69,9 @@
     },
     {
       "module": "legacy-user",
-      "total": 184,
-      "writes": 66,
-      "writesWithValidator": 66,
+      "total": 187,
+      "writes": 69,
+      "writesWithValidator": 69,
       "writesMissingValidator": 0
     },
     {
@@ -83,14 +83,14 @@
     },
     {
       "module": "other",
-      "total": 26,
+      "total": 28,
       "writes": 6,
       "writesWithValidator": 6,
       "writesMissingValidator": 0
     },
     {
       "module": "seeker",
-      "total": 110,
+      "total": 102,
       "writes": 56,
       "writesWithValidator": 56,
       "writesMissingValidator": 0
@@ -104,9 +104,9 @@
     },
     {
       "module": "university",
-      "total": 36,
-      "writes": 16,
-      "writesWithValidator": 16,
+      "total": 40,
+      "writes": 19,
+      "writesWithValidator": 19,
       "writesMissingValidator": 0
     }
   ],

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import { existsRepoPath, readRepoFile } from "./utils/repoPaths.js";
 
 const root = process.cwd();
 const manifestPath = path.join(
@@ -12,13 +13,12 @@ const sourceCache = new Map();
 const failures = [];
 
 function readSource(relativePath) {
-  const fullPath = path.join(root, relativePath);
-  if (!fs.existsSync(fullPath)) {
+  if (!existsRepoPath(relativePath)) {
     failures.push(`${relativePath} does not exist`);
     return "";
   }
   if (!sourceCache.has(relativePath)) {
-    sourceCache.set(relativePath, fs.readFileSync(fullPath, "utf8"));
+    sourceCache.set(relativePath, readRepoFile(relativePath));
   }
   return sourceCache.get(relativePath);
 }

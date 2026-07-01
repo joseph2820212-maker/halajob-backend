@@ -85,7 +85,7 @@
         {
           "path": "mobile/test/widget_test.dart",
           "mustContain": [
-            "approved profile settings notification chrome stays locked for every role",
+            "company header exposes universal account actions",
             "settings notifications and data rights stay in drill-in panels",
             "settings-notification-manual-whatsapp"
           ]

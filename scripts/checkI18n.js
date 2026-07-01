@@ -1,7 +1,4 @@
-import fs from 'node:fs';
-import path from 'node:path';
-
-const root = process.cwd();
+import { existsRepoPath, readRepoFile } from './utils/repoPaths.js';
 
 const files = [
   'mobile/lib/l10n/app_ar.arb',
@@ -18,13 +15,12 @@ const hardcodedEnglishHeaderPattern =
 const failures = [];
 
 for (const file of files) {
-  const fullPath = path.join(root, file);
-  if (!fs.existsSync(fullPath)) {
+  if (!existsRepoPath(file)) {
     failures.push(`${file}: missing translation resource`);
     continue;
   }
 
-  const content = fs.readFileSync(fullPath, 'utf8');
+  const content = readRepoFile(file);
   if (mojibakePattern.test(content)) {
     failures.push(`${file}: contains corrupted Arabic/mojibake characters`);
   }
@@ -37,13 +33,12 @@ for (const file of [
   'mobile/lib/src/core/network/app_api_client.dart',
   'mobile/lib/src/features/auth/auth_service.dart',
 ]) {
-  const fullPath = path.join(root, file);
-  if (!fs.existsSync(fullPath)) {
+  if (!existsRepoPath(file)) {
     failures.push(`${file}: missing mobile API client`);
     continue;
   }
 
-  const content = fs.readFileSync(fullPath, 'utf8');
+  const content = readRepoFile(file);
   if (hardcodedEnglishHeaderPattern.test(content)) {
     failures.push(`${file}: hardcodes x-language/lan to English`);
   }
