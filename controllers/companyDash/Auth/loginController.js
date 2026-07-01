@@ -206,6 +206,18 @@ const login = async (req, res, next) => {
     const ok = await bcryptjs.compare(String(password), user.password || "");
 
     if (!ok) {
+      // Record the failed attempt for the audit trail. Matches what
+      // /dash/v1 (admin) login does — the previous version was silent on
+      // the wrong-password branch so grinding attempts against known
+      // company emails left no record.
+      recordAnalyticsEvent({
+        req,
+        event: "company_login_failed",
+        userId: user._id,
+        entityType: "other",
+        metadata: { reason: "wrong_password", identifier_type: identifier.includes("@") ? "email" : "phone" },
+      }).catch(() => null);
+
       return ReturnAppData.createError({
         res,
         status: 400,

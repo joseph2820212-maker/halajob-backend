@@ -433,15 +433,51 @@ const decorateJobs = async (jobs, userId, employee, options = {}) => {
   });
 };
 
-// Regex covers the crawler/prefetch User-Agents most commonly hitting us in
-// the wild plus the generic "bot"/"spider"/"crawl" tokens. Skipping markSeen
-// for these means view counters no longer inflate when a search engine
-// crawls the jobs feed or a link preview service prefetches a job URL.
-const BOT_UA_RE =
-  /(bot|crawl|spider|prefetch|preview|scrape|monitoring|axios|okhttp|wget|curl|python-requests|headlesschrome|phantomjs|slurp|semrush|ahrefs|yandex|baidu|duckduck|bing|googlebot|linkedinbot|whatsapp|telegrambot|facebookexternalhit|twitterbot|discordbot)/i;
+// Narrowly-scoped bot / link-preview User-Agent tokens. Anchored with word
+// boundaries so substring matches don't fire (previous version matched
+// "whatsapp" inside legit WhatsApp in-app browsers and "okhttp" inside
+// every Retrofit/Kotlin-based Android client — including our own mobile
+// app — so real users' views were being silently dropped).
+//
+// Missing UA is NOT treated as bot-like. Some legitimate clients (native
+// Android URLSession defaults, our own contract tests, headless CI callers
+// that intentionally omit UA) send no header and should still work.
+// If bots later start faking "no UA", we can flip the default; for now
+// erring on the side of counting real users.
+const BOT_UA_RE = new RegExp(
+  "\\b(" +
+    [
+      "googlebot",
+      "bingbot",
+      "yandexbot",
+      "baiduspider",
+      "duckduckbot",
+      "slurp",
+      "semrushbot",
+      "ahrefsbot",
+      "mj12bot",
+      "petalbot",
+      "applebot",
+      "linkedinbot",
+      "facebookexternalhit",
+      "twitterbot",
+      "telegrambot",
+      "discordbot",
+      "slackbot",
+      "whatsapp/2\\.\\d", // link preview UA prefix, not the in-app browser
+      "phantomjs",
+      "headlesschrome",
+      "puppeteer",
+      "playwright",
+      "python-requests",
+      "wget",
+    ].join("|") +
+    ")\\b",
+  "i",
+);
 
 const isLikelyBotUA = (userAgent) => {
-  if (!userAgent) return true;
+  if (!userAgent) return false;
   return BOT_UA_RE.test(String(userAgent));
 };
 

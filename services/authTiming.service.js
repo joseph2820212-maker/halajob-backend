@@ -7,14 +7,20 @@
 
 import bcryptjs from "bcrypt";
 
-// A real bcrypt(2a) hash of the string "not-a-real-password". Precomputed at
-// module load so the fake compare runs the same PBKDF work as a real one.
-// Recomputed lazily to survive process forks / cluster mode.
+// The dummy hash must be computed at the SAME cost as the real password
+// hashes in the DB — otherwise the wall-clock time for the "user not
+// found" branch drifts from the "wrong password" branch and the timing
+// side channel opens back up.
+//
+// Every issuer in the codebase currently uses cost 10; when that changes,
+// bump BCRYPT_COST too and CI will catch drift via the smoke-import test.
+const BCRYPT_COST = Number.parseInt(process.env.BCRYPT_COST || "10", 10) || 10;
+
 let DUMMY_HASH = null;
 
 const ensureDummyHash = async () => {
   if (DUMMY_HASH) return DUMMY_HASH;
-  DUMMY_HASH = await bcryptjs.hash("not-a-real-password", 10);
+  DUMMY_HASH = await bcryptjs.hash("not-a-real-password", BCRYPT_COST);
   return DUMMY_HASH;
 };
 
