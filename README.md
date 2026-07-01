@@ -1,16 +1,17 @@
-# Hala Job
+# Hala Job — backend
 
-HalaJob is a Node.js/Express and MongoDB backend with a Vite web frontend and a
-Flutter mobile app. The current launch-hardening branch is:
+Node.js/Express and MongoDB backend for HalaJob. This repo is API-only; the
+web, admin, and mobile clients live in separate repos:
 
-```text
-codex/gate-a-mobile-ui-lock
-```
+- Website: `joseph2820212-maker/halajob-website`
+- Admin console: `joseph2820212-maker/halajob-admin`
+- Mobile (Flutter): `joseph2820212-maker/halajob-mobile`
 
-> Historical note: "JobZain" was an earlier internal/product name. The public product name is now **Hala Job** (operated by llill ltd; public web domain halajob.com). The backend API domain may temporarily remain `jobzain.com` as a technical URL — see `BRAND_CLEANUP_AUDIT.md`.
+The trunk in this repo is `main`. Historical launch-hardening work happened on
+`codex/gate-a-mobile-ui-lock` and `flutter-seeker-campus` in the pre-split
+monorepo (`joseph2820212-maker/halajobe`); those branches do not exist here.
 
-The launch source branch remains `flutter-seeker-campus`; new hardening branches
-should be based directly on it.
+> Historical note: "JobZain" was an earlier internal/product name. The public product name is now **Hala Job** (operated by llill ltd; public web domain halajob.com). The backend API domain may temporarily remain `jobzain.com` as a technical URL — see `docs/legacy/BRAND_CLEANUP_AUDIT.md`.
 
 ## Repository Map
 
@@ -23,10 +24,9 @@ should be based directly on it.
 | Services/helpers | `services/`, `helper/`, `utils/` |
 | Validation | `validations/`, `middlewares/validate.js` |
 | Verification scripts | `scripts/` |
-| Web frontend | `web/` |
-| Flutter mobile app | `mobile/` |
 | Generated API docs | `docs/api/` |
 | Security/testing docs | `docs/security/`, `docs/testing/` |
+| Legacy cross-app docs | `docs/legacy/` (kept for history from the pre-split monorepo) |
 
 ## Start Here
 
@@ -83,52 +83,26 @@ NODE_ENV=development
 
 See `docs/ENVIRONMENT.md` for the full environment reference.
 
-## Web Frontend
+## Web / Admin / Mobile clients
 
-```bash
-npm --prefix web ci
-npm --prefix web run build
-npm --prefix web test
-```
+These live in their own repos and each has its own README with build, test,
+and deploy instructions:
 
-Frontend environment:
+- Website (customer, green theme): `joseph2820212-maker/halajob-website`
+- Admin console: `joseph2820212-maker/halajob-admin`
+- Mobile (Flutter): `joseph2820212-maker/halajob-mobile`
 
-```text
-VITE_API_URL=https://jobzain.com
-VITE_ENABLE_UNIVERSITY_PREVIEW=false
-```
-
-The root `vercel.json` builds the `web/` app for Vercel deployments.
-
-## Mobile App
-
-```bash
-cd mobile
-flutter pub get
-flutter analyze
-flutter test
-```
-
-The tester APK is local/debug signed unless a production signing strategy is
-configured. Do not call an APK fresh unless it was rebuilt from the current
-source. Campus tester builds can enable local-device campus auth for UI/device
-QA; production campus auth should use the backend.
+The root `vercel.json` here deploys the backend API.
 
 ## Verification
 
-Use `docs/TESTING_GUIDE.md` as the source of truth. Core branch checks include:
+Use `docs/TESTING_GUIDE.md` as the source of truth. Core backend checks
+include:
 
 ```bash
-npm run test:launch-gate
-npm run test:launch-gate:backend
-npm run test:launch-gate:web
-npm run test:launch-gate:ui-contracts
-npm run test:launch-gate:mobile
 npm run check:secrets
 npm run check:syntax
 npm run check:imports
-npm run test:syria-docs
-npm run test:production-launch-evidence
 npm run smoke:import
 npm run smoke:http
 npm run smoke:cors
@@ -139,18 +113,17 @@ npm run test:response-codes
 npm run test:model-integrity
 npm run test:mixed-fields
 npm run test:data-retention
-npm run test:object-authorization
-npm run test:audit-logging
-npm run test:integration:syria-product
-npm run check:web-routes
-npm run test:launch-gate:web
-npm run test:web-smoke
+npm run test:syria-docs
+npm run test:production-launch-evidence
 ```
 
-CI also runs the web build, unit tests, `npm --prefix web run e2e`, and Flutter
-`pub get`/`analyze`/`test` on the Linux verification job. Run
-`npm run test:launch-gate:mobile` on a machine with Flutter on PATH before
-calling a mobile release ready.
+Web-, admin-, and mobile-side checks now run in the sibling repos' own CI —
+each repo's workflow builds only itself, which is the main reason for the
+split. Cross-repo launch-gate scripts that assumed the old monorepo layout
+(`test:launch-gate:web`, `test:launch-gate:mobile`, `check:web-routes`,
+`test:web-smoke`) may still exist in this repo's `package.json` from before
+the split, but should be treated as historical unless they operate purely on
+the backend surface.
 
 Regenerate source-of-truth docs after route/model/auth/contract changes:
 
