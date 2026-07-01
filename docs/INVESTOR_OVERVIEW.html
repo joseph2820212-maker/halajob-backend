@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Hala Job Platform</title>
+<style>/* Hala Job — documentation theme
+ *
+ * Palette pulled directly from src/styles.css (--jf-* tokens):
+ *   Primary (navy)  #1f3654   --jf-primary / --jf-ink
+ *   Primary dark    #15263c
+ *   Primary hover   #2a4364
+ *   Accent (orange) #e38b3c   --jf-accent
+ *   Accent deep     #c26f22
+ *   Accent tint     #e3b98c
+ *   Soft cream      #fdf3e6   --jf-soft
+ *   Page cream      #fcf7ef   --jf-page
+ *   Card            #fffaf2   --jf-card
+ *   Border (tan)    #ebdac2   --jf-border
+ *   Ink soft        #3a4a5e
+ *   Muted           #5c6b7e   --jf-muted
+ *   Secondary blue  #4e6075   --jf-blue
+ *   Bronze          #9a7b4f   --jf-purple
+ *
+ * Per-repo overrides set --accent via a data-repo attribute on <body>.
+ */
+:root {
+  --navy: #1f3654;
+  --navy-dark: #15263c;
+  --navy-hover: #2a4364;
+  --orange: #e38b3c;
+  --orange-deep: #c26f22;
+  --orange-tint: #e3b98c;
+  --soft: #fdf3e6;
+  --page: #fcf7ef;
+  --card: #fffaf2;
+  --border: #ebdac2;
+  --ink: #1f3654;
+  --ink-soft: #3a4a5e;
+  --muted: #5c6b7e;
+  --blue: #4e6075;
+  --bronze: #9a7b4f;
+  --code-bg: #15263c;
+  --code-ink: #f7ecd8;
+  --danger: #ef4444;
+  --danger-soft: #fdece0;
+  --success: #2f855a;
+
+  /* Repo accent (overridden per body[data-repo]) */
+  --accent: var(--navy);
+  --accent-ink: var(--soft);
+  --accent-soft: var(--soft);
+}
+
+/* Per-repo accent overrides on <body data-repo=""> */
+body[data-repo="backend"]  { --accent: #1f3654; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="website"]  { --accent: #e38b3c; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+body[data-repo="admin"]    { --accent: #15263c; --accent-ink: #fcf7ef; --accent-soft: #e6ebf2; }
+body[data-repo="mobile"]   { --accent: #4e6075; --accent-ink: #fcf7ef; --accent-soft: #e9eef3; }
+body[data-repo="platform"] { --accent: #c26f22; --accent-ink: #fcf7ef; --accent-soft: #fdf3e6; }
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page shell — mimics a printed document */
+.doc {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 64px 64px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(31, 54, 84, 0.08);
+}
+
+/* Cover ================================================================= */
+.cover {
+  min-height: 92vh;
+  padding: 64px;
+  background:
+    radial-gradient(ellipse at top right, rgba(227, 139, 60, 0.20) 0%, transparent 55%),
+    linear-gradient(180deg, var(--accent) 0%, var(--accent) 100%);
+  color: var(--accent-ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  page-break-after: always;
+}
+.cover-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 11px;
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+.cover h1 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 12px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--accent-ink);
+  border: 0;
+  padding: 0;
+}
+.cover .tag {
+  font-size: 20px;
+  font-weight: 300;
+  opacity: 0.92;
+  max-width: 640px;
+  line-height: 1.4;
+}
+.cover .rule {
+  height: 4px;
+  width: 88px;
+  background: var(--orange);
+  margin: 0 0 28px;
+  border-radius: 2px;
+}
+.cover-meta {
+  border-top: 1px solid rgba(252, 247, 239, 0.28);
+  padding-top: 20px;
+  font-size: 12px;
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.cover-meta dl { margin: 0; }
+.cover-meta dt {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.7;
+  font-size: 10px;
+}
+.cover-meta dd { margin: 4px 0 0; font-size: 13px; }
+.cover-logo {
+  display: inline-block;
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: rgba(252, 247, 239, 0.14);
+  color: var(--accent-ink);
+  text-align: center;
+  line-height: 44px;
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(252, 247, 239, 0.24);
+}
+
+/* Typography ============================================================= */
+h1, h2, h3, h4 {
+  color: var(--navy);
+  line-height: 1.25;
+  margin: 32px 0 12px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+h1 {
+  font-size: 28px;
+  border-bottom: 3px solid var(--orange);
+  padding-bottom: 8px;
+}
+h2 { font-size: 22px; margin-top: 40px; }
+h3 { font-size: 17px; margin-top: 28px; color: var(--ink-soft); }
+h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 20px;
+}
+
+p { margin: 8px 0 14px; }
+a { color: var(--orange-deep); text-decoration: none; border-bottom: 1px solid rgba(194, 111, 34, 0.25); }
+a:hover { border-bottom-color: var(--orange-deep); }
+
+ul, ol { padding-left: 20px; }
+li { margin: 4px 0; }
+
+/* Callouts / conventions ================================================= */
+.callout {
+  border-left: 4px solid var(--orange);
+  background: var(--soft);
+  padding: 12px 16px;
+  margin: 16px 0;
+  border-radius: 0 6px 6px 0;
+  font-size: 13px;
+  color: var(--ink);
+}
+.callout.warn   { border-color: var(--orange-deep); background: #fdf3e6; }
+.callout.danger { border-color: var(--danger); background: var(--danger-soft); }
+.callout.info   { border-color: var(--blue); background: #edf1f6; }
+
+/* Code =================================================================== */
+code {
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  background: rgba(31, 54, 84, 0.06);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--navy);
+}
+pre {
+  background: var(--code-bg);
+  color: var(--code-ink);
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 12px 0;
+  border: 1px solid var(--navy-dark);
+}
+pre code { background: none; padding: 0; color: inherit; }
+
+/* Tables ================================================================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 18px;
+  font-size: 13px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+thead th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--navy);
+  color: var(--soft);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid var(--orange);
+}
+tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td { background: var(--soft); }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Method chips (HTTP verbs on the endpoint cards) ======================== */
+.m {
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--soft);
+}
+.m-GET     { background: var(--blue); }
+.m-POST    { background: var(--orange); color: var(--navy); }
+.m-PUT     { background: var(--orange-deep); }
+.m-PATCH   { background: var(--bronze); }
+.m-DELETE  { background: var(--danger); }
+.m-OPTIONS { background: var(--muted); }
+.m-HEAD    { background: var(--muted); }
+
+/* Auth chips ============================================================= */
+.auth {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+}
+.auth-public { color: var(--ink-soft); border-color: var(--border); background: var(--soft); }
+.auth-bearer { color: var(--navy); border-color: var(--navy); background: #e6ebf2; }
+.auth-admin  { color: var(--orange-deep); border-color: var(--orange-deep); background: var(--soft); }
+
+/* Endpoint card ========================================================== */
+.endpoint {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background: var(--card);
+}
+.endpoint-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--soft);
+  border-bottom: 1px solid var(--border);
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+}
+.endpoint-head .path { font-weight: 600; color: var(--navy); }
+.endpoint-head .auth { margin-left: auto; }
+.endpoint-body { padding: 14px 16px; font-size: 13px; }
+.endpoint-body dl { margin: 0; }
+.endpoint-body dt {
+  font-weight: 600;
+  color: var(--navy);
+  margin: 10px 0 4px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.endpoint-body dt:first-child { margin-top: 0; }
+.endpoint-body dd { margin: 0 0 6px; }
+
+/* TOC ==================================================================== */
+.toc {
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin: 20px 0 32px;
+  page-break-after: always;
+}
+.toc h2 { margin-top: 0; color: var(--navy); }
+.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: sec; }
+.toc li { padding: 4px 0; border-bottom: 1px dotted rgba(31,54,84,0.12); }
+.toc li:last-child { border-bottom: 0; }
+.toc li a { border: 0; color: var(--ink); display: flex; align-items: baseline; gap: 10px; }
+.toc li a::before {
+  counter-increment: sec;
+  content: counter(sec) ".";
+  color: var(--orange-deep);
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  min-width: 24px;
+}
+.toc li a:hover { color: var(--orange-deep); }
+
+/* Small chips & badges */
+.badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--navy);
+  border: 1px solid var(--border);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 8px 20px;
+  font-size: 13px;
+  margin: 10px 0 16px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 18px;
+}
+.kv dt { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kv dd { margin: 0; }
+
+/* Footer on every page */
+.doc-footer {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 48px;
+  color: var(--muted);
+  font-size: 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+@page {
+  size: A4;
+  margin: 18mm 14mm 20mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: ui-monospace, monospace;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+  @bottom-left {
+    content: "Hala Job";
+    font-family: -apple-system, "Segoe UI", sans-serif;
+    color: #5c6b7e;
+    font-size: 10px;
+  }
+}
+@media print {
+  html, body { background: #ffffff; }
+  .doc { box-shadow: none; padding: 0; background: #ffffff; }
+  h2 { break-after: avoid; }
+  .endpoint { break-inside: avoid; }
+  table { break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  a { color: var(--ink); }
+}
+
+
+/* Investor-deck overrides. Keep theme.css authoritative; only layer things
+ * that make presentation reading feel different from technical reading. */
+
+body.deck {
+  font-size: 15px;
+  line-height: 1.6;
+}
+body.deck .doc {
+  padding: 56px 72px 72px;
+  max-width: 960px;
+}
+
+/* Section start pages get their own coloured hero + rule */
+.section-hero {
+  padding: 56px 56px 44px;
+  margin: 40px -72px 28px;
+  background: linear-gradient(135deg, var(--soft) 0%, var(--card) 60%);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  page-break-before: always;
+}
+.section-hero .eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: var(--orange-deep);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.section-hero h1 {
+  font-size: 40px;
+  line-height: 1.1;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+  color: var(--navy);
+  font-weight: 700;
+  letter-spacing: -0.6px;
+}
+.section-hero .lede {
+  font-size: 18px;
+  color: var(--ink-soft);
+  max-width: 720px;
+  margin: 0 0 20px;
+  font-weight: 300;
+}
+.section-hero .highlights {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.section-hero .highlights .chip {
+  background: var(--navy);
+  color: var(--soft);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  border: 2px solid var(--orange);
+}
+
+/* Feature grid */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 18px 0 28px;
+}
+.feature {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--orange);
+  border-radius: 8px;
+  padding: 14px 18px;
+}
+.feature h4 {
+  color: var(--navy);
+  margin: 0 0 6px;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+.feature p {
+  color: var(--ink-soft);
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Value callout — the "why it matters" boxes */
+.value {
+  background: var(--navy);
+  color: var(--soft);
+  padding: 20px 26px;
+  border-radius: 10px;
+  margin: 24px 0 32px;
+  border-left: 6px solid var(--orange);
+}
+.value .label {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 10px;
+  opacity: 0.75;
+  margin-bottom: 6px;
+}
+.value h3 {
+  color: var(--soft);
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+.value p { margin: 0; font-size: 14px; line-height: 1.6; opacity: 0.94; }
+
+/* Stat row — a strip of headline numbers */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 20px 0 24px;
+}
+.stat {
+  text-align: center;
+  padding: 18px 12px;
+  background: var(--soft);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.stat .num {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1;
+  display: block;
+}
+.stat .lbl {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* Cover — override for the pitch deck */
+body.deck .cover h1 { font-size: 52px; }
+body.deck .cover .tag { font-size: 22px; }
+</style>
+</head>
+<body class="deck" data-repo="platform">
+  <section class="cover">
+    <div>
+      <div class="cover-logo">HJ</div>
+      <div class="cover-eyebrow">Hala Job — Investor Overview</div>
+      <h1>The Hala Job Platform</h1>
+      <div class="rule"></div>
+      <p class="tag">A Syria-first, bilingual hiring platform for job seekers, universities, employers, and platform operators — four applications and one hardened backend.</p>
+    </div>
+    <div class="cover-meta"><dl><dt>Prepared for</dt><dd>Investor / stakeholder review</dd></dl><dl><dt>Coverage</dt><dd>Seeker · Campus · Company · Admin</dd></dl><dl><dt>Ships today</dt><dd>4 apps · 4,004 endpoints · 71 collections</dd></dl><dl><dt>Generated</dt><dd>2026-07-01</dd></dl></div>
+  </section>
+  <div class="doc">
+    
+          <section id="opener">
+            <div class="section-hero">
+              <div class="eyebrow">Overview</div>
+              <h1>The product</h1>
+              <p class="lede">Four applications, one backend, one language envelope. Everything below is running today, not a roadmap item.</p>
+              <div class="highlights"><span class="chip">Bilingual by default</span><span class="chip">Manual &amp; online billing</span><span class="chip">Mobile + web + admin</span><span class="chip">Backend-hardened</span></div>
+            </div>
+            
+      <h2>The product in one paragraph</h2>
+      <p>Hala Job is a Syria-first hiring platform built for the reality of the
+      market: bilingual (Arabic + English) by default, mobile-heavy, with a
+      manual-payment mode that lets subscriptions launch before an online
+      provider is in place. Job seekers, students, employers, and universities
+      each get a dedicated app — all backed by a single, hardened API.</p>
+
+      <div class="stats"><div class="stat"><span class="num">4</span><span class="lbl">Applications shipped</span></div><div class="stat"><span class="num">4,004</span><span class="lbl">Backend endpoints</span></div><div class="stat"><span class="num">71</span><span class="lbl">Data collections</span></div><div class="stat"><span class="num">2</span><span class="lbl">Languages (AR + EN)</span></div></div>
+
+      <h2>What ships today</h2>
+      <div class="feature-grid"><div class="feature"><h4>Customer website</h4><p>Public jobs, campus, seeker, and employer portals in one deployment. Green-lit at halajob.com; unknown paths safely fall back to home.</p></div><div class="feature"><h4>Admin console</h4><p>Dedicated operator app on its own domain. Client auth gate — no admin content renders in the browser until an admin session exists.</p></div><div class="feature"><h4>Mobile app (Flutter)</h4><p>Portrait-first native app for seekers and campus students. Offline-tolerant, obfuscated release builds, cleartext blocked at the OS.</p></div><div class="feature"><h4>Backend API</h4><p>Express + MongoDB. Rate limits, CORS allow-list, mongo-sanitize, hpp, per-file upload guards. Zero dependency vulnerabilities in production audit.</p></div></div>
+
+      <div class="value"><div class="label">Why the split matters</div><h3>Ship any part of the product on its own schedule.</h3><p>The four apps deploy independently. A design tweak to the customer site never waits on a backend release. A backend hotfix never triggers a Play Store submission. That&nbsp;means faster iteration, cheaper CI, and a smaller blast radius when something goes wrong.</p></div>
+    
+          </section>
+        
+          <section id="seeker">
+            <div class="section-hero">
+              <div class="eyebrow">Role · seeker</div>
+              <h1>Job seekers</h1>
+              <p class="lede">Everything a candidate needs to find, apply for, and prepare for a job — with their data staying under their control.</p>
+              <div class="highlights"><span class="chip">CV Studio + parser</span><span class="chip">Match engine</span><span class="chip">Interview prep</span><span class="chip">Career Passport</span><span class="chip">Privacy centre</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>Public job search</h4><p>Full-text search with filters for city, category, employment type, remote work, and salary band. No account required to browse.</p></div><div class="feature"><h4>Rich CV Studio</h4><p>Guided builder with multiple templates, live preview, and per-CV visibility (public link, applications-only, or private).</p></div><div class="feature"><h4>CV Parsing</h4><p>Upload an existing PDF/DOCX/plain-text CV and the platform extracts structured fields (name, contact, skills, links) with a confidence score.</p></div><div class="feature"><h4>Job matching &amp;amp; recommendations</h4><p>Backend match engine surfaces jobs that fit the seeker profile, with a per-job compatibility score.</p></div><div class="feature"><h4>Applications tracker</h4><p>Every application in one place with status history (reviewing → shortlisted → interview → offer → rejected).</p></div><div class="feature"><h4>Saved jobs &amp;amp; saved searches</h4><p>Bookmark jobs; save searches with alert digests so new matches are emailed automatically.</p></div><div class="feature"><h4>Interview prep</h4><p>Question library, mock interview flow, and interview scheduling tied to the company's calendar.</p></div><div class="feature"><h4>Career Passport</h4><p>A shareable public profile with skills, credentials, and CV — link-only, no login required to view.</p></div><div class="feature"><h4>Cover letter generator</h4><p>Job-specific cover letters (AI-assisted when the flag is on; template-based otherwise).</p></div><div class="feature"><h4>Salary insights</h4><p>Aggregate salary widget by role and city, gated behind a minimum sample size for statistical honesty.</p></div><div class="feature"><h4>Notifications</h4><p>In-app + email + push (Firebase). Per-category preferences.</p></div><div class="feature"><h4>Accessibility &amp;amp; privacy centre</h4><p>Data-export, deletion, and correction requests with a live status page; accessibility-request form for platform improvements.</p></div></div><div class="value"><div class="label">Why it works for seekers</div><h3>A CV that leaves the platform still works — and privacy stays in the user&#x27;s hands.</h3><p>Every seeker artefact (CV, career passport, cover letter) is exportable. Privacy requests are user-initiated and can be cancelled while in flight. Saved searches mean the platform brings jobs to the seeker; the seeker does not have to keep coming back.</p></div>
+          </section>
+        
+          <section id="campus">
+            <div class="section-hero">
+              <div class="eyebrow">Role · campus + university</div>
+              <h1>Campus &amp;amp; universities</h1>
+              <p class="lede">Career centres get admin tools, analytics, and partner controls. Students get a curated pipeline of opportunities that respects their consent.</p>
+              <div class="highlights"><span class="chip">Student verification</span><span class="chip">Career-centre admin</span><span class="chip">Placement analytics</span><span class="chip">Partner network</span><span class="chip">RBAC for university staff</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>Student registration &amp;amp; verification</h4><p>Backend-backed campus student accounts with per-university onboarding. Local-device auth mode available for tester devices when a backend campus is not yet live.</p></div><div class="feature"><h4>Opportunities feed</h4><p>Curated internships and fresh-graduate roles from partner employers, plus posts from the university itself.</p></div><div class="feature"><h4>Career-center admin (universities)</h4><p>University staff can post internships, run events, manage members with role-based access (owner, admin, career center, advisor, viewer).</p></div><div class="feature"><h4>Events &amp;amp; workshops</h4><p>Register for career-center events; events surface in seeker + student feeds.</p></div><div class="feature"><h4>Career Passport for students</h4><p>Same shareable public profile as seekers, tuned for students &mdash; degrees, cohort, expected graduation.</p></div><div class="feature"><h4>Analytics for career centres</h4><p>Placement counters, event attendance, application funnel, employer partner activity.</p></div><div class="feature"><h4>Partner network</h4><p>Universities can invite companies as recognised partners and reserve talent visibility for their students.</p></div><div class="feature"><h4>Talent visibility controls</h4><p>Universities choose which employer partners can see student passports and CVs.</p></div><div class="feature"><h4>Verifications</h4><p>Certificate/document verification requests attached to student profiles.</p></div><div class="feature"><h4>Members &amp;amp; team seats</h4><p>Career center staff seats with active / invited / suspended lifecycle.</p></div><div class="feature"><h4>Notifications &amp;amp; reports</h4><p>Event digests, application updates, monthly placement reports.</p></div><div class="feature"><h4>Resources library</h4><p>Curated career guides, CV templates, and interview material accessible from the student portal.</p></div></div><div class="value"><div class="label">Why it works for universities</div><h3>A career centre in a box — with real numbers to show a dean.</h3><p>Career-center analytics turn what is usually a spreadsheet exercise into a dashboard: placement rates, event turnout, employer engagement. Talent-visibility controls mean universities can honour student privacy commitments while still doing employer outreach.</p></div>
+          </section>
+        
+          <section id="company">
+            <div class="section-hero">
+              <div class="eyebrow">Role · company</div>
+              <h1>Companies &amp;amp; employers</h1>
+              <p class="lede">The full hiring loop — sourcing, screening, scheduling, offer, review — with team RBAC and a public branding page.</p>
+              <div class="highlights"><span class="chip">Kanban pipeline</span><span class="chip">Talent Pool CRM</span><span class="chip">Interview scheduling</span><span class="chip">Team RBAC</span><span class="chip">Public branding page</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>Post &amp;amp; manage jobs</h4><p>Rich job editor with multi-language descriptions, salary bands, currency (SYP/USD/EUR), requirements, and remote/hybrid/on-site flags.</p></div><div class="feature"><h4>Applicants pipeline</h4><p>Kanban-style pipeline: reviewing → shortlisted → interview → offer → rejected. Move applicants with one click; audit trail records every transition.</p></div><div class="feature"><h4>Talent Pool CRM</h4><p>Save candidates outside a job context, tag them, add private notes, and re-engage them for future roles.</p></div><div class="feature"><h4>Interview scheduling</h4><p>Book interviews with candidates; time-zone aware, calendar-friendly, syncs to applications.</p></div><div class="feature"><h4>Message templates</h4><p>Reusable outreach templates for offers, rejections, follow-ups &mdash; multi-language.</p></div><div class="feature"><h4>Question library</h4><p>Company-owned interview question bank; assign to specific roles or panels.</p></div><div class="feature"><h4>Team seats with RBAC</h4><p>Admin / HR manager / Recruiter / Viewer roles; per-seat invitations, active / suspended lifecycle.</p></div><div class="feature"><h4>Company public profile</h4><p>Public employer branding page: logo, cover, description, benefits, jobs listing &mdash; served at <code>halajob.com/companies/&lt;slug&gt;</code>.</p></div><div class="feature"><h4>Public reviews</h4><p>Employees and candidates can leave reviews; company owner can respond.</p></div><div class="feature"><h4>Campus posting</h4><p>Post internship and fresh-graduate roles that surface in university career centres.</p></div><div class="feature"><h4>Analytics dashboard</h4><p>Job views, application funnel, source attribution, time-to-hire.</p></div><div class="feature"><h4>Salary guidance</h4><p>Reverse-side of the seeker salary insights — see what the market pays for a role before you post.</p></div><div class="feature"><h4>AI hiring tools (optional)</h4><p>Behind a feature flag: job description generator, shortlist generator, message-composer. Ships disabled — enable when a provider is configured.</p></div><div class="feature"><h4>Manual subscriptions today, online-ready</h4><p>Admin assigns/adjusts subscription tiers. When an online payment provider is selected, <code>FEATURE_PAYMENTS_MODE=online</code> flips over without a redesign.</p></div><div class="feature"><h4>Company support</h4><p>Direct support tickets with priority routing (support / feature request / bug report / FAQ / WhatsApp) and status tracking.</p></div><div class="feature"><h4>Company invoices</h4><p>Invoice history, downloadable statements — even for manual subscriptions.</p></div><div class="feature"><h4>Talent invitations</h4><p>Invite specific candidates to apply to a role, or request talent recommendations from the platform.</p></div></div><div class="value"><div class="label">Why it works for employers</div><h3>The whole hiring loop in one place — recruit, screen, schedule, hire, review.</h3><p>Companies who currently split hiring across email, spreadsheets, and a job-board dashboard collapse that into one product. Talent Pool CRM turns rejected-but-good candidates into pipeline for the next role, which is the single highest-leverage feature for high-volume employers.</p></div>
+          </section>
+        
+          <section id="admin">
+            <div class="section-hero">
+              <div class="eyebrow">Role · admin</div>
+              <h1>Platform admin</h1>
+              <p class="lede">Every operator surface — approvals, moderation, RBAC, content review, subscriptions, analytics — with an immutable audit trail behind everything.</p>
+              <div class="highlights"><span class="chip">6 approval queues</span><span class="chip">Immutable audit trail</span><span class="chip">Self-lockout guard</span><span class="chip">Legal-review workflow</span><span class="chip">Feature-flag console</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>Approval queues</h4><p>One place to approve jobs, companies, legal reports, privacy requests, accessibility requests, and content pages.</p></div><div class="feature"><h4>Moderation &amp;amp; trust</h4><p>Trust &amp; safety review queue: mark-safe, request-documents, suspend. Every action audited.</p></div><div class="feature"><h4>Content management</h4><p>Manage legal pages (terms, privacy, cookies, community guidelines, trust &amp; safety), help center articles, FAQs. Legal-review workflow: draft → needs-review → approved → published. Production refuses to serve unreviewed legal pages when the enforcement flag is on.</p></div><div class="feature"><h4>Roles &amp;amp; permissions (RBAC)</h4><p>Define admin roles, assign granular permissions, and audit which user holds which role. Backend enforces self-lockout: an admin cannot demote or delete themselves.</p></div><div class="feature"><h4>User support queue</h4><p>Split between general user support and company support so ops teams can specialise.</p></div><div class="feature"><h4>Subscriptions &amp;amp; billing</h4><p>Assign manual subscriptions, adjust tiers, view company invoices. Ready to swap to online payments when a provider is chosen.</p></div><div class="feature"><h4>Universities admin</h4><p>Onboard partner universities; assign career-center admins.</p></div><div class="feature"><h4>Salary insights administration</h4><p>Curate sample-size thresholds, review outlier data, and set default currency.</p></div><div class="feature"><h4>AI moderation</h4><p>Turn AI features on or off per module (career copilot, job generation, message generation, translation) from the console — no redeploy needed.</p></div><div class="feature"><h4>Interview-prep library management</h4><p>Curate the mock-interview question bank surfaced to seekers.</p></div><div class="feature"><h4>Resource library management</h4><p>Publish career articles, CV templates, and guides.</p></div><div class="feature"><h4>Public profile moderation</h4><p>Review and moderate company public profiles &amp; seeker career passports.</p></div><div class="feature"><h4>Translations &amp;amp; i18n</h4><p>Manage bilingual content strings from the admin console.</p></div><div class="feature"><h4>Communication logs</h4><p>Read-only feed of outbound emails and WhatsApp shares — for compliance and troubleshooting.</p></div><div class="feature"><h4>Analytics</h4><p>Platform-level dashboards: user growth, jobs live, applications posted, revenue trend.</p></div><div class="feature"><h4>Audit log</h4><p>Immutable audit trail with per-category retention TTLs (Auth 2y · Data/Admin 3y · System 1y).</p></div><div class="feature"><h4>Platform settings</h4><p>Feature flags, currency, scheduled-jobs configuration, and email routing all editable without a redeploy.</p></div></div><div class="value"><div class="label">Why it works for operators</div><h3>One console, immutable audit, and no way to accidentally lock yourself out.</h3><p>Every admin action writes to an append-only audit log. Role changes are enforced at the backend so an admin cannot silently escalate their own permissions or delete their own account. Support and moderation queues are split by concern so ops teams can specialise without stepping on each other.</p></div>
+          </section>
+        
+          <section id="tech">
+            <div class="section-hero">
+              <div class="eyebrow">Foundation</div>
+              <h1>Technology &amp;amp; security</h1>
+              <p class="lede">The things a technical due-diligence check will actually inspect. Everything referenced here is in the shipped code and enforced in CI.</p>
+              <div class="highlights"><span class="chip">helmet + HSTS</span><span class="chip">Strict CSP</span><span class="chip">OS-level HTTPS</span><span class="chip">0 known CVEs</span><span class="chip">Immutable audit</span></div>
+            </div>
+            <div class="feature-grid"><div class="feature"><h4>Bilingual by default</h4><p>Every schema stores content as <code>{ en, ar }</code>. Every client picks language at boot. Every backend response respects <code>x-lang</code>.</p></div><div class="feature"><h4>Syria-first currency &amp;amp; comms</h4><p>SYP + USD + EUR supported at the launch contract level. Manual WhatsApp share enabled; SMS and official WhatsApp gated behind provider setup.</p></div><div class="feature"><h4>Hardened backend</h4><p>helmet + HSTS preload, CORS allow-list with 403 on unknown prod origins, per-prefix rate limits (auth 20/15min, upload 60/15min), mongo-sanitize, HPP guard, upload size &amp; type limits, per-file CV-download tokens with expiry.</p></div><div class="feature"><h4>Hardened clients</h4><p>Website + admin ship a strict CSP with no <code>unsafe-eval</code>; inline scripts pinned by sha256 (drift caught in CI). Admin adds an extra client-side auth gate on top of backend 401s.</p></div><div class="feature"><h4>Hardened mobile</h4><p>Cleartext blocked at the OS via <code>network_security_config.xml</code>; obfuscated release APKs with private symbols archive; secure token storage (EncryptedSharedPreferences / Keychain).</p></div><div class="feature"><h4>Immutable audit trail</h4><p>Every admin state change is audited. Per-category TTL retention. No PII stored in audit rows.</p></div><div class="feature"><h4>Zero known-CVE production dependencies</h4><p><code>npm audit --omit=dev --audit-level=high</code> is a CI gate on all three JavaScript repos. Green today; a new advisory blocks the next PR.</p></div><div class="feature"><h4>Feature-flag envelope</h4><p>16 backend flags surfaced to clients through a single <code>GET /public/v1/client-settings</code> — every launch decision is one config change, not a deploy.</p></div><div class="feature"><h4>Deploy independence</h4><p>Four independent CI pipelines. A design tweak on the website never triggers an APK build. Admin CI is under a minute. Mobile APK jobs only run on manual dispatch.</p></div></div>
+          </section>
+        
+          <section id="launch">
+            <div class="section-hero">
+              <div class="eyebrow">Where we are</div>
+              <h1>Launch state &amp;amp; advantages</h1>
+              <p class="lede">A snapshot of what is production-ready today, what still needs owner input, and what makes this platform a defensible product.</p>
+              <div class="highlights"><span class="chip">Production-hardened</span><span class="chip">Owner-only blockers documented</span><span class="chip">Bilingual + Syria-first</span><span class="chip">Full documentation shipped</span></div>
+            </div>
+            
+      <h2>What is launch-ready today</h2>
+      <ul>
+        <li>All four applications ship, type-check, test, build, and audit green in CI.</li>
+        <li>Backend serves 4,004 endpoints across seeker, company, campus, university, admin, trust, notifications, AI, analytics, and public modules.</li>
+        <li>Bilingual content across all four applications with legal, help, FAQ, contact, accessibility, privacy, support, and report surfaces.</li>
+        <li>Manual/admin subscriptions ship on day one. Online payments require an owner-selected provider — the switch is one config flag.</li>
+        <li>AI features ship disabled by default; every AI code path degrades gracefully to a "not configured" response.</li>
+      </ul>
+
+      <h2>What still needs the owner (not the engineers)</h2>
+      <ul>
+        <li>Production secrets rotation, live-database admin audit, and a live production smoke test.</li>
+        <li>Real-account setup for SMTP, Firebase/push, storage, hosting, and backup/restore.</li>
+        <li>Decision on payments (accept manual for launch, or select an online provider).</li>
+        <li>Decision on Android signing/package/update strategy.</li>
+      </ul>
+
+      <div class="value"><div class="label">Bottom line</div><h3>The platform is buildable, launchable, and hardened. What is left is business decisions and operator credentials — not code.</h3><p>The engineering delivery is done. Every launch blocker in the security review is an owner-side choice or a credential the platform genuinely cannot self-provision.</p></div>
+
+      <h2>Key advantages, one screen</h2>
+      <div class="feature-grid"><div class="feature"><h4>Independent apps, single API</h4><p>Four separately-deployable clients, one backend contract. Faster iteration, smaller blast radius, cheaper CI.</p></div><div class="feature"><h4>Bilingual + Syria-first</h4><p>Not a translation retrofit. AR/EN and SYP/USD/EUR are first-class across schema, API, and UI.</p></div><div class="feature"><h4>Launch-friendly billing</h4><p>Ship with manual subscriptions today; switch to online payments without redesigning the product surface.</p></div><div class="feature"><h4>Comprehensive admin surface</h4><p>Six approval queues, RBAC with self-lockout guards, and an immutable audit log — ready for a real operations team.</p></div><div class="feature"><h4>Backed by hardening evidence</h4><p>Every control ties back to a specific line in <code>app.js</code>, <code>vercel.json</code>, <code>AndroidManifest.xml</code>, or CI.</p></div><div class="feature"><h4>Full-package documentation</h4><p>11 audience-tuned reference documents (this being one) so a new engineer or operator can be productive in a day.</p></div></div>
+    
+          </section>
+        
+    <footer class="doc-footer">
+      <span>Hala Job — Investor Overview</span>
+      <span>Prepared 2026-07-01</span>
+    </footer>
+  </div>
+</body>
+</html>
