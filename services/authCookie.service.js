@@ -71,15 +71,32 @@ const clearAllRefreshCookies = (res) => {
   Object.values(REFRESH_COOKIE_NAMES).forEach((name) => res.clearCookie(name, cookieOptions()));
 };
 
+// Refresh-token extraction. For web clients (identified by X-Web-Client
+// / X-Web-Auth-Scope headers) we prefer the httpOnly cookie and IGNORE
+// body/header refresh tokens — otherwise the "httpOnly cookie protection"
+// is undermined by every accompanying x-refresh-token header, and any XSS
+// that reads a JS-accessible refresh token still wins.
+//
+// Native mobile clients continue to use the header/body path since they
+// don't run in a cookie jar.
 const refreshTokenFromRequest = (req, fallbackScope = "seeker") => {
+  const cookies = parseCookies(req.get?.("cookie"));
+  const cookieValue =
+    cookies[refreshCookieName(webAuthScope(req, fallbackScope))] || "";
+
+  if (isWebAuthRequest(req)) {
+    // Cookie only. If a caller (accidentally or maliciously) sent an
+    // additional body/header refresh token, ignore it.
+    return cookieValue;
+  }
+
   const explicit =
     req.body?.refreshToken ||
     req.body?.refresh_token ||
     req.get?.("x-refresh-token");
   if (explicit) return explicit;
 
-  const cookies = parseCookies(req.get?.("cookie"));
-  return cookies[refreshCookieName(webAuthScope(req, fallbackScope))] || "";
+  return cookieValue;
 };
 
 export {

@@ -14,6 +14,7 @@ import {
   refreshTokenFromRequest,
   setRefreshCookie,
 } from '../../services/authCookie.service.js';
+import { burnBcryptCycles } from '../../services/authTiming.service.js';
 
 const msg = (lan, ar, en) => (lan === 'ar' ? ar : en);
 const normEmail = (email) => String(email || '').trim().toLowerCase();
@@ -178,6 +179,9 @@ const login = async (req, res) => {
           .populate('permissions');
 
     if (!user) {
+      // Match wall-clock latency with the wrong-password branch — admin
+      // login is the highest-value target for enumeration.
+      await burnBcryptCycles(password);
       await auditAdminAuth(req, {
         action: 'admin_login_failed',
         identifier,

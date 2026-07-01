@@ -6,6 +6,7 @@ import { CvTemplateModel, EmployeeCvModel } from "../../../models/index.js";
 import { buildCvTemplateData } from "../../../services/cv/cvData.service.js";
 import { generatePdfFromHtml, renderCvHtml } from "../../../services/cv/cvPdf.service.js";
 import { fail, getEmployeeOrFail, getEmployeePlain, success } from "../../../helper/employeeDash/employeeDashHelpers.js";
+import { hashCvPublicToken } from "../../../services/cvPublicToken.service.js";
 
 const CV_OUTPUT_ROOT = path.resolve("cv", "generated");
 const CV_ROOT = path.resolve("cv");
@@ -117,7 +118,11 @@ export const createMyCvDownloadUrl = async (req, res, next) => {
     const fileName = `generated-${randomBytes(12).toString("hex")}.pdf`;
     const filePath = path.join(CV_OUTPUT_ROOT, fileName);
     const publicPath = path.posix.join("cv", "generated", fileName);
+    // The plaintext token is what the recipient uses in the share URL. The
+    // hash is what we store in the DB so a DB leak can't turn into a working
+    // share link. See services/cvPublicToken.service.js.
     const publicDownloadToken = randomBytes(24).toString("hex");
+    const publicDownloadTokenHash = hashCvPublicToken(publicDownloadToken);
     const publicDownloadExpiresAt = new Date(Date.now() + PUBLIC_CV_URL_TTL_MINUTES * 60 * 1000);
     const makeDefault = Boolean(req.body?.is_default);
     await fs.promises.writeFile(filePath, pdf);
@@ -138,7 +143,7 @@ export const createMyCvDownloadUrl = async (req, res, next) => {
       source: "builder",
       status: "active",
       last_exported_at: new Date(),
-      public_download_token: publicDownloadToken,
+      public_download_token: publicDownloadTokenHash,
       public_download_expires_at: publicDownloadExpiresAt,
       is_default: makeDefault,
     });

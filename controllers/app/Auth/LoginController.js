@@ -3,6 +3,7 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import { UserModel, RefreshTokenModel } from "../../../models/index.js";
 import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
+import { burnBcryptCycles } from "../../../services/authTiming.service.js";
 import {
   buildRoleDto,
   buildUserDto,
@@ -116,6 +117,9 @@ const login = async (req, res, next) => {
       : await UserModel.findOne({ phone_national: identifier });
 
     if (!user) {
+      // Equalize wall-clock time so an attacker can't discover which emails
+      // are registered by watching response latency.
+      await burnBcryptCycles(password);
       return ReturnAppData.createError({
         res,
         status: 400,

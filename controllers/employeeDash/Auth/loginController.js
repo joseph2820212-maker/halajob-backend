@@ -3,6 +3,7 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { EmployeeModel, RoleModel, UserModel } from "../../../models/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";
 import { recordAnalyticsEvent } from "../../../services/analytics/analyticsEvent.service.js";
+import { burnBcryptCycles } from "../../../services/authTiming.service.js";
 
 const msg = (lan, ar, en) => (lan === "ar" ? ar : en);
 
@@ -103,6 +104,9 @@ const login = async (req, res, next) => {
    : await UserModel.findOne({ phone_national: identifier }).populate("role_id");
 
   if (!user) {
+   // Match wall-clock latency with the wrong-password branch so an attacker
+   // can't discover which emails have employee accounts by timing responses.
+   await burnBcryptCycles(password);
    return ReturnAppData.createError({
     res,
     status: 400,

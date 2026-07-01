@@ -11,6 +11,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createRateLimitStore } from "./services/rateLimitStore.js";
+import { verifyCvPublicToken } from "./services/cvPublicToken.service.js";
 
 import routes from "./routes/index.js";
 import userRoutes from "./routesUser/index.js";
@@ -308,8 +309,8 @@ const verifyGeneratedCvPublicAccess = async (req, fileName) => {
     throw new ApiError(403, "invalid_cv_public_link_token", "CV");
   }
 
-  const expectedToken = String(cv.public_download_token || "").trim();
-  if (!expectedToken) {
+  const storedToken = String(cv.public_download_token || "").trim();
+  if (!storedToken) {
     throw new ApiError(403, "cv_public_link_token_required", "CV");
   }
 
@@ -318,7 +319,10 @@ const verifyGeneratedCvPublicAccess = async (req, fileName) => {
     throw new ApiError(410, "cv_public_link_expired", "CV");
   }
 
-  if (generatedCvTokenFromRequest(req) !== expectedToken) {
+  // Timing-safe compare, and handles both SHA-256 stored rows (new default)
+  // and legacy plaintext rows so pending share links keep working after this
+  // deploy lands. See services/cvPublicToken.service.js.
+  if (!verifyCvPublicToken(generatedCvTokenFromRequest(req), storedToken)) {
     throw new ApiError(403, "invalid_cv_public_link_token", "CV");
   }
 };

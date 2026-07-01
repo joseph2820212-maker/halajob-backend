@@ -3,6 +3,7 @@ import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { sendRecoveryEmail } from "../../../helper/sendEmail.js";
 import { RoleModel, UserModel } from "../../../models/index.js";
 import { generatePasscode, hashPasscode } from "../../../services/passcodeHash.service.js";
+import { burnBcryptCycles } from "../../../services/authTiming.service.js";
 import { verifyUserFromRefreshTokenPayload } from "../../../services/authService.js";
 import {
   clearRefreshToken,
@@ -137,6 +138,7 @@ const login = async (req, res, next) => {
       : await UserModel.findOne({ phone_national: identifier });
 
     if (!user) {
+      await burnBcryptCycles(password);
       return ReturnAppData.createError({
         res,
         status: 400,

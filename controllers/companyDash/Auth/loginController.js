@@ -19,6 +19,7 @@ import {
   refreshTokenFromRequest,
   setRefreshCookie,
 } from "../../../services/authCookie.service.js";
+import { burnBcryptCycles } from "../../../services/authTiming.service.js";
 
 const msg = (lan, ar, en) => (lan === "ar" ? ar : en);
 const normEmail = (email) =>
@@ -188,6 +189,9 @@ const login = async (req, res, next) => {
         );
 
     if (!user) {
+      // Match latency with the "wrong password" branch so the response
+      // timing doesn't leak whether the account exists.
+      await burnBcryptCycles(password);
       return ReturnAppData.createError({
         res,
         status: 400,
