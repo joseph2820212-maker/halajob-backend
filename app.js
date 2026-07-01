@@ -13,6 +13,7 @@ import { fileURLToPath } from "url";
 import { createRateLimitStore } from "./services/rateLimitStore.js";
 import { verifyCvPublicToken } from "./services/cvPublicToken.service.js";
 import { httpMetricsMiddleware, metricsHandler, isMetricsEnabled } from "./services/metrics.service.js";
+import { idempotencyMiddleware } from "./middlewares/idempotency.js";
 
 import routes from "./routes/index.js";
 import userRoutes from "./routesUser/index.js";
@@ -163,6 +164,13 @@ if (isMetricsEnabled()) {
   // eslint-disable-next-line no-console
   console.log("[metrics] GET /metrics enabled");
 }
+
+/* ----------------------------- Idempotency ----------------------------- */
+
+// Middleware is a no-op unless the request is a POST AND carries an
+// Idempotency-Key header AND REDIS_URL is reachable. On a match, replays
+// the cached response instead of running the handler.
+app.use(idempotencyMiddleware);
 
 /* ----------------------------- Rate Limits ----------------------------- */
 
