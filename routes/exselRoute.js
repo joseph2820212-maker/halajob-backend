@@ -18,8 +18,18 @@ const router = express.Router();
 router.post('/create', upload.single("file"), validate(adminSchemas.importUploadSchema), controller.create);
 router.post('/csv', upload.single("file"), validate(adminSchemas.importUploadSchema), controller.csv);
 router.post('/exsel', upload.single("file"), validate(adminSchemas.importUploadSchema), UploadJobName.uploadExcel);
+// Demo-data seeder. Never mounted in production. Was a GET, moved to POST
+// because it does insertMany (writes) and browsers/crawlers can prefetch GETs.
+// The GET responds 410 for one release cycle to surface any stale caller.
 if (process.env.NODE_ENV !== 'production') {
-  router.get('/insert', InsertDemoDataController.insert);
+  router.post('/insert', InsertDemoDataController.insert);
+  router.get('/insert', (_req, res) =>
+    res.status(410).json({
+      success: false,
+      message: 'gone',
+      hint: 'POST /exsel/insert (moved because the operation writes to the DB).',
+    }),
+  );
 }
 
 // استرجاع البيانات

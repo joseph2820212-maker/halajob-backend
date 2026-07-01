@@ -14,7 +14,18 @@ const router = express.Router();
 // رفع ملف واحد مع البيانات
 router.get('/get', upload.none(), controller.get);
 router.post('/update/:id', upload.none(), validate(adminSchemas.keywordUpdateSchema), controller.updateKeyWord);
-router.get('/log', upload.none(), controller.logKeyword);
+// logKeyword resets the keyword collection (deleteMany + create) from the
+// bundled ar/en JSON. Was a GET; moved to POST because the operation writes
+// to the DB and would be triggered by any browser prefetch or link crawler.
+// GET returns 410 for one release cycle to surface stale callers.
+router.post('/log', upload.none(), controller.logKeyword);
+router.get('/log', (_req, res) =>
+  res.status(410).json({
+    success: false,
+    message: 'gone',
+    hint: 'POST /keyword/log (moved because the operation rebuilds the DB).',
+  }),
+);
 // استرجاع البيانات
 
 

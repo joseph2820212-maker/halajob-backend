@@ -433,11 +433,44 @@ const decorateJobs = async (jobs, userId, employee, options = {}) => {
   });
 };
 
+// Regex covers the crawler/prefetch User-Agents most commonly hitting us in
+// the wild plus the generic "bot"/"spider"/"crawl" tokens. Skipping markSeen
+// for these means view counters no longer inflate when a search engine
+// crawls the jobs feed or a link preview service prefetches a job URL.
+const BOT_UA_RE =
+  /(bot|crawl|spider|prefetch|preview|scrape|monitoring|axios|okhttp|wget|curl|python-requests|headlesschrome|phantomjs|slurp|semrush|ahrefs|yandex|baidu|duckduck|bing|googlebot|linkedinbot|whatsapp|telegrambot|facebookexternalhit|twitterbot|discordbot)/i;
+
+const isLikelyBotUA = (userAgent) => {
+  if (!userAgent) return true;
+  return BOT_UA_RE.test(String(userAgent));
+};
+
 const markSeen = async (userId, jobIds = []) => {
   if (!userId || !jobIds.length) return;
   const operations = jobIds.map((jobId) => ({ updateOne: { filter: { user_id: userId, job_id: jobId }, update: { $setOnInsert: { user_id: userId, job_id: jobId } }, upsert: true } }));
   await UserShowJobModel.bulkWrite(operations, { ordered: false }).catch(() => null);
   await jobsModel.updateMany({ _id: { $in: jobIds } }, { $inc: { user_show: 1, "search_index.score_signals.views": 1 } }).catch(() => null);
+};
+
+// New POST beacon. Clients that used ?mark_seen=true on the list endpoint
+// should now call this after the render step. Split off the side effect so
+// the GET list handler is safe against browser prefetch / crawler traffic.
+export const markJobsSeen = async (req, res) => {
+  try {
+    const userId = req.user?._id ? String(req.user._id) : null;
+    if (!userId) {
+      return ReturnAppData.getError({ res, status: 401, message: "unauthorized" });
+    }
+    const rawIds = Array.isArray(req.body?.job_ids) ? req.body.job_ids : [];
+    const jobIds = rawIds.filter(isValidId).map((id) => new Types.ObjectId(String(id)));
+    if (!jobIds.length) {
+      return ReturnAppData.getData({ res, data: { marked: 0 } });
+    }
+    await markSeen(userId, jobIds);
+    return ReturnAppData.getData({ res, data: { marked: jobIds.length } });
+  } catch (error) {
+    return ReturnAppData.getError({ res, status: 500, message: error?.message || "mark_seen_failed" });
+  }
 };
 
 const recordJobFilterAnalytics = ({ req, filters, page, limit, total }) => {
@@ -522,7 +555,15 @@ const get = async (req, res, next) => {
     const total = agg?.meta?.[0]?.total || 0;
     const data = await decorateJobs(rawItems, userId, employee, { lang });
 
-    if (parseBool(req.query.mark_seen) === true) await markSeen(userId, rawItems.map((x) => x._id));
+    // Legacy: some clients still pass ?mark_seen=true on the list GET. Honour
+    // it, but skip when the request looks like a crawler/prefetch so the view
+    // counters don't inflate. Clients should migrate to POST /user/v1/job/mark-seen.
+    if (
+      parseBool(req.query.mark_seen) === true &&
+      !isLikelyBotUA(req.get("user-agent"))
+    ) {
+      await markSeen(userId, rawItems.map((x) => x._id));
+    }
     recordJobFilterAnalytics({ req, filters, page, limit, total });
 
     return ReturnAppData.getData({
@@ -929,7 +970,12 @@ const getById = async (req, res, next) => {
       });
     }
 
-    await markSeen(userId, [job._id]);
+    // Analytics-style view counter. Deliberately allowed on a GET (small,
+    // best-effort, no user-visible state change). Filtered to skip crawlers
+    // and prefetch UAs so views aren't inflated.
+    if (!isLikelyBotUA(req.get("user-agent"))) {
+      await markSeen(userId, [job._id]);
+    }
     recordAnalyticsEvent({
       req,
       event: "job_viewed",
@@ -972,4 +1018,4 @@ const getById = async (req, res, next) => {
   }
 };
 
-export default { get, getFilters, getById };
+export default { get, getFilters, getById, markJobsSeen };
