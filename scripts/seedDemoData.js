@@ -25,7 +25,7 @@
  */
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import bcryptjs from "bcryptjs";
+import bcryptjs from "bcrypt";
 import {
   UserModel,
   RoleModel,

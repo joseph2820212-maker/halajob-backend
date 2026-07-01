@@ -1,7 +1,7 @@
 import { UserModel } from '../models/index.js';
 import httpStatus from 'http-status';
 import APIError from '../utils/apiError.js';
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcrypt";
 
 // Helper: normalize email
 const normEmail = (e) => (e || '').trim().toLowerCase();

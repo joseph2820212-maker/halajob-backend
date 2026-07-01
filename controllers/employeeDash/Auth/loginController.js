@@ -1,4 +1,4 @@
-import bcryptjs from "bcryptjs";
+import bcryptjs from "bcrypt";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { EmployeeModel, RoleModel, UserModel } from "../../../models/index.js";
 import { generateAuthTokens } from "../../../services/tokenService.js";

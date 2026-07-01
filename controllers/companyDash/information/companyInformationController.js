@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import fs from "fs/promises";
 import { existsSync } from "fs";
 import path from "path";
-import bcryptjs from "bcryptjs";
+import bcryptjs from "bcrypt";
 import {
   getCompanyOrFail,
   getCompanyPlain,

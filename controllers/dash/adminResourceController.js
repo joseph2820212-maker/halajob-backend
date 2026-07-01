@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import bcryptjs from 'bcryptjs';
+import bcryptjs from "bcrypt";
 import ReturnDashData from '../../helper/ReturnDashData/index.js';
 import { writeAuditLog } from '../../services/auditLog.service.js';
 import { ensureCompanySubscription } from '../../services/subscriptions/companySubscription.service.js';

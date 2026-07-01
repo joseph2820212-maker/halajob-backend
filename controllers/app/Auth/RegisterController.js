@@ -1,4 +1,4 @@
-import bcryptjs from "bcryptjs";
+import bcryptjs from "bcrypt";
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import RoleModel from "../../../models/RoleModel.js";
 import { CountryModel, EmployeeModel, UserModel } from "../../../models/index.js";

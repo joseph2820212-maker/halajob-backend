@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { UserModel, RoleModel } from "../models/index.js";
 
 const buildSeedAdmins = () => {

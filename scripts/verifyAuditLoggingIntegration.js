@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import bcryptjs from "bcryptjs";
+import bcryptjs from "bcrypt";
 import mongoose from "mongoose";
 import { IntegrationMongoServer as MongoMemoryServer } from "./utils/integrationMongo.js";
 

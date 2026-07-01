@@ -8,7 +8,7 @@ import {
   serializeCompany,
   serializeEmployee,
 } from "../../../services/appAccount.service.js";
-import bcryptjs from "bcryptjs";
+import bcryptjs from "bcrypt";
 import { setRefreshCookie, webAuthScope } from "../../../services/authCookie.service.js";
 
 const normStr = (v) => (typeof v === "string" ? v.trim().toLowerCase() : "");

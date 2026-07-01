@@ -5,7 +5,7 @@
 // skips bcrypt entirely and returns in single-digit ms, while the wrong-
 // password branch pays ~100ms for the bcryptjs.compare().
 
-import bcryptjs from "bcryptjs";
+import bcryptjs from "bcrypt";
 
 // A real bcrypt(2a) hash of the string "not-a-real-password". Precomputed at
 // module load so the fake compare runs the same PBKDF work as a real one.

@@ -1,6 +1,6 @@
 import ReturnAppData from "../../../helper/ReturnAppData/index.js";
 import { UserModel, RefreshTokenModel } from "../../../models/index.js";
-import bcryptjs from "bcryptjs";
+import bcryptjs from "bcrypt";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { deleteImage } from "../../../services/imageService.js";
 
