@@ -27,7 +27,11 @@ const { logger } = await import("../../services/logger.service.js");
 process.stdout.write = origStdout;
 process.stderr.write = origStderr;
 
-const runCaptured = (fn) => {
+// Async-safe: the finally block waits for the fn's promise to settle
+// before restoring stdout/stderr. The sync-only version leaked writes
+// from any deferred logger call into the real streams — corrupting the
+// TAP output that node --test emits.
+const runCaptured = async (fn) => {
   captured = [];
   process.stdout.write = (chunk) => {
     captured.push({ stream: "stdout", chunk: String(chunk) });
@@ -38,7 +42,7 @@ const runCaptured = (fn) => {
     return true;
   };
   try {
-    fn();
+    await fn();
   } finally {
     process.stdout.write = origStdout;
     process.stderr.write = origStderr;
@@ -46,8 +50,8 @@ const runCaptured = (fn) => {
   return captured;
 };
 
-test("logger.info emits JSON to stdout", () => {
-  const out = runCaptured(() => logger.info("hello", { user_id: 42 }));
+test("logger.info emits JSON to stdout", async () => {
+  const out = await runCaptured(() => logger.info("hello", { user_id: 42 }));
   assert.equal(out.length, 1);
   assert.equal(out[0].stream, "stdout");
   const record = JSON.parse(out[0].chunk);
@@ -57,10 +61,10 @@ test("logger.info emits JSON to stdout", () => {
   assert.ok(record.ts);
 });
 
-test("logger.error emits JSON to stderr", () => {
+test("logger.error emits JSON to stderr", async () => {
   const err = new Error("boom");
   err.code = "E_BOOM";
-  const out = runCaptured(() => logger.error("something failed", { err }));
+  const out = await runCaptured(() => logger.error("something failed", { err }));
   assert.equal(out.length, 1);
   assert.equal(out[0].stream, "stderr");
   const record = JSON.parse(out[0].chunk);
@@ -72,9 +76,9 @@ test("logger.error emits JSON to stderr", () => {
   assert.ok(record.err.stack);
 });
 
-test("logger.child bindings appear on every child event", () => {
+test("logger.child bindings appear on every child event", async () => {
   const child = logger.child({ request_id: "abc" });
-  const out = runCaptured(() => child.info("hi"));
+  const out = await runCaptured(() => child.info("hi"));
   const record = JSON.parse(out[0].chunk);
   assert.equal(record.request_id, "abc");
 });

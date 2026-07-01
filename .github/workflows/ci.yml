@@ -54,11 +54,17 @@ jobs:
       # artifacts are committed under docs/api/. If a route or middleware
       # changed but the docs weren't regenerated, this step fails so the
       # author has to run `npm run docs:api-artifacts` locally and commit.
+      #
+      # Uses `git status --porcelain docs/api/` (not `git diff`) so newly-
+      # created untracked artifacts also trip the check — a bare `git diff`
+      # would miss a brand-new file added by the generator.
       - name: Fail on OpenAPI drift
         run: |
-          if ! git diff --quiet docs/api/HALAJOB_OPENAPI.yaml docs/api/HALAJOB_API_REFERENCE.md docs/api/HALAJOB_POSTMAN_COLLECTION.json docs/api/HALAJOB_ROUTE_INVENTORY.json; then
+          drift="$(git status --porcelain docs/api/)"
+          if [ -n "$drift" ]; then
             echo "::error::OpenAPI / route inventory drift detected. Run 'npm run docs:api-artifacts' + 'npm run docs:route-report' and commit the results."
-            git --no-pager diff --stat docs/api/HALAJOB_OPENAPI.yaml docs/api/HALAJOB_API_REFERENCE.md docs/api/HALAJOB_POSTMAN_COLLECTION.json docs/api/HALAJOB_ROUTE_INVENTORY.json
+            echo "$drift"
+            git --no-pager diff --stat docs/api/ | head -40
             exit 1
           fi
 
