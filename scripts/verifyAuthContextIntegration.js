@@ -63,6 +63,20 @@ async function expectRefreshTokenCleared(RefreshTokenModel, token, label) {
   assert.equal(exists, null, `${label} should delete the refresh token record`);
 }
 
+async function expectRefreshTokenRetired(RefreshTokenModel, token, label) {
+  // Rotation (P1-03 reuse detection) intentionally does NOT delete the
+  // previous refresh-token row; it retires it in place (is_active:false) so a
+  // later replay of the same token can be detected and the whole family
+  // revoked. The security property under test is that the old token can no
+  // longer authenticate a session, i.e. no ACTIVE row with this token remains.
+  const activeExists = await RefreshTokenModel.exists({ token, is_active: true });
+  assert.equal(
+    activeExists,
+    null,
+    `${label} should retire (invalidate) the refresh token record`,
+  );
+}
+
 async function main() {
   mongo = await MongoMemoryServer.create({
     instance: {
@@ -1074,7 +1088,7 @@ async function main() {
     200,
     "company refresh-token alias should rotate a valid refresh token",
   );
-  await expectRefreshTokenCleared(
+  await expectRefreshTokenRetired(
     RefreshTokenModel,
     companyRefreshAliasTokens.refreshToken,
     "company refresh-token alias",
@@ -1102,7 +1116,7 @@ async function main() {
     "active",
     "company member refresh should include the active member context",
   );
-  await expectRefreshTokenCleared(
+  await expectRefreshTokenRetired(
     RefreshTokenModel,
     companyMemberRefreshTokens.refreshToken,
     "company member refresh-token",
@@ -1124,7 +1138,7 @@ async function main() {
     403,
     "company refresh-token should reject a removed company member token",
   );
-  await expectRefreshTokenCleared(
+  await expectRefreshTokenRetired(
     RefreshTokenModel,
     removedCompanyMemberRefreshTokens.refreshToken,
     "removed company member refresh-token",
