@@ -1,13 +1,21 @@
 # Local Auth QA Setup
 
-This setup gives you a repeatable local environment for the four web surfaces:
+This setup gives you a repeatable local environment to exercise auth across the
+web surfaces:
 
 - job seeker
 - company
-- admin
 - campus
+  (these three are served by the `halajob-website` repo)
+- admin
+  (served by the `halajob-admin` repo)
 
 It is meant for local development only.
+
+> Repo layout note: HalaJob was split out of the retired `halajobe` monorepo.
+> The backend is this repo (`halajob-backend`); the public site and the admin
+> console are the sibling repos `halajob-website` and `halajob-admin`. Clone the
+> repos you need side by side. Commands below say which repo to run them in.
 
 ## 1. Make sure MongoDB is available
 
@@ -18,47 +26,46 @@ You need a MongoDB database before the backend can start.
 
 ## 2. Create the backend env file
 
-Create a file named `.env.local` in the backend root:
-
-`work/halajobe/.env.local`
-
-Paste this:
+In the **`halajob-backend`** repo root, create a file named `.env.local`:
 
 ```text
 NODE_ENV=development
 PORT=3000
-CONNECTION_URL=mongodb://127.0.0.1:27017/halajobe_local
+CONNECTION_URL=mongodb://127.0.0.1:27017/halajob_local
 JWT_SECRET=hala-job-local-only-secret
 PUBLIC_BASE_URL=http://127.0.0.1:5173
-SEED_ADMIN_EMAIL=admin@halajobe.local
+SEED_ADMIN_ALLOW_CREATE=true
+SEED_ADMIN_EMAIL=admin@halajob.local
 SEED_ADMIN_PASSWORD=HalaDev123!
 SEED_ADMIN_FIRST_NAME=Local
 SEED_ADMIN_LAST_NAME=Admin
-SEED_ADMIN_PHONE=+10000000000
+SEED_ADMIN_PHONE_E164=+10000000000
 SEED_EMPLOYEE_PASSWORD=HalaDev123!
 SEED_COMPANY_PASSWORD=HalaDev123!
 ```
 
-The backend now loads `.env.local`, so you do not need to rename this file to `.env`.
+The backend loads `.env.local`, so you do not need to rename this file to `.env`.
+`SEED_ADMIN_ALLOW_CREATE=true` is required for the seeder to create the local
+admin (see `docs/DEPLOYMENT.md` → First Admin Procedure).
 
 ## 3. Create the frontend env file
 
-Create a file named `.env.local` in the web app:
-
-`work/halajobe/web/.env.local`
-
-Paste this:
+In the **`halajob-website`** repo root, create a file named `.env.local`:
 
 ```text
 VITE_API_URL=http://127.0.0.1:3000
 VITE_ENABLE_UNIVERSITY_PREVIEW=true
 ```
 
-`VITE_ENABLE_UNIVERSITY_PREVIEW=true` keeps the university dashboard visible for review even before private campus backend records are ready.
+`VITE_ENABLE_UNIVERSITY_PREVIEW=true` keeps the university dashboard visible for
+review even before private campus backend records are ready.
+
+If you also want to test the admin console, create the same `.env.local`
+(`VITE_API_URL=http://127.0.0.1:3000`) in the **`halajob-admin`** repo root.
 
 ## 4. Install backend packages
 
-Open a terminal in `work/halajobe` and run:
+In the **`halajob-backend`** repo, run:
 
 ```bash
 npm ci
@@ -66,7 +73,7 @@ npm ci
 
 ## 5. Seed the database
 
-Still in `work/halajobe`, run:
+Still in **`halajob-backend`**, run:
 
 ```bash
 npm run seed
@@ -76,7 +83,7 @@ If seeding works, you should see the seeders complete without `CONNECTION_URL` o
 
 ## 6. Start the backend
 
-Still in `work/halajobe`, run:
+Still in **`halajob-backend`**, run:
 
 ```bash
 npm run dev
@@ -86,7 +93,7 @@ Leave that terminal running.
 
 ## 7. Start the frontend
 
-Open a second terminal in `work/halajobe/web` and run:
+Open a second terminal in the **`halajob-website`** repo and run:
 
 ```bash
 npm ci
@@ -99,12 +106,16 @@ Open the local URL printed by Vite. If it does not show a URL, try:
 http://127.0.0.1:5173
 ```
 
+For the admin console, run the same `npm ci && npm run dev` in the
+**`halajob-admin`** repo (it serves on its own Vite port, e.g.
+`http://127.0.0.1:5174`).
+
 ## 8. Test accounts created by the seeders
 
 Use these logins after `npm run seed` completes:
 
 - Admin
-  - email: `admin@halajobe.local`
+  - email: `admin@halajob.local`
   - password: `HalaDev123!`
 - Job seekers
   - emails: `employee1@gmail.com` through `employee10@gmail.com`
@@ -124,7 +135,7 @@ Use these logins after `npm run seed` completes:
 If the backend says `Missing required environment variables: CONNECTION_URL, JWT_SECRET`, check:
 
 - the file is named `.env.local`
-- the file is in `work/halajobe`
+- the file is in the `halajob-backend` repo root
 - you restarted the backend after creating the file
 
 If the frontend loads but buttons do not fetch data, check:

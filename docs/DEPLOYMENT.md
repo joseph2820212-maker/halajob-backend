@@ -1,8 +1,11 @@
 # Deployment Guide
 
 Date: 2026-06-28
-Scope: backend, web, mobile release, and production verification rules for
-HalaJob.
+Scope: the HalaJob **backend** service (this repo) and its production
+verification rules. The web, admin, and mobile clients now live in their own
+repos (`halajob-website`, `halajob-admin`, `halajob-mobile`) and deploy from
+there — this guide only references them where the backend deploy depends on
+them. See "Web Deploy Steps" and "Mobile Release Rules" below.
 
 ## Required Pre-Deploy Checks
 
@@ -28,10 +31,11 @@ npm run test:object-authorization
 npm run test:audit-logging
 npm run test:file-export-audit
 npm run test:integration:subscriptions
-npm --prefix web ci --ignore-scripts
-npm --prefix web run build
-npm --prefix web test
 ```
+
+The web and admin frontends are no longer part of this repo — run their
+build/test gates in `halajob-website` and `halajob-admin` (each has its own
+CI). Do not attempt `npm --prefix web …`; there is no `web/` folder here.
 
 Run the remaining seeded integration suites listed in `docs/TESTING_GUIDE.md`
 when deploying a broad launch candidate or when touching the related feature

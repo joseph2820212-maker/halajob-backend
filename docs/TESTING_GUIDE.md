@@ -128,34 +128,29 @@ notifications, analytics, subscriptions, company/university membership,
 admin permissions/support/resources, translations, job mutations, hiring
 workflows, and campus workflows.
 
-## Web Checks
+## Web / Admin Checks
 
-```bash
-npm --prefix web ci --ignore-scripts
-npm --prefix web run build
-npm --prefix web test
-npm --prefix web run e2e
-npm run test:web-smoke
-```
+The public site and admin console are separate repos now — run their build and
+test gates there, not from this repo (there is no `web/` folder here):
 
-Current web tests cover API auth/path behavior, scoped 401 logout, URL helpers,
-i18n helpers, and route smoke rendering for home, jobs, campus, company, seeker,
-and admin views. `npm --prefix web run e2e` and the root shortcut
-`npm run test:web-smoke` both start a local Vite preview, run the Puppeteer
-portal smoke across the main web portals, and then stop the preview server.
+- `halajob-website` — `npm ci && npm run build && npm test` (see its README)
+- `halajob-admin` — `npm ci && npm run build && npm test` (see its README)
+
+Each repo has its own CI covering typecheck, build, and route/smoke tests.
 
 ## Mobile Checks
 
+The Flutter app lives in the `halajob-mobile` repo. From that repo:
+
 ```bash
-cd mobile
 flutter pub get
 flutter analyze
 flutter test
 ```
 
-For a tester APK, use the mobile PowerShell scripts documented under
-`mobile/scripts/`. A campus tester build can use local-device campus auth for UI
-QA; production campus mode must use the backend.
+For a tester APK and signing steps, follow `halajob-mobile/README.md` and
+`halajob-mobile/docs/mobile-release-checklist.md`. A campus tester build can use
+local-device campus auth for UI QA; production campus mode must use the backend.
 
 ## Generated Docs
 
@@ -181,30 +176,28 @@ docs/DATABASE_MODELS.md
 ```
 
 If `npm run docs:api-pdf` cannot find Python, use any Python 3 environment with
-`reportlab`. On this Codex workstation, the bundled Python runtime is:
-
-```text
-C:\Users\Admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe
-```
+`reportlab` installed and run `python scripts/generateApiReferencePdf.py`
+directly.
 
 ## CI
 
 GitHub Actions workflow:
 
 ```text
-.github/workflows/flutter-mobile-ci.yml
+.github/workflows/ci.yml
 ```
 
-It runs for pushes to `flutter-seeker-campus`, `codex/**`, `claude/**`, pull
-requests into `flutter-seeker-campus`, and manual dispatch.
+It runs on every push and every pull request (no branch filter).
 
-Current CI includes backend syntax/import/secret/i18n checks, route validation,
-response-code contract, model integrity, Mixed-field register, global launch
-contract, mobile route contract, web build/tests/e2e, launch-critical
-integration coverage, Syria product integration coverage, security HTTP
-contract, Flutter analyze/tests, and mobile palette protection. Android release
-smoke builds and campus tester APK artifacts run on manual dispatch or the
-release branch to control Actions minutes.
+This is the **backend** CI (the repo was split out of the retired `halajobe`
+monorepo). It includes backend syntax/import/secret/i18n checks, route
+validation, response-code contract, model integrity, Mixed-field register,
+global launch contract, mobile route contract (backend side), OpenAPI drift
+gate, launch-critical integration coverage, Syria product integration coverage,
+security HTTP contract, and the seeded auth-context integration suite. The web,
+admin, and Flutter clients have their own CI in `halajob-website`,
+`halajob-admin`, and `halajob-mobile`; front-end build/test/e2e and Flutter
+analyze/APK gates no longer run from this repo.
 
 ## Production-Only Proof
 

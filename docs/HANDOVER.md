@@ -1,7 +1,7 @@
 # HalaJob Backend Handover
 
 Date: 2026-06-28
-Branch: `codex/gate-a-mobile-ui-lock`
+Branch: `main` (this repo was split out of the retired `halajobe` monorepo)
 Scope: backend API, database, security baseline, deployment, and mobile/web integration reference.
 
 This document is the operational handover for running, verifying, deploying, and maintaining the HalaJob backend. It does not contain secrets. Keep all real credentials in the hosting provider, local `.env`, or a secret manager only.
@@ -178,11 +178,12 @@ npm run test:integration:student-verification-documents
 npm run test:integration:employee-cv-downloads
 npm run test:integration:job-mutations
 npm run test:integration:hiring-workflows
-npm --prefix web run build
-npm --prefix web test
-npm --prefix web run e2e
-npm run test:web-smoke
 ```
+
+The web/admin build, test, and e2e gates run in their own repos
+(`halajob-website`, `halajob-admin`) — there is no `web/` folder in this repo,
+so the old `npm --prefix web …` / `npm run test:web-smoke` commands no longer
+apply here.
 
 Then regenerate docs:
 
@@ -198,9 +199,6 @@ If `npm run docs:api-pdf` cannot find Python, run the generator directly with an
 ```bash
 python scripts/generateApiReferencePdf.py
 ```
-
-On this Codex workstation, the bundled Python runtime is available under
-`C:\Users\Admin\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`.
 
 ## API Documentation
 

@@ -66,6 +66,15 @@ Scope: backend runtime and handover reference. Values in this file are descripti
 | `FIREBASE_SERVICE_ACCOUNT_PATH` | If push enabled | Path to runtime-only service account file. Do not commit. |
 | `GOOGLE_APPLICATION_CREDENTIALS` | If push enabled | Google credentials path for runtime. Do not commit. |
 
+For end-to-end FCM project setup (backend service account + mobile build
+defines), see `docs/PUSH_NOTIFICATIONS.md`.
+
+## Video interviews
+
+| Variable | Required | Purpose |
+|---|---:|---|
+| `HALA_JITSI_BASE_URL` | Optional | Base URL for company video-interview rooms (`FEATURE_VIDEO_INTERVIEWS_ENABLED`). Falls back to the public `https://meet.jit.si` when empty; set a self-hosted domain for private rooms. |
+
 ## AI
 
 | Variable | Required | Purpose |
